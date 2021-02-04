@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Formbar Setup</title>
+  <style>
+
+  </style>
+</head>
+
+<body>
+  <h1 style="color: blue">Formbar Setup</h1>
+  <div>
+  <form action="settings" method="post">
+  <!--
+    <table border="1">
+      <tr><td>Red</td><td>Green</td><td>Blue</td></tr>
+        <tr>
+            <td><input type="number" id="nr" name="r" min="0" max="255" value="0"></td>
+            <td><input type="number" id="ng" name="g" min="0" max="255" value="0"></td>
+            <td><input type="number" id="nb" name="b" min="0" max="255" value="255"></td>
+        </tr>
+    </table>
+    -->
+    <input type="submit" value="Send Setup"><br>
+    <b>Question</b><br>
+    <input type="text" name="qQuestion"><br>
+    <b>Answers</b><br>
+    <input type="radio" name="quizlet" value="0" checked><input type="text" name="qaAnswer"><br>
+    <input type="radio" name="quizlet" value="1"><input type="text" name="qbAnswer"><br>
+    <input type="radio" name="quizlet" value="2"><input type="text" name="qcAnswer"><br>
+    <input type="radio" name="quizlet" value="3"><input type="text" name="qdAnswer"><br>
+  </form>
+  </div>
+  <div>
+        <table border= 1>
+            <tr>
+                <td><a href="/settings?students=1">1</a></td>
+                <td><a href="/settings?students=2">2</a></td>
+                <td><a href="/settings?students=3">3</a></td>
+                <td><a href="/settings?students=4">4</a></td>
+                <td><a href="/settings?students=5">5</a></td>
+            </tr>
+            <tr>
+                <td><a href="/settings?students=6">6</a></td>
+                <td><a href="/settings?students=7">7</a></td>
+                <td><a href="/settings?students=8">8</a></td>
+                <td><a href="/settings?students=9">9</a></td>
+                <td><a href="/settings?students=10">10</a></td>
+            </tr>
+            <tr>
+                <td><a href="/settings?students=11">11</a></td>
+                <td><a href="/settings?students=12">12</a></td>
+                <td><a href="/settings?students=13">13</a></td>
+                <td><a href="/settings?students=14">14</a></td>
+                <td><a href="/settings?students=15">15</a></td>
+            </tr>
+            <tr>
+                <td><a href="/settings?students=16">16</a></td>
+                <td><a href="/settings?students=17">17</a></td>
+                <td><a href="/settings?students=18">18</a></td>
+                <td><a href="/settings?students=19">19</a></td>
+                <td><a href="/settings?students=20">20</a></td>
+            </tr>
+            <tr>
+                <td><a href="/settings?students=21">21</a></td>
+                <td><a href="/settings?students=22">22</a></td>
+                <td><a href="/settings?students=23">23</a></td>
+                <td><a href="/settings?students=24">24</a></td>
+                <td><a href="/settings?students=25">25</a></td>
+            </tr>
+        </table>
+    </div>
+      <div>
+        <table border= 1>
+            <tr><td><a href="/settings?mode=thumbs">Thumbs</a></td></tr>
+            <tr><td><a href="/settings?mode=survey">Survey</a></td></tr>
+            <tr><td><a href="/settings?mode=quiz">Quiz</a></td></tr>
+            <tr><td><a href="/settings?mode=essay">Essay</a></td></tr>
+            <tr><td><a href="/settings?mode=help">Help Monitor</a></td></tr>
+            <tr><td><a href="/settings?mode=kahoot">Kahoots!</a></td></tr>
+            <tr><td><a href="/settings?mode=playtime">Playtime</a></td></tr>
+            <tr><td><a href="/settings?mode=blockchest">blockchest</a></td></tr>
+        </table>
+    </div>
+  <div>
+        <table border= 1>
+            <tr><td colspan=2><b>Settings</b></td></tr>
+            <tr><td colspan=2>Only whitelisted IPs can make changes</td></tr>
+            <tr><td><a href="/settings?locked=true">Locked</a></td><td><a href="/settings?locked=false">Unlocked</a></td></tr>
+            <tr><td colspan=2>Hide or show results until complete</td></tr>
+            <tr><td><a href="/settings?blind=true">Blind Results</a></td><td><a href="/settings?blind=false">Live Results</a></td></tr>
+            <tr><td colspan=2>Show incomplete bar when votes are missing</td></tr>
+            <tr><td><a href="/settings?showinc=true">Show empty spaces</a></td><td><a href="/settings?showinc=false">Fill bar</a></td></tr>
+            <tr><td colspan=2>Clear out submissions</td></tr>
+            <tr><td><a href="/settings?clear=quiz">Quiz</a></td><td><a href="/settings?clear=essay">Essay</a></td></tr>
+            <tr><td><a href="/settings?clear=formbar">Formbar</a></td><td><a href="/settings?clear=help">Help</a></td></tr>
+        </table>
+    </div>
+</body>
+
+</html>
+

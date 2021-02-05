@@ -21,19 +21,6 @@ log.setLevel(logging.ERROR)
 
 BARPIX = 240
 MAXPIX = 762
-perc = 0
-locked = False
-paused = False
-blind = False
-showInc = True
-mode = 'thumbs'
-modes = ['thumbs', 'survey', 'quiz', 'essay', 'help', 'kahoot', 'playtime', 'blockchest']
-whiteList = [
-    '127.0.0.1',
-    '172.21.3.5'
-    ]
-
-backButton = "<button onclick='window.history.back()'>Go Back</button><script language='JavaScript' type='text/javascript'>setTimeout(\"window.history.back()\",5000);</script>"
 
 pygame.init()
 
@@ -41,7 +28,33 @@ pixels = neopixel.NeoPixel(board.D21, MAXPIX, brightness=1.0, auto_write=False)
 
 app = Flask(__name__)
 
-numStudents = 8
+settingsBoolDict = {
+    'locked' : False,
+    'paused' : False,
+    'blind' : False,
+    'showinc' : True,
+    'captions' : True
+}
+settingsIntDict = {
+    'numStudents': 8
+}
+
+settingsStrDict = {
+    'mode': 'thumbs'
+}
+
+settingsStrList = {
+    'mode': ['thumbs', 'survey', 'quiz', 'essay', 'help', 'kahoot', 'playtime', 'blockchest']
+}
+
+settingsStrDict['mode'] = 'thumbs'
+settingsStrList['modes'] = ['thumbs', 'survey', 'quiz', 'essay', 'help', 'kahoot', 'playtime', 'blockchest']
+whiteList = [
+    '127.0.0.1',
+    '172.21.3.5'
+    ]
+
+settingsIntDict['numStudents'] = 8
 up = down = wiggle = 0
 ipList = {}
 helpList = {}
@@ -57,6 +70,17 @@ quizQuestion = ''
 quizAnswers = []
 quizCorrect = ''
 
+backButton = "<button onclick='window.history.back()'>Go Back</button><script language='JavaScript' type='text/javascript'>setTimeout(\"window.history.back()\",5000);</script>"
+
+def str2bool(strng):
+    strng.lower()
+    if strng == 'true':
+        return True
+    elif strng == 'false':
+        return False
+    else:
+        return strng
+
 def fadein(irange, current, color):
     return [int(x * (current / len(irange))) for x in color]
 
@@ -70,7 +94,7 @@ def blend(irange, current, color1, color2):
     return blendColor
 
 def addBlock():
-    global colorDict
+
     if blockList[-1][0] in colorDict:
         pixels[len(blockList)-1] = colorDict[blockList[-1][0]]
     else:
@@ -78,7 +102,7 @@ def addBlock():
     pixels.show()
 
 def fillBlocks():
-    global colorDict
+
     for i, block in enumerate(blockList):
         if block[0] in colorDict:
             pixels[i] = colorDict[block[0]]
@@ -98,6 +122,19 @@ def percFill(amount, fillColor=colors['green'], emptyColor=colors['red']):
             pixels[pix] = fillColor
         pixels[pix] = emptyColor
     pixels.show()
+
+def fillBar(color=colors['default'], stop=BARPIX, start=0):
+    #If you provide no args, the whole bar is made the default color
+    #If you provide one arg, the whole bar will be that color
+    #If you provide two args, the bar will be that color until the stop point
+    #If you provide three args, pixels between the stop and start points will be that color
+    for pix in range(start, stop):
+        pixels[pix] = color
+
+def clearBar():
+    #fill with default color to clear bar
+    for pix in range(0, BARPIX):
+        pixels[pix] = colors['default']
 
 def clearString():
     for i in range(BARPIX, MAXPIX):
@@ -130,26 +167,30 @@ def printLetter(letter, startLocation, fg=colors['fg'], bg=colors['bg']):
         print("Error! Not enough space for this letter!")
 
 def surveyBar():
-    #Create empty results list
-    results = []
-    #fill with default color to clear bar
-    for pix in range(0, BARPIX):
-        pixels[pix] = colors['default']
+    results = [] # Create empty results list
+    clearBar()
     #Go through IP list and see what each IP sent as a response
     for x in ipList:
         #add this result to the results list
         results.append(ipList[x])
+    #The number of results is how many have completed the survey
     complete = len(results)
     #calculate the chunk length for each student
-    chunkLength = math.floor(BARPIX / numStudents)
+    chunkLength = math.floor(BARPIX / settingsIntDict['numStudents'])
+    #Sort the results by "alphabetical order"
+    results.sort()
+    #Loop through each result, and show the correct color
     for index, result in enumerate(results):
+        #Calculate how long this chunk will be and where it starts
         pixRange = range((chunkLength * index), (chunkLength * index) + chunkLength)
+        #Fill in that chunk with the correct color
         if result == 'a':
             for i, pix in enumerate(pixRange):
+                #If it's the first pixel of the chunk, make it a special color
                 if i == 0:
                     pixels[pix] = colors['student']
                 else:
-                    if blind and complete != numStudents:
+                    if settingsBoolDict['blind'] and complete != settingsIntDict['numStudents']:
                         pixels[pix] = fadein(pixRange, i, colors['blind'])
                     else:
                         pixels[pix] = fadein(pixRange, i, colors['red'])
@@ -158,7 +199,7 @@ def surveyBar():
                 if i == 0:
                     pixels[pix] = colors['student']
                 else:
-                    if blind and complete != numStudents:
+                    if settingsBoolDict['blind'] and complete != settingsIntDict['numStudents']:
                         pixels[pix] = fadein(pixRange, i, colors['blind'])
                     else:
                         pixels[pix] = fadein(pixRange, i, colors['blue'])
@@ -167,7 +208,7 @@ def surveyBar():
                 if i == 0:
                     pixels[pix] = colors['student']
                 else:
-                    if blind and complete != numStudents:
+                    if settingsBoolDict['blind'] and complete != settingsIntDict['numStudents']:
                         pixels[pix] = fadein(pixRange, i, colors['blind'])
                     else:
                         pixels[pix] = fadein(pixRange, i, colors['yellow'])
@@ -176,17 +217,16 @@ def surveyBar():
                 if i == 0:
                     pixels[pix] = colors['student']
                 else:
-                    if blind and complete != numStudents:
+                    if settingsBoolDict['blind'] and complete != settingsIntDict['numStudents']:
                         pixels[pix] = fadein(pixRange, i, colors['blind'])
                     else:
                         pixels[pix] = fadein(pixRange, i, colors['green'])
-    clearString()
-    showString("SRVY " + str(complete) + "/" + str(numStudents))
+    if settingsBoolDict['captions']:
+        clearString()
+        showString("SRVY " + str(complete) + "/" + str(settingsIntDict['numStudents']))
     pixels.show()
 
-def fillBar():
-    global blind
-    global paused
+def tutdBar():
     upFill = upCount = downFill = wiggleFill = 0
     complete = 0
     for x in ipList:
@@ -200,11 +240,8 @@ def fillBar():
         complete += 1
     for pix in range(0, BARPIX):
         pixels[pix] = colors['default']
-    clearString()
-    showString("TUTD " + str(complete) + "/" + str(numStudents))
-    pixels.show()
-    if showInc:
-        chunkLength = math.floor(BARPIX / numStudents)
+    if settingsBoolDict['showinc']:
+        chunkLength = math.floor(BARPIX / settingsIntDict['numStudents'])
     else:
         chunkLength = math.floor(BARPIX / complete)
     for index, ip in enumerate(ipList):
@@ -214,7 +251,7 @@ def fillBar():
                 if i == 0:
                     pixels[pix] = colors['student']
                 else:
-                    if blind and complete != numStudents:
+                    if settingsBoolDict['blind'] and complete != settingsIntDict['numStudents']:
                         pixels[pix] = fadein(pixRange, i, colors['blind'])
                     else:
                         pixels[pix] = fadein(pixRange, i, colors['green'])
@@ -224,7 +261,7 @@ def fillBar():
                 if i == 0:
                     pixels[pix] = colors['student']
                 else:
-                    if blind and complete != numStudents:
+                    if settingsBoolDict['blind'] and complete != settingsIntDict['numStudents']:
                         pixels[pix] = fadein(pixRange, i, colors['blind'])
                     else:
                         pixels[pix] = fadein(pixRange, i, colors['yellow'])
@@ -234,18 +271,24 @@ def fillBar():
                 if i == 0:
                     pixels[pix] = colors['student']
                 else:
-                    if blind and complete != numStudents:
+                    if settingsBoolDict['blind'] and complete != settingsIntDict['numStudents']:
                         pixels[pix] = fadein(pixRange, i, colors['blind'])
                     else:
                         pixels[pix] = fadein(pixRange, i, colors['red'])
             downFill -= 1
-    if upCount >= numStudents:
-        paused = True
+    if settingsBoolDict['captions']:
+        clearString()
+        showString("TUTD " + str(complete) + "/" + str(settingsIntDict['numStudents']))
+        pixels.show()
+    if upCount >= settingsIntDict['numStudents']:
+        settingsBoolDict['paused'] = True
         pixels.fill((0,0,0))
         pygame.mixer.Sound(sfx["success01"]).play()
         for i, pix in enumerate(range(0, BARPIX)):
                 pixels[pix] = blend(range(0, BARPIX), i, colors['blue'], colors['red'])
-        showString("MAX GAMER!", 0, colors['purple'])
+        if settingsBoolDict['captions']:
+            clearString()
+            showString("MAX GAMER!", 0, colors['purple'])
     pixels.show()
 
 @app.route('/')
@@ -254,10 +297,9 @@ def endpoint_home():
 
 @app.route('/color')
 def endpoint_color():
-    if not mode == 'playtime':
-        return "Not in play mode <br>" + backButton
-    global locked
-    if locked == True:
+    if not settingsStrDict['mode'] == 'playtime':
+        return "Not in playtime mode<br>" + backButton
+    if settingsBoolDict['locked'] == True:
         if not request.remote_addr in whiteList:
             return "Color changing is locked"
     r = int(request.args.get('r'))
@@ -269,69 +311,53 @@ def endpoint_color():
 
 @app.route('/settings', methods = ['POST', 'GET'])
 def settings():
-    global paused
-    global locked
-    global quizQuestion
-    global quizAnswers
-    global quizCorrect
-    global blind
-    global mode
-    global showInc
-
-    if locked:
+    if settingsBoolDict['locked']:
         if request.remote_addr not in whiteList:
             return "STAHP DOING THE SNEAKY HACKERINGS!"
-    global numStudents
-    global ipList
+
     ipList = {}
     if request.method == 'POST':
         quizQuestion = request.form['qQuestion']
         quizCorrect = int(request.form['quizlet'])
         quizAnswers = [request.form['qaAnswer'], request.form['qbAnswer'], request.form['qcAnswer'], request.form['qdAnswer']]
-        if mode == 'thumbs':
-            fillBar()
-        elif mode == 'survey':
+        if settingsStrDict['mode'] == 'thumbs':
+            tutdBar()
+        elif settingsStrDict['mode'] == 'survey':
             surveyBar()
         pygame.mixer.Sound(sfx["success01"]).play()
-        paused = False
+        settingsBoolDict['paused'] = False
         print("Quiz answer: " + quizAnswers[quizCorrect])
         return redirect(url_for('settings'))
     else:
         resString = ''
-        ### Need to find a better way of handling this
-        setLock = request.args.get('locked')
-        if setLock == 'true':
-            locked = True
-            resString += 'Set <i>locked</i> to: ' + str(locked)
-        elif setLock == 'false':
-            locked = False
-            resString += 'Set <i>locked</i> to: ' + str(locked)
-        setBlind = request.args.get('blind')
-        if setBlind == 'true':
-            blind = True
-            resString += 'Set <i>blind</i> to: ' + str(blind)
-        elif setBlind == 'false':
-            blind = False
-            resString += 'Set <i>blind</i> to: ' + str(blind)
-        setshowInc = request.args.get('showinc')
-        if setshowInc == 'true':
-            showInc = True
-            resString += 'Set <i>showInc</i> to: ' + str(showInc)
-        elif setshowInc == 'false':
-            showInc = False
-            resString += 'Set <i>showInc</i> to: ' + str(showInc)
-        setNumStudents = request.args.get('students')
-        if setNumStudents:
-            numStudents = int(setNumStudents)
-            resString += 'Set <i>numStudents</i> to: ' + str(numStudents)
-        setMode = request.args.get('mode')
-        if setMode:
-            if setMode in modes:
+        #Loop through every arg that was sent as a query parameter
+        for arg in request.args:
+            #See if you save the
+            argVal = str2bool(request.args.get(arg))
+                #if the argVal resolved to a boolean value
+            if isinstance(argVal, bool):
+                if arg in settingsBoolDict:
+                    settingsBoolDict[arg] = argVal
+                    resString += 'Set <i>' + arg + '</i> to: <i>' + str(argVal) + "</i>"
+                else:
+                    resString += 'There is no setting that takes \'true\' or \'false\' named: <i>' + arg + "</i>"
+            #else:
+                #resString += '<i>' + str(argVal) + '</i> isn\'t a valid value for <i>' + arg + '</i> (\'true\' or \'false\')'
+
+        ###
+        ### Everything past this point uses the old method of changing settings. Needs updated
+        ###
+
+        if request.args.get('students'):
+            settingsIntDict['numStudents'] = int(request.args.get('students'))
+            resString += 'Set <i>numStudents</i> to: ' + str(settingsIntDict['numStudents'])
+        if request.args.get('mode'):
+            if request.args.get('mode') in settingsStrList['modes']:
                 ipList = {}
-                mode = setMode
-                resString += 'Set <i>mode</i> to: ' + setMode
+                settingsStrDict['mode'] = request.args.get('mode')
+                resString += 'Set <i>mode</i> to: ' + settingsStrDict['mode']
             else:
-                resString += 'No mode called ' + setMode
+                resString += 'No setting called ' + settingsStrDict['mode']
         if resString == '':
             return render_template("settings.html")
         else:
@@ -341,9 +367,9 @@ def settings():
 
 @app.route('/quiz')
 def endpoint_quiz():
-    if not mode == 'quiz':
-        return "Not in Quiz mode <br>" + backButton
-    global quizCorrect
+    if not settingsStrDict['mode'] == 'quiz':
+        return "Not in Quiz settingsStrDict['mode'] <br>" + backButton
+
     answer = request.args.get('answer')
     if answer:
         answer = int(answer)
@@ -352,7 +378,7 @@ def endpoint_quiz():
                 ipList[request.remote_addr] = 'up'
             else:
                 ipList[request.remote_addr] = 'down'
-            fillBar()
+            tutdBar()
             return "Thank you for your tasty bytes...<br>" + backButton
         else:
             return "You have already answered this quiz.<br>" + backButton
@@ -368,9 +394,9 @@ def endpoint_quiz():
 
 @app.route('/survey')
 def endpoint_survey():
-    if not mode == 'survey':
-        return "Not in Survey mode <br>" + backButton
-    global numStudents
+    if not settingsStrDict['mode'] == 'survey':
+        return "Not in Survey settingsStrDict['mode'] <br>" + backButton
+
     ip = request.remote_addr
     vote = request.args.get('vote')
     name = request.args.get('name')
@@ -379,7 +405,7 @@ def endpoint_survey():
     elif vote:
         print("Recieved " + vote + " from " + name + " at " + ip)
         pygame.mixer.Sound(sfx["blip01"]).play()
-    #if mode != 'survey':
+    #if settingsStrDict['mode'] != 'survey':
         #return "There is no survey right now<br>" + backButton
     if vote:
         if vote in ["a", "b", "c", "d"]:
@@ -397,26 +423,26 @@ def endpoint_survey():
 
 @app.route('/tutd')
 def endpoint_tutd():
-    global numStudents
+
     ip = request.remote_addr
     thumb = request.args.get('thumb')
     name = request.args.get('name')
     if not name:
         name = "unknown"
     if thumb:
-        if not mode == 'thumbs':
-            return "Not in Thumbs mode <br>" + backButton
+        if not settingsStrDict['mode'] == 'thumbs':
+            return "Not in Thumbs settingsStrDict['mode'] <br>" + backButton
         else:
             print("Recieved " + thumb + " from " + name + " at ip: " + ip)
             pygame.mixer.Sound(sfx["blip01"]).play()
             if thumb == 'up' or thumb == 'down' or thumb == 'wiggle' :
                 ipList[request.remote_addr] = request.args.get('thumb')
-                fillBar()
+                tutdBar()
                 return "Thank you for your tasty bytes... (" + thumb + ")<br>" + backButton
             elif thumb == 'oops':
                 ipList.pop(ip)
                 pygame.mixer.Sound(sfx["hit01"]).play()
-                fillBar()
+                tutdBar()
                 return "I won\'t mention it if you don\'t<br>" + backButton
             else:
                 return "Bad Arguments<br><br>Try <b>/tutd?thumb=wiggle</b><br><br>You can also try <b>down</b> and <b>up</b> instead of <b>wiggle</b>"
@@ -425,8 +451,8 @@ def endpoint_tutd():
 
 @app.route('/help', methods = ['POST', 'GET'])
 def endpoint_help():
-    #if not mode == 'help':
-    #    return "Not in Help mode <br>" + backButton
+    #if not settingsStrDict['mode'] == 'help':
+    #    return "Not in Help settingsStrDict['mode'] <br>" + backButton
     if request.method == 'POST':
         name = request.form['name']
         problem = request.form['problem']
@@ -443,8 +469,8 @@ def endpoint_help():
 
 @app.route('/needshelp')
 def endpoint_needshelp():
-    #if not mode == 'help':
-    #    return "Not in Help mode <br>" + backButton
+    #if not settingsStrDict['mode'] == 'help':
+    #    return "Not in Help settingsStrDict['mode'] <br>" + backButton
     remove = request.args.get('remove')
     '''
     if bool(helpList):
@@ -477,9 +503,9 @@ def endpoint_chat():
 
 @app.route('/emptyblocks')
 def endpoint_emptyblocks():
-    if not mode == 'blockchest':
-        return "Not in blockchest mode <br>" + backButton
-    global blockList
+    if not settingsStrDict['mode'] == 'blockchest':
+        return "Not in blockchest settingsStrDict['mode'] <br>" + backButton
+
     blockList = []
     pixels.fill((0,0,0))
     pixels.show()
@@ -487,10 +513,8 @@ def endpoint_emptyblocks():
 
 @app.route('/sendblock')
 def endpoint_sendblock():
-    if not mode == 'blockchest':
-        return "Not in blockchest mode <br>" + backButton
-    global blockList
-    global colorDict
+    if not settingsStrDict['mode'] == 'blockchest':
+        return "Not in blockchest settingsStrDict['mode'] <br>" + backButton
     blockId = request.args.get("id")
     blockData = request.args.get("data")
     if blockId and blockData:
@@ -514,10 +538,10 @@ def endpoint_virtualbar():
 
 @app.route('/sfx')
 def endpoint_sfx():
-    if not mode == 'playtime':
-        return "Not in play mode <br>" + backButton
-    global locked
-    if locked == True:
+    if not settingsStrDict['mode'] == 'playtime':
+        return "Not in playtime mode<br>" + backButton
+
+    if settingsBoolDict['locked'] == True:
         if not request.remote_addr in whiteList:
             return "Sound effects are locked"
     sfx_file = request.args.get('file')
@@ -533,30 +557,28 @@ def endpoint_sfx():
 
 @app.route('/perc')
 def endpoint_perc():
-    if not mode == 'playtime':
-        return "Not in play mode <br>" + backButton
-    global locked
-    if locked == True:
+    if not settingsStrDict['mode'] == 'playtime':
+        return "Not in playtime mode<br>" + backButton
+
+    if settingsBoolDict['locked'] == True:
         if not request.remote_addr in whiteList:
-            return "Percent mode is locked"
+            return "Percent settingsStrDict['mode'] is locked"
     percAmount = request.args.get('amount')
     try:
         percAmount = float(percAmount)
         percFill(percAmount)
-        global perc
-        perc = percAmount
     except:
         return "<b>amount</b> must be a decimal place between 0 and 1. \'/perc?amount=<b>0.5</b>\'<br>" + backButton
     return "Set perecentage to: " + str(percAmount) + "<br>" + backButton
 
 @app.route('/say')
 def endpoint_say():
-    if not mode == 'playtime':
-        return "Not in play mode <br>" + backButton
-    global locked
-    if locked == True:
+    if not settingsStrDict['mode'] == 'playtime':
+        return "Not in playtime mode<br>" + backButton
+
+    if settingsBoolDict['locked'] == True:
         if not request.remote_addr in whiteList:
-            return "Say mode is locked"
+            return "Say settingsStrDict['mode'] is locked"
     phrase = request.args.get('phrase')
     fgColor = request.args.get('fg')
     bgColor = request.args.get('bg')

@@ -1,3 +1,8 @@
+### color_fix
+- added hex2dec() in colors module to convert #XXXXXX or XXXXXX format into tuplet values
+- changed /colors to use r,g,b or hex
+- /say now uses hex values for fg and bg
+
 - Made the surveyBar sort by similar color, which is the only thing I set out to do
 - Added *clearBar()*
 - changed *fillBar()* to *tutdBar()*

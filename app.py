@@ -11,7 +11,7 @@ ip = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
 
 import letters
 from sfx import sfx
-from colors import colors
+from colors import colors, hex2dec
 
 print(colors['red'])
 
@@ -161,6 +161,10 @@ def printLetter(letter, startLocation, fg=colors['fg'], bg=colors['bg']):
                         pixels[pixPoint + j] = fg
                     else:
                         pixels[pixPoint + j] = bg
+                pixPoint = startLocation + (i + (8*5))
+                for j in range(pixPoint, pixPoint + 4):
+                    pixels[j] = bg
+
         else:
             print("Error! Letter ", letter, " not found.")
     else:
@@ -302,12 +306,21 @@ def endpoint_color():
     if settingsBoolDict['locked'] == True:
         if not request.remote_addr in whiteList:
             return "Color changing is locked"
-    r = int(request.args.get('r'))
-    g = int(request.args.get('g'))
-    b = int(request.args.get('b'))
-    pixels.fill((r,g,b))
+    try:
+        r = int(request.args.get('r'))
+        g = int(request.args.get('g'))
+        b = int(request.args.get('b'))
+    except:
+        pass
+    hex = request.args.get('hex')
+    if hex2dec(hex):
+        fillBar(hex2dec(hex))
+    elif r & b & g:
+        fillBar((r, g, b))
+    else:
+        return "Bad Arguments<br><br>Try <b>/color?hex=#FF00FF</b> or <b>/color?r=255&g=0&b=255</b>"
     pixels.show()
-    return str(r) + ", " + str(g) + ", " + str(b)
+    return "Color sent!<br>" + backButton
 
 @app.route('/settings', methods = ['POST', 'GET'])
 def settings():
@@ -579,18 +592,16 @@ def endpoint_say():
     if settingsBoolDict['locked'] == True:
         if not request.remote_addr in whiteList:
             return "Say settingsStrDict['mode'] is locked"
+
     phrase = request.args.get('phrase')
     fgColor = request.args.get('fg')
     bgColor = request.args.get('bg')
-    clearString()
     if phrase:
-        if not bgColor or bgColor not in colors:
-            bgColor = colors['bg']
+        if hex2dec(fgColor) and hex2dec(bgColor):
+            clearString()
+            showString(phrase, 0, hex2dec(fgColor), hex2dec(bgColor))
         else:
-            bgColor = ((colors[bgColor][0] / 8), (colors[bgColor][1] / 8), (colors[bgColor][2] / 8))
-        if fgColor and fgColor in colors:
-            showString(phrase, 0, colors[fgColor], bgColor)
-        else:
+            clearString()
             showString(phrase)
         pixels.show()
         #engine.say(p)

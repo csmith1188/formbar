@@ -9,6 +9,8 @@ ip = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
 #import pyttsx3
 #engine = pyttsx3.init()
 
+print('Running formbar server on:' + ip)
+
 import letters
 from sfx import sfx
 from colors import colors, hex2dec

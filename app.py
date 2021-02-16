@@ -333,6 +333,7 @@ def endpoint_color():
 
 @app.route('/settings', methods = ['POST', 'GET'])
 def settings():
+    global ipList
     if settingsBoolDict['locked']:
         if request.remote_addr not in whiteList:
             return "STAHP DOING THE SNEAKY HACKERINGS!"
@@ -552,7 +553,7 @@ def endpoint_sendblock():
 
 @app.route('/getpix')
 def endpoint_getpix():
-    return '{"pixels": "'+ str(pixels) +'"}'
+    return '{"pixels": "'+ str(pixels[:BARPIX]) +'"}'
 
 @app.route('/virtualbar')
 def endpoint_virtualbar():

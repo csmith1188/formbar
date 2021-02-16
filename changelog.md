@@ -1,3 +1,7 @@
+### [Patch] Feb 16th
+- Fixed #9
+- Fixed #3
+
 ### color_fix
 - added hex2dec() in colors module to convert #XXXXXX or XXXXXX format into tuplet values
 - changed /colors to use r,g,b or hex

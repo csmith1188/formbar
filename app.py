@@ -6,6 +6,13 @@ import time, math
 import netifaces as ni
 ni.ifaddresses('eth0')
 ip = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
+
+
+
+
+
+
+
 #import pyttsx3
 #engine = pyttsx3.init()
 
@@ -549,7 +556,7 @@ def endpoint_getpix():
 
 @app.route('/virtualbar')
 def endpoint_virtualbar():
-    return render_template("virtualbar.html")
+    return render_template("virtualbar.html",  serverIp = ip)
 
 @app.route('/sfx')
 def endpoint_sfx():

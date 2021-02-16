@@ -10,12 +10,12 @@
         <meta http-equiv="refresh" content="3">
     </head>
     <body>
-    <h1>http://192.168.24.77:5000/tutd</h1>
+    <h1>{{ serverIp }}</h1>
         <div id="pixBox" style="margin: auto; border: 1px solid #FFFFFF; display: flex; justify-content: space-around;">
         </div>
     </body>
     <script>
-        function updateBar() {   
+        function updateBar() {
             var xmlHttp = new XMLHttpRequest();
             xmlHttp.open( "GET", '/getpix', false );
             xmlHttp.send( null );
@@ -35,4 +35,3 @@
         setInterval(updateBar(), 3000);
     </script>
 </html>
-

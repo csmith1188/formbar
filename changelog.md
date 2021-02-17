@@ -1,3 +1,9 @@
+### [Minor] sfx_fix
+- Fixes #10 (Dynamic SFX Finder w/ Error Catching)
+- New function playSFX( <sound file name, no extension> ) now plays pygame sounds
+- New function in sfx module updateFiles() rescans the sfx/ folder
+- sfx dictionary changed to 'sound' and is built from updateFiles()
+
 ### [Patch] Feb 16th
 - Fixed #9
 - Fixed #3

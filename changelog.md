@@ -1,3 +1,8 @@
+### [Minor] Added BGM
+- Fixed some redundant code and zombie code
+- Added new BGM module for scanning bgm folder
+
+
 ### [Minor] sfx_fix
 - Fixes #10 (Dynamic SFX Finder w/ Error Catching)
 - New function playSFX( <sound file name, no extension> ) now plays pygame sounds

@@ -14,6 +14,7 @@ print('Running formbar server on:' + ip)
 
 import letters
 import sfx
+import bgm
 from colors import colors, hex2dec
 
 import logging
@@ -24,6 +25,7 @@ BARPIX = 240
 MAXPIX = 762
 
 sfx.updateFiles()
+bgm.updateFiles()
 pygame.init()
 
 pixels = neopixel.NeoPixel(board.D21, MAXPIX, brightness=1.0, auto_write=False)
@@ -46,11 +48,9 @@ settingsStrDict = {
 }
 
 settingsStrList = {
-    'mode': ['thumbs', 'survey', 'quiz', 'essay', 'help', 'kahoot', 'playtime', 'blockchest']
+    'modes': ['thumbs', 'survey', 'quiz', 'essay', 'help', 'kahoot', 'playtime', 'blockchest']
 }
 
-settingsStrDict['mode'] = 'thumbs'
-settingsStrList['modes'] = ['thumbs', 'survey', 'quiz', 'essay', 'help', 'kahoot', 'playtime', 'blockchest']
 whiteList = [
     '127.0.0.1',
     '172.21.3.5'
@@ -72,10 +72,16 @@ quizQuestion = ''
 quizAnswers = []
 quizCorrect = ''
 
-backButton = "<button onclick='window.history.back()'>Go Back</button><script language='JavaScript' type='text/javascript'>setTimeout(\"window.history.back()\",5000);</script>"
+backButton = "<br><button onclick='window.history.back()'>Go Back</button><script language='JavaScript' type='text/javascript'>setTimeout(\"window.history.back()\",5000);</script>"
 
 def playSFX(sound):
     pygame.mixer.Sound(sfx.sound[sound]).play()
+def playBGM(bgm_filename, volume=1.0):
+    pygame.mixer.music.load(bgm.bgm[bgm_filename])
+    pygame.mixer.music.set_volume(volume)
+    pygame.mixer.music.play(loops=-1)
+def stopBGM():
+    pygame.mixer.music.stop()
 
 def str2bool(strng):
     strng.lower()
@@ -570,10 +576,44 @@ def endpoint_sfx():
         return 'Playing: ' + sfx_file + backButton
     else:
         resString = '<h2>List of available sound files:</h2><ul>'
-        for key, value in sfx.sound.items() :
+        for key, value in sfx.sound.items():
             resString += '<li><a href="/sfx?file=' + key + '">' + key + '</a></li>'
         resString += '</ul> You can play them by using \'/sfx?file=<b>&lt;sound file name&gt;</b>\''
         return resString
+
+@app.route('/bgm')
+def endpoint_bgm():
+    if not settingsStrDict['mode'] == 'playtime':
+        return "Not in playtime mode<br>" + backButton
+    if settingsBoolDict['locked'] == True:
+        if not request.remote_addr in whiteList:
+            return "Background music is locked"
+    bgm.updateFiles()
+    bgm_file = request.args.get('file')
+    if bgm_file in bgm.bgm:
+        bgm_volume = request.args.get('volume')
+        if bgm_volume and type(bgm_volume) is float:
+            playBGM(bgm_file, bgm_volume)
+        else:
+            playBGM(bgm_file)
+        return 'Playing: ' + bgm_file + backButton
+    else:
+        resString = '<h2>List of available background music files:</h2><ul>'
+        for key, value in bgm.bgm.items():
+            resString += '<li><a href="/bgm?file=' + key + '">' + key + '</a></li>'
+        resString += '</ul> You can play them by using \'<b>/bgm?file=&lt;sound file name&gt;&volume=&lt;0.0 - 1.0&gt;\'</b>'
+        resString += '<br>You can stop them by using \'<b>/bgmstop</b>\''
+        return resString
+
+@app.route('/bgmstop')
+def endpoint_bgmstop():
+    if not settingsStrDict['mode'] == 'playtime':
+        return "Not in playtime mode<br>" + backButton
+    if settingsBoolDict['locked'] == True:
+        if not request.remote_addr in whiteList:
+            return "Background music is locked"
+    stopBGM()
+    return 'Stopped music...' + backButton
 
 @app.route('/perc')
 def endpoint_perc():

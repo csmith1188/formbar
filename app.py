@@ -7,22 +7,14 @@ import netifaces as ni
 ni.ifaddresses('eth0')
 ip = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
 
-
-
-
-
-
-
 #import pyttsx3
 #engine = pyttsx3.init()
 
 print('Running formbar server on:' + ip)
 
 import letters
-from sfx import sfx
+import sfx
 from colors import colors, hex2dec
-
-print(colors['red'])
 
 import logging
 log = logging.getLogger('werkzeug')
@@ -31,6 +23,7 @@ log.setLevel(logging.ERROR)
 BARPIX = 240
 MAXPIX = 762
 
+sfx.updateFiles()
 pygame.init()
 
 pixels = neopixel.NeoPixel(board.D21, MAXPIX, brightness=1.0, auto_write=False)
@@ -80,6 +73,9 @@ quizAnswers = []
 quizCorrect = ''
 
 backButton = "<button onclick='window.history.back()'>Go Back</button><script language='JavaScript' type='text/javascript'>setTimeout(\"window.history.back()\",5000);</script>"
+
+def playSFX(sound):
+    pygame.mixer.Sound(sfx.sound[sound]).play()
 
 def str2bool(strng):
     strng.lower()
@@ -296,7 +292,7 @@ def tutdBar():
     if upCount >= settingsIntDict['numStudents']:
         settingsBoolDict['paused'] = True
         pixels.fill((0,0,0))
-        pygame.mixer.Sound(sfx["success01"]).play()
+        playSFX("success01")
         for i, pix in enumerate(range(0, BARPIX)):
                 pixels[pix] = blend(range(0, BARPIX), i, colors['blue'], colors['red'])
         if settingsBoolDict['captions']:
@@ -347,7 +343,7 @@ def settings():
             tutdBar()
         elif settingsStrDict['mode'] == 'survey':
             surveyBar()
-        pygame.mixer.Sound(sfx["success01"]).play()
+        playSFX("success01")
         settingsBoolDict['paused'] = False
         print("Quiz answer: " + quizAnswers[quizCorrect])
         return redirect(url_for('settings'))
@@ -384,7 +380,7 @@ def settings():
         if resString == '':
             return render_template("settings.html")
         else:
-            pygame.mixer.Sound(sfx["pickup01"]).play()
+            playSFX("pickup01")
             resString += "<br>" + backButton
             return resString
 
@@ -427,7 +423,7 @@ def endpoint_survey():
         name = 'unknown'
     elif vote:
         print("Recieved " + vote + " from " + name + " at " + ip)
-        pygame.mixer.Sound(sfx["blip01"]).play()
+        playSFX("blip01")
     #if settingsStrDict['mode'] != 'survey':
         #return "There is no survey right now<br>" + backButton
     if vote:
@@ -457,14 +453,14 @@ def endpoint_tutd():
             return "Not in Thumbs settingsStrDict['mode'] <br>" + backButton
         else:
             print("Recieved " + thumb + " from " + name + " at ip: " + ip)
-            pygame.mixer.Sound(sfx["blip01"]).play()
+            playSFX("blip01")
             if thumb == 'up' or thumb == 'down' or thumb == 'wiggle' :
                 ipList[request.remote_addr] = request.args.get('thumb')
                 tutdBar()
                 return "Thank you for your tasty bytes... (" + thumb + ")<br>" + backButton
             elif thumb == 'oops':
                 ipList.pop(ip)
-                pygame.mixer.Sound(sfx["hit01"]).play()
+                playSFX("hit01")
                 tutdBar()
                 return "I won\'t mention it if you don\'t<br>" + backButton
             else:
@@ -483,7 +479,7 @@ def endpoint_help():
             name = name.replace("%20", "")
             name = name.replace(" ", "")
             helpList[name] = problem
-            pygame.mixer.Sound(sfx["up04"]).play()
+            playSFX("up04")
             return "Your ticket was sent. Keep working on the problem the best you can while you wait.<br>" + backButton
         else:
             return "I at least need your name so I know who to help"
@@ -567,15 +563,16 @@ def endpoint_sfx():
     if settingsBoolDict['locked'] == True:
         if not request.remote_addr in whiteList:
             return "Sound effects are locked"
+    sfx.updateFiles()
     sfx_file = request.args.get('file')
-    if sfx_file in sfx:
-        pygame.mixer.Sound(sfx[sfx_file]).play()
+    if sfx_file in sfx.sound:
+        playSFX(sfx_file)
         return 'Playing: ' + sfx_file + backButton
     else:
         resString = '<h2>List of available sound files:</h2><ul>'
-        for key, value in sfx.items() :
+        for key, value in sfx.sound.items() :
             resString += '<li><a href="/sfx?file=' + key + '">' + key + '</a></li>'
-        resString += '</ul> You can play them by using \'/sfx?file=<b>&lt;sound file name&gt;</b>\'' + backButton
+        resString += '</ul> You can play them by using \'/sfx?file=<b>&lt;sound file name&gt;</b>\''
         return resString
 
 @app.route('/perc')
@@ -623,7 +620,7 @@ def endpoint_say():
 #Startup stuff
 showString(ip)
 pixels.show()
-pygame.mixer.Sound(sfx["bootup02"]).play()
+playSFX("bootup02")
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', use_reloader=False, debug = False)

@@ -82,8 +82,6 @@ def playBGM(bgm_filename, volume=1.0):
     pygame.mixer.music.play(loops=-1)
 def stopBGM():
     pygame.mixer.music.stop()
-def stopSound():
-    pygame.mixer.sound.stop()
 
 def str2bool(strng):
     strng.lower()

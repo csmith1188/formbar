@@ -581,16 +581,6 @@ def endpoint_sfx():
         resString += '</ul> You can play them by using \'/sfx?file=<b>&lt;sound file name&gt;</b>\''
         return resString
 
-@app.route('/sfxstop')
-def endpoint_sfxstop():
-    if not settingsStrDict['mode'] == 'playtime':
-        return "Not in playtime mode<br>" + backButton
-    if settingsBoolDict['locked'] == True:
-        if not request.remote_addr in whiteList:
-            return "SFX is locked"
-    stopSound()
-    return 'Stopped music...' + backButton
-
 @app.route('/bgm')
 def endpoint_bgm():
     if not settingsStrDict['mode'] == 'playtime':

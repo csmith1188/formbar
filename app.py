@@ -122,17 +122,16 @@ def fillBlocks():
     pixels.show()
 
 def percFill(amount, fillColor=colors['green'], emptyColor=colors['red']):
-    if amount > 1 or amount < 0:
-        if amount > 100 and amount < 0 and type(amount) is not int:
-            raise TypeError("Out of range. Must be between 0 - 1 or 0 - 100.")
-        else:
-            amount = amount * 0.01
-    pixRange = math.ceil(BARPIX * amount)
-    for pix in range(0, BARPIX):
-        if pix > pixRange:
-            pixels[pix] = fillColor
-        pixels[pix] = emptyColor
-    pixels.show()
+    if amount > 100 and amount < 0 and type(amount) is not int:
+        raise TypeError("Out of range. Must be between 0 - 1 or 0 - 100.")
+    else:
+        pixRange = math.ceil(BARPIX * (amount * 0.01))
+        for pix in range(0, BARPIX):
+            if pix <= pixRange:
+                pixels[pix] = fillColor
+            else:
+                pixels[pix] = emptyColor
+        pixels.show()
 
 def fillBar(color=colors['default'], stop=BARPIX, start=0):
     #If you provide no args, the whole bar is made the default color
@@ -625,10 +624,10 @@ def endpoint_perc():
             return "Percent settingsStrDict['mode'] is locked"
     percAmount = request.args.get('amount')
     try:
-        percAmount = float(percAmount)
+        percAmount = int(percAmount)
         percFill(percAmount)
     except:
-        return "<b>amount</b> must be a decimal place between 0 and 1. \'/perc?amount=<b>0.5</b>\'<br>" + backButton
+        return "<b>amount</b> must be an integer between 0 and 100 \'/perc?amount=<b>50</b>\'<br>" + backButton
     return "Set perecentage to: " + str(percAmount) + "<br>" + backButton
 
 @app.route('/say')

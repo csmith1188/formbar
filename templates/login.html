@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Plz Send Help</title>
+    </head>
+
+    <body>
+        <h1 style="color: blue">Login</h1>
+        <form action="login" method="post">
+            <h3>Name</h3>
+            <input type="text" id="usernameBox" name="username" value="">
+            <input type="hidden" id="forwardBox" name="forward">
+            <input type="submit" value="Log In">
+        </form>
+
+        <script type="text/javascript" defer>
+            document.getElementById('forwardBox').value = document.referrer
+        </script>
+    </body>
+
+</html>

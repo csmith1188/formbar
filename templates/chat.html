@@ -1,6 +1,7 @@
 <html>
     <head>
         <title>Chat</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
         <script>
             // Create WebSocket connection.
             const socket = new WebSocket('ws://localhost:5001');
@@ -18,7 +19,7 @@
     </head>
     <body>
         <div id='outpoot'>
-            
+
         </div>
     </body>
 </html>

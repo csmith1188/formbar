@@ -9,6 +9,7 @@
         <script type="text/javascript">
             let studentData;
             let oldStudentData;
+            let permNames = ['Teacher', 'Assistant', 'Student', 'Guest']
             function checkUpdates(url) {
                 var xhr = new XMLHttpRequest();
                 xhr.open('GET', url);
@@ -29,15 +30,15 @@
                         newStudent.classList.add('student');
                         newStudent.innerHTML = studentList[student].name;
                         newStudent.innerHTML += "	&nbsp; ";
-                        newStudent.innerHTML += studentList[student]['perms'];
+                        newStudent.innerHTML += permNames[studentList[student]['perms']];
                         newStudent.innerHTML += "	&nbsp; ";
                         newStudent.innerHTML += `<a href="users?name=${studentList[student]['name']}&action=kick">Kick</a>`;
                         newStudent.innerHTML += `
                         <select onchange="updatePerm(this)" id="userpermsDrop" name="userpermsDrop">
-                            <option value="/users?name=${studentList[student]['name']}&action=perm&perm=0">Teacher</option>
-                            <option value="/users?name=${studentList[student]['name']}&action=perm&perm=1">Assistant</option>
-                            <option value="/users?name=${studentList[student]['name']}&action=perm&perm=2">Student</option>
-                            <option value="/users?name=${studentList[student]['name']}&action=perm&perm=3" selected="selected">Anyone</option>
+                            <option value="/users?name=${studentList[student]['name']}&action=perm&perm=0">${permNames[0]}</option>
+                            <option value="/users?name=${studentList[student]['name']}&action=perm&perm=1">${permNames[1]}</option>
+                            <option value="/users?name=${studentList[student]['name']}&action=perm&perm=2">${permNames[2]}</option>
+                            <option value="/users?name=${studentList[student]['name']}&action=perm&perm=3" selected="selected">${permNames[3]}</option>
                         </select>`
                         studentBox.appendChild(newStudent)
                     }

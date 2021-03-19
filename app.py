@@ -70,6 +70,8 @@ whiteList = [
     '172.21.3.5'
     ]
 
+banList = []
+
 studentList = {
 }
 
@@ -351,17 +353,20 @@ def endpoint_home():
 @app.route('/login', methods = ['POST', 'GET'])
 def endpoint_login():
     remote = request.remote_addr
-    if request.method == 'POST':
-        username = request.form['username']
-        forward = request.form['forward']
-        #pin = request.form['pin']
-        newStudent(remote, username, forward)
-        return redirect('/', code=302)
-    elif request.args.get('name'):
-        newStudent(remote, request.args.get('name'))
-        return redirect('/', code=302)
+    if remote in banList:
+        return "This IP is in the banlist."
     else:
-        return render_template("login.html")
+        if request.method == 'POST':
+            username = request.form['username']
+            forward = request.form['forward']
+            #pin = request.form['pin']
+            newStudent(remote, username, forward)
+            return redirect('/', code=302)
+        elif request.args.get('name'):
+            newStudent(remote, request.args.get('name'))
+            return redirect('/', code=302)
+        else:
+            return render_template("login.html")
 
 @app.route('/color')
 def endpoint_color():
@@ -654,8 +659,9 @@ def endpoint_user():
                         return "User not in list. " + backButton
                 if action == 'ban':
                     if user in studentList:
-                        #Ban here
-                        pass
+                        banList.append(user)
+                        del studentList[user]
+                        return "User removed and added to ban list."
                     else:
                         return "User not in list. " + backButton
                 if action == 'perm':

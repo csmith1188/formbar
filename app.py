@@ -38,6 +38,7 @@ app = Flask(__name__)
 # 3 - anyone
 settingsPerms = {
     'admin' : 0,
+    'users' : 1,
     'api' : 3,
     'sfx' : 1,
     'bgm' : 1,
@@ -585,6 +586,7 @@ def endpoint_help():
 
 @app.route('/needshelp')
 def endpoint_needshelp():
+
     remove = request.args.get('remove')
     '''
     if bool(helpList):
@@ -614,6 +616,66 @@ def endpoint_needshelp():
 @app.route('/chat')
 def endpoint_chat():
     return render_template("chat.html")
+
+@app.route('/users')
+def endpoint_user():
+    if not request.remote_addr in studentList:
+        # This will have to send along the current address as "forward" eventually
+        return redirect('/login')
+    '''
+    if settingsBoolDict['locked'] == True:
+        if not request.remote_addr in whiteList:
+            return "You are not whitelisted. " + backButton
+    '''
+    if studentList[request.remote_addr]['perms'] > settingsPerms['users']:
+        return "You do not have high enough permissions to do this right now. " + backButton
+    else:
+        user = '';
+        if request.args.get('name'):
+            for key, value in studentList.items():
+                if request.args.get('name') == studentList[key]['name']:
+                    user = key
+                    break
+            if not user:
+                return "That user was not found by their name. " + backButton
+        if request.args.get('ip'):
+            if request.args.get('ip') in studentList:
+                user = request.args.get('ip')
+            else:
+                return "That user was not found by their IP address. " + backButton
+        if user:
+            if request.args.get('action'):
+                action = request.args.get('action')
+                if action == 'kick':
+                    if user in studentList:
+                        del studentList[user]
+                        return "User removed"
+                    else:
+                        return "User not in list. " + backButton
+                if action == 'ban':
+                    if user in studentList:
+                        #Ban here
+                        pass
+                    else:
+                        return "User not in list. " + backButton
+                if action == 'perm':
+                    if request.args.get('perm'):
+                        try:
+                            perm = int(request.args.get('perm'))
+                            if user in studentList:
+                                if perm > 3 or perm < 0 :
+                                    return "Permissions out of range. " + backButton
+                                else:
+                                    studentList[user]['perms'] = perm
+                                    return "Changed user permission. " + backButton
+                            else:
+                                return "User not in list. " + backButton
+                        except:
+                            return "Perm was not an integer. " + backButton
+            else:
+                return "No action given. " + backButton
+        else:
+            return render_template("users.html")
 
 '''
 @app.route('/emptyblocks')

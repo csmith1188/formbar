@@ -1,25 +1,77 @@
 <html>
-    <head>
-        <title>Chat</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-        <script>
-            // Create WebSocket connection.
-            const socket = new WebSocket('ws://localhost:5001');
 
-            // Connection opened
-            socket.addEventListener('open', function (event) {
-                socket.send('Hello Server!');
-            });
+<head>
+  <meta charset="utf-8">
+  <title>Websokcets</title>
+  <style media="screen">
+    #outpoot {
+      width: 40%;
+      height: 720px;
+      overflow-x: hidden;
+      overflow-y: scroll;
+    }
+  </style>
+</head>
 
-            // Listen for messages
-            socket.addEventListener('message', function (event) {
-                document.getElementById('outpoot').innerHTML += 'Message from server: ' + event.data;
-            });
-        </script>
-    </head>
-    <body>
-        <div id='outpoot'>
+<body onload="init(); user();">
+  <div id="outpoot">
+  </div>
+  <form onsubmit="event.preventDefault(); onSubmit(); return false;">
+    <input type="text" id="input" autocomplete="off">
+    <input type="submit" value="Send">
+  </form>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script type="text/javascript">
+  var ws;
+  var userName = "";
 
-        </div>
-    </body>
+  function user() {
+    userName = prompt("Enter your Username", "")
+  }
+  var boxes = {
+    outpoot: document.getElementById('outpoot'),
+  }
+  //sets my username
+  function init() {
+    // Connect to Web Socket
+    ws = new WebSocket("ws://localhost:9001/");
+    // Set event handlers.
+    ws.onopen = function() {};
+    ws.onmessage = function(message) {
+      let data = message.data;
+      output("Server: " + message.data);
+      //auto scrolls to the bottom of the list every time someone sends a message
+      boxes.outpoot.scrollTop = boxes.outpoot.scrollHeight;
+    };
+    ws.onclose = function() {
+      output();
+    };
+    ws.onerror = function(e) {
+      output();
+      console.log(e)
+    };
+  }
+
+  function onSubmit() {
+    var input = document.getElementById("input");
+    // You can send message to the Web Socket using ws.send.
+    ws.send(input.value);
+    output(userName + ": " + input.value);
+    input.value = "";
+    input.focus();
+  }
+
+  function onCloseClick() {
+    ws.close();
+  }
+
+  function output(str) {
+    var log = document.getElementById("outpoot");
+    var escaped = str.replace(/&/, "&amp;").replace(/</, "&lt;").
+    replace(/>/, "&gt;").replace(/"/, "&quot;"); // "
+    log.innerHTML =  log.innerHTML + escaped + "<br>";
+  }
+</script>
+
 </html>

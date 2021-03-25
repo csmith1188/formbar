@@ -1,0 +1,237 @@
+<html>
+	<head>
+		<title>cookie</title>
+    </head>
+	<body onload="randomize()">
+        <h1 id="category"></h1>
+		<div id="word" class="answer"></div>
+        <br><br>
+
+        <div class="keys">
+        <div id="a" class="key" onclick="guess('a')">a</div>
+        <div id="b" class="key" onclick="guess('b')">b</div>
+        <div id="c" class="key" onclick="guess('c')">c</div>
+        <div id="d" class="key" onclick="guess('d')">d</div>
+        <div id="e" class="key" onclick="guess('e')">e</div>
+        <div id="f" class="key" onclick="guess('f')">f</div>
+        <div id="g" class="key" onclick="guess('g')">g</div>
+        <div id="h" class="key" onclick="guess('h')">h</div>
+        <div id="i" class="key" onclick="guess('i')">i</div>
+        <div id="j" class="key" onclick="guess('j')">j</div>
+        <div id="k" class="key" onclick="guess('k')">k</div>
+        <div id="l" class="key" onclick="guess('l')">l</div>
+        <div id="m" class="key" onclick="guess('m')">m</div>
+        <div id="n" class="key" onclick="guess('n')">n</div>
+        <div id="o" class="key" onclick="guess('o')">o</div>
+        <div id="p" class="key" onclick="guess('p')">p</div>
+        <div id="q" class="key" onclick="guess('q')">q</div>
+        <div id="r" class="key" onclick="guess('r')">r</div>
+        <div id="s" class="key" onclick="guess('s')">s</div>
+        <div id="t" class="key" onclick="guess('t')">t</div>
+        <div id="u" class="key" onclick="guess('u')">u</div>
+        <div id="v" class="key" onclick="guess('v')">v</div>
+        <div id="w" class="key" onclick="guess('w')">w</div>
+        <div id="x" class="key" onclick="guess('x')">x</div>
+        <div id="y" class="key" onclick="guess('y')">y</div>
+        <div id="z" class="key" onclick="guess('z')">z</div>
+        </div>
+
+        <div id="score" class="score">Score: 0</div>
+        <div id="highscore" class="highscore">Highscore: 0</div>
+        <div id="lives" class="lives">Lives: 10</div>
+        <div class=""></div>
+        <img src="hangmanbg.png" class="hangmanbg">
+
+        <style>
+
+            body {
+                text-align: center;
+                font-size: 45px;
+                user-select: none;
+                font-family: sans-serif;
+            }
+
+            h1 {
+                position: relative;
+                font-size: 80px;
+                left: -250px;
+            }
+
+            .score {
+                position: absolute;
+                top: 5px;
+                left: 5px;
+                text-align: left;
+                margin: 5px;
+            }
+
+            .lives {
+                position: absolute;
+                top: 55px;
+                left: 5px;
+                text-align: left;
+                margin: 5px;
+            }
+
+            .highscore {
+                position: absolute;
+                top: 5px;
+                left: 200px;
+                text-align: left;
+                margin: 5px;
+            }
+
+            .hangmanbg {
+                position: absolute;
+                top: -25px;
+                left: 1250px;
+                text-align: left;
+                margin: 5px;
+            }
+
+
+            .answer {
+                position: relative;
+                display: inline-block;
+                left: -250px;
+            }
+
+            .key {
+                position: relative;
+                display: inline-block;
+                border-radius: 5px;
+                border: 4px solid #b5b5b5;
+                border-spacing: 15px;
+                top: 175px;
+                margin: 2px;
+                font-size: 75px;
+                width: 75px;
+            }
+            .keys {
+                position: relative;
+                width: 1000px;
+                left: 200px;
+            }
+
+            .key:hover {
+                background-color: #b5b5b5;
+                cursor: pointer;
+            }
+
+
+
+
+
+        </style>
+
+
+		<script>
+            var score = 0;
+            var highscore = 0;
+            var lives = 10;
+            var words = ["minecraft0", "pacman0", "hangman0", "spaceinvaders0", "donkeykong0", "mario0", "initiald0", "scramble0", "mortalkombat0", "ddr0", "digdug0", "pong0", "spaceace0", "tempest0", "beatmania0", "tetris0", "superbreakout0", "gauntlet0", "lunarlander0", "paperboy0", "accoutrements1", "equanimity1", "nidificate1", "penultimate1", "coruscant1", "winebibbe1", "idiosyncratic1", "cynosure1", "conviviality1", "perfidiousness1", "superabundant1", "unencumbered1", "usufruct1", "unparagoned1", "acumen1", "cupidity1", "magnanimous1", "saxicolous1", "sesquipedalian1", "bellwether1", "teacher3", "technician3", "scientist3", "veterinarian3", "mechanic3", "physician3", "pharmacist3", "dentist3", "worker3", "plumber3", "engineer3", "lawyer3", "psychologist3", "electrician3", "dietitian3", "accountant3", "architect3", "developer3", "waiter3", "policeofficer3", "broccoli4", "cheese4", "bread4", "cabbage4", "garlic4", "coffee4", "chicken4", "crabs4", "carrot4", "apple4", "banana4", "asparagus4", "bean4", "celery4", "chocolate4", "bacon4", "lemon4", "grape4", "ginger4", "ham4", "elephant2", "lion2", "skink2", "alpaca2", "parrot2", "badger2", "wolf2", "crow2", "raven2", "bison2", "goose2", "bear2", "rat2", "hare2", "kacal2", "turkey2", "alligator2", "bat2", "monkey2", "otter2"];
+            var word;
+            var letters;
+            var displayWord = "";
+            var savedWord;
+
+            function randomize() {
+                lives = 10;
+
+                word = words[Math.floor(Math.random() * words.length)];
+
+								let categories = ['Games', 'Big Words', 'Animals', 'Professions', 'Foods', 'Places'];
+
+								document.getElementById("category").innerHTML = categories[Number(word.substring(word.length-1))];
+
+
+                word = word.slice(0, -1);
+
+                letters = word.split('');
+                displayWord = "";
+                for (var i = 0; i < word.length; i++) {
+                    displayWord = displayWord + "_ ";
+                    savedWord = displayWord.split('');
+                }
+
+
+
+                document.getElementById("word").innerHTML = displayWord;
+
+
+            }
+
+
+
+            function guess(l) {
+                closeLetter(l);
+                var check = false;
+                for (var i = 0; i < letters.length; i++) {
+
+                    if (l == letters[i]) {
+                        check = true;
+                    }
+                }
+
+                if (check == true) {
+                    displayWord = "";
+                    for (var i = 0; i < word.length; i++) {
+                    if (letters[i] == l) {
+                        displayWord = displayWord + l + " ";
+                        savedWord[i] = l;
+                    } else if (letters[i] == savedWord[i]) {
+                        displayWord = displayWord + savedWord[i] + " ";
+                    } else {
+                        displayWord = displayWord + "_ ";
+                    }
+
+                    }
+                    document.getElementById("word").innerHTML = displayWord;
+
+
+
+                    if (displayWord.slice(0, -1) == word.split('').join(' ')) {
+                        //they solved the word
+                        score += lives;
+                        if (score > highscore) {
+                            highscore = score;
+                        }
+                        randomize();
+                        resetLetters();
+                    }
+
+                    document.getElementById("score").innerHTML = "Score: " + score;
+                    document.getElementById("highscore").innerHTML = "Highscore: " + highscore;
+                    document.getElementById("lives").innerHTML = "Lives: " + lives;
+
+                } else {
+                    //they guessed a wrong letter
+
+                    lives--;
+                    if (lives < 1) {
+                        //they lost
+                        score = 0;
+                        randomize();
+                        resetLetters();
+                    }
+                    document.getElementById("score").innerHTML = "Score: " + score;
+                    document.getElementById("lives").innerHTML = "Lives: " + lives;
+                }
+            }
+
+            function closeLetter(letter) {
+                document.getElementById(letter).style.backgroundColor = "#b5b5b5";
+            }
+
+            function resetLetters() {
+                elements = document.getElementsByClassName("key");
+                for (var i = 0; i < elements.length; i++) {
+                    elements[i].style.backgroundColor = "#FFFFFF";
+                }
+            }
+
+
+
+		</script>
+	</body
+</html>

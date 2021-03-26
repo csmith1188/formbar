@@ -400,7 +400,7 @@ def endpoint_color():
         return "Color sent!<br>" + backButton
 
 @app.route('/segment')
-def endpoint_color():
+def endpoint_segment():
     if not request.remote_addr in studentList:
         # This will have to send along the current address as "forward" eventually
         return redirect('/login')
@@ -418,32 +418,37 @@ def endpoint_color():
             return "Bad Arguments<br><br>Try <b>/segment?start=0&end=10&hex=#FF00FF</b> (you did not use a proper hexadecimal color)"
         if not start or not end:
             return "Bad Arguments<br><br>Try <b>/segment?start=0&end=10&hex=#FF00FF</b> (you need a start and end point)"
+        else:
+            try:
+                start = int(start)
+                end = int(end)
+            except:
+                return "Bad Arguments<br><br>Try <b>/segment?start=0&end=10&hex=#FF00FF</b> (start and end must be and integer)"
         if start > BARPIX or end > BARPIX:
             return "Bad Arguments<br><br>Try <b>/segment?start=0&end=10&hex=#FF00FF</b> (Your start or end was higher than the number of pixels: " + str(BARPIX) + ")"
-
+        pixRange = range(start, end)
         if type == 'fadein':
-            for i, pix in range(start, end):
-                pixels[pix] = fadein(range(start, end), i, hex)
+            for i, pix in enumerate(pixRange):
+                pixels[pix] = fadein(pixRange, i, hex2dec(hex))
         elif type == 'fadeout':
-            for i, pix in range(start, end):
-                pixels[pix] = fadeout(range(start, end), i, hex)
+            for i, pix in enumerate(pixRange):
+                pixels[pix] = fadeout(pixRange, i, hex2dec(hex))
         elif type == 'blend':
             if not hex:
                 return "Bad Arguments<br><br>Try <b>/segment?start=0&end=10&hex=#FF00FF&hex2=#00FF00</b> (you need at least two colors)"
             if not hex2dec(hex):
                 return "Bad Arguments<br><br>Try <b>/segment?start=0&end=10&hex=#FF00FF&hex2=#00FF00</b> (you did not use a proper hexadecimal color)"
             else:
-                for i, pix in range(start, end):
-                    pixels[pix] = blend(range(start, end), i, hex2dec(hex), hex2dec(hex2))
+                for i, pix in enumerate(pixRange):
+                    pixels[pix] = blend(pixRange, i, hex2dec(hex), hex2dec(hex2))
         elif type == 'color':
-                for i, pix in range(start, end):
+                for i, pix in enumerate(pixRange):
                     pixels[pix] = hex2dec(hex)
         else:
-            pass
-        if hex2dec(hex):
-            fillBar(hex2dec(hex))
-        else:
-            return "Bad Arguments<br><br>Try <b>/color?hex=#FF00FF</b> or <b>/color?r=255&g=0&b=255</b>"
+            if hex2dec(hex):
+                fillBar(hex2dec(hex))
+            else:
+                return "Bad Arguments<br><br>Try <b>/color?hex=#FF00FF</b> or <b>/color?r=255&g=0&b=255</b>"
         pixels.show()
         return "Color sent!<br>" + backButton
 
@@ -523,7 +528,7 @@ def settings():
                 return resString
 
 @app.route('/flush')
-def endpoint_quiz():
+def endpoint_flush():
     if not request.remote_addr in studentList:
         # This will have to send along the current address as "forward" eventually
         return redirect('/login')

@@ -399,6 +399,54 @@ def endpoint_color():
         pixels.show()
         return "Color sent!<br>" + backButton
 
+@app.route('/segment')
+def endpoint_color():
+    if not request.remote_addr in studentList:
+        # This will have to send along the current address as "forward" eventually
+        return redirect('/login')
+    if studentList[request.remote_addr]['perms'] > settingsPerms['bar']:
+        return "You do not have high enough permissions to do this right now. " + backButton
+    else:
+        type = request.args.get('type')
+        hex = request.args.get('hex')
+        hex2 = request.args.get('hex2')
+        start = request.args.get('start')
+        end = request.args.get('end')
+        if not hex:
+            return "Bad Arguments<br><br>Try <b>/segment?start=0&end=10&hex=#FF00FF</b> (you need at least one color)"
+        if not hex2dec(hex):
+            return "Bad Arguments<br><br>Try <b>/segment?start=0&end=10&hex=#FF00FF</b> (you did not use a proper hexadecimal color)"
+        if not start or not end:
+            return "Bad Arguments<br><br>Try <b>/segment?start=0&end=10&hex=#FF00FF</b> (you need a start and end point)"
+        if start > BARPIX or end > BARPIX:
+            return "Bad Arguments<br><br>Try <b>/segment?start=0&end=10&hex=#FF00FF</b> (Your start or end was higher than the number of pixels: " + str(BARPIX) + ")"
+
+        if type == 'fadein':
+            for i, pix in range(start, end):
+                pixels[pix] = fadein(range(start, end), i, hex)
+        elif type == 'fadeout':
+            for i, pix in range(start, end):
+                pixels[pix] = fadeout(range(start, end), i, hex)
+        elif type == 'blend':
+            if not hex:
+                return "Bad Arguments<br><br>Try <b>/segment?start=0&end=10&hex=#FF00FF&hex2=#00FF00</b> (you need at least two colors)"
+            if not hex2dec(hex):
+                return "Bad Arguments<br><br>Try <b>/segment?start=0&end=10&hex=#FF00FF&hex2=#00FF00</b> (you did not use a proper hexadecimal color)"
+            else:
+                for i, pix in range(start, end):
+                    pixels[pix] = blend(range(start, end), i, hex2dec(hex), hex2dec(hex2))
+        elif type == 'color':
+                for i, pix in range(start, end):
+                    pixels[pix] = hex2dec(hex)
+        else:
+            pass
+        if hex2dec(hex):
+            fillBar(hex2dec(hex))
+        else:
+            return "Bad Arguments<br><br>Try <b>/color?hex=#FF00FF</b> or <b>/color?r=255&g=0&b=255</b>"
+        pixels.show()
+        return "Color sent!<br>" + backButton
+
 @app.route('/settings', methods = ['POST', 'GET'])
 def settings():
     global ipList
@@ -474,6 +522,18 @@ def settings():
                 resString += "<br>" + backButton
                 return resString
 
+@app.route('/flush')
+def endpoint_quiz():
+    if not request.remote_addr in studentList:
+        # This will have to send along the current address as "forward" eventually
+        return redirect('/login')
+    if studentList[request.remote_addr]['perms'] > settingsPerms['admin']:
+        return "You do not have high enough permissions to do this right now. " + backButton
+    else:
+        for user in studentList:
+            if not user['perms'] == settingsPerms['admin']:
+                del user['perms']
+
 @app.route('/quiz')
 def endpoint_quiz():
     if not request.remote_addr in studentList:
@@ -523,7 +583,7 @@ def endpoint_survey():
         return "You do not have high enough permissions to do this right now. " + backButton
     else:
         if not settingsStrDict['mode'] == 'survey':
-            return "Not in Survey settingsStrDict['mode'] <br>" + backButton
+            return "Not in Survey mode <br>" + backButton
         ip = request.remote_addr
         vote = request.args.get('vote')
         name = request.args.get('name')
@@ -575,13 +635,14 @@ def endpoint_tutd():
 
 @app.route('/help', methods = ['POST', 'GET'])
 def endpoint_help():
+    if not request.remote_addr in studentList:
+        # This will have to send along the current address as "forward" eventually
+        return redirect('/login')
     if request.method == 'POST':
-        name = request.form['name']
-        problem = request.form['problem']
         if name:
-            name = name.replace("%20", "")
+            name = studentList[request.remote_addr]['name']
             name = name.replace(" ", "")
-            helpList[name] = problem
+            helpList[name] = "Help ticket"
             playSFX("up04")
             return "Your ticket was sent. Keep working on the problem the best you can while you wait.<br>" + backButton
         else:
@@ -591,32 +652,37 @@ def endpoint_help():
 
 @app.route('/needshelp')
 def endpoint_needshelp():
-
-    remove = request.args.get('remove')
-    '''
-    if bool(helpList):
-        pixels.fill(colors['red'])
+    if not request.remote_addr in studentList:
+        # This will have to send along the current address as "forward" eventually
+        return redirect('/login')
+    if studentList[request.remote_addr]['perms'] > settingsPerms['admin']:
+        return "You do not have high enough permissions to do this right now. " + backButton
     else:
-        pixels.fill((0, 0, 0))
-    pixels.show()
-    '''
-    if remove:
-        if remove in helpList:
-            del helpList[remove]
-            return "Removed ticket for: " + remove +"<br>" + backButton
+        remove = request.args.get('remove')
+        '''
+        if bool(helpList):
+            pixels.fill(colors['red'])
         else:
-            return "Couldn't find ticket for: " + remove +"<br>" + backButton
-    else:
-        resString = '<meta http-equiv="refresh" content="5">'
-        if not helpList:
-            resString += "No tickets yet. <br><button onclick='location.reload();'>Try Again</button>"
-            return resString
+            pixels.fill((0, 0, 0))
+        pixels.show()
+        '''
+        if remove:
+            if remove in helpList:
+                del helpList[remove]
+                return "Removed ticket for: " + remove +"<br>" + backButton
+            else:
+                return "Couldn't find ticket for: " + remove +"<br>" + backButton
         else:
-            resString += "<table border=1>"
-            for ticket in helpList:
-                resString += "<tr><td><a href=\'/needshelp?remove=" + ticket +"\'>" + ticket + "</a></td><td>" + helpList[ticket] + "</td></tr>"
-            resString += "</table>"
-            return resString
+            resString = '<meta http-equiv="refresh" content="5">'
+            if not helpList:
+                resString += "No tickets yet. <br><button onclick='location.reload();'>Try Again</button>"
+                return resString
+            else:
+                resString += "<table border=1>"
+                for ticket in helpList:
+                    resString += "<tr><td><a href=\'/needshelp?remove=" + ticket +"\'>" + ticket + "</a></td><td>" + helpList[ticket] + "</td></tr>"
+                resString += "</table>"
+                return resString
 
 @app.route('/chat')
 def endpoint_chat():

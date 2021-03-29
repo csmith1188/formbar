@@ -1,14 +1,17 @@
 from flask import Flask, redirect, url_for, request, render_template
+from websocket_server import WebsocketServer
 import board, neopixel
 import json, csv
 import pygame
 import time, math
+import threading
+import multiprocessing
 import netifaces as ni
 ni.ifaddresses('eth0')
 ip = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
 
-#import pyttsx3
-#engine = pyttsx3.init()
+
+WSPORT=9001
 
 print('Running formbar server on:' + ip)
 
@@ -93,6 +96,24 @@ quizCorrect = ''
 
 backButton = "<br><button onclick='window.history.back()'>Go Back</button><script language='JavaScript' type='text/javascript'>setTimeout(\"window.history.back()\",5000);</script>"
 
+def aniTest():
+    fillBar((0,0,0))
+    for i in range(0, BARPIX - 40):
+        pixRange = range(i+20, i + 40)
+        pixRange2 = range(i, i + 20)
+        for j, pix in enumerate(pixRange):
+            pixels[pix] = blend(pixRange, j, colors['blue'], colors['red'])
+        for j, pix in enumerate(pixRange2):
+            pixels[pix] = blend(pixRange2, j, colors['green'], colors['blue'])
+        pixels.show()
+
+@app.route('/anitest')
+def endpoint_anitest():
+    if len(threading.enumerate()) < 4:
+        threading.Thread(target=aniTest, daemon=True).start()
+        return 'testing...'
+    else:
+        return 'Too many threads'
 
 def newStudent(remote, username, forward='', pin=''):
     global studentList
@@ -144,7 +165,6 @@ def blend(irange, current, color1, color2):
     return blendColor
 
 def addBlock():
-
     if blockList[-1][0] in colorDict:
         pixels[len(blockList)-1] = colorDict[blockList[-1][0]]
     else:
@@ -152,7 +172,6 @@ def addBlock():
     pixels.show()
 
 def fillBlocks():
-
     for i, block in enumerate(blockList):
         if block[0] in colorDict:
             pixels[i] = colorDict[block[0]]
@@ -691,7 +710,13 @@ def endpoint_needshelp():
 
 @app.route('/chat')
 def endpoint_chat():
-    return render_template("chat.html")
+    if not request.remote_addr in studentList:
+        # This will have to send along the current address as "forward" eventually
+        return redirect('/login')
+    if studentList[request.remote_addr]['perms'] > settingsPerms['say']:
+        return "You do not have high enough permissions to do this right now. " + backButton
+    else:
+        return render_template("chat.html", username = studentList[request.remote_addr]['name'], serverIp = ip)
 
 @app.route('/users')
 def endpoint_user():
@@ -806,7 +831,7 @@ def endpoint_getpermissions():
 
 @app.route('/virtualbar')
 def endpoint_virtualbar():
-    return render_template("virtualbar.html",  serverIp = ip)
+    return render_template("virtualbar.html", serverIp = ip)
 
 @app.route('/sfx')
 def endpoint_sfx():
@@ -914,10 +939,44 @@ def endpoint_say():
             return "<b>phrase</b> must contain a string. \'/say?phrase=<b>\'hello\'</b>\'<br>" + backButton
         return "Set phrase to: " + str(phrase) + "<br>" + backButton
 
+
+'''
+    Websocket Setup
+'''
+
+# Called for every client connecting (after handshake)
+def new_client(client, server):
+	print("New client connected and was given id %d" % client['id'])
+
+# Called for every client disconnecting
+def client_left(client, server):
+	print("Client(%d) disconnected" % client['id'])
+
+# Called when a client sends a message
+def message_received(client, server, message):
+	if len(message) > 200:
+		message = message[:200]+'..'
+	print("Client(%d) said: %s" % (client['id'], message))
+
 #Startup stuff
 showString(ip)
 pixels.show()
 playSFX("bootup02")
 
-if __name__ == '__main__':
+def start_flask():
     app.run(host='0.0.0.0', use_reloader=False, debug = False)
+
+def start_chat():
+    server = WebsocketServer(WSPORT, host='0.0.0.0')
+    server.set_fn_new_client(new_client)
+    server.set_fn_client_left(client_left)
+    server.set_fn_message_received(message_received)
+    server.run_forever()
+
+if __name__ == '__main__':
+    flaskApp = multiprocessing.Process(target=start_flask)
+    chatApp = multiprocessing.Process(target=start_chat)
+    flaskApp.start()
+    chatApp.start()
+    flaskApp.join()
+    chatApp.join()

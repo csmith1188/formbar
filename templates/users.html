@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+        <title>Users</title>
+        <script type="text/javascript">
+            let studentData;
+            let oldStudentData;
+            let permNames = ['Teacher', 'Assistant', 'Student', 'Guest']
+            function checkUpdates(url) {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', url);
+                xhr.onload = function() {
+                    studentData = xhr.response;
+                };
+                xhr.send();
+            }
+            setInterval(function() {
+                checkUpdates('/getstudents');
+                if (studentData != oldStudentData) {
+                    oldStudentData = studentData;
+                    let studentList = JSON.parse(studentData);
+                    let studentBox = document.getElementById('students');
+                    studentBox.innerHTML = '';
+                    for (student in studentList) {
+                        let newStudent = document.createElement('div');
+                        newStudent.classList.add('student');
+                        newStudent.innerHTML = studentList[student].name;
+                        newStudent.innerHTML += "	&nbsp; ";
+                        newStudent.innerHTML += permNames[studentList[student]['perms']];
+                        newStudent.innerHTML += "	&nbsp; ";
+                        newStudent.innerHTML += `<a href="users?name=${studentList[student]['name']}&action=kick">Kick</a>`;
+                        newStudent.innerHTML += `
+                        <select onchange="updatePerm(this)" id="userpermsDrop" name="userpermsDrop">
+                            <option value="/users?name=${studentList[student]['name']}&action=perm&perm=0">${permNames[0]}</option>
+                            <option value="/users?name=${studentList[student]['name']}&action=perm&perm=1">${permNames[1]}</option>
+                            <option value="/users?name=${studentList[student]['name']}&action=perm&perm=2">${permNames[2]}</option>
+                            <option value="/users?name=${studentList[student]['name']}&action=perm&perm=3" selected="selected">${permNames[3]}</option>
+                        </select>`
+                        studentBox.appendChild(newStudent)
+                    }
+                }
+            }, 1000);
+
+            function updatePerm(el) {
+                let request = new XMLHttpRequest();
+                console.log(el.value);
+                request.open("GET", el.value);
+                request.onload = function() {
+                    console.log(request.response);
+                };
+                request.send();
+            }
+        </script>
+    </head>
+
+    <body>
+        <h1 style="color: blue">Users</h1>
+        <div id="students">
+        </div>
+    </body>
+
+</html>

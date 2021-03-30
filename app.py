@@ -663,14 +663,11 @@ def endpoint_help():
         # This will have to send along the current address as "forward" eventually
         return redirect('/login')
     if request.method == 'POST':
-        if name:
-            name = studentList[request.remote_addr]['name']
-            name = name.replace(" ", "")
-            helpList[name] = "Help ticket"
-            playSFX("up04")
-            return "Your ticket was sent. Keep working on the problem the best you can while you wait.<br>" + backButton
-        else:
-            return "I at least need your name so I know who to help"
+        name = studentList[request.remote_addr]['name']
+        name = name.replace(" ", "")
+        helpList[name] = "Help ticket"
+        playSFX("up04")
+        return "Your ticket was sent. Keep working on the problem the best you can while you wait.<br>" + backButton
     else:
         return render_template("help.html")
 
@@ -938,28 +935,6 @@ def endpoint_say():
         else:
             return "<b>phrase</b> must contain a string. \'/say?phrase=<b>\'hello\'</b>\'<br>" + backButton
         return "Set phrase to: " + str(phrase) + "<br>" + backButton
-
-'''
-    Websocket Setup
-    https://github.com/Pithikos/python-websocket-server
-'''
-
-# Called for every client connecting (after handshake)
-def new_client(client, server):
-	print("New client connected and was given id %d" % client['id'])
-
-# Called for every client disconnecting
-def client_left(client, server):
-	print("Client(%d) disconnected" % client['id'])
-
-# Called when a client sends a message
-def message_received(client, server, message):
-    #Check for "login" message
-    #Check for permissions
-    #Checking max message length here
-	if len(message) > 200:
-		message = message[:200]+'..'
-	print("Client(%d) said: %s" % (client['id'], message))
 
 #Startup stuff
 showString(ip)

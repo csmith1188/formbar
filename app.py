@@ -637,24 +637,49 @@ def endpoint_say():
 
     if settingsBoolDict['locked'] == True:
         if not request.remote_addr in whiteList:
-            return "Say settingsStrDict['mode'] is locked"
-
-    phrase = request.args.get('phrase')
-    fgColor = request.args.get('fg')
-    bgColor = request.args.get('bg')
-    if phrase:
-        if hex2dec(fgColor) and hex2dec(bgColor):
-            clearString()
-            showString(phrase, 0, hex2dec(fgColor), hex2dec(bgColor))
-        else:
-            clearString()
-            showString(phrase)
-        pixels.show()
-        #engine.say(p)
-        #engine.runAndWait()
+            return "You are not whitelisted. " + backButton
+    '''
+    if studentList[request.remote_addr]['perms'] > settingsPerms['bar']:
+        return "You do not have high enough permissions to do this right now. " + backButton
     else:
-        return "<b>phrase</b> must contain a string. \'/say?phrase=<b>\'hello\'</b>\'<br>" + backButton
-    return "Set phrase to: " + str(phrase) + "<br>" + backButton
+        phrase = request.args.get('phrase')
+        fgColor = request.args.get('fg')
+        bgColor = request.args.get('bg')
+        if phrase:
+            if hex2dec(fgColor) and hex2dec(bgColor):
+                clearString()
+                showString(phrase, 0, hex2dec(fgColor), hex2dec(bgColor))
+            else:
+                clearString()
+                showString(phrase)
+            pixels.show()
+            #engine.say(p)
+            #engine.runAndWait()
+        else:
+            return "<b>phrase</b> must contain a string. \'/say?phrase=<b>\'hello\'</b>\'<br>" + backButton
+        return "Set phrase to: " + str(phrase) + "<br>" + backButton
+
+'''
+    Websocket Setup
+    https://github.com/Pithikos/python-websocket-server
+'''
+
+# Called for every client connecting (after handshake)
+def new_client(client, server):
+	print("New client connected and was given id %d" % client['id'])
+
+# Called for every client disconnecting
+def client_left(client, server):
+	print("Client(%d) disconnected" % client['id'])
+
+# Called when a client sends a message
+def message_received(client, server, message):
+    #Check for "login" message
+    #Check for permissions
+    #Checking max message length here
+	if len(message) > 200:
+		message = message[:200]+'..'
+	print("Client(%d) said: %s" % (client['id'], message))
 
 #Startup stuff
 showString(ip)

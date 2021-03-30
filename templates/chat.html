@@ -4,31 +4,134 @@
         <meta charset="utf-8">
         <title>Chat</title>
         <style media="screen">
-            #outpoot {
-                width: 90%;
+            #contentChat {
+                /* display: flex; */
+            }
+
+            #container-full-width {
+                display: flex;
                 height: 80%;
+            }
+
+            #outputBox {
+                width: 85%;
                 overflow-x: hidden;
                 overflow-y: scroll;
+            }
+
+            #userlist {
+                display: flex;
+            }
+
+            .user {
+                background-color: #cccccc;
+                border: 1px solid #000000;
+                border-radius: 5px;
+                height: auto;
+            }
+
+            .msg {
+                margin: 5px;
+                padding: 5px;
+                border-radius: 5px;
+                border: 1px solid #000000;
+                background-color: #cccccc;
+            }
+
+            .me {
+                background-color: #ccffcc;
+            }
+
+            .them {
+                background-color: #ccccff;
+            }
+
+            .alert {
+                background-color: #ffcccc;
+            }
+
+            .whisper {
+                background-color: #ffccff;
             }
         </style>
     </head>
 
-    <body onload="init();">
-        <div id="outpoot">
-        </div>
-        <form onsubmit="event.preventDefault(); onSubmit(); return false;">
-            <input type="text" id="input" autocomplete="off">
-            <input type="submit" value="Send">
-        </form>
+    <body>
+        <div id="contentChat">
+            <div id="container-full-width">
+                <div id="outputBox"></div>
+                <div id="userlist"></div>
+            </div>
+            <div class="controlChat">
+              <form onsubmit="event.preventDefault(); onSubmit(); return false;">
+                <input type="text" id="input" autocomplete="off">
+                <input type="submit" value="Send" id="sendButton">
+              </form>
+            </div>
     </body>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+
     <script type="text/javascript">
-        var ws;
+        // Connect to Web Socket
         ws = new WebSocket("ws://{{ serverIp }}:9001");
-        var userName = "{{ username }}";
+        var username = "{{ username }}";
+        var receiver = 'all';
+
+        //When the connection opens.
+        ws.onopen = function() {};
+
+        ws.onmessage = function(message) {
+            let data = JSON.parse(message.data);
+            if (data.type == 'message' || data.type == 'alert') {
+                console.log(data);
+                output(data);
+            } else if (data.type == 'userlist') {
+                boxes.userlist.innerHTML = ''
+                for (user in data.content) {
+                    let newUser = document.createElement('div')
+                    newUser.classList.add('msg')
+                    if (data.content[user].name == username) newUser.classList.add('me')
+                    else newUser.setAttribute("onclick", "changeRec('" + data.content[user].name + "', this)");
+                    newUser.appendChild(document.createTextNode(data.content[user].name))
+                    boxes.userlist.appendChild(newUser);
+                }
+            }
+        };
+
+        //When the connection closes
+        ws.onclose = function() {
+            output({
+                from: 'server',
+                content: 'Disconnected...'
+            });
+        };
+
+        //When there is an error
+        ws.onerror = function(e) {
+            output({
+                from: 'server',
+                content: 'Critical Error. See console...'
+            });
+            console.log(e)
+        };
 
         var boxes = {
-            outpoot: document.getElementById('outpoot'),
+            outputBox: document.getElementById('outputBox'),
+            inputBox: document.getElementById("input"),
+            userlist: document.getElementById("userlist"),
+            sendButton: document.getElementById("userlist")
+        }
+
+        function changeRec(name, el) {
+          if (receiver != name) {
+            receiver = name;
+            sendButton.value = "Send to " + receiver;
+            el.classList.add('whisper');
+          } else {
+            receiver = 'all';
+            sendButton.value = "Send";
+            el.classList.remove('whisper');
+          }
         }
 
         function atBottom(ele) {
@@ -45,47 +148,40 @@
             }
         }
 
-        //sets my username
-        function init() {
-            // Connect to Web Socket
-            // Set event handlers.
-            ws.onopen = function() {};
-            ws.onmessage = function(message) {
-                let data = message.data;
-                output("Server: " + message.data);
-                //auto scrolls to the bottom of the list every time someone sends a message
-                boxes.outpoot.scrollTop = boxes.outpoot.scrollHeight;
-            };
-            ws.onclose = function() {
-                output('Disconnected...');
-            };
-            ws.onerror = function(e) {
-                output("Critical Error. See console.");
-                console.log(e)
-            };
-        }
-
         function onSubmit() {
-            var input = document.getElementById("input");
             // You can send message to the Web Socket using ws.send()
-            ws.send(input.value);
-            output(userName + ": " + input.value);
-            input.value = "";
-            input.focus();
+            ws.send(JSON.stringify({
+                type: 'message',
+                to: receiver,
+                from: username,
+                content: boxes.inputBox.value
+            }));
+            // output({
+            //     from: 'me',
+            //     content: boxes.inputBox.value
+            // });
+            boxes.inputBox.value = "";
+            boxes.inputBox.focus();
         }
 
         function onCloseClick() {
             ws.close();
         }
 
-        function output(str) {
+        function output(message) {
             let lockBottom = false;
-            var log = document.getElementById("outpoot");
-            if (atBottom(log)) lockBottom = true;
-            var escaped = str.replace(/&/, "&amp;").replace(/</, "&lt;").
-            replace(/>/, "&gt;").replace(/"/, "&quot;"); // "
-            log.innerHTML = log.innerHTML + escaped + "<br>";
-            if (lockBottom) log.scrollTo(0, log.scrollHeight);
+            if (atBottom(boxes.outputBox)) lockBottom = true;
+            //If you want to strip HTML from the message
+            message.content = message.content.replace(/&/, "&amp;").replace(/</, "&lt;").replace(/>/, "&gt;").replace(/"/, "&quot;");
+            let newMSG = document.createElement('div')
+            newMSG.classList.add('msg')
+            if (message.to == username) newMSG.classList.add('whisper')
+            if (message.from == username) newMSG.classList.add('me')
+            else if (message.from == 'server' || message.type == 'alert') newMSG.classList.add('alert')
+            else newMSG.classList.add('them')
+            newMSG.appendChild(document.createTextNode(message.from + ": " + message.content))
+            boxes.outputBox.appendChild(newMSG);
+            if (lockBottom) boxes.outputBox.scrollTo(0, boxes.outputBox.scrollHeight);
         }
     </script>
 

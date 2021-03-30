@@ -5,7 +5,6 @@ import json, csv
 import pygame
 import time, math
 import threading
-import multiprocessing
 import netifaces as ni
 ni.ifaddresses('eth0')
 ip = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
@@ -39,6 +38,7 @@ app = Flask(__name__)
 # 1 - mod
 # 2 - student
 # 3 - anyone
+# 4 - banned
 settingsPerms = {
     'admin' : 0,
     'users' : 1,
@@ -123,7 +123,6 @@ def newStudent(remote, username, forward='', pin=''):
             'thumb': '',
             'survey': '',
             'perms': 2,
-            'banstatus': False
         }
         if len(studentList) - 1:
             print("New user logged in. Made them a student: " + username)
@@ -941,6 +940,75 @@ showString(ip)
 pixels.show()
 playSFX("bootup02")
 
+'''
+    Websocket Setup
+    https://github.com/Pithikos/python-websocket-server
+
+    {
+        type: <command|message>,
+        to: username|server,
+        from: username|server,
+        content: <message>
+    }
+
+'''
+
+def packMSG(type, rx, tx, content):
+    msgOUT = {
+        "type": type,
+        "to": rx,
+        "from": tx,
+        "content": content
+        }
+    return msgOUT
+
+# Called for every client connecting (after handshake)
+def new_client(client, server):
+    try:
+        studentList[client['address'][0]]['wsID'] = client['id']
+        print(studentList[client['address'][0]]['name'] + " connected and was given id %d" % client['id'])
+        server.send_message_to_all(json.dumps(packMSG('alert', 'all', 'server', studentList[client['address'][0]]['name'] + " has joined the server...")))
+        server.send_message_to_all(json.dumps(packMSG('userlist', 'all', 'server', studentList)))
+    except:
+        print("Error finding user in list")
+
+# Called for every client disconnecting
+def client_left(client, server):
+    server.send_message_to_all(json.dumps(packMSG('alert', 'all', 'server', studentList[client['address'][0]]['name'] + " has left the server...")))
+    server.send_message_to_all(json.dumps(packMSG('userlist', 'all', 'server', studentList)))
+    print(studentList[client['address'][0]]['name'] + " disconnected")
+
+# Called when a client sends a message
+def message_received(client, server, message):
+    # try:
+        message = json.loads(message)
+        if message['type'] == 'userlist':
+            server.send_message(client, json.dumps(packMSG('userlist', studentList[client['address'][0]]['name'], 'server', studentList)))
+        else:
+            #Check for permissions
+            if studentList[client['address'][0]]['perms'] > settingsPerms['say']:
+                messageOut = packMSG('alert', studentList[client['address'][0]]['name'], 'server', "You do not have permission to send text messages.")
+                server.send_message(client, json.dumps(messageOut))
+            else:
+                #Checking max message length here
+                if len(message['content']) > 252:
+                    message['content'] = message['content'][:252]+'...'
+                #Check recipients here
+                if message['to'] == 'all':
+                    messageOut =  packMSG('message', 'all', studentList[client['address'][0]]['name'], message['content'])
+                    server.send_message_to_all(json.dumps(messageOut))
+                else:
+                    for student in studentList:
+                        if studentList[student]['name'] == message['to']:
+                            for toClient in server.clients:
+                                if toClient['id'] == studentList[student]['wsID']:
+                                    messageOut =  packMSG('message', message['to'], studentList[client['address'][0]]['name'], message['content'])
+                                    server.send_message(toClient, json.dumps(messageOut))
+                                    break
+                print(message['from'] + " said to " + message['to'] + ": " + message['content'])
+    # except Exception as e:
+    #     print('Error: ' + str(e))
+
 def start_flask():
     app.run(host='0.0.0.0', use_reloader=False, debug = False)
 
@@ -952,9 +1020,10 @@ def start_chat():
     server.run_forever()
 
 if __name__ == '__main__':
-    flaskApp = multiprocessing.Process(target=start_flask)
-    chatApp = multiprocessing.Process(target=start_chat)
-    flaskApp.start()
+    chatApp = threading.Thread(target=start_chat, daemon=True)
     chatApp.start()
-    flaskApp.join()
+    # flaskApp = threading.Thread(target=start_flask)
+    # flaskApp.start()
+    # flaskApp.join()
+    start_flask()
     chatApp.join()

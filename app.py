@@ -6,8 +6,10 @@ import pygame
 import time, math
 import threading
 import netifaces as ni
-ni.ifaddresses('eth0')
-ip = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
+
+#Get internal IP address
+ip = ni.ifaddresses('wlan0')[ni.AF_INET][0]['addr']
+# ip = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
 
 
 WSPORT=9001
@@ -944,10 +946,11 @@ playSFX("bootup02")
     Websocket Setup
     https://github.com/Pithikos/python-websocket-server
 
+    A message to or from the server should be a stringified JSON object:
     {
-        type: <command|message>,
-        to: username|server,
-        from: username|server,
+        type: <alert|userlist|help|message>,
+        to: <*username*|server|all>,
+        from: <*username*|server>,
         content: <message>
     }
 
@@ -980,10 +983,18 @@ def client_left(client, server):
 
 # Called when a client sends a message
 def message_received(client, server, message):
-    # try:
+    try:
         message = json.loads(message)
         if message['type'] == 'userlist':
             server.send_message(client, json.dumps(packMSG('userlist', studentList[client['address'][0]]['name'], 'server', studentList)))
+        if message['type'] == 'alert':
+            server.send_message(client, json.dumps(packMSG('alert', studentList[client['address'][0]]['name'], 'server', 'Only the server can send alerts!')))
+        if message['type'] == 'help':
+            name = studentList[client['address'][0]]['name']
+            name = name.replace(" ", "")
+            helpList[name] = message['content']
+            playSFX("up04")
+            server.send_message(client, json.dumps(packMSG('alert', studentList[client['address'][0]]['name'], 'server', 'Your help ticket was sent. Keep working on the problem while you wait!')))
         else:
             #Check for permissions
             if studentList[client['address'][0]]['perms'] > settingsPerms['say']:
@@ -1006,8 +1017,8 @@ def message_received(client, server, message):
                                     server.send_message(toClient, json.dumps(messageOut))
                                     break
                 print(message['from'] + " said to " + message['to'] + ": " + message['content'])
-    # except Exception as e:
-    #     print('Error: ' + str(e))
+    except Exception as e:
+        print('Error: ' + str(e))
 
 def start_flask():
     app.run(host='0.0.0.0', use_reloader=False, debug = False)

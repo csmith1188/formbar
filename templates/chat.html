@@ -1,19 +1,31 @@
+<!DOCTYPE html>
 <html>
 
-    <head>
-        <meta charset="utf-8">
-        <title>Chat</title>
-        <style media="screen">
-            #contentChat {
-                /* display: flex; */
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style media="screen">
+            body {
+                padding-left: 0;
+                padding-right: 0;
             }
+            #content {
+                    margin: 0px;
+                    height: 100%;
+                    width: 90%;
+                }
 
             #container-full-width {
+                width: 100%;
+                margin: 0;
                 display: flex;
                 height: 80%;
             }
 
             #outputBox {
+                height: 100%;
                 width: 85%;
                 overflow-x: hidden;
                 overflow-y: scroll;
@@ -21,13 +33,14 @@
 
             #userlist {
                 display: flex;
+                flex-wrap: wrap;
             }
 
             .user {
                 background-color: #cccccc;
                 border: 1px solid #000000;
                 border-radius: 5px;
-                height: auto;
+                flex-grow: 1;
             }
 
             .msg {
@@ -54,135 +67,144 @@
                 background-color: #ffccff;
             }
         </style>
-    </head>
+</head>
 
-    <body>
-        <div id="contentChat">
-            <div id="container-full-width">
-                <div id="outputBox"></div>
-                <div id="userlist"></div>
-            </div>
-            <div class="controlChat">
-              <form onsubmit="event.preventDefault(); onSubmit(); return false;">
+<body>
+    <div id="content">
+        <div id="container-full-width">
+            <div id="outputBox"></div>
+            <div id="userlist"></div>
+        </div>
+        <div class="controlChat">
+            <form onsubmit="event.preventDefault(); onSubmit(); return false;">
                 <input type="text" id="input" autocomplete="off">
                 <input type="submit" value="Send" id="sendButton">
-              </form>
-            </div>
-    </body>
+            </form>
+        </div>
+</body>
 
 
-    <script type="text/javascript">
-        // Connect to Web Socket
-        ws = new WebSocket("ws://{{ serverIp }}:9001");
-        var username = "{{ username }}";
-        var receiver = 'all';
+<script type="text/javascript">
+    // Connect to Web Socket
+    ws = new WebSocket("ws://{{ serverIp }}:9001");
+    var username = "{{ username }}";
+    var receiver = 'all';
 
-        //When the connection opens.
-        ws.onopen = function() {};
+    //When the connection opens.
+    ws.onopen = function() {};
 
-        ws.onmessage = function(message) {
-            let data = JSON.parse(message.data);
-            if (data.type == 'message' || data.type == 'alert') {
-                console.log(data);
-                output(data);
-            } else if (data.type == 'userlist') {
-                boxes.userlist.innerHTML = ''
-                for (user in data.content) {
-                    let newUser = document.createElement('div')
-                    newUser.classList.add('msg')
-                    if (data.content[user].name == username) newUser.classList.add('me')
-                    else newUser.setAttribute("onclick", "changeRec('" + data.content[user].name + "', this)");
-                    newUser.appendChild(document.createTextNode(data.content[user].name))
-                    boxes.userlist.appendChild(newUser);
-                }
+    ws.onmessage = function(message) {
+        let data = JSON.parse(message.data);
+        if (data.type == 'message' || data.type == 'alert') {
+            console.log(data);
+            output(data);
+        } else if (data.type == 'userlist') {
+            boxes.userlist.innerHTML = ''
+            for (user in data.content) {
+                let newUser = document.createElement('div')
+                newUser.classList.add('msg')
+                if (data.content[user].name == username) newUser.classList.add('me')
+                else newUser.setAttribute("onclick", "changeRec('" + data.content[user].name + "', this)");
+                newUser.appendChild(document.createTextNode(data.content[user].name))
+                boxes.userlist.appendChild(newUser);
             }
-        };
-
-        //When the connection closes
-        ws.onclose = function() {
-            output({
-                from: 'server',
-                content: 'Disconnected...'
-            });
-        };
-
-        //When there is an error
-        ws.onerror = function(e) {
-            output({
-                from: 'server',
-                content: 'Critical Error. See console...'
-            });
-            console.log(e)
-        };
-
-        var boxes = {
-            outputBox: document.getElementById('outputBox'),
-            inputBox: document.getElementById("input"),
-            userlist: document.getElementById("userlist"),
-            sendButton: document.getElementById("userlist")
         }
+    };
 
-        function changeRec(name, el) {
-          if (receiver != name) {
+    //When the connection closes
+    ws.onclose = function() {
+        output({
+            from: 'server',
+            content: 'Disconnected...'
+        });
+    };
+
+    //When there is an error
+    ws.onerror = function(e) {
+        output({
+            from: 'server',
+            content: 'Critical Error. See console...'
+        });
+        console.log(e)
+    };
+
+    var boxes = {
+        outputBox: document.getElementById('outputBox'),
+        inputBox: document.getElementById("input"),
+        userlist: document.getElementById("userlist"),
+        sendButton: document.getElementById("userlist")
+    }
+
+    function packMSG(type, rx, tx, content) {
+        let msgOUT = {
+            type: type,
+            to: rx,
+            from: tx,
+            content: content
+            }
+        return msgOUT
+    }
+
+    function changeRec(name, el) {
+        if (receiver != name) {
             receiver = name;
             sendButton.value = "Send to " + receiver;
             el.classList.add('whisper');
-          } else {
+        } else {
             receiver = 'all';
             sendButton.value = "Send";
             el.classList.remove('whisper');
-          }
         }
+    }
 
-        function atBottom(ele) {
-            var sh = ele.scrollHeight;
-            var st = ele.scrollTop;
-            var ht = ele.offsetHeight;
-            if (ht == 0) {
-                return true;
-            }
-            if (st == sh - ht) {
-                return true;
-            } else {
-                return false;
-            }
+    function atBottom(ele) {
+        var sh = ele.scrollHeight;
+        var st = ele.scrollTop;
+        var ht = ele.offsetHeight;
+        if (ht == 0) {
+            return true;
         }
+        if (st == sh - ht) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-        function onSubmit() {
-            // You can send message to the Web Socket using ws.send()
-            ws.send(JSON.stringify({
-                type: 'message',
-                to: receiver,
-                from: username,
-                content: boxes.inputBox.value
-            }));
-            // output({
-            //     from: 'me',
-            //     content: boxes.inputBox.value
-            // });
-            boxes.inputBox.value = "";
-            boxes.inputBox.focus();
+    function onSubmit() {
+        let text = boxes.inputBox.value;
+        if (text.startsWith("!#help")) {
+            // text.splice(0, 2);
+            // args = text.split(" ");
+            // args.shift();
+            ws.send(JSON.stringify(packMSG('help', receiver, username, text)));
+        } else {
+            ws.send(JSON.stringify(packMSG('message', receiver, username, text)));
         }
+        boxes.inputBox.value = "";
+        boxes.inputBox.focus();
+    }
 
-        function onCloseClick() {
-            ws.close();
-        }
+    function onCloseClick() {
+        ws.close();
+    }
 
-        function output(message) {
-            let lockBottom = false;
-            if (atBottom(boxes.outputBox)) lockBottom = true;
-            //If you want to strip HTML from the message
-            message.content = message.content.replace(/&/, "&amp;").replace(/</, "&lt;").replace(/>/, "&gt;").replace(/"/, "&quot;");
-            let newMSG = document.createElement('div')
-            newMSG.classList.add('msg')
-            if (message.to == username) newMSG.classList.add('whisper')
-            if (message.from == username) newMSG.classList.add('me')
-            else if (message.from == 'server' || message.type == 'alert') newMSG.classList.add('alert')
-            else newMSG.classList.add('them')
-            newMSG.appendChild(document.createTextNode(message.from + ": " + message.content))
-            boxes.outputBox.appendChild(newMSG);
-            if (lockBottom) boxes.outputBox.scrollTo(0, boxes.outputBox.scrollHeight);
-        }
-    </script>
+    function output(message) {
+        let lockBottom = false;
+        if (atBottom(boxes.outputBox)) lockBottom = true;
+        let newMSG = document.createElement('div')
+        newMSG.classList.add('msg')
+        if (message.to == username) newMSG.classList.add('whisper')
+        if (message.from == username) newMSG.classList.add('me')
+        else if (message.from == 'server' || message.type == 'alert') newMSG.classList.add('alert')
+        else newMSG.classList.add('them')
+        //Use this if you want to allow HTML
+        newMSG.innerHTML = message.from + ": " + message.content
+        //Use this if you want to convert HTML into text
+        // newMSG.appendChild(document.createTextNode(message.from + ": " + message.content))
+        boxes.outputBox.appendChild(newMSG);
+        if (lockBottom) boxes.outputBox.scrollTo(0, boxes.outputBox.scrollHeight);
+    }
+</script>
 
 </html>

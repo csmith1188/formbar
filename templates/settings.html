@@ -1,73 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <title>Formbar Setup</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-        <script type="text/javascript">
-            function getSettings() {
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formbar Setup</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script type="text/javascript">
+        function getSettings() {
 
-            }
+        }
 
-            function sendStudents() {
-                studentNum = document.getElementById('studentNum').value;
-                let request = new XMLHttpRequest();
-                request.open("GET", "/settings?students=" + studentNum);
-                // request.onload = function() {
-                //     console.log(request.response);
-                // };
-                request.send();
-            }
+        function sendStudents() {
+            studentNum = document.getElementById('studentNum').value;
+            let request = new XMLHttpRequest();
+            request.open("GET", "/settings?students=" + studentNum);
+            // request.onload = function() {
+            //     console.log(request.response);
+            // };
+            request.send();
+        }
 
-            function updatePerm(el) {
-                console.log("GET", "/settings?" + el.value);
-                let request = new XMLHttpRequest();
-                request.open("GET", "/settings?" + el.value);
-                request.onload = function() {
-                    // console.log(request.response);
-                };
-                request.send();
-            }
+        function updatePerm(el) {
+            console.log("GET", "/settings?" + el.value);
+            let request = new XMLHttpRequest();
+            request.open("GET", "/settings?" + el.value);
+            request.onload = function() {
+                // console.log(request.response);
+            };
+            request.send();
+        }
 
-            function upbLabel(el) {
-                document.getElementById('studentNumButton').innerHTML = "Update Students (" + el.value + ")"
-            }
+        function upbLabel(el) {
+            document.getElementById('studentNumButton').innerHTML = "Update Students (" + el.value + ")"
+        }
 
-            function getStudentData() {
+        function getStudentData() {
 
-            }
+        }
 
-            var studentData;
+        var studentData;
 
-            function checkUpdates(url) {
-                var xhr = new XMLHttpRequest();
-                xhr.open('GET', url);
-                xhr.onload = function() {
-                    studentData = xhr.response;
-                };
-                xhr.send();
-            }
-            setInterval(function() {
-                checkUpdates('/getstudents');
-                if (studentData) {
-                    let studentList = JSON.parse(studentData);
-                    let studentBox = document.getElementById('students');
-                    studentBox.innerHTML = '';
-                    for (student in studentList) {
-                        let newStudent = document.createElement('div');
-                        newStudent.classList.add('student');
-                        newStudent.innerHTML = studentList[student].name;
-                        studentBox.appendChild(newStudent)
-                    }
+        function checkUpdates(url) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', url);
+            xhr.onload = function() {
+                studentData = xhr.response;
+            };
+            xhr.send();
+        }
+        setInterval(function() {
+            checkUpdates('/getstudents');
+            if (studentData) {
+                let studentList = JSON.parse(studentData);
+                let studentBox = document.getElementById('students');
+                studentBox.innerHTML = '';
+                for (student in studentList) {
+                    let newStudent = document.createElement('div');
+                    newStudent.classList.add('student');
+                    newStudent.innerHTML = studentList[student].name;
+                    studentBox.appendChild(newStudent)
                 }
-            }, 1000);
-        </script>
-    </head>
+            }
+        }, 1000);
+    </script>
+</head>
 
-    <body>
+<body>
+    <div id="content">
+
         <h1 style="color: blue">Formbar Setup</h1>
         <div>
             <form action="settings" method="post">
@@ -209,6 +210,7 @@
                 </tr>
             </table>
         </div>
-    </body>
+    </div>
+</body>
 
 </html>

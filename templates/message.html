@@ -13,9 +13,9 @@
 
 <!-- Main content here -->
 {% block main %}
-<h1 style="color: blue">Ask For Help</h1>
-<form action="help" method="post" style="text-align: center;">
-    <input type="submit" value="Click to Send a Help Ticket">
-</form>
-
+{{ message }}
+<br><br><button onclick='window.history.back()'>Go Back</button>
+<script language='JavaScript' type='text/javascript'>
+    setTimeout("window.history.back()", 5000);
+</script>
 {% endblock %}

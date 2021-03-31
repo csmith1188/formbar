@@ -1,216 +1,216 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'header.html' %}
+<!-- ^^ This means add this file to the end of the contents of header.html -->
+<!-- This is where the title, top buttons, and stylesheet is located -->
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formbar Setup</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <script type="text/javascript">
-        function getSettings() {
+<!-- Change title here -->
+{% block title %}Formbar Login{% endblock %}
 
-        }
+<!-- Extra style declarations here -->
+{% block style %}{% endblock %}
 
-        function sendStudents() {
-            studentNum = document.getElementById('studentNum').value;
-            let request = new XMLHttpRequest();
-            request.open("GET", "/settings?students=" + studentNum);
-            // request.onload = function() {
-            //     console.log(request.response);
-            // };
-            request.send();
-        }
+<!-- Extra javascript here -->
+{% block script %}
+<script type="text/javascript">
+    function getSettings() {
 
-        function updatePerm(el) {
-            console.log("GET", "/settings?" + el.value);
-            let request = new XMLHttpRequest();
-            request.open("GET", "/settings?" + el.value);
-            request.onload = function() {
-                // console.log(request.response);
-            };
-            request.send();
-        }
+    }
 
-        function upbLabel(el) {
-            document.getElementById('studentNumButton').innerHTML = "Update Students (" + el.value + ")"
-        }
+    function sendStudents() {
+        studentNum = document.getElementById('studentNum').value;
+        let request = new XMLHttpRequest();
+        request.open("GET", "/settings?students=" + studentNum);
+        // request.onload = function() {
+        // console.log(request.response);
+        // };
+        request.send();
+    }
 
-        function getStudentData() {
+    function updatePerm(el) {
+        console.log("GET", "/settings?" + el.value);
+        let request = new XMLHttpRequest();
+        request.open("GET", "/settings?" + el.value);
+        request.onload = function() {
+            // console.log(request.response);
+        };
+        request.send();
+    }
 
-        }
+    function upbLabel(el) {
+        document.getElementById('studentNumButton').innerHTML = "Update Students (" + el.value + ")"
+    }
 
-        var studentData;
+    function getStudentData() {
 
-        function checkUpdates(url) {
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', url);
-            xhr.onload = function() {
-                studentData = xhr.response;
-            };
-            xhr.send();
-        }
-        setInterval(function() {
-            checkUpdates('/getstudents');
-            if (studentData) {
-                let studentList = JSON.parse(studentData);
-                let studentBox = document.getElementById('students');
-                studentBox.innerHTML = '';
-                for (student in studentList) {
-                    let newStudent = document.createElement('div');
-                    newStudent.classList.add('student');
-                    newStudent.innerHTML = studentList[student].name;
-                    studentBox.appendChild(newStudent)
-                }
+    }
+
+    var studentData;
+
+    function checkUpdates(url) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', url);
+        xhr.onload = function() {
+            studentData = xhr.response;
+        };
+        xhr.send();
+    }
+    setInterval(function() {
+        checkUpdates('/getstudents');
+        if (studentData) {
+            let studentList = JSON.parse(studentData);
+            let studentBox = document.getElementById('students');
+            studentBox.innerHTML = '';
+            for (student in studentList) {
+                let newStudent = document.createElement('div');
+                newStudent.classList.add('student');
+                newStudent.innerHTML = studentList[student].name;
+                studentBox.appendChild(newStudent)
             }
-        }, 1000);
-    </script>
-</head>
+        }
+    }, 1000);
+</script>
+{% endblock %}
 
-<body>
-    <div id="content">
-
-        <h1 style="color: blue">Formbar Setup</h1>
-        <div>
-            <form action="settings" method="post">
-                <input type="submit" value="Send Setup"><br>
-                <b>Question</b><br>
-                <input type="text" name="qQuestion"><br>
-                <b>Answers</b><br>
-                <input type="radio" name="quizlet" value="0" checked><input type="text" name="qaAnswer"><br>
-                <input type="radio" name="quizlet" value="1"><input type="text" name="qbAnswer"><br>
-                <input type="radio" name="quizlet" value="2"><input type="text" name="qcAnswer"><br>
-                <input type="radio" name="quizlet" value="3"><input type="text" name="qdAnswer"><br>
-            </form>
-        </div>
-        <br>
-        <div>
-            <input type="range" id="studentNum" oninput="upbLabel(this)" name="studentNum" min="1" max="30" style="width:200px;"><br>
-            <button type="button" id="studentNumButton" onclick="sendStudents()">Update Students</button>
-        </div>
-        <br>
-        <div id="perms">
-            <b>Permissions:</b>
-            <div class="perBox">
-                <b>API</b><br>
-                <select onchange="updatePerm(this)" id="apipermsDrop" name="apipermsDrop">
-                    <option value="api=0">Teacher</option>
-                    <option value="api=1">Assistant</option>
-                    <option value="api=2">Student</option>
-                    <option value="api=3" selected="selected">Anyone</option>
-                </select>
-            </div>
-            <div class="perBox">
-                <b>Sounds</b><br>
-
-                <select onchange="updatePerm(this)" id="sfxpermsDrop" name="sfxpermsDrop">
-                    <option value="sfx=0" selected="selected">Teacher</option>
-                    <option value="sfx=1">Assistant</option>
-                    <option value="sfx=2">Student</option>
-                    <option value="sfx=3">Anyone</option>
-                </select>
-            </div>
-            <div class="perBox">
-                <b>Music</b><br>
-
-                <select onchange="updatePerm(this)" id="bgmpermsDrop" name="bgmpermsDrop">
-                    <option value="bgm=0" selected="selected">Teacher</option>
-                    <option value="bgm=1">Assistant</option>
-                    <option value="bgm=2">Student</option>
-                    <option value="bgm=3">Anyone</option>
-                </select>
-            </div>
-            <div class="perBox">
-                <b>Phrases</b><br>
-
-                <select onchange="updatePerm(this)" id="saypermsDrop" name="saypermsDrop">
-                    <option value="say=0" selected="selected">Teacher</option>
-                    <option value="say=1">Assistant</option>
-                    <option value="say=2">Student</option>
-                    <option value="say=3">Anyone</option>
-                </select>
-            </div>
-            <div class="perBox">
-                <b>LED Bar</b><br>
-
-                <select onchange="updatePerm(this)" id="barpermsDrop" name="barpermsDrop">
-                    <option value="bar=0" selected="selected">Teacher</option>
-                    <option value="bar=1">Assistant</option>
-                    <option value="bar=2">Student</option>
-                    <option value="bar=3">Anyone</option>
-                </select>
-            </div>
-        </div>
-        <div id="students">
-        </div>
-        <div>
-            <table border=1>
-                <tr>
-                    <td><a href="/settings?mode=thumbs">Thumbs</a></td>
-                </tr>
-                <tr>
-                    <td><a href="/settings?mode=survey">Survey</a></td>
-                </tr>
-                <tr>
-                    <td><a href="/settings?mode=quiz">Quiz</a></td>
-                </tr>
-                <tr>
-                    <td><a href="/settings?mode=essay">Essay</a></td>
-                </tr>
-                <tr>
-                    <td><a href="/settings?mode=help">Help Monitor</a></td>
-                </tr>
-                <tr>
-                    <td><a href="/settings?mode=kahoot">Kahoots!</a></td>
-                </tr>
-                <tr>
-                    <td><a href="/settings?mode=playtime">Playtime</a></td>
-                </tr>
-                <tr>
-                    <td><a href="/settings?mode=blockchest">blockchest</a></td>
-                </tr>
-            </table>
-        </div>
-        <br>
-        <div>
-            <table border=1>
-                <tr>
-                    <td colspan=2><b>Settings</b></td>
-                </tr>
-                <tr>
-                    <td colspan=2>Only whitelisted IPs can make changes</td>
-                </tr>
-                <tr>
-                    <td><a href="/settings?locked=true">Locked</a></td>
-                    <td><a href="/settings?locked=false">Unlocked</a></td>
-                </tr>
-                <tr>
-                    <td colspan=2>Hide or show results until complete</td>
-                </tr>
-                <tr>
-                    <td><a href="/settings?blind=true">Blind Results</a></td>
-                    <td><a href="/settings?blind=false">Live Results</a></td>
-                </tr>
-                <tr>
-                    <td colspan=2>Show incomplete bar when votes are missing</td>
-                </tr>
-                <tr>
-                    <td><a href="/settings?showinc=true">Show empty spaces</a></td>
-                    <td><a href="/settings?showinc=false">Fill bar</a></td>
-                </tr>
-                <tr>
-                    <td colspan=2>Clear out submissions</td>
-                </tr>
-                <tr>
-                    <td><a href="/settings?clear=quiz">Quiz</a></td>
-                    <td><a href="/settings?clear=essay">Essay</a></td>
-                </tr>
-                <tr>
-                    <td><a href="/settings?clear=formbar">Formbar</a></td>
-                    <td><a href="/settings?clear=help">Help</a></td>
-                </tr>
-            </table>
-        </div>
+<!-- Main content here -->
+{% block main %}
+<h1 style="color: blue">Formbar Setup</h1>
+<div>
+    <form action="settings" method="post">
+        <input type="submit" value="Send Setup"><br>
+        <b>Question</b><br>
+        <input type="text" name="qQuestion"><br>
+        <b>Answers</b><br>
+        <input type="radio" name="quizlet" value="0" checked><input type="text" name="qaAnswer"><br>
+        <input type="radio" name="quizlet" value="1"><input type="text" name="qbAnswer"><br>
+        <input type="radio" name="quizlet" value="2"><input type="text" name="qcAnswer"><br>
+        <input type="radio" name="quizlet" value="3"><input type="text" name="qdAnswer"><br>
+    </form>
+</div>
+<br>
+<div>
+    <input type="range" id="studentNum" oninput="upbLabel(this)" name="studentNum" min="1" max="30" style="width:200px;"><br>
+    <button type="button" id="studentNumButton" onclick="sendStudents()">Update Students</button>
+</div>
+<br>
+<div id="perms">
+    <b>Permissions:</b>
+    <div class="perBox">
+        <b>API</b><br>
+        <select onchange="updatePerm(this)" id="apipermsDrop" name="apipermsDrop">
+            <option value="api=0">Teacher</option>
+            <option value="api=1">Assistant</option>
+            <option value="api=2">Student</option>
+            <option value="api=3" selected="selected">Anyone</option>
+        </select>
     </div>
-</body>
+    <div class="perBox">
+        <b>Sounds</b><br>
 
-</html>
+        <select onchange="updatePerm(this)" id="sfxpermsDrop" name="sfxpermsDrop">
+            <option value="sfx=0" selected="selected">Teacher</option>
+            <option value="sfx=1">Assistant</option>
+            <option value="sfx=2">Student</option>
+            <option value="sfx=3">Anyone</option>
+        </select>
+    </div>
+    <div class="perBox">
+        <b>Music</b><br>
+
+        <select onchange="updatePerm(this)" id="bgmpermsDrop" name="bgmpermsDrop">
+            <option value="bgm=0" selected="selected">Teacher</option>
+            <option value="bgm=1">Assistant</option>
+            <option value="bgm=2">Student</option>
+            <option value="bgm=3">Anyone</option>
+        </select>
+    </div>
+    <div class="perBox">
+        <b>Phrases</b><br>
+
+        <select onchange="updatePerm(this)" id="saypermsDrop" name="saypermsDrop">
+            <option value="say=0" selected="selected">Teacher</option>
+            <option value="say=1">Assistant</option>
+            <option value="say=2">Student</option>
+            <option value="say=3">Anyone</option>
+        </select>
+    </div>
+    <div class="perBox">
+        <b>LED Bar</b><br>
+
+        <select onchange="updatePerm(this)" id="barpermsDrop" name="barpermsDrop">
+            <option value="bar=0" selected="selected">Teacher</option>
+            <option value="bar=1">Assistant</option>
+            <option value="bar=2">Student</option>
+            <option value="bar=3">Anyone</option>
+        </select>
+    </div>
+</div>
+<div id="students">
+</div>
+<div>
+    <table border=1>
+        <tr>
+            <td><a href="/settings?mode=thumbs">Thumbs</a></td>
+        </tr>
+        <tr>
+            <td><a href="/settings?mode=survey">Survey</a></td>
+        </tr>
+        <tr>
+            <td><a href="/settings?mode=quiz">Quiz</a></td>
+        </tr>
+        <tr>
+            <td><a href="/settings?mode=essay">Essay</a></td>
+        </tr>
+        <tr>
+            <td><a href="/settings?mode=help">Help Monitor</a></td>
+        </tr>
+        <tr>
+            <td><a href="/settings?mode=kahoot">Kahoots!</a></td>
+        </tr>
+        <tr>
+            <td><a href="/settings?mode=playtime">Playtime</a></td>
+        </tr>
+        <tr>
+            <td><a href="/settings?mode=blockchest">blockchest</a></td>
+        </tr>
+    </table>
+</div>
+<br>
+<div>
+    <table border=1>
+        <tr>
+            <td colspan=2><b>Settings</b></td>
+        </tr>
+        <tr>
+            <td colspan=2>Only whitelisted IPs can make changes</td>
+        </tr>
+        <tr>
+            <td><a href="/settings?locked=true">Locked</a></td>
+            <td><a href="/settings?locked=false">Unlocked</a></td>
+        </tr>
+        <tr>
+            <td colspan=2>Hide or show results until complete</td>
+        </tr>
+        <tr>
+            <td><a href="/settings?blind=true">Blind Results</a></td>
+            <td><a href="/settings?blind=false">Live Results</a></td>
+        </tr>
+        <tr>
+            <td colspan=2>Show incomplete bar when votes are missing</td>
+        </tr>
+        <tr>
+            <td><a href="/settings?showinc=true">Show empty spaces</a></td>
+            <td><a href="/settings?showinc=false">Fill bar</a></td>
+        </tr>
+        <tr>
+            <td colspan=2>Clear out submissions</td>
+        </tr>
+        <tr>
+            <td><a href="/settings?clear=quiz">Quiz</a></td>
+            <td><a href="/settings?clear=essay">Essay</a></td>
+        </tr>
+        <tr>
+            <td><a href="/settings?clear=formbar">Formbar</a></td>
+            <td><a href="/settings?clear=help">Help</a></td>
+        </tr>
+    </table>
+</div>
+{% endblock %}

@@ -11,7 +11,6 @@ import netifaces as ni
 ip = ni.ifaddresses('wlan0')[ni.AF_INET][0]['addr']
 # ip = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
 
-
 WSPORT=9001
 
 print('Running formbar server on:' + ip)
@@ -96,7 +95,7 @@ quizQuestion = ''
 quizAnswers = []
 quizCorrect = ''
 
-backButton = "<br><button onclick='window.history.back()'>Go Back</button><script language='JavaScript' type='text/javascript'>setTimeout(\"window.history.back()\",5000);</script>"
+backButton = "<button onclick='window.history.back()'>Go Back</button><script language='JavaScript' type='text/javascript'>setTimeout(\"window.history.back()\",5000);</script>"
 
 def aniTest():
     fillBar((0,0,0))
@@ -396,10 +395,10 @@ def endpoint_color():
     '''
     if settingsBoolDict['locked'] == True:
         if not request.remote_addr in whiteList:
-            return "You are not whitelisted. " + backButton
+            return render_template("message.html", message = "You are not whitelisted. " )
     '''
     if studentList[request.remote_addr]['perms'] > settingsPerms['bar']:
-        return "You do not have high enough permissions to do this right now. " + backButton
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
         try:
             r = int(request.args.get('r'))
@@ -415,9 +414,9 @@ def endpoint_color():
         elif r and b and g:
             fillBar((r, g, b))
         else:
-            return "Bad Arguments<br><br>Try <b>/color?hex=#FF00FF</b> or <b>/color?r=255&g=0&b=255</b>"
+            return "Bad ArgumentsTry <b>/color?hex=#FF00FF</b> or <b>/color?r=255&g=0&b=255</b>"
         pixels.show()
-        return "Color sent!<br>" + backButton
+        return render_template("message.html", message = "Color sent!" )
 
 @app.route('/segment')
 def endpoint_segment():
@@ -425,7 +424,7 @@ def endpoint_segment():
         # This will have to send along the current address as "forward" eventually
         return redirect('/login')
     if studentList[request.remote_addr]['perms'] > settingsPerms['bar']:
-        return "You do not have high enough permissions to do this right now. " + backButton
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
         type = request.args.get('type')
         hex = request.args.get('hex')
@@ -433,19 +432,19 @@ def endpoint_segment():
         start = request.args.get('start')
         end = request.args.get('end')
         if not hex:
-            return "Bad Arguments<br><br>Try <b>/segment?start=0&end=10&hex=#FF00FF</b> (you need at least one color)"
+            return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=#FF00FF</b> (you need at least one color)"
         if not hex2dec(hex):
-            return "Bad Arguments<br><br>Try <b>/segment?start=0&end=10&hex=#FF00FF</b> (you did not use a proper hexadecimal color)"
+            return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=#FF00FF</b> (you did not use a proper hexadecimal color)"
         if not start or not end:
-            return "Bad Arguments<br><br>Try <b>/segment?start=0&end=10&hex=#FF00FF</b> (you need a start and end point)"
+            return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=#FF00FF</b> (you need a start and end point)"
         else:
             try:
                 start = int(start)
                 end = int(end)
             except:
-                return "Bad Arguments<br><br>Try <b>/segment?start=0&end=10&hex=#FF00FF</b> (start and end must be and integer)"
+                return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=#FF00FF</b> (start and end must be and integer)"
         if start > BARPIX or end > BARPIX:
-            return "Bad Arguments<br><br>Try <b>/segment?start=0&end=10&hex=#FF00FF</b> (Your start or end was higher than the number of pixels: " + str(BARPIX) + ")"
+            return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=#FF00FF</b> (Your start or end was higher than the number of pixels: " + str(BARPIX) + ")"
         pixRange = range(start, end)
         if type == 'fadein':
             for i, pix in enumerate(pixRange):
@@ -455,9 +454,9 @@ def endpoint_segment():
                 pixels[pix] = fadeout(pixRange, i, hex2dec(hex))
         elif type == 'blend':
             if not hex:
-                return "Bad Arguments<br><br>Try <b>/segment?start=0&end=10&hex=#FF00FF&hex2=#00FF00</b> (you need at least two colors)"
+                return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=#FF00FF&hex2=#00FF00</b> (you need at least two colors)"
             if not hex2dec(hex):
-                return "Bad Arguments<br><br>Try <b>/segment?start=0&end=10&hex=#FF00FF&hex2=#00FF00</b> (you did not use a proper hexadecimal color)"
+                return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=#FF00FF&hex2=#00FF00</b> (you did not use a proper hexadecimal color)"
             else:
                 for i, pix in enumerate(pixRange):
                     pixels[pix] = blend(pixRange, i, hex2dec(hex), hex2dec(hex2))
@@ -468,9 +467,9 @@ def endpoint_segment():
             if hex2dec(hex):
                 fillBar(hex2dec(hex))
             else:
-                return "Bad Arguments<br><br>Try <b>/color?hex=#FF00FF</b> or <b>/color?r=255&g=0&b=255</b>"
+                return "Bad ArgumentsTry <b>/color?hex=#FF00FF</b> or <b>/color?r=255&g=0&b=255</b>"
         pixels.show()
-        return "Color sent!<br>" + backButton
+        return render_template("message.html", message = "Color sent!" )
 
 @app.route('/settings', methods = ['POST', 'GET'])
 def settings():
@@ -482,10 +481,10 @@ def settings():
     '''
     if settingsBoolDict['locked'] == True:
         if not request.remote_addr in whiteList:
-            return "You are not whitelisted. " + backButton
+            return render_template("message.html", message = "You are not whitelisted. " )
     '''
     if studentList[request.remote_addr]['perms'] > settingsPerms['bar']:
-        return "You do not have high enough permissions to do this right now. " + backButton
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
         ipList = {}
         for student in studentList:
@@ -544,7 +543,7 @@ def settings():
                 return render_template("settings.html")
             else:
                 playSFX("pickup01")
-                resString += "<br>" + backButton
+                resString += ""
                 return resString
 
 @app.route('/flush')
@@ -553,7 +552,7 @@ def endpoint_flush():
         # This will have to send along the current address as "forward" eventually
         return redirect('/login')
     if studentList[request.remote_addr]['perms'] > settingsPerms['admin']:
-        return "You do not have high enough permissions to do this right now. " + backButton
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
         for user in studentList:
             if not user['perms'] == settingsPerms['admin']:
@@ -567,10 +566,10 @@ def endpoint_quiz():
     '''
     if settingsBoolDict['locked'] == True:
         if not request.remote_addr in whiteList:
-            return "You are not whitelisted. " + backButton
+            return render_template("message.html", message = "You are not whitelisted. " )
     '''
     if studentList[request.remote_addr]['perms'] > settingsPerms['bar']:
-        return "You do not have high enough permissions to do this right now. " + backButton
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
         answer = request.args.get('answer')
         if answer:
@@ -581,9 +580,9 @@ def endpoint_quiz():
                 else:
                     ipList[request.remote_addr] = 'down'
                 tutdBar()
-                return "Thank you for your tasty bytes...<br>" + backButton
+                return render_template("message.html", message = "Thank you for your tasty bytes..." )
             else:
-                return "You have already answered this quiz.<br>" + backButton
+                return render_template("message.html", message = "You have already answered this quiz." )
         else:
             resString = '<meta http-equiv="refresh" content="5">'
             if request.remote_addr in ipList:
@@ -602,13 +601,13 @@ def endpoint_survey():
     '''
     if settingsBoolDict['locked'] == True:
         if not request.remote_addr in whiteList:
-            return "You are not whitelisted. " + backButton
+            return render_template("message.html", message = "You are not whitelisted. " )
     '''
     if studentList[request.remote_addr]['perms'] > settingsPerms['bar']:
-        return "You do not have high enough permissions to do this right now. " + backButton
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
         if not settingsStrDict['mode'] == 'survey':
-            return "Not in Survey mode <br>" + backButton
+            return render_template("message.html", message = "Not in Survey mode " )
         ip = request.remote_addr
         vote = request.args.get('vote')
         name = request.args.get('name')
@@ -618,18 +617,18 @@ def endpoint_survey():
             print("Recieved " + vote + " from " + name + " at " + ip)
             playSFX("blip01")
         #if settingsStrDict['mode'] != 'survey':
-            #return "There is no survey right now<br>" + backButton
+            #return render_template("message.html", message = "There is no survey right now" )
         if vote:
             if vote in ["a", "b", "c", "d"]:
                 ipList[request.remote_addr] = vote
                 surveyBar()
-                return "Thank you for your tasty bytes... (" + vote + ")<br>" + backButton
+                return render_template("message.html", message = "Thank you for your tasty bytes... (" + vote + ")" )
             elif vote == 'oops':
                 ipList.pop(ip)
                 surveyBar()
-                return "I won\'t mention it if you don\'t<br>" + backButton
+                return render_template("message.html", message = "I won\'t mention it if you don\'t" )
             else:
-                return "Bad Arguments<br><br>Try <b>/survey?vote=a</b>"
+                return "Bad ArgumentsTry <b>/survey?vote=a</b>"
         else:
             return render_template("thumbsrental.html")
 
@@ -647,14 +646,14 @@ def endpoint_tutd():
             if thumb == 'up' or thumb == 'down' or thumb == 'wiggle' :
                 studentList[request.remote_addr]['thumb'] = request.args.get('thumb')
                 tutdBar()
-                return "Thank you for your tasty bytes... (" + thumb + ")<br>" + backButton
+                return render_template("message.html", message = "Thank you for your tasty bytes... (" + thumb + ")" )
             elif thumb == 'oops':
                 studentList[request.remote_addr]['thumb'] = ''
                 playSFX("hit01")
                 tutdBar()
-                return "I won\'t mention it if you don\'t<br>" + backButton
+                return render_template("message.html", message = "I won\'t mention it if you don\'t" )
             else:
-                return "Bad Arguments<br><br>Try <b>/tutd?thumb=wiggle</b><br><br>You can also try <b>down</b> and <b>up</b> instead of <b>wiggle</b>"
+                return "Bad ArgumentsTry <b>/tutd?thumb=wiggle</b>You can also try <b>down</b> and <b>up</b> instead of <b>wiggle</b>"
         else:
             return render_template("thumbsrental.html")
 
@@ -668,7 +667,7 @@ def endpoint_help():
         name = name.replace(" ", "")
         helpList[name] = "Help ticket"
         playSFX("up04")
-        return "Your ticket was sent. Keep working on the problem the best you can while you wait.<br>" + backButton
+        return render_template("message.html", message = "Your ticket was sent. Keep working on the problem the best you can while you wait." )
     else:
         return render_template("help.html")
 
@@ -678,7 +677,7 @@ def endpoint_needshelp():
         # This will have to send along the current address as "forward" eventually
         return redirect('/login')
     if studentList[request.remote_addr]['perms'] > settingsPerms['admin']:
-        return "You do not have high enough permissions to do this right now. " + backButton
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
         remove = request.args.get('remove')
         '''
@@ -691,13 +690,13 @@ def endpoint_needshelp():
         if remove:
             if remove in helpList:
                 del helpList[remove]
-                return "Removed ticket for: " + remove +"<br>" + backButton
+                return render_template("message.html", message = "Removed ticket for: " + remove +"" )
             else:
-                return "Couldn't find ticket for: " + remove +"<br>" + backButton
+                return render_template("message.html", message = "Couldn't find ticket for: " + remove +"" )
         else:
             resString = '<meta http-equiv="refresh" content="5">'
             if not helpList:
-                resString += "No tickets yet. <br><button onclick='location.reload();'>Try Again</button>"
+                resString += "No tickets yet. <button onclick='location.reload();'>Try Again</button>"
                 return resString
             else:
                 resString += "<table border=1>"
@@ -712,7 +711,7 @@ def endpoint_chat():
         # This will have to send along the current address as "forward" eventually
         return redirect('/login')
     if studentList[request.remote_addr]['perms'] > settingsPerms['say']:
-        return "You do not have high enough permissions to do this right now. " + backButton
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
         return render_template("chat.html", username = studentList[request.remote_addr]['name'], serverIp = ip)
 
@@ -724,10 +723,10 @@ def endpoint_user():
     '''
     if settingsBoolDict['locked'] == True:
         if not request.remote_addr in whiteList:
-            return "You are not whitelisted. " + backButton
+            return render_template("message.html", message = "You are not whitelisted. " )
     '''
     if studentList[request.remote_addr]['perms'] > settingsPerms['users']:
-        return "You do not have high enough permissions to do this right now. " + backButton
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
         user = '';
         if request.args.get('name'):
@@ -736,12 +735,12 @@ def endpoint_user():
                     user = key
                     break
             if not user:
-                return "That user was not found by their name. " + backButton
+                return render_template("message.html", message = "That user was not found by their name. " )
         if request.args.get('ip'):
             if request.args.get('ip') in studentList:
                 user = request.args.get('ip')
             else:
-                return "That user was not found by their IP address. " + backButton
+                return render_template("message.html", message = "That user was not found by their IP address. " )
         if user:
             if request.args.get('action'):
                 action = request.args.get('action')
@@ -750,30 +749,30 @@ def endpoint_user():
                         del studentList[user]
                         return "User removed"
                     else:
-                        return "User not in list. " + backButton
+                        return render_template("message.html", message = "User not in list. " )
                 if action == 'ban':
                     if user in studentList:
                         banList.append(user)
                         del studentList[user]
                         return "User removed and added to ban list."
                     else:
-                        return "User not in list. " + backButton
+                        return render_template("message.html", message = "User not in list. " )
                 if action == 'perm':
                     if request.args.get('perm'):
                         try:
                             perm = int(request.args.get('perm'))
                             if user in studentList:
                                 if perm > 3 or perm < 0 :
-                                    return "Permissions out of range. " + backButton
+                                    return render_template("message.html", message = "Permissions out of range. " )
                                 else:
                                     studentList[user]['perms'] = perm
-                                    return "Changed user permission. " + backButton
+                                    return render_template("message.html", message = "Changed user permission. " )
                             else:
-                                return "User not in list. " + backButton
+                                return render_template("message.html", message = "User not in list. " )
                         except:
-                            return "Perm was not an integer. " + backButton
+                            return render_template("message.html", message = "Perm was not an integer. " )
             else:
-                return "No action given. " + backButton
+                return render_template("message.html", message = "No action given. " )
         else:
             return render_template("users.html")
 
@@ -788,7 +787,7 @@ def endpoint_emptyblocks():
 @app.route('/sendblock')
 def endpoint_sendblock():
     if not settingsStrDict['mode'] == 'blockchest':
-        return "Not in blockchest settingsStrDict['mode'] <br>" + backButton
+        return render_template("message.html", message = "Not in blockchest settingsStrDict['mode'] " )
     blockId = request.args.get("id")
     blockData = request.args.get("data")
     if blockId and blockData:
@@ -813,7 +812,7 @@ def endpoint_getstudents():
         # This will have to send along the current address as "forward" eventually
         return redirect('/login')
     if studentList[request.remote_addr]['perms'] > settingsPerms['api']:
-        return "You do not have high enough permissions to do this right now. " + backButton
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
         return json.dumps(studentList)
 
@@ -823,7 +822,7 @@ def endpoint_getpermissions():
         # This will have to send along the current address as "forward" eventually
         return redirect('/login')
     if studentList[request.remote_addr]['perms'] > settingsPerms['api']:
-        return "You do not have high enough permissions to do this right now. " + backButton
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
         return json.dumps(settingsPerms)
 
@@ -837,13 +836,13 @@ def endpoint_sfx():
         # This will have to send along the current address as "forward" eventually
         return redirect('/login')
     if studentList[request.remote_addr]['perms'] > settingsPerms['sfx']:
-        return "You do not have high enough permissions to do this right now. " + backButton
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
         sfx.updateFiles()
         sfx_file = request.args.get('file')
         if sfx_file in sfx.sound:
             playSFX(sfx_file)
-            return 'Playing: ' + sfx_file + backButton
+            return render_template("message.html", message = 'Playing: ' + sfx_file )
         else:
             resString = '<h2>List of available sound files:</h2><ul>'
             for key, value in sfx.sound.items():
@@ -859,10 +858,10 @@ def endpoint_bgm():
     '''
     if settingsBoolDict['locked'] == True:
         if not request.remote_addr in whiteList:
-            return "You are not whitelisted. " + backButton
+            return render_template("message.html", message = "You are not whitelisted. " )
     '''
     if studentList[request.remote_addr]['perms'] > settingsPerms['bgm']:
-        return "You do not have high enough permissions to do this right now. " + backButton
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
         bgm.updateFiles()
         bgm_file = request.args.get('file')
@@ -872,19 +871,19 @@ def endpoint_bgm():
                 playBGM(bgm_file, bgm_volume)
             else:
                 playBGM(bgm_file)
-            return 'Playing: ' + bgm_file + backButton
+            return render_template("message.html", message = 'Playing: ' + bgm_file )
         else:
             resString = '<h2>List of available background music files:</h2><ul>'
             for key, value in bgm.bgm.items():
                 resString += '<li><a href="/bgm?file=' + key + '">' + key + '</a></li>'
             resString += '</ul> You can play them by using \'<b>/bgm?file=&lt;sound file name&gt;&volume=&lt;0.0 - 1.0&gt;\'</b>'
-            resString += '<br>You can stop them by using \'<b>/bgmstop</b>\''
+            resString += 'You can stop them by using \'<b>/bgmstop</b>\''
             return resString
 
 @app.route('/bgmstop')
 def endpoint_bgmstop():
     stopBGM()
-    return 'Stopped music...' + backButton
+    return render_template("message.html", message = 'Stopped music...' )
 
 @app.route('/perc')
 def endpoint_perc():
@@ -894,18 +893,18 @@ def endpoint_perc():
     '''
     if settingsBoolDict['locked'] == True:
         if not request.remote_addr in whiteList:
-            return "You are not whitelisted. " + backButton
+            return render_template("message.html", message = "You are not whitelisted. " )
     '''
     if studentList[request.remote_addr]['perms'] > settingsPerms['bar']:
-        return "You do not have high enough permissions to do this right now. " + backButton
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
         percAmount = request.args.get('amount')
         try:
             percAmount = int(percAmount)
             percFill(percAmount)
         except:
-            return "<b>amount</b> must be an integer between 0 and 100 \'/perc?amount=<b>50</b>\'<br>" + backButton
-        return "Set perecentage to: " + str(percAmount) + "<br>" + backButton
+            return render_template("message.html", message = "<b>amount</b> must be an integer between 0 and 100 \'/perc?amount=<b>50</b>\'" )
+        return render_template("message.html", message = "Set perecentage to: " + str(percAmount) + "" )
 
 @app.route('/say')
 def endpoint_say():
@@ -915,10 +914,10 @@ def endpoint_say():
     '''
     if settingsBoolDict['locked'] == True:
         if not request.remote_addr in whiteList:
-            return "You are not whitelisted. " + backButton
+            return render_template("message.html", message = "You are not whitelisted. " )
     '''
     if studentList[request.remote_addr]['perms'] > settingsPerms['bar']:
-        return "You do not have high enough permissions to do this right now. " + backButton
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
         phrase = request.args.get('phrase')
         fgColor = request.args.get('fg')
@@ -934,8 +933,8 @@ def endpoint_say():
             #engine.say(p)
             #engine.runAndWait()
         else:
-            return "<b>phrase</b> must contain a string. \'/say?phrase=<b>\'hello\'</b>\'<br>" + backButton
-        return "Set phrase to: " + str(phrase) + "<br>" + backButton
+            return render_template("message.html", message = "<b>phrase</b> must contain a string. \'/say?phrase=<b>\'hello\'</b>\'" )
+        return render_template("message.html", message = "Set phrase to: " + str(phrase) + "" )
 
 #Startup stuff
 showString(ip)

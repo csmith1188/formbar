@@ -1,30 +1,30 @@
-<!DOCTYPE html>
-<html>
+{% extends 'header.html' %}
+<!-- ^^ This means add this file to the end of the contents of header.html -->
+<!-- This is where the title, top buttons, and stylesheet is located -->
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thumbspanel Rental</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
+<!-- Change title here -->
+{% block title %}Formbar Login{% endblock %}
 
-<body>
-    <div id="content">
-        <h2>Thumbs</h2>
-        <a href="/tutd?thumb=up">Up</a><br>
-        <a href="/tutd?thumb=wiggle">Wiggle</a><br>
-        <a href="/tutd?thumb=down">Down</a><br>
-        <a href="/tutd?thumb=oops">Oops</a><br><br>
-        <h2>Quiz</h2>
-        <a href="/survey?vote=a">A</a><br>
-        <a href="/survey?vote=b">B</a><br>
-        <a href="/survey?vote=c">C</a><br>
-        <a href="/survey?vote=d">D</a><br>
-        <a href="/survey?vote=oops">Oops</a><br><br>
-        <h2>Help</h2>
-        <a href="/quiz">Quiz</a><br>
-        <a href="/help">Help</a><br>
-    </div>
-</body>
+<!-- Extra style declarations here -->
+{% block style %}{% endblock %}
 
-</html>
+<!-- Extra javascript here -->
+{% block script %}{% endblock %}
+
+<!-- Main content here -->
+{% block main %}
+<h2>Thumbs</h2>
+<a href="/tutd?thumb=up">Up</a><br>
+<a href="/tutd?thumb=wiggle">Wiggle</a><br>
+<a href="/tutd?thumb=down">Down</a><br>
+<a href="/tutd?thumb=oops">Oops</a><br><br>
+<h2>Quiz</h2>
+<a href="/survey?vote=a">A</a><br>
+<a href="/survey?vote=b">B</a><br>
+<a href="/survey?vote=c">C</a><br>
+<a href="/survey?vote=d">D</a><br>
+<a href="/survey?vote=oops">Oops</a><br><br>
+<h2>Help</h2>
+<a href="/quiz">Quiz</a><br>
+<a href="/help">Help</a><br>
+{% endblock %}

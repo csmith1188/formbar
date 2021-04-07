@@ -1,102 +1,89 @@
-{% extends 'header.html' %}
-<!-- ^^ This means add this file to the end of the contents of header.html -->
-<!-- This is where the title, top buttons, and stylesheet is located -->
+<!DOCTYPE html>
+<html>
 
-<!-- Change title here -->
-{% block title %}Formbar Login{% endblock %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style media="screen">
+            body {
+                padding-left: 0;
+                padding-right: 0;
+            }
+            #content {
+                    margin: 0px;
+                    height: 100%;
+                    width: 90%;
+                }
 
-<!-- Extra style declarations here -->
-{% block style %}
-<style media="screen">
-html {
-  height: 100%;
-}
-body {
-    height: 100%;
-}
+            #container-full-width {
+                width: 100%;
+                margin: 0;
+                display: flex;
+                height: 80%;
+            }
 
-#content {
-    height: 90%;
-    position: relative;
-}
+            #outputBox {
+                height: 100%;
+                width: 85%;
+                overflow-x: hidden;
+                overflow-y: scroll;
+            }
 
-#container-full-width {
-}
+            #userlist {
+                display: flex;
+                flex-wrap: wrap;
+            }
 
-#outputBox {
-   float:left;
-   width: 80%;
-   display: inline-block;
-   vertical-align: top;
-   overflow-x: hidden;
-   overflow-y: scroll;
-   height: 600px;
-}
+            .user {
+                background-color: #cccccc;
+                border: 1px solid #000000;
+                border-radius: 5px;
+                flex-grow: 1;
+            }
 
-.msg {
-    margin: 5px;
-    padding: 5px;
-    border-radius: 5px;
-    border: 1px solid #000000;
-    background-color: #cccccc;
-}
+            .msg {
+                margin: 5px;
+                padding: 5px;
+                border-radius: 5px;
+                border: 1px solid #000000;
+                background-color: #cccccc;
+            }
 
-#userlist {
-    float: right;
-    display: flex;
-    flex-wrap: wrap;
-    vertical-align: top;
-    width: 20%;
-}
+            .me {
+                background-color: #ccffcc;
+            }
 
-.user {
-   background-color: #cccccc;
-   border: 1px solid #000000;
-   border-radius: 5px;
-   overflow-x:auto;
-}
+            .them {
+                background-color: #ccccff;
+            }
 
-.me {
-   background-color: #ccffcc;
-}
+            .alert {
+                background-color: #ffcccc;
+            }
 
-.them {
-   background-color: #ccccff;
-}
+            .whisper {
+                background-color: #ffccff;
+            }
+        </style>
+</head>
 
-.alert {
-   background-color: #ffcccc;
-}
+<body>
+    <div id="content">
+        <div id="container-full-width">
+            <div id="outputBox"></div>
+            <div id="userlist"></div>
+        </div>
+        <div class="controlChat">
+            <form onsubmit="event.preventDefault(); onSubmit(); return false;">
+                <input type="text" id="input" autocomplete="off">
+                <input type="submit" value="Send" id="sendButton">
+            </form>
+        </div>
+</body>
 
-.whisper {
-   background-color: #ffccff;
-}
 
-#controlChat {
-    position: absolute;
-    left: 15px;
-    bottom: 15px;
-}
-
-</style>
-{% endblock %}
-
-<!-- Extra javascript here -->
-{% block script %}
-{% endblock %}
-
-<!-- Main content here -->
-{% block main %}
-<div id="container-full-width">
-    <div id="outputBox"></div>
-    <div id="userlist"></div>
-</div>
-<div id="controlChat">
-    <form onsubmit="event.preventDefault(); onSubmit(); return false;">
-        <input type="text" id="input" autocomplete="off">
-        <input type="submit" value="Send" id="sendButton">
-    </form>
-</div>
 <script type="text/javascript">
     // Connect to Web Socket
     ws = new WebSocket("ws://{{ serverIp }}:9001");
@@ -154,7 +141,7 @@ body {
             to: rx,
             from: tx,
             content: content
-        }
+            }
         return msgOUT
     }
 
@@ -186,18 +173,16 @@ body {
 
     function onSubmit() {
         let text = boxes.inputBox.value;
-        if (text != "") {
-            if (text.startsWith("!#help")) {
-                // text.splice(0, 2);
-                // args = text.split(" ");
-                // args.shift();
-                ws.send(JSON.stringify(packMSG('help', receiver, username, text)));
-            } else {
-                ws.send(JSON.stringify(packMSG('message', receiver, username, text)));
-            }
-            boxes.inputBox.value = "";
-            boxes.inputBox.focus();
+        if (text.startsWith("!#help")) {
+            // text.splice(0, 2);
+            // args = text.split(" ");
+            // args.shift();
+            ws.send(JSON.stringify(packMSG('help', receiver, username, text)));
+        } else {
+            ws.send(JSON.stringify(packMSG('message', receiver, username, text)));
         }
+        boxes.inputBox.value = "";
+        boxes.inputBox.focus();
     }
 
     function onCloseClick() {
@@ -221,4 +206,5 @@ body {
         if (lockBottom) boxes.outputBox.scrollTo(0, boxes.outputBox.scrollHeight);
     }
 </script>
-{% endblock %}
+
+</html>

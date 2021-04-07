@@ -1,21 +1,20 @@
-{% extends 'header.html' %}
-<!-- ^^ This means add this file to the end of the contents of header.html -->
-<!-- This is where the title, top buttons, and stylesheet is located -->
+<!DOCTYPE html>
+<html lang="en">
 
-<!-- Change title here -->
-{% block title %}Formbar Login{% endblock %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formbar Help</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
 
-<!-- Extra style declarations here -->
-{% block style %}{% endblock %}
+<body>
+    <div id="content">
+        <h1 style="color: blue">Ask For Help</h1>
+        <form action="help" method="post" style="text-align: center;">
+            <input type="submit" value="Click to Send a Help Ticket">
+        </form>
+    </div>
+</body>
 
-<!-- Extra javascript here -->
-{% block script %}{% endblock %}
-
-<!-- Main content here -->
-{% block main %}
-<h1 style="color: blue">Ask For Help</h1>
-<form action="help" method="post" style="text-align: center;">
-    <input type="submit" value="Click to Send a Help Ticket">
-</form>
-
-{% endblock %}
+</html>

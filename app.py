@@ -8,8 +8,8 @@ import threading
 import netifaces as ni
 
 #Get internal IP address
-ip = ni.ifaddresses('wlan0')[ni.AF_INET][0]['addr']
-# ip = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
+#ip = ni.ifaddresses('wlan0')[ni.AF_INET][0]['addr']
+ip = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
 
 
 WSPORT=9001

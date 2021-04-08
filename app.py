@@ -6,6 +6,22 @@ import pygame
 import time, math
 import threading
 import netifaces as ni
+import logging
+
+logging.basicConfig(filename='info.log',
+                            filemode='a',
+                            format='%(asctime)s.%(msecs)d %(levelname)s %(message)s',
+                            datefmt='%H:%M:%S',
+                            level=logging.DEBUG)
+# set up logging to console
+console = logging.StreamHandler()
+console.setLevel(logging.DEBUG)
+# set a format which is simpler for console use
+formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+console.setFormatter(formatter)
+# add the handler to the root logger
+logging.getLogger('').addHandler(console)
+logger = logging.getLogger(__name__)
 
 #Get internal IP address
 #ip = ni.ifaddresses('wlan0')[ni.AF_INET][0]['addr']
@@ -14,7 +30,7 @@ ip = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
 
 WSPORT=9001
 
-print('Running formbar server on:' + ip)
+logging.info('Running formbar server on:' + ip)
 
 import letters
 import sfx
@@ -127,10 +143,10 @@ def newStudent(remote, username, forward='', pin=''):
             'perms': 2,
         }
         if len(studentList) - 1:
-            print("New user logged in. Made them a student: " + username)
+            logging.info("New user logged in. Made them a student: " + username)
             studentList[remote]['perms'] = 2
         else:
-            print("First user logged in. Made them a Teacher: " + username)
+            logging.info("First user logged in. Made them a Teacher: " + username)
             studentList[remote]['perms'] = 0
         if forward:
             return redirect(forward, code=302)
@@ -235,9 +251,9 @@ def printLetter(letter, startLocation, fg=colors['fg'], bg=colors['bg']):
                     pixels[j] = bg
 
         else:
-            print("Error! Letter ", letter, " not found.")
+            logging.warning("Warning! Letter ", letter, " not found.")
     else:
-        print("Error! Not enough space for this letter!")
+        logging.warning("Warning! Not enough space for this letter!")
 
 def surveyBar():
     results = [] # Create empty results list
@@ -615,7 +631,7 @@ def endpoint_survey():
         if not name:
             name = 'unknown'
         elif vote:
-            print("Recieved " + vote + " from " + name + " at " + ip)
+            logging.info("Recieved " + vote + " from " + name + " at " + ip)
             playSFX("blip01")
         #if settingsStrDict['mode'] != 'survey':
             #return "There is no survey right now<br>" + backButton
@@ -642,7 +658,7 @@ def endpoint_tutd():
         ip = request.remote_addr
         thumb = request.args.get('thumb')
         if thumb:
-            # print("Recieved " + thumb + " from " + name + " at ip: " + ip)
+            # logging.info("Recieved " + thumb + " from " + name + " at ip: " + ip)
             playSFX("blip01")
             if thumb == 'up' or thumb == 'down' or thumb == 'wiggle' :
                 studentList[request.remote_addr]['thumb'] = request.args.get('thumb')
@@ -969,17 +985,18 @@ def packMSG(type, rx, tx, content):
 def new_client(client, server):
     try:
         studentList[client['address'][0]]['wsID'] = client['id']
-        print(studentList[client['address'][0]]['name'] + " connected and was given id %d" % client['id'])
+        logging.info(studentList[client['address'][0]]['name'] + " connected and was given id %d" % client['id'])
         server.send_message_to_all(json.dumps(packMSG('alert', 'all', 'server', studentList[client['address'][0]]['name'] + " has joined the server...")))
         server.send_message_to_all(json.dumps(packMSG('userlist', 'all', 'server', studentList)))
-    except:
-        print("Error finding user in list")
+    except Exception as e:
+        logging.error("Error finding user in list: " + str(e))
 
 # Called for every client disconnecting
 def client_left(client, server):
     server.send_message_to_all(json.dumps(packMSG('alert', 'all', 'server', studentList[client['address'][0]]['name'] + " has left the server...")))
     server.send_message_to_all(json.dumps(packMSG('userlist', 'all', 'server', studentList)))
-    print(studentList[client['address'][0]]['name'] + " disconnected")
+    del studentList[client['address'][0]]['wsID']
+    logging.info(studentList[client['address'][0]]['name'] + " disconnected")
 
 # Called when a client sends a message
 def message_received(client, server, message):
@@ -1016,9 +1033,9 @@ def message_received(client, server, message):
                                     messageOut =  packMSG('message', message['to'], studentList[client['address'][0]]['name'], message['content'])
                                     server.send_message(toClient, json.dumps(messageOut))
                                     break
-                print(message['from'] + " said to " + message['to'] + ": " + message['content'])
+                logging.info(message['from'] + " said to " + message['to'] + ": " + message['content'])
     except Exception as e:
-        print('Error: ' + str(e))
+        logging.error('Error: ' + str(e))
 
 def start_flask():
     app.run(host='0.0.0.0', use_reloader=False, debug = False)

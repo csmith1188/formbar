@@ -1,0 +1,29 @@
+{% extends 'header.html' %}
+<!-- ^^ This means add this file to the end of the contents of header.html -->
+<!-- This is where the title, top buttons, and stylesheet is located -->
+
+<!-- Change title here -->
+{% block title %}Formbar Login{% endblock %}
+
+<!-- Extra style declarations here -->
+{% block style %}{% endblock %}
+
+<!-- Extra javascript here -->
+{% block script %}{% endblock %}
+
+<!-- Main content here -->
+{% block main %}
+
+<h1 style="color: blue">Login</h1>
+<form action="login" method="post">
+    <h3>Name</h3>
+    <input type="text" id="usernameBox" name="username" value="">
+    <input type="hidden" id="forwardBox" name="forward">
+    <input type="submit" value="Log In">
+</form>
+
+<script type="text/javascript">
+    document.getElementById('forwardBox').value = null;
+</script>
+
+{% endblock %}

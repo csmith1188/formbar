@@ -1,24 +1,224 @@
-<html>
-    <head>
-        <title>Chat</title>
-        <script>
-            // Create WebSocket connection.
-            const socket = new WebSocket('ws://localhost:5001');
+{% extends 'header.html' %}
+<!-- ^^ This means add this file to the end of the contents of header.html -->
+<!-- This is where the title, top buttons, and stylesheet is located -->
 
-            // Connection opened
-            socket.addEventListener('open', function (event) {
-                socket.send('Hello Server!');
-            });
+<!-- Change title here -->
+{% block title %}Formbar Login{% endblock %}
 
-            // Listen for messages
-            socket.addEventListener('message', function (event) {
-                document.getElementById('outpoot').innerHTML += 'Message from server: ' + event.data;
-            });
-        </script>
-    </head>
-    <body>
-        <div id='outpoot'>
-            
-        </div>
-    </body>
-</html>
+<!-- Extra style declarations here -->
+{% block style %}
+<style media="screen">
+html {
+  height: 100%;
+}
+body {
+    height: 100%;
+}
+
+#content {
+    height: 90%;
+    position: relative;
+}
+
+#container-full-width {
+}
+
+#outputBox {
+   float:left;
+   width: 80%;
+   display: inline-block;
+   vertical-align: top;
+   overflow-x: hidden;
+   overflow-y: scroll;
+   height: 600px;
+}
+
+.msg {
+    margin: 5px;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #000000;
+    background-color: #cccccc;
+}
+
+#userlist {
+    float: right;
+    display: flex;
+    flex-wrap: wrap;
+    vertical-align: top;
+    width: 20%;
+}
+
+.user {
+   background-color: #cccccc;
+   border: 1px solid #000000;
+   border-radius: 5px;
+   overflow-x:auto;
+}
+
+.me {
+   background-color: #ccffcc;
+}
+
+.them {
+   background-color: #ccccff;
+}
+
+.alert {
+   background-color: #ffcccc;
+}
+
+.whisper {
+   background-color: #ffccff;
+}
+
+#controlChat {
+    position: absolute;
+    left: 15px;
+    bottom: 15px;
+}
+
+</style>
+{% endblock %}
+
+<!-- Extra javascript here -->
+{% block script %}
+{% endblock %}
+
+<!-- Main content here -->
+{% block main %}
+<div id="container-full-width">
+    <div id="outputBox"></div>
+    <div id="userlist"></div>
+</div>
+<div id="controlChat">
+    <form onsubmit="event.preventDefault(); onSubmit(); return false;">
+        <input type="text" id="input" autocomplete="off">
+        <input type="submit" value="Send" id="sendButton">
+    </form>
+</div>
+<script type="text/javascript">
+    // Connect to Web Socket
+    ws = new WebSocket("ws://{{ serverIp }}:9001");
+    var username = "{{ username }}";
+    var receiver = 'all';
+
+    //When the connection opens.
+    ws.onopen = function() {};
+
+    ws.onmessage = function(message) {
+        let data = JSON.parse(message.data);
+        if (data.type == 'message' || data.type == 'alert') {
+            console.log(data);
+            output(data);
+        } else if (data.type == 'userlist') {
+            boxes.userlist.innerHTML = ''
+            for (user in data.content) {
+                let newUser = document.createElement('div')
+                newUser.classList.add('msg')
+                if (data.content[user].name == username) newUser.classList.add('me')
+                else newUser.setAttribute("onclick", "changeRec('" + data.content[user].name + "', this)");
+                newUser.appendChild(document.createTextNode(data.content[user].name))
+                boxes.userlist.appendChild(newUser);
+            }
+        }
+    };
+
+    //When the connection closes
+    ws.onclose = function() {
+        output({
+            from: 'server',
+            content: 'Disconnected...'
+        });
+    };
+
+    //When there is an error
+    ws.onerror = function(e) {
+        output({
+            from: 'server',
+            content: 'Critical Error. See console...'
+        });
+        console.log(e)
+    };
+
+    var boxes = {
+        outputBox: document.getElementById('outputBox'),
+        inputBox: document.getElementById("input"),
+        userlist: document.getElementById("userlist"),
+        sendButton: document.getElementById("userlist")
+    }
+
+    function packMSG(type, rx, tx, content) {
+        let msgOUT = {
+            type: type,
+            to: rx,
+            from: tx,
+            content: content
+        }
+        return msgOUT
+    }
+
+    function changeRec(name, el) {
+        if (receiver != name) {
+            receiver = name;
+            sendButton.value = "Send to " + receiver;
+            el.classList.add('whisper');
+        } else {
+            receiver = 'all';
+            sendButton.value = "Send";
+            el.classList.remove('whisper');
+        }
+    }
+
+    function atBottom(ele) {
+        var sh = ele.scrollHeight;
+        var st = ele.scrollTop;
+        var ht = ele.offsetHeight;
+        if (ht == 0) {
+            return true;
+        }
+        if (st == sh - ht) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function onSubmit() {
+        let text = boxes.inputBox.value;
+        if (text != "") {
+            if (text.startsWith("!#help")) {
+                // text.splice(0, 2);
+                // args = text.split(" ");
+                // args.shift();
+                ws.send(JSON.stringify(packMSG('help', receiver, username, text)));
+            } else {
+                ws.send(JSON.stringify(packMSG('message', receiver, username, text)));
+            }
+            boxes.inputBox.value = "";
+            boxes.inputBox.focus();
+        }
+    }
+
+    function onCloseClick() {
+        ws.close();
+    }
+
+    function output(message) {
+        let lockBottom = false;
+        if (atBottom(boxes.outputBox)) lockBottom = true;
+        let newMSG = document.createElement('div')
+        newMSG.classList.add('msg')
+        if (message.to == username) newMSG.classList.add('whisper')
+        if (message.from == username) newMSG.classList.add('me')
+        else if (message.from == 'server' || message.type == 'alert') newMSG.classList.add('alert')
+        else newMSG.classList.add('them')
+        //Use this if you want to allow HTML
+        newMSG.innerHTML = message.from + ": " + message.content
+        //Use this if you want to convert HTML into text
+        // newMSG.appendChild(document.createTextNode(message.from + ": " + message.content))
+        boxes.outputBox.appendChild(newMSG);
+        if (lockBottom) boxes.outputBox.scrollTo(0, boxes.outputBox.scrollHeight);
+    }
+</script>
+{% endblock %}

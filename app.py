@@ -75,7 +75,11 @@ quizCorrect = ''
 backButton = "<br><button onclick='window.history.back()'>Go Back</button><script language='JavaScript' type='text/javascript'>setTimeout(\"window.history.back()\",5000);</script>"
 
 def playSFX(sound):
-    pygame.mixer.Sound(sfx.sound[sound]).play()
+    try:
+        pygame.mixer.Sound(sfx.sound[sound]).play()
+        return "Succesfully played: "
+    except:
+        return "Invalid format: "
 def playBGM(bgm_filename, volume=1.0):
     pygame.mixer.music.load(bgm.bgm[bgm_filename])
     pygame.mixer.music.set_volume(volume)
@@ -570,9 +574,10 @@ def endpoint_sfx():
             return "Sound effects are locked"
     sfx.updateFiles()
     sfx_file = request.args.get('file')
+    resultText = ''
     if sfx_file in sfx.sound:
-        playSFX(sfx_file)
-        return 'Playing: ' + sfx_file + backButton
+        resultText = playSFX(sfx_file)
+        return resultText + sfx_file + backButton
     else:
         resString = '<h2>List of available sound files:</h2><ul>'
         for key, value in sfx.sound.items():

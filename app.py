@@ -147,6 +147,7 @@ def newStudent(remote, username, forward='', pin=''):
         else:
             logging.info("First user logged in. Made them a Teacher: " + username)
             studentList[remote]['perms'] = 0
+        playSFX("up02")
         if forward:
             return redirect(forward, code=302)
 
@@ -574,9 +575,11 @@ def endpoint_flush():
     if studentList[request.remote_addr]['perms'] > settingsPerms['admin']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
-        for user in studentList:
-            if not user['perms'] == settingsPerms['admin']:
-                del user['perms']
+        for user in list(studentList):
+            if not studentList[user]['perms'] == settingsPerms['admin']:
+                del studentList[user]
+        playSFX("splash01")
+        return render_template("message.html", message = "Users removed from list." )
 
 @app.route('/quiz')
 def endpoint_quiz():
@@ -685,9 +688,12 @@ def endpoint_help():
     if request.method == 'POST':
         name = studentList[request.remote_addr]['name']
         name = name.replace(" ", "")
-        helpList[name] = "Help ticket"
-        playSFX("up04")
-        return render_template("message.html", message = "Your ticket was sent. Keep working on the problem the best you can while you wait." )
+        if name in helpList:
+            return render_template("message.html", message = "You already have a help ticket in. If your problem is time-sensitive, or your last ticket was not cleared, please get the teacher's attention manually." )
+        else:
+            helpList[name] = "Help ticket"
+            playSFX("up04")
+            return render_template("message.html", message = "Your ticket was sent. Keep working on the problem the best you can while you wait." )
     else:
         return render_template("help.html")
 
@@ -723,7 +729,7 @@ def endpoint_needshelp():
                 for ticket in helpList:
                     resString += "<tr><td><a href=\'/needshelp?remove=" + ticket +"\'>" + ticket + "</a></td><td>" + helpList[ticket] + "</td></tr>"
                 resString += "</table>"
-                return resString
+                return render_template("needshelp.html", table = resString)
 
 @app.route('/chat')
 def endpoint_chat():
@@ -997,10 +1003,10 @@ def new_client(client, server):
 
 # Called for every client disconnecting
 def client_left(client, server):
+    logging.info(studentList[client['address'][0]]['name'] + " disconnected")
+    del studentList[client['address'][0]]['wsID']
     server.send_message_to_all(json.dumps(packMSG('alert', 'all', 'server', studentList[client['address'][0]]['name'] + " has left the server...")))
     server.send_message_to_all(json.dumps(packMSG('userlist', 'all', 'server', studentList)))
-    del studentList[client['address'][0]]['wsID']
-    logging.info(studentList[client['address'][0]]['name'] + " disconnected")
 
 # Called when a client sends a message
 def message_received(client, server, message):

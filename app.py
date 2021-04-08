@@ -135,7 +135,11 @@ def newStudent(remote, username, forward='', pin=''):
             return redirect(forward, code=302)
 
 def playSFX(sound):
-    pygame.mixer.Sound(sfx.sound[sound]).play()
+    try:
+        pygame.mixer.Sound(sfx.sound[sound]).play()
+        return "Succesfully played: "
+    except:
+        return "Invalid format: "
 def playBGM(bgm_filename, volume=1.0):
     pygame.mixer.music.load(bgm.bgm[bgm_filename])
     pygame.mixer.music.set_volume(volume)
@@ -832,6 +836,7 @@ def endpoint_virtualbar():
 
 @app.route('/sfx')
 def endpoint_sfx():
+
     if not request.remote_addr in studentList:
         # This will have to send along the current address as "forward" eventually
         return redirect('/login')

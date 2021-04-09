@@ -11,7 +11,7 @@ h1 {
     margin: auto;
 }
 
-#content {
+#content, #homebutton{
     border-radius: 10px;
     margin: auto;
     padding: 10px;
@@ -74,4 +74,11 @@ h1 {
 .bigbutton:hover {
     border: 5px outset #eeeeee;
     background-color: #ffffff;
+}
+
+.user {
+   background-color: #cccccc;
+   border: 1px solid #000000;
+   border-radius: 5px;
+   overflow-x:auto;
 }

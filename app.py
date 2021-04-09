@@ -71,14 +71,18 @@ settingsBoolDict = {
     'paused' : False,
     'blind' : False,
     'showinc' : True,
-    'captions' : True
+    'captions' : True,
+    'autocount' : True
 }
 settingsIntDict = {
     'numStudents': 8
 }
 
 settingsStrDict = {
-    'mode': 'thumbs'
+    'mode': 'thumbs',
+    'upcolor': 'green',
+    'wigglecolor': 'yellow',
+    'downcolor': 'red'
 }
 
 settingsStrList = {
@@ -147,7 +151,7 @@ def newStudent(remote, username, forward='', pin=''):
         else:
             logging.info("First user logged in. Made them a Teacher: " + username)
             studentList[remote]['perms'] = 0
-        playSFX("up02")
+        playSFX("sfx_up02")
         if forward:
             return redirect(forward, code=302)
 
@@ -321,6 +325,8 @@ def surveyBar():
 
 def tutdBar():
     global studentList
+    if settingsBoolDict['autocount']:
+        autoStudentCount()
     upFill = upCount = downFill = wiggleFill = 0
     complete = 0
     for x in studentList:
@@ -378,13 +384,21 @@ def tutdBar():
     if upCount >= settingsIntDict['numStudents']:
         settingsBoolDict['paused'] = True
         pixels.fill((0,0,0))
-        playSFX("success01")
+        playSFX("sfx_success01")
         for i, pix in enumerate(range(0, BARPIX)):
                 pixels[pix] = blend(range(0, BARPIX), i, colors['blue'], colors['red'])
         if settingsBoolDict['captions']:
             clearString()
             showString("MAX GAMER!", 0, colors['purple'])
     pixels.show()
+
+def autoStudentCount():
+    settingsIntDict['numStudents'] = 0
+    for user in studentList:
+        if studentList[user]['perms'] == 2:
+            settingsIntDict['numStudents'] += 1
+    if settingsIntDict['numStudents'] == 0:
+        settingsIntDict['numStudents'] = 1
 
 @app.route('/')
 def endpoint_home():
@@ -510,16 +524,15 @@ def settings():
         ipList = {}
         for student in studentList:
             studentList[student]['thumb'] = ''
-        tutdBar()
         if request.method == 'POST':
-            quizQuestion = request.form['qQuestion']
-            quizCorrect = int(request.form['quizlet'])
-            quizAnswers = [request.form['qaAnswer'], request.form['qbAnswer'], request.form['qcAnswer'], request.form['qdAnswer']]
+            # quizQuestion = request.form['qQuestion']
+            # quizCorrect = int(request.form['quizlet'])
+            # quizAnswers = [request.form['qaAnswer'], request.form['qbAnswer'], request.form['qcAnswer'], request.form['qdAnswer']]
             if settingsStrDict['mode'] == 'thumbs':
                 tutdBar()
             elif settingsStrDict['mode'] == 'survey':
                 surveyBar()
-            playSFX("success01")
+            playSFX("sfx_success01")
             settingsBoolDict['paused'] = False
             return redirect(url_for('settings'))
         else:
@@ -552,6 +565,11 @@ def settings():
 
             if request.args.get('students'):
                 settingsIntDict['numStudents'] = int(request.args.get('students'))
+                if settingsIntDict['numStudents'] == 0:
+                    settingsBoolDict['autocount'] = True
+                    autoStudentCount()
+                else:
+                    settingsBoolDict['autocount'] = False
                 resString += 'Set <i>numStudents</i> to: ' + str(settingsIntDict['numStudents'])
             if request.args.get('mode'):
                 if request.args.get('mode') in settingsStrList['modes']:
@@ -563,7 +581,7 @@ def settings():
             if resString == '':
                 return render_template("settings.html")
             else:
-                playSFX("pickup01")
+                playSFX("sfx_pickup01")
                 resString += ""
                 return resString
 
@@ -578,7 +596,7 @@ def endpoint_flush():
         for user in list(studentList):
             if not studentList[user]['perms'] == settingsPerms['admin']:
                 del studentList[user]
-        playSFX("splash01")
+        playSFX("sfx_splash01")
         return render_template("message.html", message = "Users removed from list." )
 
 @app.route('/quiz')
@@ -638,7 +656,7 @@ def endpoint_survey():
             name = 'unknown'
         elif vote:
             logging.info("Recieved " + vote + " from " + name + " at " + ip)
-            playSFX("blip01")
+            playSFX("sfx_blip01")
         #if settingsStrDict['mode'] != 'survey':
             #return render_template("message.html", message = "There is no survey right now" )
         if vote:
@@ -665,14 +683,14 @@ def endpoint_tutd():
         thumb = request.args.get('thumb')
         if thumb:
             # logging.info("Recieved " + thumb + " from " + name + " at ip: " + ip)
-            playSFX("blip01")
+            playSFX("sfx_blip01")
             if thumb == 'up' or thumb == 'down' or thumb == 'wiggle' :
                 studentList[request.remote_addr]['thumb'] = request.args.get('thumb')
                 tutdBar()
                 return render_template("message.html", message = "Thank you for your tasty bytes... (" + thumb + ")" )
             elif thumb == 'oops':
                 studentList[request.remote_addr]['thumb'] = ''
-                playSFX("hit01")
+                playSFX("sfx_hit01")
                 tutdBar()
                 return render_template("message.html", message = "I won\'t mention it if you don\'t" )
             else:
@@ -692,7 +710,7 @@ def endpoint_help():
             return render_template("message.html", message = "You already have a help ticket in. If your problem is time-sensitive, or your last ticket was not cleared, please get the teacher's attention manually." )
         else:
             helpList[name] = "Help ticket"
-            playSFX("up04")
+            playSFX("sfx_up04")
             return render_template("message.html", message = "Your ticket was sent. Keep working on the problem the best you can while you wait." )
     else:
         return render_template("help.html")
@@ -966,7 +984,7 @@ def endpoint_say():
 #Startup stuff
 showString(ip)
 pixels.show()
-playSFX("bootup02")
+playSFX("sfx_bootup02")
 
 '''
     Websocket Setup
@@ -1020,7 +1038,7 @@ def message_received(client, server, message):
             name = studentList[client['address'][0]]['name']
             name = name.replace(" ", "")
             helpList[name] = message['content']
-            playSFX("up04")
+            playSFX("sfx_up04")
             server.send_message(client, json.dumps(packMSG('alert', studentList[client['address'][0]]['name'], 'server', 'Your help ticket was sent. Keep working on the problem while you wait!')))
         else:
             #Check for permissions

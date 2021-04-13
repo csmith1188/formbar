@@ -893,7 +893,7 @@ def endpoint_sfx():
             for key, value in sfx.sound.items():
                 resString += '<li><a href="/sfx?file=' + key + '">' + key + '</a></li>'
             resString += '</ul> You can play them by using \'/sfx?file=<b>&lt;sound file name&gt;</b>\''
-            return resString
+            return render_template("general.html", content = resString, style = '<style>ul {columns: 2; -webkit-columns: 2; -moz-columns: 2;}</style>')
 
 @app.route('/bgm')
 def endpoint_bgm():
@@ -918,12 +918,13 @@ def endpoint_bgm():
                 playBGM(bgm_file)
             return render_template("message.html", message = 'Playing: ' + bgm_file )
         else:
-            resString = '<h2>List of available background music files:</h2><ul>'
+            resString = '<a href="/bgmstop">Stop Music</a>'
+            resString += '<h2>List of available background music files:</h2><ul>'
             for key, value in bgm.bgm.items():
                 resString += '<li><a href="/bgm?file=' + key + '">' + key + '</a></li>'
             resString += '</ul> You can play them by using \'<b>/bgm?file=&lt;sound file name&gt;&volume=&lt;0.0 - 1.0&gt;\'</b>'
-            resString += 'You can stop them by using \'<b>/bgmstop</b>\''
-            return resString
+            resString += '<br><br>You can stop them by using \'<b>/bgmstop</b>\''
+            return render_template("general.html", content = resString, style = '<style>ul {columns: 2; -webkit-columns: 2; -moz-columns: 2;}</style>')
 
 @app.route('/bgmstop')
 def endpoint_bgmstop():

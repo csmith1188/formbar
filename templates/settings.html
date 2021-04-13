@@ -3,10 +3,31 @@
 <!-- This is where the title, top buttons, and stylesheet is located -->
 
 <!-- Change title here -->
-{% block title %}Formbar Login{% endblock %}
+{% block title %}Formbar Settings{% endblock %}
 
 <!-- Extra style declarations here -->
-{% block style %}{% endblock %}
+{% block style %}
+<style media="screen">
+    #perms {
+        display: flex;
+        justify-content: space-around;
+    }
+    #studentBox {
+        padding: 5px;
+        margin: 5px;
+    }
+
+    .up {
+      background-color: #ccffcc;
+    }
+    .wiggle {
+      background-color: #ffffcc;
+    }
+    .down {
+      background-color: #ffcccc;
+    }
+</style>
+{% endblock %}
 
 <!-- Extra javascript here -->
 {% block script %}
@@ -36,7 +57,9 @@
     }
 
     function upbLabel(el) {
-        document.getElementById('studentNumButton').innerHTML = "Update Students (" + el.value + ")"
+        let newCount = el.value;
+        if (newCount) document.getElementById('studentNumButton').innerHTML = "Update Students (" + newCount + ")"
+        else document.getElementById('studentNumButton').innerHTML = "Update Students (Automatic)"
     }
 
     function getStudentData() {
@@ -44,6 +67,9 @@
     }
 
     var studentData;
+    var oldStudentData;
+    var permNames = ['Teacher', 'Assistant', 'Student', 'Guest']
+
 
     function checkUpdates(url) {
         var xhr = new XMLHttpRequest();
@@ -55,14 +81,38 @@
     }
     setInterval(function() {
         checkUpdates('/getstudents');
-        if (studentData) {
+        if (studentData != oldStudentData) {
+            oldStudentData = studentData;
             let studentList = JSON.parse(studentData);
             let studentBox = document.getElementById('students');
             studentBox.innerHTML = '';
             for (student in studentList) {
                 let newStudent = document.createElement('div');
-                newStudent.classList.add('student');
+                newStudent.classList.add('user');
                 newStudent.innerHTML = studentList[student].name;
+                newStudent.innerHTML += "	&nbsp; ";
+                newStudent.innerHTML += permNames[studentList[student]['perms']];
+                newStudent.innerHTML += "	&nbsp; ";
+                newStudent.innerHTML += `<a href="users?name=${studentList[student]['name']}&action=kick">Remove</a>`;
+                // newStudent.innerHTML += "	&nbsp; ";
+                // newStudent.innerHTML += `<a href="users?name=${studentList[student]['name']}&action=ban">Ban</a>`;
+                newStudent.innerHTML +=
+                    `
+                <select onchange="updatePerm(this)" id="userpermsDrop" name="userpermsDrop">
+                    <option value="/users?name=${studentList[student]['name']}&action=perm&perm=0">${permNames[0]}</option>
+                    <option value="/users?name=${studentList[student]['name']}&action=perm&perm=1">${permNames[1]}</option>
+                    <option value="/users?name=${studentList[student]['name']}&action=perm&perm=2">${permNames[2]}</option>
+                    <option value="/users?name=${studentList[student]['name']}&action=perm&perm=3" selected="selected">${permNames[3]}</option>
+                </select>`
+                if (studentList[student]['thumb'] == 'up') newStudent.classList.add('up')
+                else if (studentList[student]['thumb'] == 'wiggle') newStudent.classList.add('wiggle')
+                else if (studentList[student]['thumb'] == 'down') newStudent.classList.add('down')
+                else {
+                  newStudent.classList.remove('up')
+                  newStudent.classList.remove('wiggle')
+                  newStudent.classList.remove('down')
+                }
+
                 studentBox.appendChild(newStudent)
             }
         }
@@ -75,19 +125,19 @@
 <h1 style="color: blue">Formbar Setup</h1>
 <div>
     <form action="settings" method="post">
-        <input type="submit" value="Send Setup"><br>
-        <b>Question</b><br>
+        <input type="submit" value="Start New TUTD/Survey"><br>
+        <!-- <b>Question</b><br>
         <input type="text" name="qQuestion"><br>
         <b>Answers</b><br>
         <input type="radio" name="quizlet" value="0" checked><input type="text" name="qaAnswer"><br>
         <input type="radio" name="quizlet" value="1"><input type="text" name="qbAnswer"><br>
         <input type="radio" name="quizlet" value="2"><input type="text" name="qcAnswer"><br>
-        <input type="radio" name="quizlet" value="3"><input type="text" name="qdAnswer"><br>
+        <input type="radio" name="quizlet" value="3"><input type="text" name="qdAnswer"><br> -->
     </form>
 </div>
 <br>
 <div>
-    <input type="range" id="studentNum" oninput="upbLabel(this)" name="studentNum" min="1" max="30" style="width:200px;"><br>
+    <input type="range" id="studentNum" oninput="upbLabel(this)" name="studentNum" min="0" max="30" style="width:200px;">
     <button type="button" id="studentNumButton" onclick="sendStudents()">Update Students</button>
 </div>
 <br>
@@ -96,17 +146,19 @@
     <div class="perBox">
         <b>API</b><br>
         <select onchange="updatePerm(this)" id="apipermsDrop" name="apipermsDrop">
+            <option value="" disabled selected style="display:none;">(Anyone)</option>
             <option value="api=0">Teacher</option>
             <option value="api=1">Assistant</option>
             <option value="api=2">Student</option>
-            <option value="api=3" selected="selected">Anyone</option>
+            <option value="api=3">Anyone</option>
         </select>
     </div>
     <div class="perBox">
         <b>Sounds</b><br>
 
         <select onchange="updatePerm(this)" id="sfxpermsDrop" name="sfxpermsDrop">
-            <option value="sfx=0" selected="selected">Teacher</option>
+            <option value="" disabled selected style="display:none;">(Teacher)</option>
+            <option value="sfx=0">Teacher</option>
             <option value="sfx=1">Assistant</option>
             <option value="sfx=2">Student</option>
             <option value="sfx=3">Anyone</option>
@@ -116,7 +168,8 @@
         <b>Music</b><br>
 
         <select onchange="updatePerm(this)" id="bgmpermsDrop" name="bgmpermsDrop">
-            <option value="bgm=0" selected="selected">Teacher</option>
+            <option value="" disabled selected style="display:none;">(Teacher)</option>
+            <option value="bgm=0">Teacher</option>
             <option value="bgm=1">Assistant</option>
             <option value="bgm=2">Student</option>
             <option value="bgm=3">Anyone</option>
@@ -126,7 +179,8 @@
         <b>Phrases</b><br>
 
         <select onchange="updatePerm(this)" id="saypermsDrop" name="saypermsDrop">
-            <option value="say=0" selected="selected">Teacher</option>
+            <option value="" disabled selected style="display:none;">(Teacher)</option>
+            <option value="say=0">Teacher</option>
             <option value="say=1">Assistant</option>
             <option value="say=2">Student</option>
             <option value="say=3">Anyone</option>
@@ -136,7 +190,8 @@
         <b>LED Bar</b><br>
 
         <select onchange="updatePerm(this)" id="barpermsDrop" name="barpermsDrop">
-            <option value="bar=0" selected="selected">Teacher</option>
+            <option value="" disabled selected style="display:none;">(Teacher)</option>
+            <option value="bar=0">Teacher</option>
             <option value="bar=1">Assistant</option>
             <option value="bar=2">Student</option>
             <option value="bar=3">Anyone</option>

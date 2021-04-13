@@ -5,15 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block icon %}{% endblock %}
     {% block style %}{% endblock %}
     {% block script %} {% endblock %}
 </head>
 
 <body>
-    <div id="quickmenu">
+    <!--div id="quickmenu">
         <a href="/">Home</a>
-    </div>
+    </div-->
     <div id="content">
         {% block main %}{% endblock %}
     </div>

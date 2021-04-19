@@ -458,6 +458,10 @@ def endpoint_color():
         pixels.show()
         return render_template("message.html", message = "Color sent!" )
 
+@app.route('/hangman')
+def endpoint_hangman():
+    return render_template("hangman.html")
+
 @app.route('/segment')
 def endpoint_segment():
     if not request.remote_addr in studentList:

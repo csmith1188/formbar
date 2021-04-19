@@ -1,6 +1,7 @@
 from flask import Flask, redirect, url_for, request, render_template
 from websocket_server import WebsocketServer
 import board, neopixel
+import pandas
 import json, csv
 import pygame
 import time, math
@@ -35,6 +36,7 @@ import letters
 import sfx
 import bgm
 from colors import colors, hex2dec
+import lessons
 
 import logging
 log = logging.getLogger('werkzeug')
@@ -81,7 +83,7 @@ settingsIntDict = {
 settingsStrDict = {
     'mode': 'thumbs',
     'upcolor': 'green',
-    'wigglecolor': 'yellow',
+    'wigglecolor': 'blue',
     'downcolor': 'red'
 }
 
@@ -130,7 +132,7 @@ def aniTest():
 
 @app.route('/anitest')
 def endpoint_anitest():
-    if len(threading.enumerate()) < 4:
+    if len(threading.enumerate()) < 5:
         threading.Thread(target=aniTest, daemon=True).start()
         return 'testing...'
     else:
@@ -365,7 +367,7 @@ def tutdBar():
                     if settingsBoolDict['blind'] and complete != settingsIntDict['numStudents']:
                         pixels[pix] = fadein(pixRange, i, colors['blind'])
                     else:
-                        pixels[pix] = fadein(pixRange, i, colors['yellow'])
+                        pixels[pix] = fadein(pixRange, i, colors['blue'])
             wiggleFill -= 1
         elif downFill > 0:
             for i, pix in enumerate(pixRange):
@@ -414,8 +416,11 @@ def endpoint_login():
             username = request.form['username']
             forward = request.form['forward']
             #pin = request.form['pin']
-            newStudent(remote, username, forward)
-            return redirect('/', code=302)
+            if username.strip():
+                newStudent(remote, username, forward)
+                return redirect('/', code=302)
+            else:
+                return render_template("message.html", message="You cannot have a blank name.")
         elif request.args.get('name'):
             newStudent(remote, request.args.get('name'))
             return redirect('/', code=302)
@@ -683,16 +688,22 @@ def endpoint_tutd():
         thumb = request.args.get('thumb')
         if thumb:
             # logging.info("Recieved " + thumb + " from " + name + " at ip: " + ip)
-            playSFX("sfx_blip01")
             if thumb == 'up' or thumb == 'down' or thumb == 'wiggle' :
-                studentList[request.remote_addr]['thumb'] = request.args.get('thumb')
-                tutdBar()
-                return render_template("message.html", message = "Thank you for your tasty bytes... (" + thumb + ")" )
+                if not studentList[request.remote_addr]['thumb']:
+                    studentList[request.remote_addr]['thumb'] = request.args.get('thumb')
+                    playSFX("sfx_blip01")
+                    tutdBar()
+                    return render_template("message.html", message = "Thank you for your tasty bytes... (" + thumb + ")" )
+                else:
+                    return render_template("message.html", message = "You've already sunmitted this answer... (" + thumb + ")" )
             elif thumb == 'oops':
-                studentList[request.remote_addr]['thumb'] = ''
-                playSFX("sfx_hit01")
-                tutdBar()
-                return render_template("message.html", message = "I won\'t mention it if you don\'t" )
+                if studentList[request.remote_addr]['thumb']:
+                    studentList[request.remote_addr]['thumb'] = ''
+                    playSFX("sfx_hit01")
+                    tutdBar()
+                    return render_template("message.html", message = "I won\'t mention it if you don\'t" )
+                else:
+                    return render_template("message.html", message = "You don't have an answer to erase." )
             else:
                 return "Bad ArgumentsTry <b>/tutd?thumb=wiggle</b>You can also try <b>down</b> and <b>up</b> instead of <b>wiggle</b>"
         else:

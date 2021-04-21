@@ -3,30 +3,498 @@
 <!-- This is where the title, top buttons, and stylesheet is located -->
 
 <!-- Change title here -->
-{% block title %}Formbar Home{% endblock %}
+{% block title %}Home{% endblock %}
+{% block icon %}<link rel="icon" href="{{ url_for('static', filename='homeImages/favicon') }}">{% endblock %}
 
 <!-- Extra style declarations here -->
-{% block style %}{% endblock %}
+{% block style %}
+<style>
+
+body {
+  font-family: "Segoe UI", sans-serif;
+}
+
+h1 {
+  margin: 0 0 12px 0;
+  font-size: 24px;
+  color: #00bf00;
+}
+
+h2 {
+  margin-bottom: 10px;
+  font-size: 20px;
+  color: #00bf00;
+}
+
+input {
+  vertical-align: middle;
+  outline: none;
+}
+
+input[type="text"] {
+  width: 144px;
+}
+
+input[type="text"],
+input[type="number"] {
+  border-color: black;
+  border-style: none none solid;
+  font-size: 16px;
+  font-family: "Segoe UI", sans-serif;
+}
+
+input[type="number"] {
+  width: 48px;
+}
+
+button, input[type="color"] {
+  height: 32px;
+  background-color: white;
+  border: 1px solid;
+  border-radius: 6px;
+  color: #0040bf;
+  font-size: 16px;
+  font-family: "Segoe UI", sans-serif;
+  font-weight: bold;
+}
+
+button, input[type="color"], .thumbButton, .letterButton {
+  transition-duration: 0.2s;
+  cursor: pointer;
+}
+
+button:hover, button:focus, input[type="color"]:hover, input[type="color"]:focus, .thumbButton:hover, .thumbButton:focus, .letterButton:hover, .letterButton:focus, .checkMark:active {
+  filter: brightness(80%);
+}
+
+a:active {
+  filter: brightness(50%);
+}
+
+button, input[type="color"], .thumbButton, .letterButton {
+  transform: translate(2px, -2px);
+  box-shadow: -2px 2px;
+  outline: none;
+}
+
+.highlight, button:active, input[type="color"]:active, .thumbButton:active, .letterButton:active {
+  transform: initial;
+  box-shadow: initial;
+}
+
+.thumbButton {
+  width: 72px;
+  margin: 12px;
+  border-radius: 36px;
+}
+
+.letterButton {
+  width: 54px;
+  margin: 9px;
+  border-radius: 27px;
+}
+
+.checkMark {
+  width: 24px;
+  margin-left: 4px;
+  border-radius: 12px;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.disabled {
+  filter: brightness(50%) grayscale(100%);
+  cursor: not-allowed;
+}
+
+.disabled:hover {
+  filter: brightness(50%) grayscale(100%);
+}
+
+.thumbButton.disabled, .letterButton.disabled, button.disabled, input[type="color"].disabled {
+  transform: initial;
+  box-shadow: initial;
+}
+
+.checkMark.disabled {
+  background-color: #fff;
+}
+
+.disabled.highlight:hover {
+  filter: initial;
+}
+
+</style>
+{% endblock %}
 
 <!-- Extra javascript here -->
 {% block script %}{% endblock %}
 
 <!-- Main content here -->
 {% block main %}
-<h1>Formbar</h1>
-<div class="container1-flex">
-    <div class="bigbutton bb-green" onclick="window.location = '/tutd';">
-        Thumbs Panel<br>(/tutd)
+<div id="bodyDiv" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; overflow: auto;">
+  <iframe src="/virtualbar" id="virtualBar" style="position: absolute; top: -78px; left: 0; width: 100%; height: 117px; border: none;"></iframe>
+
+  <div id="centered" style="position: relative; top: 50%; transform: translateY(-50%); white-space: nowrap;">
+    <div style="width: fit-content; margin: auto;">
+      <div id="buttonsDiv" style="display: inline-block; vertical-align: top; padding: 20px;">
+        <h1>Poll & quiz responses</h1>
+        <div style="text-align: center;">
+          <img src="{{ url_for('static', filename='homeImages/thumbButton0.png') }}" id="thumbButton0" class="thumbButton" title="Thumbs up" onclick="thumbsVote(0)" tabindex="0" style="color: #00bf00"
+          ><img src="{{ url_for('static', filename='homeImages/thumbButton1.png') }}" id="thumbButton1" class="thumbButton" title="Wiggle" onclick="thumbsVote(1)" tabindex="0" style="color: #ffbf00"
+          ><img src="{{ url_for('static', filename='homeImages/thumbButton2.png') }}" id="thumbButton2" class="thumbButton" title="Thumbs down" onclick="thumbsVote(2)" tabindex="0" style="color: #bf0000">
+          <br>
+          <img src="{{ url_for('static', filename='homeImages/letterButton0.png') }}" id="letterButton0" class="letterButton" title="Answer A" onclick="answer(0)" tabindex="0" style="color: #bf0000"
+          ><img src="{{ url_for('static', filename='homeImages/letterButton1.png') }}" id="letterButton1" class="letterButton" title="Answer B" onclick="answer(1)" tabindex="0" style="color: #ffbf00"
+          ><img src="{{ url_for('static', filename='homeImages/letterButton2.png') }}" id="letterButton2" class="letterButton" title="Answer C" onclick="answer(2)" tabindex="0" style="color: #00bf00"
+          ><img src="{{ url_for('static', filename='homeImages/letterButton3.png') }}" id="letterButton3" class="letterButton" title="Answer D" onclick="answer(3)" tabindex="0" style="color: #0040bf">
+        </div>
+      </div>
+
+      <div id="play" style="display:inline-block;">
+        <div id="textDiv" style="display: inline-block; vertical-align: top; padding: 20px;">
+          <h1>Change text</h1>
+          <input type="text" id="message" style="text-transform: uppercase; font-family: monospace;" placeholder="Message" maxlength="10"> <img src="{{ url_for('static', filename='homeImages/checkMark.png') }}" class="checkMark" title="Submit" onclick="sendText()" tabindex="0">
+        </div>
+
+        <div id="colorDiv" style="display: inline-block; vertical-align: top; padding: 20px;">
+          <h1>Change color</h1>
+          <input type="color" id="color" style="width: 80px; height: 20px;">
+          <img src="{{ url_for('static', filename='homeImages/checkMark.png') }}" class="checkMark" title="Submit" onclick="sendColor()" tabindex="0">
+        </div>
+
+        <br>
+
+        <div id="soundDiv" style="display: inline-block; vertical-align: top; padding: 20px;">
+          <h1>Sound effects</h1>
+          <input type="text" id="sound" placeholder="Filename" list="sfxFiles">
+          <datalist id="sfxFiles">
+            <option value="19 dollar fortnite card"></option>
+            <option value="blip01"></option>
+            <option value="bombdefused"></option>
+            <option value="bootup02"></option>
+            <option value="bruh"></option>
+            <option value="dodge01"></option>
+            <option value="dukenukem"></option>
+            <option value="enemyspotted"></option>
+            <option value="explode01"></option>
+            <option value="falconpunch"></option>
+            <option value="feellikeanut"></option>
+            <option value="hit01"></option>
+            <option value="intelinside"></option>
+            <option value="ivefallen"></option>
+            <option value="john_cena"></option>
+            <option value="laser01"></option>
+            <option value="llamasinhatsfull"></option>
+            <option value="mlgairhorn"></option>
+            <option value="pickup01"></option>
+            <option value="pickup02"></option>
+            <option value="pizzapizza"></option>
+            <option value="powerup02"></option>
+            <option value="sfx_blip01"></option>
+            <option value="sfx_bootup02"></option>
+            <option value="sfx_dodge01"></option>
+            <option value="sfx_explode01"></option>
+            <option value="sfx_hit01"></option>
+            <option value="sfx_laser01"></option>
+            <option value="sfx_pickup01"></option>
+            <option value="sfx_pickup02"></option>
+            <option value="sfx_powerup02"></option>
+            <option value="sfx_shoot01"></option>
+            <option value="sfx_splash01"></option>
+            <option value="sfx_success01"></option>
+            <option value="sfx_up01"></option>
+            <option value="sfx_up02"></option>
+            <option value="sfx_up03"></option>
+            <option value="sfx_up04"></option>
+            <option value="shoot01"></option>
+            <option value="spicymeatball"></option>
+            <option value="splash01"></option>
+            <option value="success01"></option>
+            <option value="Taco-Bell-ding-dong"></option>
+            <option value="thisismyhouse"></option>
+            <option value="UndertaleMegalovania"></option>
+            <option value="up01"></option>
+            <option value="up02"></option>
+            <option value="up03"></option>
+            <option value="up04"></option>
+            <option value="wassup"></option>
+            <option value="yougotmail"></option>
+          </datalist>
+          <img src="{{ url_for('static', filename='homeImages/checkMark.png') }}" class="checkMark" title="Submit" onclick="sendSound()" tabindex="0"><br>
+          <button id="stopSoundButton" style="height: 24px; margin-top: 12px; font-size: 12px; color: #bf0000;" onclick="stopSound()">Stop sound effects</button>
+        </div>
+
+        <div id="helpDiv" style="display: inline-block; vertical-align: top; padding: 20px;">
+          <h1>Request help</h1>
+          <form action="help" method="post">
+            <button>Send ticket</button>
+          </form>
+          <div id="ticketSent" style="margin-top: 6px;"></div>
+        </div>
+      </div>
     </div>
-    <div class="bigbutton bb-blue" onclick="window.location = '/chat';">
-        Chat<br>(/chat)
+
+    <div style="width: fit-content; margin: auto;">
+      <div id="???Div" style="display: inline-block; vertical-align: top; padding: 20px;">
+        <h1>ü</h1>
+      </div>
+
+      <div id="debugDiv" style="display: inline-block; vertical-align: top; padding: 20px;">
+        <h1>Debugging</h1>
+          <button onclick="window.open('/getpix')" style="height: 32px; font-size: 16px; color: #0040bf">Get all pixels</button>
+        <h2>Fill percentage</h2>
+        <input type="number" id="percent" min="0" max="100"><label for="percent">%</label>
+        <img src="{{ url_for('static', filename='homeImages/checkMark.png') }}" class="checkMark" title="Submit" onclick="sendPercent()" tabindex="0">
+      </div>
+
+      <div id="chatDiv" style="display: inline-block; vertical-align: top; padding: 20px;">
+        <div style="position: relative; width: 300px; height: 200px; border-radius: 25px; padding: 10px; background-color: #444; cursor: pointer">
+          <div onclick="window.open('/chat')" tabindex="0" style="cursor: pointer;">
+            <h1 style="color: #bfbfff">Open chat</h1>
+            <img src="{{ url_for('static', filename='homeImages/openChat.png') }}" style="position: absolute; top: 10px; right: 10px; width: 32px;">
+            <i id="newMsg" style="color: #8f8fbf;">Message previews will appear here.</i>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="bigbutton bb-red" onclick="window.location = '/help';">
-        Help!<br>(/help)
-    </div>
-    <div class="bigbutton bb-yellow" onclick="window.location = '/settings';">
-        Settings<br>(/settings)
-    </div>
+  </div>
 </div>
 
+<div id="corner" style="position: absolute; bottom: 8px;">
+  Name: <span id="name"></span> | <a style="color: #bf0000; text-decoration: underline; cursor: pointer;" onclick="enterName(true)">Log in again</a>
+</div>
+<script>
+  let request = new XMLHttpRequest();
+  let name = localStorage.getItem("name");
+  let thumbButtons = document.querySelectorAll(".thumbButton");
+  let letterButtons = document.querySelectorAll(".letterButton");
+  let checkMarks = document.querySelectorAll(".checkMark");
+
+  window.onload = function() {
+    smallWindowCheck();
+    mode();
+    enterName();
+  };
+
+  window.onresize = smallWindowCheck;
+
+  function smallWindowCheck() {
+    let bodyDiv = document.getElementById("bodyDiv");
+    let centered = document.getElementById("centered");
+    let virtualBar = document.getElementById("virtualBar");
+    let corner = document.getElementById("corner");
+    if (bodyDiv.scrollWidth > bodyDiv.clientWidth) {
+      centered.style.top = "initial";
+      centered.style.transform = "initial";
+      virtualBar.style.display = "none";
+      corner.style.display = "none";
+    } else {
+      centered.style.top = "50%";
+      centered.style.transform = "translateY(-50%)";
+      virtualBar.style.display = "initial";
+      corner.style.display = "initial";
+    }
+  }
+
+  function mode() {
+    let mode = "";
+
+    if (mode != "thumbs") {
+      Array.from(thumbButtons).forEach(function(button) {
+        button.classList.add("disabled");
+        button.removeAttribute("onclick");
+        button.removeAttribute("tabindex");
+        button.title = "Not in thumbs mode";
+      });
+    }
+
+    if (mode != "quiz" && mode != "survey") {
+      Array.from(letterButtons).forEach(function(button) {
+        button.classList.add("disabled");
+        button.removeAttribute("onclick");
+        button.removeAttribute("tabindex");
+        button.title = "Not in quiz or survey mode";
+      });
+    }
+
+    if (mode != "playtime") {
+      Array.from(checkMarks).forEach(function(button) {
+        button.classList.add("disabled");
+        button.removeAttribute("onclick");
+        button.removeAttribute("tabindex");
+        button.title = "Not in playtime mode";
+      });
+    }
+  }
+
+  function enterName(manual) {
+    let name = localStorage.getItem("name");
+
+    if (manual) {
+      name = prompt("Enter your name");
+      name = name.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    } else {
+      while (!name) {
+        name = prompt("Enter your name");
+        name = name.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+        if (!name) {
+          alert("Login required");
+        }
+      }
+    }
+
+    if (name) {
+      localStorage.setItem("name", name);
+      document.getElementById("name").innerHTML = name;
+      request.open("GET", "/login?name=" + name);
+      request.send();
+    } else {
+      name = localStorage.getItem("name");
+    }
+  }
+
+  Array.from(thumbButtons).forEach(function(button, index) {
+    button.addEventListener("keydown", function(event) {
+      //Enter key
+      if (event.keyCode == 13) {
+        thumbsVote(index);
+      }
+    });
+  });
+
+  Array.from(letterButtons).forEach(function(button, index) {
+    button.addEventListener("keydown", function(event) {
+      //Enter key
+      if (event.keyCode == 13) {
+        answer(index);
+      }
+    });
+  });
+
+  let chosen = false;
+
+  function thumbsVote(thumb) {
+    if (chosen === thumb) {
+      chosen = false;
+      removeHighlight("thumbButton" + thumb);
+      request.open("GET", "/tutd?thumb=oops");
+      request.send();
+    } else {
+      chosen = thumb;
+      if (thumb == 0) {
+        request.open("GET", "/tutd?thumb=up");
+      } else if (thumb == 1) {
+        request.open("GET", "/tutd?thumb=wiggle");
+      } else if (thumb == 2) {
+        request.open("GET", "/tutd?thumb=down");
+      }
+      request.send();
+      Array.from(thumbButtons).forEach(function(button, index) {
+        removeHighlight("thumbButton" + index);
+      });
+      highlight("thumbButton" + thumb);
+    }
+  }
+
+  function answer(answer) {
+    chosenButton = document.getElementById("letterButton" + answer);
+    request.open("GET", "/quiz?answer=" + answer);
+    request.send();
+    highlight("letterButton" + answer);
+    Array.from(letterButtons).forEach(function(button) {
+      button.classList.add("disabled");
+      button.removeAttribute("onclick");
+      button.removeAttribute("tabindex");
+      button.title = "Already answered";
+    });
+    chosenButton.style.filter = "initial";
+  }
+
+  function highlight(image) {
+    button = document.getElementById(image);
+    button.src = "formbar/static/homeImages/" + image + "-highlight.png";
+    button.classList.add("highlight");
+  }
+
+  function removeHighlight(image) {
+    button = document.getElementById(image);
+    button.src = "formbar/static/homeImages/" + image + ".png";
+    button.classList.remove("highlight");
+  }
+
+  function sendText() {
+    let text = document.getElementById("message").value;
+    text = text.replace(/\s/g, "_");
+    if (!text) {
+      text = "_";
+    }
+    request.open("GET", "/say?phrase=" + text);
+    request.send();
+    document.getElementById("message").value = "";
+  }
+
+  document.getElementById("message").addEventListener("keydown", function(event) {
+    //Enter key
+    if (event.keyCode == 13) {
+      sendText();
+    }
+  });
+
+  function sendColor() {
+    //request.open("GET", );
+    request.send();
+  }
+
+  function sendSound() {
+    let soundFile = document.getElementById("sound").value;
+    request.open("GET", "/sfx?file=" + soundFile);
+    request.send();
+    document.getElementById("sound").value = "";
+  }
+
+  document.getElementById("sound").addEventListener("keydown", function(event) {
+    //Enter key
+    if (event.keyCode == 13) {
+      sendSound();
+    }
+  });
+
+  function stopSound() {
+    request.open("GET", "/sfxstop");
+    request.send();
+  }
+
+  document.getElementById("percent").addEventListener("keydown", function(event) {
+    //Enter key
+    if (event.keyCode == 13) {
+      sendPercent();
+    }
+  });
+
+  document.getElementById("percent").onblur = function() {
+    let percent = document.getElementById("percent").value;
+    percent = parseInt(percent);
+    if (percent < 0) {
+      percent = 0;
+    }
+    if (percent > 100) {
+      percent = 100;
+    }
+    document.getElementById("percent").value = percent;
+  }
+
+  function sendPercent() {
+    let percent = document.getElementById("percent").value;
+    if (!percent) {
+      percent = 0;
+    }
+    request.open("GET", "/perc?amount=" + percent);
+    request.send();
+    document.getElementById("percent").value = "";
+  }
+
+  //TO DO: blockchest, ticket sent, disabled incl. title + onclick, sendcolor url, msg previews
+  //Get current mode + when mode changed, quiz correct answer + new question, submit help, getpix in alert, customize virtual bar, get text
+</script>
 {% endblock %}

@@ -10,13 +10,16 @@
 <style>
   :root {
     --background-color: #333;
+    --bg-dark-color: #222;
     --bg-highlight-color: #444;
     --bg-green-color: #243;
     --bg-purple-color: #423;
+    --bg-yellow-color: #430;
     --main-color: #bfbfff;
     --alt-color: #8f8fbf;
     --green-color: #80ffbf;
     --purple-color: #ff80bf;
+    --yellow-color: #ffbf00;
     --gray-color: #aaa;
   }
 
@@ -55,7 +58,7 @@
     top: 0;
     left: 0;
     width: calc(100% - 340px);
-    height: calc(100% - 116px);
+    height: calc(100% - 90px);
     padding: 0 10px;
     overflow: auto;
   }
@@ -65,8 +68,9 @@
     margin: 10px 0;
   }
 
-   .them .username {
-    cursor: pointer;
+  .them .username {
+    color: var(--main-color);
+      cursor: pointer;
   }
 
   .whisper {
@@ -89,8 +93,8 @@
 
   #userlist {
     width: 300px;
-    height: calc(100% - 136px);
-    background-color: #222;
+    height: calc(100% - 110px);
+    background-color: var(--bg-dark-color);
     position: fixed;
     top: 0;
     right: 0;
@@ -118,8 +122,8 @@
   }
 
   #controlChat {
-    background-color: #333;
-    border-top: 1px solid #bfbfff;
+    background-color: var(--background-color);
+    border-top: 1px solid var(--main-color);
     position: fixed;
     width: 100%;
     bottom: 0;
@@ -129,7 +133,9 @@
 
   #input {
     width: 75%;
-    background-color: #222;
+    height: 32px;
+    box-sizing: border-box;
+    background-color: var(--bg-dark-color);
     color: white;
     outline: none;
     resize: none;
@@ -138,7 +144,7 @@
     font-size: 16px;
   }
 
-  #messageIinput:focus {
+  #input:focus {
     outline: 1px solid var(--main-color);
   }
 
@@ -157,14 +163,14 @@
   }
 
   #sendButton {
-    width: 100px;
-    height: 46px;
-    border-radius: 12.5px;
-    margin-left: 10px;
+    width: 64px;
+    height: 32px;
+    border-radius: 6.25px;
+    margin-left: 5px;
     background-color: var(--background-color);
     color: var(--main-color);
     border: 1px var(--main-color) solid;
-    font: 29px "Segoe UI", sans-serif;
+    font: 20px "Segoe UI", sans-serif;
     vertical-align: top;
     cursor: pointer;
     outline: none;
@@ -203,14 +209,8 @@
     font-size: 20px;
   }
 
-  input[type="text"] {
-    width: 144px;
-    background-color: transparent;
-    color: white;
-    border: 1px var(--main-color);
-    border-style: none none solid none;
-    font: 16px "Segoe UI", sans-serif;
-    outline: none;
+  #quickmenu {
+    display: none;
   }
 </style>
 {% endblock %}
@@ -229,9 +229,9 @@
 </div>
 <div id="controlChat">
     <form onsubmit="event.preventDefault(); onSubmit(); return false;" style="margin: 0;">
-        <div style="margin-bottom: 5px;">To <span id="recipient">all</span></div>
-        <textarea id="input" placeholder="Send a message"></textarea>
-        <button id="sendButton">Send</button>
+        <div style="font-size: 14px; margin-bottom: 5px;">To <span id="recipient">all</span></div>
+        <input id="input" placeholder="Send a message" autocomplete="off"></input>
+        <input type="submit" value="Send" id="sendButton">
     </form>
 </div>
 <script type="text/javascript">
@@ -249,7 +249,7 @@
             console.log(data);
             output(data);
         } else if (data.type == 'userlist') {
-            boxes.userlist.innerHTML = ''
+            boxes.userlist.innerHTML = '<h2 id="ulHeading">Online</h2>'
             for (user in data.content) {
                 let newUser = document.createElement('div')
                 newUser.classList.add('msg', 'ulName')
@@ -361,7 +361,7 @@
         else {
           newMSG.classList.add('them')
           //Change to only affect username
-          //message.setAttribute("onclick", "changeRec('" + data.content[user].name + "', this)");
+          //message.setAttribute("onclick", "changeRec('" + message.from + "', this)");
           //message.title = "Send a private message";
         }
         //Use this if you want to allow HTML
@@ -371,12 +371,5 @@
         boxes.outputBox.appendChild(newMSG);
         if (lockBottom) boxes.outputBox.scrollTo(0, boxes.outputBox.scrollHeight);
     }
-
-    document.getElementById("input").oninput = function() {
-      //Set inputBox to normal size
-      boxes.inputBox.rows = "";
-        //If inputBox is full, enlarge
-      if (boxes.inputBox.clientHeight < input.scrollHeight) boxes.inputBox.rows = 5;
-    };
 </script>
-</html>
+{% endblock %}

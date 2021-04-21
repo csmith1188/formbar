@@ -3,215 +3,81 @@
 <!-- This is where the title, top buttons, and stylesheet is located -->
 
 <!-- Change title here -->
-{% block title %}Chat{% endblock %}
+{% block title %}Formbar Chat{% endblock %}
 
 <!-- Extra style declarations here -->
 {% block style %}
-<style>
-  :root {
-    --background-color: #333;
-    --bg-dark-color: #222;
-    --bg-highlight-color: #444;
-    --bg-green-color: #243;
-    --bg-purple-color: #423;
-    --bg-yellow-color: #430;
-    --main-color: #bfbfff;
-    --alt-color: #8f8fbf;
-    --green-color: #80ffbf;
-    --purple-color: #ff80bf;
-    --yellow-color: #ffbf00;
-    --gray-color: #aaa;
-  }
+<style media="screen">
+html {
+  height: 100%;
+}
+body {
+    height: 100%;
+}
 
-  body {
-    background-color: var(--background-color);
-    color: white;
-    font-family: "Segoe UI", sans-serif;
-  }
+#content {
+    height: 90%;
+    position: relative;
+}
 
-  ::-webkit-scrollbar {
-    width: 15px;
-    height: 15px;
-  }
+#container-full-width {
+}
 
-  ::-webkit-scrollbar-thumb {
-    box-shadow: inset 0 0 5px 5px var(--main-color);
-    border: solid 5px transparent;
-  }
+#outputBox {
+   float:left;
+   width: 80%;
+   display: inline-block;
+   vertical-align: top;
+   overflow-x: hidden;
+   overflow-y: scroll;
+   height: 600px;
+}
 
-  ::-webkit-scrollbar-thumb:hover {
-    box-shadow: inset 0 0 5px 5px white;
-  }
-
-  ::-webkit-scrollbar-thumb:active {
-    box-shadow: inset 0 0 15px 15px white;
-    border: none;
-  }
-
-  ::-webkit-scrollbar-corner {
-    box-shadow: inset 0 0 5px 5px white;
-    border: solid 5px transparent;
-  }
-
-  #outputBox {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: calc(100% - 340px);
-    height: calc(100% - 90px);
-    padding: 0 10px;
-    overflow: auto;
-  }
-
-  .msg {
+.msg {
+    margin: 5px;
     padding: 5px;
-    margin: 10px 0;
-  }
+    border-radius: 5px;
+    border: 1px solid #000000;
+    background-color: #cccccc;
+}
 
-  .them .username {
-    color: var(--main-color);
-      cursor: pointer;
-  }
-
-  .whisper {
-    background-color: var(--bg-purple-color);
-  }
-
-  .me {
-    background-color: var(--bg-highlight-color);
-  }
-
-  .date {
-    color: var(--alt-color);
-    margin-right: 5px;
-  }
-
-  .alert .content {
-    font-style: italic;
-    color: var(--alt-color);
-  }
-
-  #userlist {
-    width: 300px;
-    height: calc(100% - 110px);
-    background-color: var(--bg-dark-color);
-    position: fixed;
-    top: 0;
-    right: 0;
-    padding: 10px;
-  }
-
-  #ulHeading {
-    display: inline-block;
-    margin-bottom: 5px;
-    color: white;
-  }
-
-  .ulName {
-    margin: 8px 0;
-    padding: 3px;
-  }
-
-  .ulName.them {
-    cursor: pointer;
-  }
-
-  .ulName.them:hover {
-    background-color: var(--main-color);
-    color: var(--background-color);
-  }
-
-  #controlChat {
-    background-color: var(--background-color);
-    border-top: 1px solid var(--main-color);
-    position: fixed;
-    width: 100%;
-    bottom: 0;
-    left: 0;
-    padding: 20px;
-  }
-
-  #input {
-    width: 75%;
-    height: 32px;
-    box-sizing: border-box;
-    background-color: var(--bg-dark-color);
-    color: white;
-    outline: none;
-    resize: none;
-    border: 1px solid var(--main-color);
-    font-family: "Segoe UI", sans-serif;
-    font-size: 16px;
-  }
-
-  #input:focus {
-    outline: 1px solid var(--main-color);
-  }
-
-  #input::-webkit-scrollbar-thumb {
-    box-shadow: inset 0 0 5px 5px var(--main-color);
-    border: solid 5px transparent;
-  }
-
-  #input::-webkit-scrollbar-thumb:hover {
-    box-shadow: inset 0 0 5px 5px white;
-  }
-
-  #input::-webkit-scrollbar-thumb:active {
-    box-shadow: inset 0 0 15px 15px white;
-    border: none;
-  }
-
-  #sendButton {
-    width: 64px;
-    height: 32px;
-    border-radius: 6.25px;
-    margin-left: 5px;
-    background-color: var(--background-color);
-    color: var(--main-color);
-    border: 1px var(--main-color) solid;
-    font: 20px "Segoe UI", sans-serif;
+#userlist {
+    float: right;
+    display: flex;
+    flex-wrap: wrap;
     vertical-align: top;
-    cursor: pointer;
-    outline: none;
-  }
+    width: 20%;
+}
 
-  #sendButton:hover, #sendButton:focus {
-    background-color: var(--main-color);
-    color: var(--background-color);
-  }
+.user {
+   background-color: #cccccc;
+   border: 1px solid #000000;
+   border-radius: 5px;
+   overflow-x:auto;
+}
 
-  #sendButton:active {
-    background-color: white;
-  }
+.me {
+   background-color: #ccffcc;
+}
 
-  a {
-    color: var(--main-color);
-  }
+.them {
+   background-color: #ccccff;
+}
 
-  a:visited {
-    color: var(--alt-color);
-  }
+.alert {
+   background-color: #ffcccc;
+}
 
-  a:active {
-    color: white;
-  }
+.whisper {
+   background-color: #ffccff;
+}
 
-  h1 {
-    margin: 0;
-    color: var(--main-color);
-    font-size: 24px;
-  }
+#controlChat {
+    position: absolute;
+    left: 15px;
+    bottom: 15px;
+}
 
-  h2 {
-    margin: 0;
-    color: var(--main-color);
-    font-size: 20px;
-  }
-
-  #quickmenu {
-    display: none;
-  }
 </style>
 {% endblock %}
 
@@ -223,14 +89,11 @@
 {% block main %}
 <div id="container-full-width">
     <div id="outputBox"></div>
-    <div id="userlist">
-      <h2 id="ulHeading">Online</h2>
-    </div>
+    <div id="userlist"></div>
 </div>
 <div id="controlChat">
-    <form onsubmit="event.preventDefault(); onSubmit(); return false;" style="margin: 0;">
-        <div style="font-size: 14px; margin-bottom: 5px;">To <span id="recipient">all</span></div>
-        <input id="input" placeholder="Send a message" autocomplete="off"></input>
+    <form onsubmit="event.preventDefault(); onSubmit(); return false;">
+        <input type="text" id="input" autocomplete="off">
         <input type="submit" value="Send" id="sendButton">
     </form>
 </div>
@@ -249,16 +112,12 @@
             console.log(data);
             output(data);
         } else if (data.type == 'userlist') {
-            boxes.userlist.innerHTML = '<h2 id="ulHeading">Online</h2>'
+            boxes.userlist.innerHTML = ''
             for (user in data.content) {
                 let newUser = document.createElement('div')
-                newUser.classList.add('msg', 'ulName')
+                newUser.classList.add('msg')
                 if (data.content[user].name == username) newUser.classList.add('me')
-                else {
-                  newUser.classList.add('them')
-                  newUser.setAttribute("onclick", "changeRec('" + data.content[user].name + "', this)");
-                  newUser.title = "Send a private message";
-                }
+                else newUser.setAttribute("onclick", "changeRec('" + data.content[user].name + "', this)");
                 newUser.appendChild(document.createTextNode(data.content[user].name))
                 boxes.userlist.appendChild(newUser);
             }
@@ -286,8 +145,7 @@
         outputBox: document.getElementById('outputBox'),
         inputBox: document.getElementById("input"),
         userlist: document.getElementById("userlist"),
-        sendButton: document.getElementById("sendButton"),
-        recBox: document.getElementById("recipient")
+        sendButton: document.getElementById("userlist")
     }
 
     function packMSG(type, rx, tx, content) {
@@ -303,15 +161,11 @@
     function changeRec(name, el) {
         if (receiver != name) {
             receiver = name;
-            boxes.recBox.innerHTML = receiver;
-            boxes.recBox.style.color = "var(--purple-color)";
-            //sendButton.value = "Send to " + receiver;
+            sendButton.value = "Send to " + receiver;
             el.classList.add('whisper');
         } else {
             receiver = 'all';
-            boxes.recBox.innerHTML = "all";
-            boxes.recBox.style.color = "white";
-            //sendButton.value = "Send";
+            sendButton.value = "Send";
             el.classList.remove('whisper');
         }
     }
@@ -358,14 +212,9 @@
         if (message.to == username) newMSG.classList.add('whisper')
         if (message.from == username) newMSG.classList.add('me')
         else if (message.from == 'server' || message.type == 'alert') newMSG.classList.add('alert')
-        else {
-          newMSG.classList.add('them')
-          //Change to only affect username
-          //message.setAttribute("onclick", "changeRec('" + message.from + "', this)");
-          //message.title = "Send a private message";
-        }
+        else newMSG.classList.add('them')
         //Use this if you want to allow HTML
-        newMSG.innerHTML = "<b class='username'>" + message.from + "</b><div class='content'>" + message.content + "</div>"
+        newMSG.innerHTML = message.from + ": " + message.content
         //Use this if you want to convert HTML into text
         // newMSG.appendChild(document.createTextNode(message.from + ": " + message.content))
         boxes.outputBox.appendChild(newMSG);

@@ -1,37 +1,44 @@
+<!DOCTYPE html>
 <html>
-    <head>
-        <title>Virtual LED Formbar</title>
-        <style>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual LED Formbar</title>
+    <style>
         body {
             background-color: #000000;
             color: #FFFFFF;
-            }
-        </style>
-        <meta http-equiv="refresh" content="3">
-    </head>
-    <body>
-    <h1>{{ serverIp }}</h1>
-        <div id="pixBox" style="margin: auto; border: 1px solid #FFFFFF; display: flex; justify-content: space-around;">
-        </div>
-    </body>
-    <script>
-        function updateBar() {
-            var xmlHttp = new XMLHttpRequest();
-            xmlHttp.open( "GET", '/getpix', false );
-            xmlHttp.send( null );
-            let res = JSON.parse(xmlHttp.responseText);
-            let pix = eval(res.pixels);
-            pixBox = document.getElementById('pixBox');
-            pixBox.innerHTML = '';
-            for (let i = pix.length - 1; i >= 0; i--) {
-                    for (let color = 0; color < pix[i].length; color++) {
-                        pix[i][color] = pix[i][color].toString(16);
-                        if (pix[i][color].length < 2)
-                            pix[i][color] = "0" + pix[i][color];
-                    }
-                    pixBox.innerHTML += '<div style="display: inline; flex-grow: 1; overflow: hidden; background-color: #' + pix[i][0] + '' + pix[i][1] + '' + pix[i][2] + ';">&nbsp;</div>';
-                }
         }
-        setInterval(updateBar(), 3000);
-    </script>
+    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta http-equiv="refresh" content="3">
+</head>
+
+<body>
+    <h1>{{ serverIp }}</h1>
+    <div id="pixBox" style="margin: auto; border: 1px solid #FFFFFF; display: flex; justify-content: space-around;">
+    </div>
+</body>
+<script>
+    function updateBar() {
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open("GET", '/getpix', false);
+        xmlHttp.send(null);
+        let res = JSON.parse(xmlHttp.responseText);
+        let pix = eval(res.pixels);
+        pixBox = document.getElementById('pixBox');
+        pixBox.innerHTML = '';
+        for (let i = pix.length - 1; i >= 0; i--) {
+            for (let color = 0; color < pix[i].length; color++) {
+                pix[i][color] = pix[i][color].toString(16);
+                if (pix[i][color].length < 2)
+                    pix[i][color] = "0" + pix[i][color];
+            }
+            pixBox.innerHTML += '<div style="display: inline; flex-grow: 1; overflow: hidden; background-color: #' + pix[i][0] + '' + pix[i][1] + '' + pix[i][2] + ';">&nbsp;</div>';
+        }
+    }
+    setInterval(updateBar(), 3000);
+</script>
+
 </html>

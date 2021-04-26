@@ -1,5 +1,4 @@
 colors = {
-    "lellow": "hey",
     "blind": (255, 128, 0),
     "default": (64, 64, 64),
     "student": (255, 0, 255),

@@ -1,24 +1,375 @@
-<html>
-    <head>
-        <title>Chat</title>
-        <script>
-            // Create WebSocket connection.
-            const socket = new WebSocket('ws://localhost:5001');
+{% extends 'header.html' %}
+<!-- ^^ This means add this file to the end of the contents of header.html -->
+<!-- This is where the title, top buttons, and stylesheet is located -->
 
-            // Connection opened
-            socket.addEventListener('open', function (event) {
-                socket.send('Hello Server!');
-            });
+<!-- Change title here -->
+{% block title %}Chat{% endblock %}
 
-            // Listen for messages
-            socket.addEventListener('message', function (event) {
-                document.getElementById('outpoot').innerHTML += 'Message from server: ' + event.data;
-            });
-        </script>
-    </head>
-    <body>
-        <div id='outpoot'>
-            
-        </div>
-    </body>
-</html>
+<!-- Extra style declarations here -->
+{% block style %}
+<style>
+  :root {
+    --background-color: #333;
+    --bg-dark-color: #222;
+    --bg-highlight-color: #444;
+    --bg-green-color: #243;
+    --bg-purple-color: #423;
+    --bg-yellow-color: #430;
+    --main-color: #bfbfff;
+    --alt-color: #8f8fbf;
+    --green-color: #80ffbf;
+    --purple-color: #ff80bf;
+    --yellow-color: #ffbf00;
+    --gray-color: #aaa;
+  }
+
+  body {
+    background-color: var(--background-color);
+    color: white;
+    font-family: "Segoe UI", sans-serif;
+  }
+
+  ::-webkit-scrollbar {
+    width: 15px;
+    height: 15px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    box-shadow: inset 0 0 5px 5px var(--main-color);
+    border: solid 5px transparent;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    box-shadow: inset 0 0 5px 5px white;
+  }
+
+  ::-webkit-scrollbar-thumb:active {
+    box-shadow: inset 0 0 15px 15px white;
+    border: none;
+  }
+
+  ::-webkit-scrollbar-corner {
+    box-shadow: inset 0 0 5px 5px white;
+    border: solid 5px transparent;
+  }
+
+  #outputBox {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: calc(100% - 340px);
+    height: calc(100% - 90px);
+    padding: 0 10px;
+    overflow: auto;
+  }
+
+  .msg {
+    padding: 5px;
+    margin: 10px 0;
+  }
+
+  .them .username {
+    color: var(--main-color);
+      cursor: pointer;
+  }
+
+  .whisper {
+    background-color: var(--bg-purple-color);
+  }
+
+  .me {
+    background-color: var(--bg-highlight-color);
+  }
+
+  .date {
+    color: var(--alt-color);
+    margin-right: 5px;
+  }
+
+  .alert .content {
+    font-style: italic;
+    color: var(--alt-color);
+  }
+
+  #userlist {
+    width: 300px;
+    height: calc(100% - 110px);
+    background-color: var(--bg-dark-color);
+    position: fixed;
+    top: 0;
+    right: 0;
+    padding: 10px;
+  }
+
+  #ulHeading {
+    display: inline-block;
+    margin-bottom: 5px;
+    color: white;
+  }
+
+  .ulName {
+    margin: 8px 0;
+    padding: 3px;
+  }
+
+  .ulName.them {
+    cursor: pointer;
+  }
+
+  .ulName.them:hover {
+    background-color: var(--main-color);
+    color: var(--background-color);
+  }
+
+  #controlChat {
+    background-color: var(--background-color);
+    border-top: 1px solid var(--main-color);
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    padding: 20px;
+  }
+
+  #input {
+    width: 75%;
+    height: 32px;
+    box-sizing: border-box;
+    background-color: var(--bg-dark-color);
+    color: white;
+    outline: none;
+    resize: none;
+    border: 1px solid var(--main-color);
+    font-family: "Segoe UI", sans-serif;
+    font-size: 16px;
+  }
+
+  #input:focus {
+    outline: 1px solid var(--main-color);
+  }
+
+  #input::-webkit-scrollbar-thumb {
+    box-shadow: inset 0 0 5px 5px var(--main-color);
+    border: solid 5px transparent;
+  }
+
+  #input::-webkit-scrollbar-thumb:hover {
+    box-shadow: inset 0 0 5px 5px white;
+  }
+
+  #input::-webkit-scrollbar-thumb:active {
+    box-shadow: inset 0 0 15px 15px white;
+    border: none;
+  }
+
+  #sendButton {
+    width: 64px;
+    height: 32px;
+    border-radius: 6.25px;
+    margin-left: 5px;
+    background-color: var(--background-color);
+    color: var(--main-color);
+    border: 1px var(--main-color) solid;
+    font: 20px "Segoe UI", sans-serif;
+    vertical-align: top;
+    cursor: pointer;
+    outline: none;
+  }
+
+  #sendButton:hover, #sendButton:focus {
+    background-color: var(--main-color);
+    color: var(--background-color);
+  }
+
+  #sendButton:active {
+    background-color: white;
+  }
+
+  a {
+    color: var(--main-color);
+  }
+
+  a:visited {
+    color: var(--alt-color);
+  }
+
+  a:active {
+    color: white;
+  }
+
+  h1 {
+    margin: 0;
+    color: var(--main-color);
+    font-size: 24px;
+  }
+
+  h2 {
+    margin: 0;
+    color: var(--main-color);
+    font-size: 20px;
+  }
+
+  #quickmenu {
+    display: none;
+  }
+</style>
+{% endblock %}
+
+<!-- Extra javascript here -->
+{% block script %}
+{% endblock %}
+
+<!-- Main content here -->
+{% block main %}
+<div id="container-full-width">
+    <div id="outputBox"></div>
+    <div id="userlist">
+      <h2 id="ulHeading">Online</h2>
+    </div>
+</div>
+<div id="controlChat">
+    <form onsubmit="event.preventDefault(); onSubmit(); return false;" style="margin: 0;">
+        <div style="font-size: 14px; margin-bottom: 5px;">To <span id="recipient">all</span></div>
+        <input id="input" placeholder="Send a message" autocomplete="off"></input>
+        <input type="submit" value="Send" id="sendButton">
+    </form>
+</div>
+<script type="text/javascript">
+    // Connect to Web Socket
+    ws = new WebSocket("ws://{{ serverIp }}:9001");
+    var username = "{{ username }}";
+    var receiver = 'all';
+
+    //When the connection opens.
+    ws.onopen = function() {};
+
+    ws.onmessage = function(message) {
+        let data = JSON.parse(message.data);
+        if (data.type == 'message' || data.type == 'alert') {
+            console.log(data);
+            output(data);
+        } else if (data.type == 'userlist') {
+            boxes.userlist.innerHTML = '<h2 id="ulHeading">Online</h2>'
+            for (user in data.content) {
+                let newUser = document.createElement('div')
+                newUser.classList.add('msg', 'ulName')
+                if (data.content[user].name == username) newUser.classList.add('me')
+                else {
+                  newUser.classList.add('them')
+                  newUser.setAttribute("onclick", "changeRec('" + data.content[user].name + "', this)");
+                  newUser.title = "Send a private message";
+                }
+                newUser.appendChild(document.createTextNode(data.content[user].name))
+                boxes.userlist.appendChild(newUser);
+            }
+        }
+    };
+
+    //When the connection closes
+    ws.onclose = function() {
+        output({
+            from: 'server',
+            content: 'Disconnected...'
+        });
+    };
+
+    //When there is an error
+    ws.onerror = function(e) {
+        output({
+            from: 'server',
+            content: 'Critical Error. See console...'
+        });
+        console.log(e)
+    };
+
+    var boxes = {
+        outputBox: document.getElementById('outputBox'),
+        inputBox: document.getElementById("input"),
+        userlist: document.getElementById("userlist"),
+        sendButton: document.getElementById("sendButton"),
+        recBox: document.getElementById("recipient")
+    }
+
+    function packMSG(type, rx, tx, content) {
+        let msgOUT = {
+            type: type,
+            to: rx,
+            from: tx,
+            content: content
+        }
+        return msgOUT
+    }
+
+    function changeRec(name, el) {
+        if (receiver != name) {
+            receiver = name;
+            boxes.recBox.innerHTML = receiver;
+            boxes.recBox.style.color = "var(--purple-color)";
+            //sendButton.value = "Send to " + receiver;
+            el.classList.add('whisper');
+        } else {
+            receiver = 'all';
+            boxes.recBox.innerHTML = "all";
+            boxes.recBox.style.color = "white";
+            //sendButton.value = "Send";
+            el.classList.remove('whisper');
+        }
+    }
+
+    function atBottom(ele) {
+        var sh = ele.scrollHeight;
+        var st = ele.scrollTop;
+        var ht = ele.offsetHeight;
+        if (ht == 0) {
+            return true;
+        }
+        if (st == sh - ht) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function onSubmit() {
+        let text = boxes.inputBox.value;
+        if (text != "") {
+            if (text.startsWith("!#help")) {
+                // text.splice(0, 2);
+                // args = text.split(" ");
+                // args.shift();
+                ws.send(JSON.stringify(packMSG('help', receiver, username, text)));
+            } else {
+                ws.send(JSON.stringify(packMSG('message', receiver, username, text)));
+            }
+            boxes.inputBox.value = "";
+            boxes.inputBox.focus();
+        }
+    }
+
+    function onCloseClick() {
+        ws.close();
+    }
+
+    function output(message) {
+        let lockBottom = false;
+        if (atBottom(boxes.outputBox)) lockBottom = true;
+        let newMSG = document.createElement('div')
+        newMSG.classList.add('msg')
+        if (message.to == username) newMSG.classList.add('whisper')
+        if (message.from == username) newMSG.classList.add('me')
+        else if (message.from == 'server' || message.type == 'alert') newMSG.classList.add('alert')
+        else {
+          newMSG.classList.add('them')
+          //Change to only affect username
+          //message.setAttribute("onclick", "changeRec('" + message.from + "', this)");
+          //message.title = "Send a private message";
+        }
+        //Use this if you want to allow HTML
+        newMSG.innerHTML = "<b class='username'>" + message.from + "</b><div class='content'>" + message.content + "</div>"
+        //Use this if you want to convert HTML into text
+        // newMSG.appendChild(document.createTextNode(message.from + ": " + message.content))
+        boxes.outputBox.appendChild(newMSG);
+        if (lockBottom) boxes.outputBox.scrollTo(0, boxes.outputBox.scrollHeight);
+    }
+</script>
+{% endblock %}

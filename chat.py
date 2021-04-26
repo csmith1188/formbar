@@ -1,15 +1,21 @@
-import asyncio
-import websockets
+'''
+    Websocket Setup
+    https://github.com/Pithikos/python-websocket-server
+'''
 
-async def hello(websocket, path):
-    name = await websocket.recv()
-    print(f"< {name}")
+# Called for every client connecting (after handshake)
+def new_client(client, server):
+	print("New client connected and was given id %d" % client['id'])
 
-    greeting = f"Hello {name}!"
+# Called for every client disconnecting
+def client_left(client, server):
+	print("Client(%d) disconnected" % client['id'])
 
-    await websocket.send(greeting)
-    print(f"> {greeting}")
-    
-start_server = websockets.serve(hello, "localhost", 5001)
-asyncio.get_event_loop().run_until_complete(start_server)
-asyncio.get_event_loop().run_forever()
+# Called when a client sends a message
+def message_received(client, server, message):
+    #Check for "login" message
+    #Check for permissions
+    #Checking max message length here
+	if len(message) > 200:
+		message = message[:200]+'..'
+	print("Client(%d) said: %s" % (client['id'], message))

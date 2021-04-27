@@ -234,6 +234,7 @@
       <br><br><br>
 
       <h1>Play music</h1>
+      <img src="{{ url_for('static', filename='homeImages/checkMark.png') }}" class="checkMark" title="Submit" onclick="randomBGM()" tabindex="0">
       <input type="text" id="music" placeholder="Filename" list="bgmFiles">
       <datalist id="bgmFiles"></datalist>
       <img src="{{ url_for('static', filename='homeImages/checkMark.png') }}" class="checkMark" title="Submit" onclick="sendMusic()" tabindex="0"><br>
@@ -351,6 +352,12 @@
     request.send();
   }
 
+  let sfx;
+
+  sfx.foreach = function(sound) {
+    document.getElementById("sfxFiles").innerHTML += "<option value='" + sound + "'></option>";
+  };
+
   function sendSound() {
     let soundFile = document.getElementById("sound").value;
     request.open("GET", "/sfx?file=" + soundFile);
@@ -366,6 +373,16 @@
   function stopSound() {
     request.open("GET", "/sfxstop");
     request.send();
+  }
+
+  let bgm;
+
+  bgm.foreach = function(song) {
+    document.getElementById("bgmFiles").innerHTML += "<option value='" + song + "'></option>";
+  };
+
+  function randomBGM() {
+    document.getElementById("music").value = bgm[Math.floor(Math.random() * bgm.length)];
   }
 
   document.getElementById("percentNumber").addEventListener("keydown", function(event) {

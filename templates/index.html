@@ -1,0 +1,442 @@
+{% extends 'header.html' %}
+<!-- ^^ This means add this file to the end of the contents of header.html -->
+<!-- This is where the title, top buttons, and stylesheet is located -->
+
+<!-- Change title here -->
+{% block title %}Formbar & Webchat{% endblock %}
+{% block icon %}
+<link rel="icon" href="{{ url_for('static', filename='homeImages/favicon-thumbs.png') }}">{% endblock %}
+
+<!-- Extra style declarations here -->
+{% block style %}
+<style>
+  body {
+    font: 16px "Segoe UI", sans-serif;
+  }
+
+  ::-webkit-scrollbar {
+    width: 15px;
+    height: 15px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    box-shadow: inset 0 0 5px 5px #777;
+    border: solid 5px transparent;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    box-shadow: inset 0 0 5px 5px #444;
+  }
+
+  ::-webkit-scrollbar-thumb:active {
+    box-shadow: inset 0 0 15px 15px #444;
+    border: none;
+  }
+
+  h1 {
+    margin: 0 0 12px;
+    font-size: 24px;
+    color: #00bf00;
+  }
+
+  h2 {
+    margin: 0 0 10px;
+    font-size: 20px;
+    color: #00bf00;
+  }
+
+  input[type="text"],
+  input[type="number"] {
+    background-color: transparent;
+    border-color: black;
+    border-style: none none solid;
+    font-size: 16px;
+    font-family: "Segoe UI", sans-serif;
+    outline: none;
+  }
+
+  input[type="text"] {
+    width: 144px;
+  }
+
+  input[type="number"] {
+    width: 48px;
+  }
+
+  button,
+  input[type="color"] {
+    height: 24px;
+    background-color: #eee;
+    border: 1px solid;
+    border-radius: 6px;
+    color: #0040bf;
+    font-family: "Segoe UI", sans-serif;
+    font-weight: bold;
+  }
+
+  input[type="color"] {
+    width: 80px;
+    height: 20px;
+  }
+
+  button,
+  input[type="color"],
+  .thumbButton,
+  .letterButton {
+    transform: translate(2px, -2px);
+    box-shadow: -2px 2px;
+    transition-duration: 0.2s;
+    cursor: pointer;
+  }
+
+  button:hover,
+  input[type="color"]:hover,
+  .thumbButton:hover,
+  .letterButton:hover,
+  .checkMark:active {
+    filter: brightness(80%);
+  }
+
+  a:active {
+    filter: brightness(50%);
+  }
+
+  .highlight,
+  button:active,
+  input[type="color"]:active,
+  .thumbButton:active,
+  .letterButton:active {
+    transform: initial;
+    box-shadow: initial;
+  }
+
+  .thumbButton,
+  .letterButton {
+    width: 96px;
+    margin: 12px;
+    border-radius: 48px;
+  }
+
+  .checkMark {
+    width: 24px;
+    margin-left: 4px;
+    border-radius: 12px;
+    vertical-align: middle;
+    cursor: pointer;
+  }
+
+  .tab {
+    display: inline-block;
+    font-size: 20px;
+    padding: 10px 20px;
+    cursor: pointer;
+  }
+
+  .tab:hover:not(.open) {
+    background-color: #0040bf;
+  }
+
+  .open {
+    background-color: #4070df;
+  }
+
+  #goToPage {
+    position: absolute;
+    right: 0;
+    top: 47px;
+    padding: 5px 20px;
+    background-color: #eee;
+    color: #1747a7;
+    cursor: pointer;
+  }
+
+  #goToPage:hover {
+    background-color: #bfcfee;
+  }
+
+  #thumbs,
+  #letters,
+  play,
+  segment,
+  #segment,
+  #color1Heading,
+  #color2Div {
+    display: none;
+  }
+
+  #quickmenu,
+  #content {
+    display: none;
+  }
+</style>
+{% endblock %}
+
+<!-- Extra javascript here -->
+{% block script %}{% endblock %}
+
+<!-- Main content here -->
+{% block main %}
+<iframe src="/virtualbar" style="position: absolute; top: -78px; left: 0; width: 100%; height: 117px; border: none; background-color: black;"></iframe>
+
+<div style="position: fixed; left: 0; bottom: 0; width: 250px; height: calc(100% - 39px); padding: 8px; box-sizing: border-box; background: #eee;">
+  <div style="height: calc(100% - 167px); overflow: auto;">
+    <div id="thumbs" style="text-align: center;">
+      <img src="{{ url_for('static', filename='homeImages/thumbButton0.png') }}" id="thumbButton0" class="thumbButton" title="Thumbs up" onclick="thumbsVote(0)" tabindex="0" style="color: #00bf00;">
+      <br>
+      <img src="{{ url_for('static', filename='homeImages/thumbButton1.png') }}" id="thumbButton1" class="thumbButton" title="Wiggle" onclick="thumbsVote(1)" tabindex="0" style="color: #0040bf;">
+      <br>
+      <img src="{{ url_for('static', filename='homeImages/thumbButton2.png') }}" id="thumbButton2" class="thumbButton" title="Thumbs down" onclick="thumbsVote(2)" tabindex="0" style="color: #bf0000;">
+    </div>
+
+    <div id="letters" style="text-align: center;">
+      <img src="{{ url_for('static', filename='homeImages/letterButton0.png') }}" id="letterButton0" class="letterButton" title="Answer A" onclick="answer(0)" tabindex="0" style="color: #bf0000;">
+      <br>
+      <img src="{{ url_for('static', filename='homeImages/letterButton1.png') }}" id="letterButton1" class="letterButton" title="Answer B" onclick="answer(1)" tabindex="0" style="color: #ffbf00;">
+      <br>
+      <img src="{{ url_for('static', filename='homeImages/letterButton2.png') }}" id="letterButton2" class="letterButton" title="Answer C" onclick="answer(2)" tabindex="0" style="color: #00bf00;">
+      <br>
+      <img src="{{ url_for('static', filename='homeImages/letterButton3.png') }}" id="letterButton3" class="letterButton" title="Answer D" onclick="answer(3)" tabindex="0" style="color: #0040bf;">
+    </div>
+
+    <div id="play">
+      <h1>Change text</h1>
+      <input type="text" id="message" style="text-transform: uppercase; font-family: monospace;" placeholder="Message" maxlength="10">
+      <img src="{{ url_for('static', filename='homeImages/checkMark.png') }}" class="checkMark" title="Submit" onclick="sendText()" tabindex="0">
+      <br><br><br>
+
+      <h1>Change color</h1>
+      <input type="radio" id="hideSegment" name="segment" checked onclick="hideSegment()" style="margin-left: 0;"><label for="hideSegment">Entire bar</label>
+      <input type="radio" id="showSegment" name="segment" onclick="showSegment()"><label for="showSegment">Segment</label>
+      <br>
+      <div id="segment">
+        <input type="number" id="segmentStartNumber" min="0" max="240" value="0" onchange="validNumber(this)"> –
+        <input type="number" id="segmentEndNumber" min="0" max="240" value="240" onchange="validNumber(this)">
+      </div>
+        <input type="radio" id="hideColor2" name="gradient" checked onclick="hideColor2()" style="margin: 8px 3px 8px 0;"><label for="hideColor2">Single color</label>
+      <input type="radio" id="showColor2" name="gradient" onclick="showColor2()"><label for="showColor2">Gradient</label>
+      <br>
+      <div style="display: inline-block;">
+        <h2 id="color1Heading">Color 1</h2>
+        <input type="color" id="color1">
+      </div>
+      <div id="color2Div" style="margin-left: 8px;">
+        <h2>Color 2</h2>
+        <input type="color" id="color2">
+      </div>
+      <img src="{{ url_for('static', filename='homeImages/checkMark.png') }}" class="checkMark" title="Submit" onclick="sendColor()" tabindex="0">
+      <br><br><br>
+
+      <h1>Sound effects</h1>
+      <input type="text" id="sound" placeholder="Filename" list="sfxFiles">
+      <datalist id="sfxFiles">
+        <option value="19 dollar fortnite card"></option>
+        <option value="blip01"></option>
+        <option value="bombdefused"></option>
+        <option value="bootup02"></option>
+        <option value="bruh"></option>
+        <option value="dodge01"></option>
+        <option value="dukenukem"></option>
+        <option value="enemyspotted"></option>
+        <option value="explode01"></option>
+        <option value="falconpunch"></option>
+        <option value="feellikeanut"></option>
+        <option value="hit01"></option>
+        <option value="intelinside"></option>
+        <option value="ivefallen"></option>
+        <option value="john_cena"></option>
+        <option value="laser01"></option>
+        <option value="llamasinhatsfull"></option>
+        <option value="mlgairhorn"></option>
+        <option value="pickup01"></option>
+        <option value="pickup02"></option>
+        <option value="pizzapizza"></option>
+        <option value="powerup02"></option>
+        <option value="sfx_blip01"></option>
+        <option value="sfx_bootup02"></option>
+        <option value="sfx_dodge01"></option>
+        <option value="sfx_explode01"></option>
+        <option value="sfx_hit01"></option>
+        <option value="sfx_laser01"></option>
+        <option value="sfx_pickup01"></option>
+        <option value="sfx_pickup02"></option>
+        <option value="sfx_powerup02"></option>
+        <option value="sfx_shoot01"></option>
+        <option value="sfx_splash01"></option>
+        <option value="sfx_success01"></option>
+        <option value="sfx_up01"></option>
+        <option value="sfx_up02"></option>
+        <option value="sfx_up03"></option>
+        <option value="sfx_up04"></option>
+        <option value="shoot01"></option>
+        <option value="spicymeatball"></option>
+        <option value="splash01"></option>
+        <option value="success01"></option>
+        <option value="Taco-Bell-ding-dong"></option>
+        <option value="thisismyhouse"></option>
+        <option value="UndertaleMegalovania"></option>
+        <option value="up01"></option>
+        <option value="up02"></option>
+        <option value="up03"></option>
+        <option value="up04"></option>
+        <option value="wassup"></option>
+        <option value="yougotmail"></option>
+      </datalist>
+      <img src="{{ url_for('static', filename='homeImages/checkMark.png') }}" class="checkMark" title="Submit" onclick="sendSound()" tabindex="0"><br>
+      <button id="stopSoundButton" style="margin-top: 12px;" onclick="stopSound()">Stop sound effects</button>
+      <br><br><br>
+
+      <h1>Fill percentage</h1>
+      <input type="number" id="percentNumber" value="0" min="0" max="100" onchange="validNumber(this)"><label for="percentNumber">%</label>
+      <img src="{{ url_for('static', filename='homeImages/checkMark.png') }}" class="checkMark" title="Submit" onclick="sendPercent()" tabindex="0">
+    </div>
+  </div>
+
+  <div id="bottom" style="position: fixed; bottom: 8px;">
+    <button onclick="openPage('getpix')" style="margin-bottom: 6px;">Get all pixels</button>
+    <br>
+    Name: <span id="name"></span> | <a style="color: #0040bf; text-decoration: underline; cursor: pointer;" onclick="enterName(true)">Log in again</a>
+    <br>
+    Mode: <span id="mode"></span>
+  </div>
+</div>
+
+<div style="position: fixed; right: 0; bottom: 0; width: calc(100% - 250px); height: calc(100% - 39px);">
+  <div style="background-color: #00388f; color: white;">
+    <div id="chatTab" class="tab open" onclick="openPage('chat')">Chat</div
+    ><div id="helpTab" class="tab" onclick="openPage('help')">Help</div
+    ><div id="hangmanTab" class="tab" onclick="openPage('hangman')">Hangman</div>
+    <div style="display: flex; width: calc(100% - 66px); background-color: #1747a7; padding: 5px;">
+      <label for="url" style="filter: opacity(80%); cursor: text;">172.21.3.4:5000/</label><input type="text" id="url" value="chat" autocomplete="off" style="flex: 1; padding: 0; color: white; border: none;">
+    </div>
+    <span id="goToPage" title="Go to this page" onclick="openPage(document.getElementById('url').value)">➤</span>
+  </div>
+  <div>
+    <iframe src="/chat" id="mainWindow" style="position: absolute; width: 100%; height: calc(100% - 78px); border: none;"></iframe>
+  </div>
+</div>
+
+<script>
+  let request = new XMLHttpRequest();
+
+  function mode() {
+
+  }
+
+  function logIn(manual) {
+    let name = localStorage.getItem("name");
+
+    if (manual) {
+      name = prompt("Enter your name", name);
+      //Remove HTML
+      name = name.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    } else {
+      while (!name) {
+        name = prompt("Enter your name");
+        //Remove HTML
+        name = name.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+        if (!name) alert("Login required");
+      }
+    }
+
+    if (name) {
+      localStorage.setItem("name", name);
+      document.getElementById("name").innerHTML = name;
+      request.open("GET", "/login?name=" + name);
+      request.send();
+    } else name = localStorage.getItem("name");
+  }
+
+  window.onload = function() {
+    mode();
+    logIn();
+  };
+
+  function sendText() {
+    let text = document.getElementById("message").value;
+    //Replace spaces with underscores
+    text = text.replace(/\s/g, "_");
+    if (!text) text = "_";
+    request.open("GET", "/say?phrase=" + text);
+    request.send();
+    document.getElementById("message").value = "";
+  }
+
+  document.getElementById("message").addEventListener("keydown", function(event) {
+    //Enter key
+    if (event.keyCode == 13) sendText();
+  });
+
+  function hideSegment() {
+    document.getElementById("segment").style.display = "none";
+  }
+
+  function showSegment() {
+    document.getElementById("segment").style.display = "block";
+  }
+
+  function validNumber(el) {
+    //Convert value to integer
+    let number = parseInt(el.value);
+    if (number < el.min || isNaN(number)) el.value = el.min;
+    else if (number > el.max) el.value = el.max;
+    else el.value = number;
+  }
+
+  function hideColor2() {
+    document.getElementById("color1Heading").style.display = "none";
+    document.getElementById("color2Div").style.display = "none";
+  }
+
+  function showColor2() {
+    document.getElementById("color1Heading").style.display = "block";
+    document.getElementById("color2Div").style.display = "inline-block";
+  }
+
+  function sendColor() {
+    //request.open("GET", );
+    request.send();
+  }
+
+  function sendSound() {
+    let soundFile = document.getElementById("sound").value;
+    request.open("GET", "/sfx?file=" + soundFile);
+    request.send();
+    document.getElementById("sound").value = "";
+  }
+
+  document.getElementById("sound").addEventListener("keydown", function(event) {
+    //Enter key
+    if (event.keyCode == 13) sendSound();
+  });
+
+  function stopSound() {
+    request.open("GET", "/sfxstop");
+    request.send();
+  }
+
+  document.getElementById("percentNumber").addEventListener("keydown", function(event) {
+    //Enter key
+    if (event.keyCode == 13) sendPercent();
+  });
+
+  document.getElementById("url").addEventListener("keydown", function(event) {
+    //Enter key
+    if (event.keyCode == 13) openPage(this.value);
+  });
+
+  function openPage(page) {
+    document.getElementById("mainWindow").src = "/" + page;
+    document.getElementById("url").value = page;
+    let tabs = document.querySelectorAll(".tab");
+    Array.from(tabs).forEach(function(tab) {
+      tab.classList.remove("open");
+    });
+    if (document.getElementById(page + "Tab")) document.getElementById(page + "Tab").classList.add("open");
+  }
+
+  //Uncheck segment when hidden, imgbtn enter keys, color url
+
+  /*var session = Flashphoner.createSession({urlServer:"wss://192.168.88.59:8443"});
+  session.createStream({name:"rtsp://192.168.88.5/live.sdp", display:myVideo}).play();*/
+</script>
+{% endblock %}

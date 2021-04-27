@@ -9,24 +9,24 @@
 {% block style %}
 <style>
   :root {
-    --background-color: #333;
-    --bg-dark-color: #222;
+    --background-color: #303234;
+    --bg-dark-color: #202123;
     --bg-highlight-color: #444;
-    --bg-green-color: #243;
+    --bg-green-color: #242;
     --bg-purple-color: #423;
     --bg-yellow-color: #430;
-    --main-color: #bfbfff;
-    --alt-color: #8f8fbf;
+    --main-color: #bfcfff;
+    --alt-color: #8f9bbf;
     --green-color: #80ffbf;
     --purple-color: #ff80bf;
-    --yellow-color: #ffbf00;
-    --gray-color: #aaa;
+    --yellow-color: #ffaf60;
+    --gray-color: #ccc;
   }
 
   body {
     background-color: var(--background-color);
     color: white;
-    font-family: "Segoe UI", sans-serif;
+    font: 16px "Segoe UI", sans-serif;
   }
 
   ::-webkit-scrollbar {
@@ -58,7 +58,7 @@
     top: 0;
     left: 0;
     width: calc(100% - 340px);
-    height: calc(100% - 90px);
+    height: calc(100% - 97px);
     padding: 0 10px;
     overflow: auto;
   }
@@ -73,7 +73,7 @@
       cursor: pointer;
   }
 
-  .whisper {
+  .msg.whisper {
     background-color: var(--bg-purple-color);
   }
 
@@ -93,7 +93,7 @@
 
   #userlist {
     width: 300px;
-    height: calc(100% - 110px);
+    height: calc(100% - 117px);
     background-color: var(--bg-dark-color);
     position: fixed;
     top: 0;
@@ -131,13 +131,23 @@
     padding: 20px;
   }
 
+  #removeRec {
+    display: none;
+    margin-left: 4px;
+    color: var(--gray-color);
+    cursor: pointer;
+  }
+
+  #removeRec:hover {
+    color: white;
+  }
+
   #input {
     width: 75%;
     height: 32px;
     box-sizing: border-box;
     background-color: var(--bg-dark-color);
     color: white;
-    outline: none;
     resize: none;
     border: 1px solid var(--main-color);
     font-family: "Segoe UI", sans-serif;
@@ -162,26 +172,34 @@
     border: none;
   }
 
-  #sendButton {
-    width: 64px;
-    height: 32px;
-    border-radius: 6.25px;
+  #sendButton, button {
+    box-sizing: border-box;
     margin-left: 5px;
     background-color: var(--background-color);
     color: var(--main-color);
     border: 1px var(--main-color) solid;
-    font: 20px "Segoe UI", sans-serif;
-    vertical-align: top;
     cursor: pointer;
-    outline: none;
   }
 
-  #sendButton:hover, #sendButton:focus {
+  #sendButton {
+    width: 64px;
+    height: 32px;
+    border-radius: 8px;
+    font: 20px "Segoe UI", sans-serif;
+    vertical-align: top;
+  }
+
+  button {
+    border-radius: 5.5px;
+    font: 14px "Segoe UI", sans-serif;
+  }
+
+  #sendButton:hover, button:hover {
     background-color: var(--main-color);
     color: var(--background-color);
   }
 
-  #sendButton:active {
+  #sendButton:active, button:active {
     background-color: white;
   }
 
@@ -209,7 +227,8 @@
     font-size: 20px;
   }
 
-  #quickmenu {
+  #quickmenu,
+  #content {
     display: none;
   }
 </style>
@@ -228,11 +247,12 @@
     </div>
 </div>
 <div id="controlChat">
+    <div style="font-size: 14px; margin-bottom: 5px;">To <span id="recipient">all</span><span id="removeRec" onclick="removeRec()" title="Reset recipients to all">✕</span></div>
     <form onsubmit="event.preventDefault(); onSubmit(); return false;" style="margin: 0;">
-        <div style="font-size: 14px; margin-bottom: 5px;">To <span id="recipient">all</span></div>
-        <input id="input" placeholder="Send a message" autocomplete="off"></input>
+        <input id="input" placeholder="Enter a message" autocomplete="off"></input>
         <input type="submit" value="Send" id="sendButton">
     </form>
+    <div style="font-size: 14px; margin-top: 5px;">Commands: <button onclick="enterCommand('!#help')">!#help</button></div>
 </div>
 <script type="text/javascript">
     // Connect to Web Socket
@@ -301,19 +321,21 @@
     }
 
     function changeRec(name, el) {
-        if (receiver != name) {
-            receiver = name;
-            boxes.recBox.innerHTML = receiver;
-            boxes.recBox.style.color = "var(--purple-color)";
-            //sendButton.value = "Send to " + receiver;
-            el.classList.add('whisper');
-        } else {
-            receiver = 'all';
-            boxes.recBox.innerHTML = "all";
-            boxes.recBox.style.color = "white";
-            //sendButton.value = "Send";
-            el.classList.remove('whisper');
-        }
+          receiver = name;
+          boxes.recBox.innerHTML = receiver;
+          boxes.recBox.style.color = "var(--purple-color)";
+          //sendButton.value = "Send to " + receiver;
+          //el.classList.add('whisper');
+          document.getElementById("removeRec").style.display = "initial";
+    }
+
+    function removeRec() {
+        receiver = 'all';
+        boxes.recBox.innerHTML = "all";
+        boxes.recBox.style.color = "white";
+        //sendButton.value = "Send";
+        //el.classList.remove('whisper');
+        document.getElementById("removeRec").style.display = "none";
     }
 
     function atBottom(ele) {
@@ -338,6 +360,10 @@
                 // args = text.split(" ");
                 // args.shift();
                 ws.send(JSON.stringify(packMSG('help', receiver, username, text)));
+                output({
+                    from: 'server',
+                    content: 'Ticket sent'
+                });
             } else {
                 ws.send(JSON.stringify(packMSG('message', receiver, username, text)));
             }
@@ -357,7 +383,10 @@
         newMSG.classList.add('msg')
         if (message.to == username) newMSG.classList.add('whisper')
         if (message.from == username) newMSG.classList.add('me')
-        else if (message.from == 'server' || message.type == 'alert') newMSG.classList.add('alert')
+        else if (message.from == 'server' || message.type == 'alert') {
+          newMSG.classList.add('alert')
+          message.from = "";
+        }
         else {
           newMSG.classList.add('them')
           //Change to only affect username
@@ -370,6 +399,11 @@
         // newMSG.appendChild(document.createTextNode(message.from + ": " + message.content))
         boxes.outputBox.appendChild(newMSG);
         if (lockBottom) boxes.outputBox.scrollTo(0, boxes.outputBox.scrollHeight);
+    }
+
+    function enterCommand(command) {
+      boxes.inputBox.value = command;
+      boxes.inputBox.focus();
     }
 </script>
 {% endblock %}

@@ -228,61 +228,15 @@
 
       <h1>Sound effects</h1>
       <input type="text" id="sound" placeholder="Filename" list="sfxFiles">
-      <datalist id="sfxFiles">
-        <option value="19 dollar fortnite card"></option>
-        <option value="blip01"></option>
-        <option value="bombdefused"></option>
-        <option value="bootup02"></option>
-        <option value="bruh"></option>
-        <option value="dodge01"></option>
-        <option value="dukenukem"></option>
-        <option value="enemyspotted"></option>
-        <option value="explode01"></option>
-        <option value="falconpunch"></option>
-        <option value="feellikeanut"></option>
-        <option value="hit01"></option>
-        <option value="intelinside"></option>
-        <option value="ivefallen"></option>
-        <option value="john_cena"></option>
-        <option value="laser01"></option>
-        <option value="llamasinhatsfull"></option>
-        <option value="mlgairhorn"></option>
-        <option value="pickup01"></option>
-        <option value="pickup02"></option>
-        <option value="pizzapizza"></option>
-        <option value="powerup02"></option>
-        <option value="sfx_blip01"></option>
-        <option value="sfx_bootup02"></option>
-        <option value="sfx_dodge01"></option>
-        <option value="sfx_explode01"></option>
-        <option value="sfx_hit01"></option>
-        <option value="sfx_laser01"></option>
-        <option value="sfx_pickup01"></option>
-        <option value="sfx_pickup02"></option>
-        <option value="sfx_powerup02"></option>
-        <option value="sfx_shoot01"></option>
-        <option value="sfx_splash01"></option>
-        <option value="sfx_success01"></option>
-        <option value="sfx_up01"></option>
-        <option value="sfx_up02"></option>
-        <option value="sfx_up03"></option>
-        <option value="sfx_up04"></option>
-        <option value="shoot01"></option>
-        <option value="spicymeatball"></option>
-        <option value="splash01"></option>
-        <option value="success01"></option>
-        <option value="Taco-Bell-ding-dong"></option>
-        <option value="thisismyhouse"></option>
-        <option value="UndertaleMegalovania"></option>
-        <option value="up01"></option>
-        <option value="up02"></option>
-        <option value="up03"></option>
-        <option value="up04"></option>
-        <option value="wassup"></option>
-        <option value="yougotmail"></option>
-      </datalist>
+      <datalist id="sfxFiles"></datalist>
       <img src="{{ url_for('static', filename='homeImages/checkMark.png') }}" class="checkMark" title="Submit" onclick="sendSound()" tabindex="0"><br>
       <button id="stopSoundButton" style="margin-top: 12px;" onclick="stopSound()">Stop sound effects</button>
+      <br><br><br>
+
+      <h1>Play music</h1>
+      <input type="text" id="music" placeholder="Filename" list="bgmFiles">
+      <datalist id="bgmFiles"></datalist>
+      <img src="{{ url_for('static', filename='homeImages/checkMark.png') }}" class="checkMark" title="Submit" onclick="sendMusic()" tabindex="0"><br>
       <br><br><br>
 
       <h1>Fill percentage</h1>
@@ -294,7 +248,7 @@
   <div id="bottom" style="position: fixed; bottom: 8px;">
     <button onclick="openPage('getpix')" style="margin-bottom: 6px;">Get all pixels</button>
     <br>
-    Name: <span id="name"></span> | <a style="color: #0040bf; text-decoration: underline; cursor: pointer;" onclick="enterName(true)">Log in again</a>
+    Name: <span id="name"></span> | <a style="color: #0040bf; text-decoration: underline; cursor: pointer;" onclick="logIn(true)">Log in again</a>
     <br>
     Mode: <span id="mode"></span>
   </div>

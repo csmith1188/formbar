@@ -1,13 +1,13 @@
-from flask import Flask, redirect, url_for, request, render_template
-from websocket_server import WebsocketServer
-import board, neopixel
-import pandas
-import json, csv
-import pygame
-import time, math
-import threading
-import netifaces as ni
-import logging
+from flask import Flask, redirect, url_for, request, render_template#Importing Flask from flask.
+from websocket_server import WebsocketServer#Importing the WebsocketServer from websocket_server.
+import board, neopixel#Importing the board, and the neopixel.
+import pandas#Importing pandas.
+import json, csv#Importing JSON.
+import pygame#Importing pygame.
+import time, math#Importing the time, and math that will be used for equations.
+import threading#Importing threading.
+import netifaces as ni#Importing netifaces as ni being the alternative name.
+import logging#Importing logging.
 
 logging.basicConfig(filename='info.log',
                             filemode='a',
@@ -32,13 +32,12 @@ WSPORT=9001
 
 logging.info('Running formbar server on:' + ip)
 
-import letters
-import sfx
-import bgm
-from colors import colors, hex2dec
-import lessons
+import letters#Importing letters.
+import sfx#Importing the sound.
+import bgm#Importing background music.
+from colors import colors, hex2dec#Importing colors and hex2dec from colors.
+import lessons#Importing lessons.
 
-import logging
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
@@ -1093,9 +1092,9 @@ def start_chat():
 
 if __name__ == '__main__':
     chatApp = threading.Thread(target=start_chat, daemon=True)
-    chatApp.start()
+    chatApp.start()#Starts up the chat feature
     # flaskApp = threading.Thread(target=start_flask)
     # flaskApp.start()
     # flaskApp.join()
     start_flask()
-    chatApp.join()
+    chatApp.join()#Makes the chat joinable.

@@ -960,6 +960,10 @@ def endpoint_bgm():
         bgm_file = request.args.get('file')
         if bgm_file in bgm.bgm:
             bgm_volume = request.args.get('volume')
+            try:
+                bgm_volume = float(bgm_volume)
+            except:
+                logging.warning("Could not convert volume to float.")
             if bgm_volume and type(bgm_volume) is float:
                 playBGM(bgm_file, bgm_volume)
             else:

@@ -1,24 +1,42 @@
 from flask import Flask, redirect, url_for, request, render_template
 from websocket_server import WebsocketServer
 import board, neopixel
+import pandas
 import json, csv
 import pygame
 import time, math
 import threading
 import netifaces as ni
+import logging
+
+logging.basicConfig(filename='info.log',
+                            filemode='a',
+                            format='%(asctime)s.%(msecs)d %(levelname)s %(message)s',
+                            datefmt='%H:%M:%S',
+                            level=logging.DEBUG)
+# set up logging to console
+console = logging.StreamHandler()
+console.setLevel(logging.DEBUG)
+# set a format which is simpler for console use
+formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+console.setFormatter(formatter)
+# add the handler to the root logger
+logging.getLogger('').addHandler(console)
+logger = logging.getLogger(__name__)
 
 #Get internal IP address
-ip = ni.ifaddresses('wlan0')[ni.AF_INET][0]['addr']
-# ip = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
+#ip = ni.ifaddresses('wlan0')[ni.AF_INET][0]['addr']
+ip = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
 
 WSPORT=9001
 
-print('Running formbar server on:' + ip)
+logging.info('Running formbar server on:' + ip)
 
 import letters
 import sfx
 import bgm
 from colors import colors, hex2dec
+import lessons
 
 import logging
 log = logging.getLogger('werkzeug')
@@ -55,14 +73,18 @@ settingsBoolDict = {
     'paused' : False,
     'blind' : False,
     'showinc' : True,
-    'captions' : True
+    'captions' : True,
+    'autocount' : True
 }
 settingsIntDict = {
     'numStudents': 8
 }
 
 settingsStrDict = {
-    'mode': 'thumbs'
+    'mode': 'thumbs',
+    'upcolor': 'green',
+    'wigglecolor': 'blue',
+    'downcolor': 'red'
 }
 
 settingsStrList = {
@@ -110,7 +132,7 @@ def aniTest():
 
 @app.route('/anitest')
 def endpoint_anitest():
-    if len(threading.enumerate()) < 4:
+    if len(threading.enumerate()) < 5:
         threading.Thread(target=aniTest, daemon=True).start()
         return 'testing...'
     else:
@@ -126,11 +148,12 @@ def newStudent(remote, username, forward='', pin=''):
             'perms': 2,
         }
         if len(studentList) - 1:
-            print("New user logged in. Made them a student: " + username)
+            logging.info("New user logged in. Made them a student: " + username)
             studentList[remote]['perms'] = 2
         else:
-            print("First user logged in. Made them a Teacher: " + username)
+            logging.info("First user logged in. Made them a Teacher: " + username)
             studentList[remote]['perms'] = 0
+        playSFX("sfx_up02")
         if forward:
             return redirect(forward, code=302)
 
@@ -238,9 +261,9 @@ def printLetter(letter, startLocation, fg=colors['fg'], bg=colors['bg']):
                     pixels[j] = bg
 
         else:
-            print("Error! Letter ", letter, " not found.")
+            logging.warning("Warning! Letter ", letter, " not found.")
     else:
-        print("Error! Not enough space for this letter!")
+        logging.warning("Warning! Not enough space for this letter!")
 
 def surveyBar():
     results = [] # Create empty results list
@@ -304,6 +327,8 @@ def surveyBar():
 
 def tutdBar():
     global studentList
+    if settingsBoolDict['autocount']:
+        autoStudentCount()
     upFill = upCount = downFill = wiggleFill = 0
     complete = 0
     for x in studentList:
@@ -342,7 +367,7 @@ def tutdBar():
                     if settingsBoolDict['blind'] and complete != settingsIntDict['numStudents']:
                         pixels[pix] = fadein(pixRange, i, colors['blind'])
                     else:
-                        pixels[pix] = fadein(pixRange, i, colors['yellow'])
+                        pixels[pix] = fadein(pixRange, i, colors['blue'])
             wiggleFill -= 1
         elif downFill > 0:
             for i, pix in enumerate(pixRange):
@@ -361,13 +386,21 @@ def tutdBar():
     if upCount >= settingsIntDict['numStudents']:
         settingsBoolDict['paused'] = True
         pixels.fill((0,0,0))
-        playSFX("success01")
+        playSFX("sfx_success01")
         for i, pix in enumerate(range(0, BARPIX)):
                 pixels[pix] = blend(range(0, BARPIX), i, colors['blue'], colors['red'])
         if settingsBoolDict['captions']:
             clearString()
             showString("MAX GAMER!", 0, colors['purple'])
     pixels.show()
+
+def autoStudentCount():
+    settingsIntDict['numStudents'] = 0
+    for user in studentList:
+        if studentList[user]['perms'] == 2:
+            settingsIntDict['numStudents'] += 1
+    if settingsIntDict['numStudents'] == 0:
+        settingsIntDict['numStudents'] = 1
 
 @app.route('/')
 def endpoint_home():
@@ -383,8 +416,11 @@ def endpoint_login():
             username = request.form['username']
             forward = request.form['forward']
             #pin = request.form['pin']
-            newStudent(remote, username, forward)
-            return redirect('/', code=302)
+            if username.strip():
+                newStudent(remote, username, forward)
+                return redirect('/', code=302)
+            else:
+                return render_template("message.html", message="You cannot have a blank name.")
         elif request.args.get('name'):
             newStudent(remote, request.args.get('name'))
             return redirect('/', code=302)
@@ -421,6 +457,10 @@ def endpoint_color():
             return "Bad ArgumentsTry <b>/color?hex=#FF00FF</b> or <b>/color?r=255&g=0&b=255</b>"
         pixels.show()
         return render_template("message.html", message = "Color sent!" )
+
+@app.route('/hangman')
+def endpoint_hangman():
+    return render_template("hangman.html")
 
 @app.route('/segment')
 def endpoint_segment():
@@ -493,16 +533,15 @@ def settings():
         ipList = {}
         for student in studentList:
             studentList[student]['thumb'] = ''
-        tutdBar()
         if request.method == 'POST':
-            quizQuestion = request.form['qQuestion']
-            quizCorrect = int(request.form['quizlet'])
-            quizAnswers = [request.form['qaAnswer'], request.form['qbAnswer'], request.form['qcAnswer'], request.form['qdAnswer']]
+            # quizQuestion = request.form['qQuestion']
+            # quizCorrect = int(request.form['quizlet'])
+            # quizAnswers = [request.form['qaAnswer'], request.form['qbAnswer'], request.form['qcAnswer'], request.form['qdAnswer']]
             if settingsStrDict['mode'] == 'thumbs':
                 tutdBar()
             elif settingsStrDict['mode'] == 'survey':
                 surveyBar()
-            playSFX("success01")
+            playSFX("sfx_success01")
             settingsBoolDict['paused'] = False
             return redirect(url_for('settings'))
         else:
@@ -535,6 +574,11 @@ def settings():
 
             if request.args.get('students'):
                 settingsIntDict['numStudents'] = int(request.args.get('students'))
+                if settingsIntDict['numStudents'] == 0:
+                    settingsBoolDict['autocount'] = True
+                    autoStudentCount()
+                else:
+                    settingsBoolDict['autocount'] = False
                 resString += 'Set <i>numStudents</i> to: ' + str(settingsIntDict['numStudents'])
             if request.args.get('mode'):
                 if request.args.get('mode') in settingsStrList['modes']:
@@ -546,7 +590,7 @@ def settings():
             if resString == '':
                 return render_template("settings.html")
             else:
-                playSFX("pickup01")
+                playSFX("sfx_pickup01")
                 resString += ""
                 return resString
 
@@ -558,9 +602,11 @@ def endpoint_flush():
     if studentList[request.remote_addr]['perms'] > settingsPerms['admin']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
-        for user in studentList:
-            if not user['perms'] == settingsPerms['admin']:
-                del user['perms']
+        for user in list(studentList):
+            if not studentList[user]['perms'] == settingsPerms['admin']:
+                del studentList[user]
+        playSFX("sfx_splash01")
+        return render_template("message.html", message = "Users removed from list." )
 
 @app.route('/quiz')
 def endpoint_quiz():
@@ -618,8 +664,8 @@ def endpoint_survey():
         if not name:
             name = 'unknown'
         elif vote:
-            print("Recieved " + vote + " from " + name + " at " + ip)
-            playSFX("blip01")
+            logging.info("Recieved " + vote + " from " + name + " at " + ip)
+            playSFX("sfx_blip01")
         #if settingsStrDict['mode'] != 'survey':
             #return render_template("message.html", message = "There is no survey right now" )
         if vote:
@@ -645,17 +691,23 @@ def endpoint_tutd():
         ip = request.remote_addr
         thumb = request.args.get('thumb')
         if thumb:
-            # print("Recieved " + thumb + " from " + name + " at ip: " + ip)
-            playSFX("blip01")
+            # logging.info("Recieved " + thumb + " from " + name + " at ip: " + ip)
             if thumb == 'up' or thumb == 'down' or thumb == 'wiggle' :
-                studentList[request.remote_addr]['thumb'] = request.args.get('thumb')
-                tutdBar()
-                return render_template("message.html", message = "Thank you for your tasty bytes... (" + thumb + ")" )
+                if not studentList[request.remote_addr]['thumb']:
+                    studentList[request.remote_addr]['thumb'] = request.args.get('thumb')
+                    playSFX("sfx_blip01")
+                    tutdBar()
+                    return render_template("message.html", message = "Thank you for your tasty bytes... (" + thumb + ")" )
+                else:
+                    return render_template("message.html", message = "You've already sunmitted this answer... (" + thumb + ")" )
             elif thumb == 'oops':
-                studentList[request.remote_addr]['thumb'] = ''
-                playSFX("hit01")
-                tutdBar()
-                return render_template("message.html", message = "I won\'t mention it if you don\'t" )
+                if studentList[request.remote_addr]['thumb']:
+                    studentList[request.remote_addr]['thumb'] = ''
+                    playSFX("sfx_hit01")
+                    tutdBar()
+                    return render_template("message.html", message = "I won\'t mention it if you don\'t" )
+                else:
+                    return render_template("message.html", message = "You don't have an answer to erase." )
             else:
                 return "Bad ArgumentsTry <b>/tutd?thumb=wiggle</b>You can also try <b>down</b> and <b>up</b> instead of <b>wiggle</b>"
         else:
@@ -669,9 +721,12 @@ def endpoint_help():
     if request.method == 'POST':
         name = studentList[request.remote_addr]['name']
         name = name.replace(" ", "")
-        helpList[name] = "Help ticket"
-        playSFX("up04")
-        return render_template("message.html", message = "Your ticket was sent. Keep working on the problem the best you can while you wait." )
+        if name in helpList:
+            return render_template("message.html", message = "You already have a help ticket in. If your problem is time-sensitive, or your last ticket was not cleared, please get the teacher's attention manually." )
+        else:
+            helpList[name] = "Help ticket"
+            playSFX("sfx_up04")
+            return render_template("message.html", message = "Your ticket was sent. Keep working on the problem the best you can while you wait." )
     else:
         return render_template("help.html")
 
@@ -707,7 +762,7 @@ def endpoint_needshelp():
                 for ticket in helpList:
                     resString += "<tr><td><a href=\'/needshelp?remove=" + ticket +"\'>" + ticket + "</a></td><td>" + helpList[ticket] + "</td></tr>"
                 resString += "</table>"
-                return resString
+                return render_template("needshelp.html", table = resString)
 
 @app.route('/chat')
 def endpoint_chat():
@@ -853,7 +908,7 @@ def endpoint_sfx():
             for key, value in sfx.sound.items():
                 resString += '<li><a href="/sfx?file=' + key + '">' + key + '</a></li>'
             resString += '</ul> You can play them by using \'/sfx?file=<b>&lt;sound file name&gt;</b>\''
-            return resString
+            return render_template("general.html", content = resString, style = '<style>ul {columns: 2; -webkit-columns: 2; -moz-columns: 2;}</style>')
 
 @app.route('/bgm')
 def endpoint_bgm():
@@ -878,12 +933,13 @@ def endpoint_bgm():
                 playBGM(bgm_file)
             return render_template("message.html", message = 'Playing: ' + bgm_file )
         else:
-            resString = '<h2>List of available background music files:</h2><ul>'
+            resString = '<a href="/bgmstop">Stop Music</a>'
+            resString += '<h2>List of available background music files:</h2><ul>'
             for key, value in bgm.bgm.items():
                 resString += '<li><a href="/bgm?file=' + key + '">' + key + '</a></li>'
             resString += '</ul> You can play them by using \'<b>/bgm?file=&lt;sound file name&gt;&volume=&lt;0.0 - 1.0&gt;\'</b>'
-            resString += 'You can stop them by using \'<b>/bgmstop</b>\''
-            return resString
+            resString += '<br><br>You can stop them by using \'<b>/bgmstop</b>\''
+            return render_template("general.html", content = resString, style = '<style>ul {columns: 2; -webkit-columns: 2; -moz-columns: 2;}</style>')
 
 @app.route('/bgmstop')
 def endpoint_bgmstop():
@@ -944,7 +1000,7 @@ def endpoint_say():
 #Startup stuff
 showString(ip)
 pixels.show()
-playSFX("bootup02")
+playSFX("sfx_bootup02")
 
 '''
     Websocket Setup
@@ -973,17 +1029,18 @@ def packMSG(type, rx, tx, content):
 def new_client(client, server):
     try:
         studentList[client['address'][0]]['wsID'] = client['id']
-        print(studentList[client['address'][0]]['name'] + " connected and was given id %d" % client['id'])
+        logging.info(studentList[client['address'][0]]['name'] + " connected and was given id %d" % client['id'])
         server.send_message_to_all(json.dumps(packMSG('alert', 'all', 'server', studentList[client['address'][0]]['name'] + " has joined the server...")))
         server.send_message_to_all(json.dumps(packMSG('userlist', 'all', 'server', studentList)))
-    except:
-        print("Error finding user in list")
+    except Exception as e:
+        logging.error("Error finding user in list: " + str(e))
 
 # Called for every client disconnecting
 def client_left(client, server):
+    logging.info(studentList[client['address'][0]]['name'] + " disconnected")
+    del studentList[client['address'][0]]['wsID']
     server.send_message_to_all(json.dumps(packMSG('alert', 'all', 'server', studentList[client['address'][0]]['name'] + " has left the server...")))
     server.send_message_to_all(json.dumps(packMSG('userlist', 'all', 'server', studentList)))
-    print(studentList[client['address'][0]]['name'] + " disconnected")
 
 # Called when a client sends a message
 def message_received(client, server, message):
@@ -997,7 +1054,7 @@ def message_received(client, server, message):
             name = studentList[client['address'][0]]['name']
             name = name.replace(" ", "")
             helpList[name] = message['content']
-            playSFX("up04")
+            playSFX("sfx_up04")
             server.send_message(client, json.dumps(packMSG('alert', studentList[client['address'][0]]['name'], 'server', 'Your help ticket was sent. Keep working on the problem while you wait!')))
         else:
             #Check for permissions
@@ -1020,9 +1077,9 @@ def message_received(client, server, message):
                                     messageOut =  packMSG('message', message['to'], studentList[client['address'][0]]['name'], message['content'])
                                     server.send_message(toClient, json.dumps(messageOut))
                                     break
-                print(message['from'] + " said to " + message['to'] + ": " + message['content'])
+                logging.info(message['from'] + " said to " + message['to'] + ": " + message['content'])
     except Exception as e:
-        print('Error: ' + str(e))
+        logging.error('Error: ' + str(e))
 
 def start_flask():
     app.run(host='0.0.0.0', use_reloader=False, debug = False)

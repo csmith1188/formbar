@@ -618,7 +618,7 @@ def endpoint_flush():
     if not request.remote_addr in studentList:
         # This will have to send along the current address as "forward" eventually
         return redirect('/login')
-    if studentList[request.remote_addr]['perms'] > settingsPerms02['admin']:
+    if studentList[request.remote_addr]['perms'] > settingsPerms['admin']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
         for user in list(studentList):

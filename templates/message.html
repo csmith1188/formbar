@@ -1,0 +1,21 @@
+{% extends 'header.html' %}
+<!-- ^^ This means add this file to the end of the contents of header.html -->
+<!-- This is where the title, top buttons, and stylesheet is located -->
+
+<!-- Change title here -->
+{% block title %}Formbar Alert{% endblock %}
+
+<!-- Extra style declarations here -->
+{% block style %}{% endblock %}
+
+<!-- Extra javascript here -->
+{% block script %}{% endblock %}
+
+<!-- Main content here -->
+{% block main %}
+{{ message|safe }}
+<br><br><button onclick='window.history.back()'>Go Back</button>
+<script language='JavaScript' type='text/javascript'>
+    setTimeout("window.history.back()", 5000);
+</script>
+{% endblock %}

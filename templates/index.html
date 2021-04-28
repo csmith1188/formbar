@@ -1,37 +1,32 @@
-<html>
-    <head>
-        <title>LED Formbar Start</title>
-    </head>
-    <body>
-    <h1>LED Formbar (for classroom Formative Assessment and Management)</h1>
-        <table>
-            <tr><td><h3>Teachers</h3></td></tr>
-            <tr><td>
-                <ul>
-                    <li>To see the Virtual bar, go to <a href="/virtualbar">/virtualbar</a></li>
-                    <li>To change settings, go to <a href="/settings">/settings</a></li>
-                    <li>To view a list of people who have requested help, go to <a href="/needshelp">/needshelp</a></li>
-                    <li>To view and play our list of background music, go to <a href="/bgm">/bgm</a>, You can also stop this by going to <a href="/bgmstop">/bgmstop</a></li>
-                    <li>To Say something through the speakers, go to <a href="/say">/say</a>, with the Paramters phrase = {Phrase you want to say}</li>
-                </ul></tr>
-            <tr><td><h3>Students</h3></td></tr>
-               <tr><td> <ul>
-                    <li>To see the Virtual bar, go to <a href="/virtualbar">/virtualbar</a></li>
-                    <li>To borrow a "Thumbs Panel" to interact with the bar, go to <a href="/tutd">/tutd</a></li>
-                    <li>To let the teacher know you need help, go to <a href="/help">/help</a></li>
-                    <li>To answer a quiz question, go to <a href="/quiz">/quiz</a></li>
-                    <li>To set the color of the LED bar, go to <a href=color?r=255&g=100&b=50>/color</a> set the color either using hexdecial or RGB parameters</li>
-                    <li>To pick a sound that can play throught the speakers, go to <a href="/sfx">/sfx</a>,You can also stop this by going to <a href="/sfxstop">/sfxstop</a></li>
-                    <li>To empty blocks from the MC chest, go to <a href="/emptyblocks">/emptyblocks</a></li>
-                    <li>To add blocks into the MC chest, go to <a href="/sendblocks">/sendblocks</a></li>
-                </ul></tr></td>
-                <tr><td><h3>Debugging</h3></td></tr>
-                   <tr><td> <ul>
-                      <li>To get amount of pixels, go to <a href="/getpix">/getpix</a></li>
-                      <li>To set the health of boss, go to <a href="/perc">/perc</a>, with the parametes amount = {percantageAmount} </li>
-                    </ul></tr></td>
-            </td></tr>
-        </table>
-    </body>
-    <script>
-    </script>
+{% extends 'header.html' %}
+<!-- ^^ This means add this file to the end of the contents of header.html -->
+<!-- This is where the title, top buttons, and stylesheet is located -->
+
+<!-- Change title here -->
+{% block title %}Formbar Home{% endblock %}
+
+<!-- Extra style declarations here -->
+{% block style %}{% endblock %}
+
+<!-- Extra javascript here -->
+{% block script %}{% endblock %}
+
+<!-- Main content here -->
+{% block main %}
+<h1>Formbar</h1>
+<div class="container1-flex">
+    <div class="bigbutton bb-green" onclick="window.location = '/tutd';">
+        Thumbs Panel<br>(/tutd)
+    </div>
+    <div class="bigbutton bb-blue" onclick="window.location = '/chat';">
+        Chat<br>(/chat)
+    </div>
+    <div class="bigbutton bb-red" onclick="window.location = '/help';">
+        Help!<br>(/help)
+    </div>
+    <div class="bigbutton bb-yellow" onclick="window.location = '/settings';">
+        Settings<br>(/settings)
+    </div>
+</div>
+
+{% endblock %}

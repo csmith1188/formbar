@@ -1,21 +1,30 @@
-<html>
-    <head>
-        <title>Thumbspanel Rental</title>
-    </head>
-    <body>
-      <h2>Thumbs</h2>
-        <a href="/tutd?thumb=up">Up</a><br>
-        <a href="/tutd?thumb=wiggle">Wiggle</a><br>
-        <a href="/tutd?thumb=down">Down</a><br>
-        <a href="/tutd?thumb=oops">Oops</a><br><br>
-      <h2>Quiz</h2>
-        <a href="/survey?vote=a">A</a><br>
-        <a href="/survey?vote=b">B</a><br>
-        <a href="/survey?vote=c">C</a><br>
-        <a href="/survey?vote=d">D</a><br>
-        <a href="/survey?vote=oops">Oops</a><br><br>
-      <h2>Help</h2>
-        <a href="/quiz">Quiz</a><br>
-        <a href="/help">Help</a><br>
-    </body>
-</html>
+{% extends 'header.html' %}
+<!-- ^^ This means add this file to the end of the contents of header.html -->
+<!-- This is where the title, top buttons, and stylesheet is located -->
+
+<!-- Change title here -->
+{% block title %}Formbar Thumbspanel{% endblock %}
+
+<!-- Extra style declarations here -->
+{% block style %}{% endblock %}
+
+<!-- Extra javascript here -->
+{% block script %}{% endblock %}
+
+<!-- Main content here -->
+{% block main %}
+<h2>Thumbs</h2>
+<a href="/tutd?thumb=up">Up</a><br>
+<a href="/tutd?thumb=wiggle">Wiggle</a><br>
+<a href="/tutd?thumb=down">Down</a><br>
+<a href="/tutd?thumb=oops">Oops</a><br><br>
+<h2>Quiz</h2>
+<a href="/survey?vote=a">A</a><br>
+<a href="/survey?vote=b">B</a><br>
+<a href="/survey?vote=c">C</a><br>
+<a href="/survey?vote=d">D</a><br>
+<a href="/survey?vote=oops">Oops</a><br><br>
+<h2>Help</h2>
+<a href="/quiz">Quiz</a><br>
+<a href="/help">Help</a><br>
+{% endblock %}

@@ -41,7 +41,6 @@ import bgm
 from colors import colors, hex2dec
 import lessons
 
-import logging
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
@@ -1129,9 +1128,9 @@ def start_chat():
 
 if __name__ == '__main__':
     chatApp = threading.Thread(target=start_chat, daemon=True)
-    chatApp.start()
+    chatApp.start()#Starts up the chat feature
     # flaskApp = threading.Thread(target=start_flask)
     # flaskApp.start()
     # flaskApp.join()
     start_flask()
-    chatApp.join()
+    chatApp.join()#Makes the chat joinable.

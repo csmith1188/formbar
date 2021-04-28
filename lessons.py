@@ -1,5 +1,5 @@
-import pandas
-import os
+import pandas#Imports pandas.
+import os#Imports operating system.
 
 def readFolder():
     lessonList = []

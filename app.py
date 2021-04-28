@@ -1,13 +1,15 @@
-from flask import Flask, redirect, url_for, request, render_template#Importing Flask from flask.
-from websocket_server import WebsocketServer#Importing the WebsocketServer from websocket_server.
-import board, neopixel#Importing the board, and the neopixel.
-import pandas#Importing pandas.
-import json, csv#Importing JSON.
-import pygame#Importing pygame.
-import time, math#Importing the time, and math that will be used for equations.
-import threading#Importing threading.
-import netifaces as ni#Importing netifaces as ni being the alternative name.
-import logging#Importing logging.
+#Importing external modules
+from flask import Flask, redirect, url_for, request, render_template
+from websocket_server import WebsocketServer
+import board, neopixel
+import pandas
+import json, csv
+import pygame
+import time, math
+import threading
+import netifaces as ni
+import logging
+
 
 logging.basicConfig(filename='info.log',
                             filemode='a',
@@ -32,11 +34,12 @@ WSPORT=9001
 
 logging.info('Running formbar server on:' + ip)
 
-import letters#Importing letters.
-import sfx#Importing the sound.
-import bgm#Importing background music.
-from colors import colors, hex2dec#Importing colors and hex2dec from colors.
-import lessons#Importing lessons.
+#Importing customs modules
+import letters
+import sfx
+import bgm
+from colors import colors, hex2dec
+import lessons
 
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
@@ -156,16 +159,19 @@ def newStudent(remote, username, forward='', pin=''):
         if forward:
             return redirect(forward, code=302)
 
+#This function Allows you to choose and play whatever sound effect you want
 def playSFX(sound):
     try:
         pygame.mixer.Sound(sfx.sound[sound]).play()
         return "Succesfully played: "
     except:
         return "Invalid format: "
+# This function allows you to choose wich background music you want
 def playBGM(bgm_filename, volume=1.0):
     pygame.mixer.music.load(bgm.bgm[bgm_filename])
     pygame.mixer.music.set_volume(volume)
     pygame.mixer.music.play(loops=-1)
+#This function stops BGM
 def stopBGM():
     pygame.mixer.music.stop()
 
@@ -225,6 +231,7 @@ def fillBar(color=colors['default'], stop=BARPIX, start=0):
     for pix in range(start, stop):
         pixels[pix] = color
 
+#This function clears(default) the color from the formbar
 def clearBar():
     #fill with default color to clear bar
     for pix in range(0, BARPIX):
@@ -264,6 +271,7 @@ def printLetter(letter, startLocation, fg=colors['fg'], bg=colors['bg']):
     else:
         logging.warning("Warning! Not enough space for this letter!")
 
+#Shows results of test when done with surveyBar
 def surveyBar():
     results = [] # Create empty results list
     clearBar()
@@ -324,6 +332,7 @@ def surveyBar():
         showString("SRVY " + str(complete) + "/" + str(settingsIntDict['numStudents']))
     pixels.show()
 
+#it takes the students picked answer and puts the required color for that specific choice
 def tutdBar():
     global studentList
     if settingsBoolDict['autocount']:
@@ -401,10 +410,12 @@ def autoStudentCount():
     if settingsIntDict['numStudents'] == 0:
         settingsIntDict['numStudents'] = 1
 
+#Default formbar(Main page)
 @app.route('/')
 def endpoint_home():
     return render_template('index.html')
 
+#Before choosing endpoints you are required to log in
 @app.route('/login', methods = ['POST', 'GET'])
 def endpoint_login():
     remote = request.remote_addr
@@ -426,6 +437,12 @@ def endpoint_login():
         else:
             return render_template("login.html")
 
+'''
+Change the color of the entire bar
+Query Parameters:
+    hex = six hexadecimal digit rgb color (prioritizes over RGB)
+    r, g, b = provide three color values between 0 and 255
+'''
 @app.route('/color')
 def endpoint_color():
     if not request.remote_addr in studentList:
@@ -457,6 +474,7 @@ def endpoint_color():
         pixels.show()
         return render_template("message.html", message = "Color sent!" )
 
+#This endpoint takes you to the hangman game
 @app.route('/hangman')
 def endpoint_hangman():
     return render_template("hangman.html")
@@ -514,6 +532,7 @@ def endpoint_segment():
         pixels.show()
         return render_template("message.html", message = "Color sent!" )
 
+#This endpoint is exclusive only to the teacher.
 @app.route('/settings', methods = ['POST', 'GET'])
 def settings():
     global ipList
@@ -607,6 +626,7 @@ def endpoint_flush():
         playSFX("sfx_splash01")
         return render_template("message.html", message = "Users removed from list." )
 
+#takes you to a quiz(literally)
 @app.route('/quiz')
 def endpoint_quiz():
     if not request.remote_addr in studentList:
@@ -642,6 +662,7 @@ def endpoint_quiz():
             resString += '</table>'
             return resString
 
+#This endpoint allows the teacher to test students.
 @app.route('/survey')
 def endpoint_survey():
     if not request.remote_addr in studentList:
@@ -681,6 +702,7 @@ def endpoint_survey():
         else:
             return render_template("thumbsrental.html")
 
+#It takes you to the thumbs panel for voting
 @app.route('/tutd')
 def endpoint_tutd():
     if not request.remote_addr in studentList:
@@ -712,6 +734,7 @@ def endpoint_tutd():
         else:
             return render_template("thumbsrental.html")
 
+#This endpoint lets you switch the settings for the formbar(exclusive for teacher)
 @app.route('/help', methods = ['POST', 'GET'])
 def endpoint_help():
     if not request.remote_addr in studentList:
@@ -729,6 +752,7 @@ def endpoint_help():
     else:
         return render_template("help.html")
 
+#This endpoint allows the teacher to check tickets that students send for help.
 @app.route('/needshelp')
 def endpoint_needshelp():
     if not request.remote_addr in studentList:
@@ -763,6 +787,7 @@ def endpoint_needshelp():
                 resString += "</table>"
                 return render_template("needshelp.html", table = resString)
 
+#This endpoint allows students and teacher to chat realTime.
 @app.route('/chat')
 def endpoint_chat():
     if not request.remote_addr in studentList:
@@ -773,6 +798,7 @@ def endpoint_chat():
     else:
         return render_template("chat.html", username = studentList[request.remote_addr]['name'], serverIp = ip)
 
+#This endpoint allows us to see which user(Student) is logged in.
 @app.route('/users')
 def endpoint_user():
     if not request.remote_addr in studentList:
@@ -842,6 +868,7 @@ def endpoint_emptyblocks():
     pixels.show()
     return "Emptied blocks"
 
+
 @app.route('/sendblock')
 def endpoint_sendblock():
     if not settingsStrDict['mode'] == 'blockchest':
@@ -860,10 +887,12 @@ def endpoint_sendblock():
         return "Bad Arguments. Requires 'id' and 'data'"
 '''
 
+#Shows the different colors the pixels take in the virtualbar.
 @app.route('/getpix')
 def endpoint_getpix():
     return '{"pixels": "'+ str(pixels[:BARPIX]) +'"}'
 
+#This endpoints shows the actions the students did EX:TUTD up
 @app.route('/getstudents')
 def endpoint_getstudents():
     if not request.remote_addr in studentList:
@@ -874,6 +903,7 @@ def endpoint_getstudents():
     else:
         return json.dumps(studentList)
 
+#This restrics students actions to other features in the formbar(They need to ask for permision first)
 @app.route('/getpermissions')
 def endpoint_getpermissions():
     if not request.remote_addr in studentList:
@@ -884,10 +914,12 @@ def endpoint_getpermissions():
     else:
         return json.dumps(settingsPerms)
 
+#This endpoint allows you to see the formbars IP with style and shows different colors.
 @app.route('/virtualbar')
 def endpoint_virtualbar():
     return render_template("virtualbar.html", serverIp = ip)
 
+#This endpoint leads to the Sound Effect page
 @app.route('/sfx')
 def endpoint_sfx():
 
@@ -909,6 +941,7 @@ def endpoint_sfx():
             resString += '</ul> You can play them by using \'/sfx?file=<b>&lt;sound file name&gt;</b>\''
             return render_template("general.html", content = resString, style = '<style>ul {columns: 2; -webkit-columns: 2; -moz-columns: 2;}</style>')
 
+#This endpoint leads to the Background music page
 @app.route('/bgm')
 def endpoint_bgm():
     if not request.remote_addr in studentList:
@@ -940,11 +973,13 @@ def endpoint_bgm():
             resString += '<br><br>You can stop them by using \'<b>/bgmstop</b>\''
             return render_template("general.html", content = resString, style = '<style>ul {columns: 2; -webkit-columns: 2; -moz-columns: 2;}</style>')
 
+#Stops the current background Music
 @app.route('/bgmstop')
 def endpoint_bgmstop():
     stopBGM()
     return render_template("message.html", message = 'Stopped music...' )
 
+#
 @app.route('/perc')
 def endpoint_perc():
     if not request.remote_addr in studentList:
@@ -1083,6 +1118,7 @@ def message_received(client, server, message):
 def start_flask():
     app.run(host='0.0.0.0', use_reloader=False, debug = False)
 
+#This function activate chat and let students chat with one another.
 def start_chat():
     server = WebsocketServer(WSPORT, host='0.0.0.0')
     server.set_fn_new_client(new_client)

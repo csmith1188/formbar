@@ -11,7 +11,7 @@ colors = {
     "purple": (255, 0, 255),
     "cyan": (0, 255, 255),
     "orange": (255, 128, 0)
-}#Imports color codes
+}
 
 def hex2dec(hexVal):
     #see if the hex value is in string format

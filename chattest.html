@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+
+
+  <style>
+    :root {
+      --background-color: #303234;
+      --bg-dark-color: #202123;
+      --bg-highlight-color: #444;
+      --bg-green-color: #242;
+      --bg-purple-color: #423;
+      --bg-yellow-color: #430;
+      --main-color: #bfcfff;
+      --alt-color: #8f9bbf;
+      --green-color: #80ffbf;
+      --purple-color: #ff80bf;
+      --yellow-color: #ffaf60;
+      --gray-color: #ccc;
+    }
+
+    body {
+      background-color: var(--background-color);
+      color: white;
+      font: 16px "Segoe UI", sans-serif;
+    }
+
+    ::-webkit-scrollbar {
+      width: 15px;
+      height: 15px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      box-shadow: inset 0 0 5px 5px var(--main-color);
+      border: solid 5px transparent;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      box-shadow: inset 0 0 5px 5px white;
+    }
+
+    ::-webkit-scrollbar-thumb:active {
+      box-shadow: inset 0 0 15px 15px white;
+      border: none;
+    }
+
+    ::-webkit-scrollbar-corner {
+      box-shadow: inset 0 0 5px 5px white;
+      border: solid 5px transparent;
+    }
+
+    #outputBox {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: calc(100% - 340px);
+      height: calc(100% - 97px);
+      padding: 0 10px;
+      overflow: auto;
+    }
+
+    .msg {
+      padding: 5px;
+      margin: 10px 0;
+    }
+
+    .them .username {
+      color: var(--main-color);
+      cursor: pointer;
+    }
+
+    .msg.whisper {
+      background-color: var(--bg-purple-color);
+    }
+
+    .me {
+      background-color: var(--bg-highlight-color);
+    }
+
+    .date {
+      color: var(--alt-color);
+      margin-right: 5px;
+    }
+
+    .alert .content {
+      font-style: italic;
+      color: var(--alt-color);
+    }
+
+    #userlist {
+      width: 300px;
+      height: calc(100% - 117px);
+      background-color: var(--bg-dark-color);
+      position: fixed;
+      top: 0;
+      right: 0;
+      padding: 10px;
+    }
+
+    #ulHeading {
+      display: inline-block;
+      margin-bottom: 5px;
+      color: white;
+    }
+
+    .ulName {
+      margin: 8px 0;
+      padding: 3px;
+    }
+
+    .ulName.them {
+      cursor: pointer;
+    }
+
+    .ulName.them:hover {
+      background-color: var(--main-color);
+      color: var(--background-color);
+    }
+
+    #controlChat {
+      background-color: var(--background-color);
+      border-top: 1px solid var(--main-color);
+      position: fixed;
+      width: 100%;
+      bottom: 0;
+      left: 0;
+      padding: 20px;
+    }
+
+    #removeRec {
+      display: none;
+      margin-left: 4px;
+      color: var(--gray-color);
+      cursor: pointer;
+    }
+
+    #removeRec:hover {
+      color: white;
+    }
+
+    #input {
+      width: 75%;
+      height: 32px;
+      box-sizing: border-box;
+      background-color: var(--bg-dark-color);
+      color: white;
+      resize: none;
+      border: 1px solid var(--main-color);
+      font-family: "Segoe UI", sans-serif;
+      font-size: 16px;
+    }
+
+    #input:focus {
+      outline: 1px solid var(--main-color);
+    }
+
+    #input::-webkit-scrollbar-thumb {
+      box-shadow: inset 0 0 5px 5px var(--main-color);
+      border: solid 5px transparent;
+    }
+
+    #input::-webkit-scrollbar-thumb:hover {
+      box-shadow: inset 0 0 5px 5px white;
+    }
+
+    #input::-webkit-scrollbar-thumb:active {
+      box-shadow: inset 0 0 15px 15px white;
+      border: none;
+    }
+
+    #sendButton,
+    button {
+      box-sizing: border-box;
+      margin-left: 5px;
+      background-color: var(--background-color);
+      color: var(--main-color);
+      border: 1px var(--main-color) solid;
+      cursor: pointer;
+    }
+
+    #sendButton {
+      width: 64px;
+      height: 32px;
+      border-radius: 8px;
+      font: 20px "Segoe UI", sans-serif;
+      vertical-align: top;
+    }
+
+    button {
+      border-radius: 5.5px;
+      font: 14px "Segoe UI", sans-serif;
+    }
+
+    #sendButton:hover,
+    button:hover {
+      background-color: var(--main-color);
+      color: var(--background-color);
+    }
+
+    #sendButton:active,
+    button:active {
+      background-color: white;
+    }
+
+    a {
+      color: var(--main-color);
+    }
+
+    a:visited {
+      color: var(--alt-color);
+    }
+
+    a:active {
+      color: white;
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--main-color);
+      font-size: 24px;
+    }
+
+    h2 {
+      margin: 0;
+      color: var(--main-color);
+      font-size: 20px;
+    }
+
+    #quickmenu,
+    #content {
+      display: none;
+    }
+  </style>
+
+
+
+</head>
+
+<body>
+  <div id="content">
+
+    <div id="container-full-width">
+      <div id="outputBox"></div>
+      <div id="userlist">
+        <h2 id="ulHeading">Online</h2>
+      </div>
+    </div>
+    <div id="controlChat">
+      <div style="font-size: 14px; margin-bottom: 5px;">To <span id="recipient">all</span><span id="removeRec" onclick="removeRec()" title="Reset recipients to all">✕</span></div>
+      <form onsubmit="event.preventDefault(); onSubmit(); return false;" style="margin: 0;">
+        <input id="input" placeholder="Enter a message" autocomplete="off"></input>
+        <input type="submit" value="Send" id="sendButton">
+      </form>
+      <div style="font-size: 14px; margin-top: 5px;">Commands: <button onclick="enterCommand('!#help')">!#help</button></div>
+    </div>
+  </div>
+</body>
+
+</html>

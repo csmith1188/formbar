@@ -1,4 +1,4 @@
-import os#Imports operating system.
+import os
 
 sound = {}
 

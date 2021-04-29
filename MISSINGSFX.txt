@@ -1,0 +1,22 @@
+'19 dollar fortnite card.wav'   explode01.wav           pizzapizza.wav      splash01.wav
+ afewmomentslater.wav           falconpunch.wav         powerup02.wav       steammessage.wav
+ amongusstart.wav               fbi.wav                 rickroll.wav        success01.wav
+ babyshark.wav                  feellikeanut.wav        roundabout.wav      Taco-Bell-ding-dong.wav
+ bennyhill.wav                  gangstasparadise.wav    sfx_blip01.wav      thatsalotofdamage.wav
+ blip01.wav                     highnoon.wav            sfx_bootup02.wav    thisismyhouse.wav
+ bombdefused.wav                hit01.wav               sfx_dodge01.wav     up01.wav
+ bootup02.wav                   howdareyou.wav          sfx_explode01.wav   up02.wav
+ bruh.wav                       intelinside.wav         sfx_hit01.wav       up03.wav
+ butterdog.wav                  ivefallen.wav           sfx_laser01.wav     up04.wav
+ crickets.wav                   john_cena.wav           sfx_pickup01.wav    wassup.wav
+ curbyourenthusiasm.wav         laser01.wav             sfx_pickup02.wav    wat.wav
+ dialup.wav                     mgsalert.wav            sfx_powerup02.wav   willheimscrem.wav
+ discordjoin.wav                missionfailed.wav       sfx_shoot01.wav     win95start.wav
+ discordleave.wav               mlgairhorn.wav          sfx_splash01.wav    winxpshutdown.wav
+ discordmessage.wav             nani.wav                sfx_success01.wav   winxpstart.wav
+ dodge01.wav                    nogodpleaseno.wav       sfx_up01.wav        wompwomp.wav
+ dogofwisdom.wav                ohyesdaddy.wav          sfx_up02.wav        xperror.wav
+ dukenukem.wav                  peanutbutterjelly.wav   sfx_up03.wav        yougotmail.wav
+ elevatormusic.wav              pickup01.wav            sfx_up04.wav        ZAWARUDO.wav
+ enemyspotted.wav               pickup02.wav            shoot01.wav
+ epicsaxguy.wav                 pinkpanther.wav         spicymeatball.wav

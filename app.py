@@ -1149,7 +1149,7 @@ def message_received(client, server, message):
                     server.send_message_to_all(json.dumps(messageOut))
                 else:
                     for student in studentList:
-                        if studentList[student]['name'] == message['to']:
+                        if studentList[student]['name'] == message['to'] or studentList[student]['name'] == message['from']:
                             for toClient in server.clients:
                                 if toClient['id'] == studentList[student]['wsID']:
                                     messageOut =  packMSG('message', message['to'], studentList[client['address'][0]]['name'], message['content'])

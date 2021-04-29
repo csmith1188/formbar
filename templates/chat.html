@@ -227,8 +227,7 @@
     font-size: 20px;
   }
 
-  #quickmenu,
-  #content {
+  #quickmenu {
     display: none;
   }
 </style>
@@ -249,7 +248,7 @@
 <div id="controlChat">
     <div style="font-size: 14px; margin-bottom: 5px;">To <span id="recipient">all</span><span id="removeRec" onclick="removeRec()" title="Reset recipients to all">✕</span></div>
     <form onsubmit="event.preventDefault(); onSubmit(); return false;" style="margin: 0;">
-        <input id="input" placeholder="Enter a message" autocomplete="off"></input>
+        <input id="input" placeholder="Enter a message" autocomplete="off">
         <input type="submit" value="Send" id="sendButton">
     </form>
     <div style="font-size: 14px; margin-top: 5px;">Commands: <button onclick="enterCommand('!#help')">!#help</button></div>

@@ -16,6 +16,7 @@ logging.basicConfig(filename='info.log',
                             format='%(asctime)s.%(msecs)d %(levelname)s %(message)s',
                             datefmt='%H:%M:%S',
                             level=logging.DEBUG)
+
 # set up logging to console
 console = logging.StreamHandler()
 console.setLevel(logging.DEBUG)
@@ -25,13 +26,20 @@ console.setFormatter(formatter)
 # add the handler to the root logger
 logging.getLogger('').addHandler(console)
 logger = logging.getLogger(__name__)
+# Change the built-in logging for flask
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 
 #Get internal IP address
+    #for wireless connections:
 #ip = ni.ifaddresses('wlan0')[ni.AF_INET][0]['addr']
+    #for wired connections
 ip = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
 
+#Set the websocket port for chat and live actions
 WSPORT=9001
 
+#Display IP address to console for user connection
 logging.info('Running formbar server on:' + ip)
 
 #Importing customs modules
@@ -41,20 +49,24 @@ import bgm
 from colors import colors, hex2dec
 import lessons
 
-log = logging.getLogger('werkzeug')
-log.setLevel(logging.ERROR)
-
+#Set the maximum number of pixels on the bar
 BARPIX = 240
+#Set the maximum number of pixels, including pixelpanels
 MAXPIX = 762
 
+#Scan the sfx and bgm folders
 sfx.updateFiles()
 bgm.updateFiles()
+#Start up pygame for sfx and bgm
 pygame.init()
 
+#Start the neopixel tracker
 pixels = neopixel.NeoPixel(board.D21, MAXPIX, brightness=1.0, auto_write=False)
 
+#Start a new flask server for http service
 app = Flask(__name__)
 
+#Permission levels are as follows:
 # 0 - teacher
 # 1 - mod
 # 2 - student
@@ -98,12 +110,38 @@ whiteList = [
     '172.21.3.5'
     ]
 
-banList = []
-
-studentList = {
+settings = {
+    'perms': {
+        'admin' : 0,
+        'users' : 1,
+        'api' : 3,
+        'sfx' : 1,
+        'bgm' : 1,
+        'say' : 1,
+        'bar' : 1
+    },
+    'locked' : False,
+    'paused' : False,
+    'blind' : False,
+    'showinc' : True,
+    'captions' : True,
+    'autocount' : True,
+    'numStudents': 8,
+    'mode': 'thumbs',
+    'upcolor': 'green',
+    'wigglecolor': 'blue',
+    'downcolor': 'red',
+    'modes': ['thumbs', 'survey', 'quiz', 'essay', 'help', 'kahoot', 'playtime', 'blockchest'],
+    'whitelist': [
+        '127.0.0.1',
+        '172.21.3.5'
+        ]
 }
 
-settingsIntDict['numStudents'] = 8
+banList = []
+
+studentList = {}
+
 up = down = wiggle = 0
 ipList = {}
 helpList = {}
@@ -167,10 +205,11 @@ def playSFX(sound):
     except:
         return "Invalid format: "
 # This function allows you to choose wich background music you want
-def playBGM(bgm_filename, volume=0.6):
+def playBGM(bgm_filename, volume=0.5):
     pygame.mixer.music.load(bgm.bgm[bgm_filename])
     pygame.mixer.music.set_volume(volume)
     pygame.mixer.music.play(loops=-1)
+
 #This function stops BGM
 def stopBGM():
     pygame.mixer.music.stop()
@@ -962,7 +1001,8 @@ def endpoint_bgm():
             try:
                 bgm_volume = float(bgm_volume)
             except:
-                logging.warning("Could not convert volume to float.")
+                logging.warning("Could not convert volume to float. Setting to default.")
+                bgm_volume = 0.5
             if bgm_volume and type(bgm_volume) is float:
                 playBGM(bgm_file, bgm_volume)
             else:

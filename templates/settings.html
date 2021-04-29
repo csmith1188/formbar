@@ -16,7 +16,6 @@
         padding: 5px;
         margin: 5px;
     }
-
     .up {
       background-color: #ccffcc;
     }
@@ -47,9 +46,9 @@
     }
 
     function updatePerm(el) {
-        console.log("GET", "/settings?" + el.value);
+        console.log("GET", el.value);
         let request = new XMLHttpRequest();
-        request.open("GET", "/settings?" + el.value);
+        request.open("GET", el.value);
         request.onload = function() {
             // console.log(request.response);
         };
@@ -147,10 +146,10 @@
         <b>API</b><br>
         <select onchange="updatePerm(this)" id="apipermsDrop" name="apipermsDrop">
             <option value="" disabled selected style="display:none;">(Anyone)</option>
-            <option value="api=0">Teacher</option>
-            <option value="api=1">Assistant</option>
-            <option value="api=2">Student</option>
-            <option value="api=3">Anyone</option>
+            <option value="/settings?api=0">Teacher</option>
+            <option value="/settings?api=1">Assistant</option>
+            <option value="/settings?api=2">Student</option>
+            <option value="/settings?api=3">Anyone</option>
         </select>
     </div>
     <div class="perBox">
@@ -158,10 +157,10 @@
 
         <select onchange="updatePerm(this)" id="sfxpermsDrop" name="sfxpermsDrop">
             <option value="" disabled selected style="display:none;">(Teacher)</option>
-            <option value="sfx=0">Teacher</option>
-            <option value="sfx=1">Assistant</option>
-            <option value="sfx=2">Student</option>
-            <option value="sfx=3">Anyone</option>
+            <option value="/settings?sfx=0">Teacher</option>
+            <option value="/settings?sfx=1">Assistant</option>
+            <option value="/settings?sfx=2">Student</option>
+            <option value="/settings?sfx=3">Anyone</option>
         </select>
     </div>
     <div class="perBox">
@@ -169,10 +168,10 @@
 
         <select onchange="updatePerm(this)" id="bgmpermsDrop" name="bgmpermsDrop">
             <option value="" disabled selected style="display:none;">(Teacher)</option>
-            <option value="bgm=0">Teacher</option>
-            <option value="bgm=1">Assistant</option>
-            <option value="bgm=2">Student</option>
-            <option value="bgm=3">Anyone</option>
+            <option value="/settings?bgm=0">Teacher</option>
+            <option value="/settings?bgm=1">Assistant</option>
+            <option value="/settings?bgm=2">Student</option>
+            <option value="/settings?bgm=3">Anyone</option>
         </select>
     </div>
     <div class="perBox">
@@ -180,10 +179,10 @@
 
         <select onchange="updatePerm(this)" id="saypermsDrop" name="saypermsDrop">
             <option value="" disabled selected style="display:none;">(Teacher)</option>
-            <option value="say=0">Teacher</option>
-            <option value="say=1">Assistant</option>
-            <option value="say=2">Student</option>
-            <option value="say=3">Anyone</option>
+            <option value="/settings?say=0">Teacher</option>
+            <option value="/settings?say=1">Assistant</option>
+            <option value="/settings?say=2">Student</option>
+            <option value="/settings?say=3">Anyone</option>
         </select>
     </div>
     <div class="perBox">
@@ -191,10 +190,10 @@
 
         <select onchange="updatePerm(this)" id="barpermsDrop" name="barpermsDrop">
             <option value="" disabled selected style="display:none;">(Teacher)</option>
-            <option value="bar=0">Teacher</option>
-            <option value="bar=1">Assistant</option>
-            <option value="bar=2">Student</option>
-            <option value="bar=3">Anyone</option>
+            <option value="/settings?bar=0">Teacher</option>
+            <option value="/settings?bar=1">Assistant</option>
+            <option value="/settings?bar=2">Student</option>
+            <option value="/settings?bar=3">Anyone</option>
         </select>
     </div>
 </div>
@@ -215,16 +214,10 @@
             <td><a href="/settings?mode=essay">Essay</a></td>
         </tr>
         <tr>
-            <td><a href="/settings?mode=help">Help Monitor</a></td>
-        </tr>
-        <tr>
-            <td><a href="/settings?mode=kahoot">Kahoots!</a></td>
+            <td><a href="/settings?mode=progress">Progress</a></td>
         </tr>
         <tr>
             <td><a href="/settings?mode=playtime">Playtime</a></td>
-        </tr>
-        <tr>
-            <td><a href="/settings?mode=blockchest">blockchest</a></td>
         </tr>
     </table>
 </div>

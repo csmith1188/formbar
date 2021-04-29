@@ -3,7 +3,7 @@
 <!-- This is where the title, top buttons, and stylesheet is located -->
 
 <!-- Change title here -->
-{% block title %}Formbar & Webchat{% endblock %}
+{% block title %}Formbar Home{% endblock %}
 {% block icon %}<link rel="icon" href="{{ url_for('static', filename='homeImages/favicon.png') }}">{% endblock %}
 
 <!-- Extra style declarations here -->
@@ -139,13 +139,32 @@
     background-color: #4070df;
   }
 
+  .urlButton {
+    width: 21px;
+    padding: 4px;
+    text-align: center;
+  }
+
+  .urlButton:not(.disabled) {
+    cursor: pointer;
+  }
+
+  .urlButton.disabled {
+    cursor: default;
+  }
+
+  .urlButton:hover:not(.disabled) {
+    background-color: #f00;
+  }
+
+  .urlButton.disabled {
+    filter: opacity(50%);
+  }
+
   #goToPage {
-    position: absolute;
-    right: 0;
-    top: 47px;
-    padding: 5px 20px;
+    padding: 4px 16px;
     background-color: #eee;
-    color: #1747a7;
+    color: #30549B;
     cursor: pointer;
   }
 
@@ -207,8 +226,8 @@
       <input type="radio" id="showSegment" name="segment" onclick="showSegment()"><label for="showSegment">Segment</label>
       <br>
       <div id="segment">
-        <input type="number" id="segmentStartNumber" min="0" max="240" value="0" onchange="validNumber(this)"> –
-        <input type="number" id="segmentEndNumber" min="0" max="240" value="240" onchange="validNumber(this)">
+        <input type="number" id="segmentStart" min="0" max="240" value="0" onchange="validNumber(this)"> –
+        <input type="number" id="segmentEnd" min="0" max="240" value="240" onchange="validNumber(this)">
       </div>
         <input type="radio" id="hideColor2" name="gradient" checked onclick="hideColor2()" style="margin: 8px 3px 8px 0;"><label for="hideColor2">Single color</label>
       <input type="radio" id="showColor2" name="gradient" onclick="showColor2()"><label for="showColor2">Gradient</label>
@@ -239,7 +258,7 @@
       <br><br><br>
 
       <h1>Fill percentage</h1>
-      <input type="number" id="percentNumber" value="0" min="0" max="100" onchange="validNumber(this)"><label for="percentNumber">%</label>
+      <input type="number" id="percent" value="0" min="0" max="100" onchange="validNumber(this)"><label for="percent">%</label>
       <img src="{{ url_for('static', filename='homeImages/checkMark.png') }}" class="checkMark" title="Submit" onclick="sendPercent()" tabindex="0">
     </div>
   </div>
@@ -254,14 +273,17 @@
 </div>
 
 <div style="position: fixed; right: 0; bottom: 0; width: calc(100% - 250px); height: calc(100% - 39px);">
-  <div style="background-color: #00388f; color: white;">
+  <div style="background-color: #00308f; color: white;">
     <div id="chatTab" class="tab open" onclick="openPage('chat')">Chat</div
     ><div id="helpTab" class="tab" onclick="openPage('help')">Help</div
     ><div id="hangmanTab" class="tab" onclick="openPage('hangman')">Hangman</div>
-    <div style="display: flex; width: calc(100% - 66px); background-color: #1747a7; padding: 5px;">
-      <label for="url" style="filter: opacity(80%); cursor: text;">172.21.3.4:5000/</label><input type="text" id="url" value="chat" autocomplete="off" style="flex: 1; padding: 0; color: white; border: none;">
+    <div style="display: flex; background-color: #30549B;">
+    <div class="urlButton disabled" onclick="window.history.back();">🡠</div><div class="urlButton disabled" onclick="window.history.forward();">🡢</div><div class="urlButton" onclick="location.reload();">⭮</div>
+      <div style="display: flex; left: 87px; width: calc(100% - 87px - 48px); padding: 4px;">
+          <label for="url" style="filter: opacity(70%); cursor: text;">172.21.3.4:5000/</label><input type="text" id="url" value="chat" autocomplete="off" style="width: 100%; padding: 0; color: white; border: none;">
+      </div>
+      <span id="goToPage" title="Go to this page" onclick="openPage(document.getElementById('url').value)">➤</span>
     </div>
-    <span id="goToPage" title="Go to this page" onclick="openPage(document.getElementById('url').value)">➤</span>
   </div>
   <div>
     <iframe src="/chat" id="mainWindow" style="position: absolute; width: 100%; height: calc(100% - 78px); border: none;"></iframe>
@@ -350,11 +372,11 @@
     request.send();
   }
 
-  let sfx;
+  let sfx = ['19 dollar fortnite card', 'afewmomentslater', 'amongusstart', 'Applause', 'babyshark', 'bennyhill', 'bombdefused', 'bruh', 'butterdog', 'crickets', 'curbyourenthusiasm', 'dialup', 'discordjoin', 'discordleave', 'discordmessage', 'dogofwisdom', 'dukenukem', 'dundundun', 'elevatormusic', 'enemyspotted', 'epicsaxguy', 'falconpunch', 'fbi', 'feellikeanut', 'gangstasparadise', 'highnoon', 'howdareyou', 'intelinside', 'ivefallen', 'john_cena', 'kahootslobby1', 'llamasinhatsfull', 'mgsalert', 'missionfailed', 'Mission_failed', 'mlgairhorn', 'nani', 'nogodpleaseno', 'ohyesdaddy', 'peanutbutterjelly', 'pinkpanther', 'pizzapizza', 'rickroll', 'roundabout', 'sfx_blip01', 'sfx_bootup02', 'sfx_dodge01', 'sfx_explode01', 'sfx_hit01', 'sfx_laser01', 'sfx_pickup01', 'sfx_pickup02', 'sfx_powerup02', 'sfx_shoot01', 'sfx_splash01', 'sfx_success01', 'sfx_up01', 'sfx_up02', 'sfx_up03', 'sfx_up04', 'spicymeatball', 'splash01', 'steammessage', 'success01', 'Taco-Bell-ding-dong', 'thatsalotofdamage', 'thisismyhouse', 'Vine_boom_effect', 'wassup', 'wat', 'Watcha_say', 'willheimscrem', 'win95start', 'winxpshutdown', 'winxpstart', 'wompwomp', 'xperror', 'yougotmail', 'ZAWARUDO'];
 
-  sfx.foreach = function(sound) {
+  sfx.forEach(function(sound) {
     document.getElementById("sfxFiles").innerHTML += "<option value='" + sound + "'></option>";
-  };
+  });
 
   function sendSound() {
     let soundFile = document.getElementById("sound").value;
@@ -373,17 +395,36 @@
     request.send();
   }
 
-  let bgm;
+  let bgm = ['Able_Sisters', 'attack_on_titan', 'beaststars_s2', 'black_clover', 'bleach', 'brodyquest', 'chugjug', 'CoShuNie', 'crabrave', 'EEEAAAOOO', 'elmowash', 'eve', 'FF7MainTheme', 'giorno', 'jojo5', 'kahootslobby1', 'Kokoronashi', 'megametal', 'naruto', 'NeonGenesisEvangelion', 'nihilist', 'pkmn_blackwhite', 'prelude', 'ReRe', 'rickcoffin', 'rickroll', 'roundabout', 'shrek', 'snowdin_remix1', 'Take_on_me_recorder.wav', 'thedootsong', 'thenextepisode', 'touchyou', 'UltraInstinctThemeGoku', 'UndertaleMegalovania', 'veilmv', 'We_do_a_little_trolling.wav', 'YOASOB'];
 
-  bgm.foreach = function(song) {
+  bgm.forEach(function(song) {
     document.getElementById("bgmFiles").innerHTML += "<option value='" + song + "'></option>";
-  };
+  });
 
   function randomBGM() {
     document.getElementById("music").value = bgm[Math.floor(Math.random() * bgm.length)];
   }
 
-  document.getElementById("percentNumber").addEventListener("keydown", function(event) {
+  function sendMusic() {
+    let musicFile = document.getElementById("music").value;
+    request.open("GET", "/bgm?file=" + musicFile);
+    request.send();
+    document.getElementById("music").value = "";
+  }
+
+  document.getElementById("music").addEventListener("keydown", function(event) {
+    //Enter key
+    if (event.keyCode == 13) sendMusic();
+  });
+
+  function sendPercent() {
+    let percent = document.getElementById("percent").value;
+    request.open("GET", "/perc?amount=" + percent);
+    request.send();
+    document.getElementById("percent").value = "";
+  }
+
+  document.getElementById("percent").addEventListener("keydown", function(event) {
     //Enter key
     if (event.keyCode == 13) sendPercent();
   });
@@ -403,9 +444,6 @@
     if (document.getElementById(page + "Tab")) document.getElementById(page + "Tab").classList.add("open");
   }
 
-  //Uncheck segment when hidden, imgbtn enter keys, color url
-
-  /*var session = Flashphoner.createSession({urlServer:"wss://192.168.88.59:8443"});
-  session.createStream({name:"rtsp://192.168.88.5/live.sdp", display:myVideo}).play();*/
+  //Uncheck segment when hidden, imgbtn enter keys, color url, only send if value exists, TABINDEX activate on enter
 </script>
 {% endblock %}

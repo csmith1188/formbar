@@ -57,8 +57,9 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: calc(100% - 340px);
-    height: calc(100% - 97px);
+    width: calc(100% - 300px);
+    height: calc(100% - 125px);
+    box-sizing: border-box;
     padding: 0 10px;
     overflow: auto;
   }
@@ -70,7 +71,7 @@
 
   .them .username {
     color: var(--main-color);
-      cursor: pointer;
+    cursor: pointer;
   }
 
   .msg.whisper {
@@ -93,7 +94,8 @@
 
   #userlist {
     width: 300px;
-    height: calc(100% - 117px);
+    box-sizing: border-box;
+    height: calc(100% - 125px);
     background-color: var(--bg-dark-color);
     position: fixed;
     top: 0;
@@ -388,12 +390,11 @@
         }
         else {
           newMSG.classList.add('them')
-          //Change to only affect username
-          //message.setAttribute("onclick", "changeRec('" + message.from + "', this)");
-          //message.title = "Send a private message";
+          var usernameOnclick = "changeRec(\"" + message.from + "\", this)";
+          var usernameTitle = "Send a private message";
         }
         //Use this if you want to allow HTML
-        newMSG.innerHTML = "<b class='username'>" + message.from + "</b><div class='content'>" + message.content + "</div>"
+        newMSG.innerHTML = "<b class='username' onclick='" + usernameOnclick + "' title='" + usernameTitle + "'>" + message.from + "</b><div class='content'>" + message.content + "</div>"
         //Use this if you want to convert HTML into text
         // newMSG.appendChild(document.createTextNode(message.from + ": " + message.content))
         boxes.outputBox.appendChild(newMSG);

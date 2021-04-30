@@ -138,6 +138,20 @@ settings = {
         ]
 }
 
+sessionData = {
+    'wawdLink': '/',
+    'agendaStep': 0,
+    'currentEssay': 0,
+    'currentProgress': 0,
+    'currentQuiz': 0,
+    'stepResults': [],
+    'bgm': {
+        'lastTime': 0,
+        'lastPlayer': '',
+        'list': {}
+    }
+}
+
 banList = []
 
 studentList = {}
@@ -997,17 +1011,22 @@ def endpoint_bgm():
         bgm.updateFiles()
         bgm_file = request.args.get('file')
         if bgm_file in bgm.bgm:
-            bgm_volume = request.args.get('volume')
-            try:
-                bgm_volume = float(bgm_volume)
-            except:
-                logging.warning("Could not convert volume to float. Setting to default.")
-                bgm_volume = 0.5
-            if bgm_volume and type(bgm_volume) is float:
-                playBGM(bgm_file, bgm_volume)
+            if time.time() - sessionData['bgm']['lastTime'] >= 60:
+                sessionData['bgm']['lastTime'] = time.time()
+                bgm_volume = request.args.get('volume')
+                try:
+                    if request.args.get('volume'):
+                        bgm_volume = float(bgm_volume)
+                except:
+                    logging.warning("Could not convert volume to float. Setting to default.")
+                    bgm_volume = 0.5
+                if bgm_volume and type(bgm_volume) is float:
+                    playBGM(bgm_file, bgm_volume)
+                else:
+                    playBGM(bgm_file)
+                return render_template("message.html", message = 'Playing: ' + bgm_file )
             else:
-                playBGM(bgm_file)
-            return render_template("message.html", message = 'Playing: ' + bgm_file )
+                return render_template("message.html", message = "It has only been " + str(int(time.time() - sessionData['bgm']['lastTime'])) + " seconds since the last song started. Please wait at least 60 seconds.")
         else:
             resString = '<a href="/bgmstop">Stop Music</a>'
             resString += '<h2>List of available background music files:</h2><ul>'

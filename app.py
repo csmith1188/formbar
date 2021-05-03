@@ -49,6 +49,7 @@ import sfx
 import bgm
 from colors import colors, hex2dec
 import lessons
+import sessions
 
 #Set the maximum number of pixels on the bar
 BARPIX = 240
@@ -66,6 +67,8 @@ pixels = neopixel.NeoPixel(board.D21, MAXPIX, brightness=1.0, auto_write=False)
 
 #Start a new flask server for http service
 app = Flask(__name__)
+
+sD = sessions.Session()
 
 #Permission levels are as follows:
 # 0 - teacher
@@ -139,22 +142,6 @@ settings = {
         ]
 }
 
-sessionData = {
-    'wawdLink': '/',
-    'agendaStep': 0,
-    'currentEssay': 0,
-    'currentProgress': 0,
-    'currentQuiz': 0,
-    'stepResults': [],
-    'lesson': {},
-    'bgm': {
-        'nowplaying': '',
-        'lastTime': 0,
-        'lastPlayer': '',
-        'list': {}
-    }
-}
-
 banList = []
 
 studentList = {}
@@ -169,12 +156,6 @@ colorDict = {
         '16': (255, 96, 0),
         '56': (0, 192, 192),
         }
-
-quizQuestion = ''
-quizAnswers = []
-quizCorrect = ''
-
-backButton = "<button onclick='window.history.back()'>Go Back</button><script language='JavaScript' type='text/javascript'>setTimeout(\"window.history.back()\",5000);</script>"
 
 def aniTest():
     fillBar((0,0,0))
@@ -591,7 +572,26 @@ def endpoint_segment():
 #This will take the student to the current "What are we doing?" link
 @app.route('/wawd', methods = ['POST', 'GET'])
 def endpoint_wawd():
-    return redirect(sessionData['wawdLink'])
+    if sD.wawdLink[0] == "/" and len(sD.wawdLink) > 1:
+        return redirect(sD.wawdLink)
+    else:
+        return render_template('general.html', content='<h2>External Resource</h2><a href="' +str(sD.wawdLink) + '">' + str(sD.wawdLink) + '</a>')
+
+def getWAWD():
+    step = sD.lesson.steps[sD.currentStep]
+    if step['Type'] == 'Resource':
+        sD.wawdLink = sD.lesson.links[int(step['Prompt'])]['URL']
+    elif step['Type'] == 'TUTD':
+        sD.wawdLink = '/tutd'
+    elif step['Type'] == 'Essay':
+        sD.wawdLink = '/essay'
+    elif step['Type'] == 'Survey':
+        sD.wawdLink = '/survey'
+    elif step['Type'] == 'Quiz':
+        sD.wawdLink = '/quiz'
+    elif step['Type'] == 'Progress':
+        sD.wawdLink = '/progress'
+    print(sD.wawdLink)
 
 #This will take the student to the current "What are we doing?" link
 @app.route('/lesson', methods = ['POST', 'GET'])
@@ -609,20 +609,86 @@ def endpoint_lesson():
     else:
         if request.args.get('load'):
             try:
-                lessons.updateFiles()
-                sessionData['lesson'] = lessons.readBook(request.args.get('load'))
-                return render_template('message.html', message=sessionData['lesson'])
+                sD.lessonList = lessons.updateFiles()
+                sD.lesson = lessons.readBook(request.args.get('load'))
+                return render_template('message.html', message=sD.lesson)
             except Exception as e:
                 print(traceback.format_exc())
                 logging.error(e)
                 return render_template('message.html', message=e)
+        elif request.args.get('action'):
+            if request.args.get('action') == 'next':
+                sD.currentStep += 1
+                if sD.currentStep >= len(sD.lesson.steps):
+                    sD.currentStep = len(sD.lesson.steps)
+                    return render_template('message.html', message='End of lesson!')
+                else:
+                    return redirect('/lesson')
+            elif request.args.get('action') == 'prev':
+                sD.currentStep -= 1
+                if sD.currentStep <= 0:
+                    sD.currentStep = 0
+                    return render_template('message.html', message='Already at start of lesson!')
+                else:
+                    return redirect('/lesson')
+            else:
+                return redirect('/lesson')
         else:
-            lessons.updateFiles()
-            resString = '<ul>'
-            for lesson in lessons.lessons:
-                resString += '<li><a href="/lesson?load=' + lesson + '">' + lesson + '</a></li>'
-            resString +='</ul>'
-            return render_template('general.html', content=resString)
+            if not sD.lesson:
+                sD.lessonList = lessons.updateFiles()
+                resString = '<ul>'
+                for lesson in sD.lessonList:
+                    resString += '<li><a href="/lesson?load=' + lesson + '">' + lesson + '</a></li>'
+                resString +='</ul>'
+                return render_template('general.html', content=resString)
+            else:
+                resString = ''
+                resString += '<a href="/lesson?action=prev">Last Step</a>'
+                resString += '<a href="/lesson?action=next">Next Step</a>'
+                resString += '<h2>Current Step: ' + str(sD.lesson.steps[sD.currentStep]['Prompt']) + '</h2>'
+                resString += '<table>'
+                #Agenda
+                for i, item in enumerate(sD.lesson.agenda):
+                    resString += '<tr>'
+                    if not i:
+                        for col in item:
+                            resString += '<td class="header">' + col + '</td>'
+                        resString += '</tr><tr>'
+                    for col in item:
+                        resString += '<td class="row">' + str(item[col]) + '</td>'
+                    resString += '</div>'
+                #Steps
+                for i, item in enumerate(sD.lesson.steps):
+                    resString += '<tr>'
+                    if not i:
+                        for col in item:
+                            resString += '<td class="header">' + col + '</td>'
+                        resString += '</tr><tr>'
+                    for col in item:
+                        resString += '<td class="row">' + str(item[col]) + '</td>'
+                    resString += '</div>'
+                #Objectives
+                for i, item in enumerate(sD.lesson.objectives):
+                    resString += '<tr>'
+                    if not i:
+                        for col in item:
+                            resString += '<td class="header">' + col + '</td>'
+                        resString += '</tr><tr>'
+                    for col in item:
+                        resString += '<td class="row">' + str(item[col]) + '</td>'
+                    resString += '</div>'
+                #Resources
+                for i, item in enumerate(sD.lesson.links):
+                    resString += '<tr>'
+                    if not i:
+                        for col in item:
+                            resString += '<td class="header">' + col + '</td>'
+                        resString += '</tr><tr>'
+                    for col in item:
+                        resString += '<td class="row">' + str(item[col]) + '</td>'
+                    resString += '</div>'
+                getWAWD()
+                return render_template('general.html', content=resString, style='<style>.header{font-weight: bold;}.row:nth-child(odd){background-color: #aaaaaa;}.row:nth-child(even){background-color: #cccccc;}.entry{}</style>')
 
 #This endpoint is exclusive only to the teacher.
 @app.route('/settings', methods = ['POST', 'GET'])
@@ -732,27 +798,7 @@ def endpoint_quiz():
     if studentList[request.remote_addr]['perms'] > settingsPerms['bar']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
-        answer = request.args.get('answer')
-        if answer:
-            answer = int(answer)
-            if request.remote_addr not in ipList:
-                if answer == quizCorrect:
-                    ipList[request.remote_addr] = 'up'
-                else:
-                    ipList[request.remote_addr] = 'down'
-                tutdBar()
-                return render_template("message.html", message = "Thank you for your tasty bytes..." )
-            else:
-                return render_template("message.html", message = "You have already answered this quiz." )
-        else:
-            resString = '<meta http-equiv="refresh" content="5">'
-            if request.remote_addr in ipList:
-                resString += '<b><i>You have already answered this question. Wait for a new one</b></i>'
-            resString += '<table border=1><tr><td>' + quizQuestion + '</td></tr>'
-            for i, question in enumerate(quizAnswers):
-                resString += '<tr><td><a href="/quiz?answer=' + str(i) + '">' + question + '</a></td></tr>'
-            resString += '</table>'
-            return resString
+        return "Broken"
 
 #This endpoint allows the teacher to test students.
 @app.route('/survey')
@@ -1050,8 +1096,8 @@ def endpoint_bgm():
         bgm.updateFiles()
         bgm_file = request.args.get('file')
         if bgm_file in bgm.bgm:
-            if time.time() - sessionData['bgm']['lastTime'] >= 60:
-                sessionData['bgm']['lastTime'] = time.time()
+            if time.time() - sD.bgm['lastTime'] >= 60:
+                sD.bgm['lastTime'] = time.time()
                 bgm_volume = request.args.get('volume')
                 try:
                     if request.args.get('volume'):
@@ -1059,17 +1105,17 @@ def endpoint_bgm():
                 except:
                     logging.warning("Could not convert volume to float. Setting to default.")
                     bgm_volume = 0.5
-                sessionData['bgm']['nowplaying']= bgm_file
+                sD.bgm['nowplaying']= bgm_file
                 if bgm_volume and type(bgm_volume) is float:
                     playBGM(bgm_file, bgm_volume)
                 else:
                     playBGM(bgm_file)
                 return render_template("message.html", message = 'Playing: ' + bgm_file )
             else:
-                return render_template("message.html", message = "It has only been " + str(int(time.time() - sessionData['bgm']['lastTime'])) + " seconds since the last song started. Please wait at least 60 seconds.")
+                return render_template("message.html", message = "It has only been " + str(int(time.time() - sD.bgm['lastTime'])) + " seconds since the last song started. Please wait at least 60 seconds.")
         else:
             resString = '<a href="/bgmstop">Stop Music</a>'
-            resString += '<h2>Now playing: ' + sessionData['bgm']['nowplaying'] + '</h2>'
+            resString += '<h2>Now playing: ' + sD.bgm['nowplaying'] + '</h2>'
             resString += '<h2>List of available background music files:</h2><ul>'
             for key, value in bgm.bgm.items():
                 resString += '<li><a href="/bgm?file=' + key + '">' + key + '</a></li>'

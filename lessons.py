@@ -3,12 +3,12 @@ import os#Imports operating system.
 
 class Lesson():
     def __init__(self):
-        pass
-    agenda = []
-    objective = []
-    links = []
-    quizList = {}
-    progList = {}
+        self.agenda = []
+        self.steps = []
+        self.objectives = []
+        self.links = []
+        self.quizList = {}
+        self.progList = {}
 
     # lessonModel = {
     #     'agenda': [{'time': 0, 'title': '', 'desc': '', 'step': 0}],
@@ -32,29 +32,29 @@ def updateFiles():
         if file[-5:] == '.xlsx':
             #Add them to the lessonsFiles list if so
             lessons[file[:-5]] = "/home/pi/formbar/lessondata/" + file
+    return lessons
 
 def readBook(incBook):
     newBook = 'lessondata/' + incBook + '.xlsx'
     book = pandas.ExcelFile(newBook)
-    lessonData = Lesson()
+    lD = Lesson()
     for sheet in book.sheet_names:
         if sheet == 'Agenda':
-            data = book.parse(sheet).to_dict()
-            agenda = []
-            for i, col in enumerate(data):
-                if len(agenda) <= i:
-                    agenda.append({})
-                agenda[i][col] = data[col]
-            print(data)
+            data = book.parse(sheet).to_dict('index')
+            for col in data:
+                lD.agenda.append(data[col])
         elif sheet == 'Steps':
-            data = book.parse(sheet).to_dict()
-            print(data)
+            data = book.parse(sheet).to_dict('index')
+            for col in data:
+                lD.steps.append(data[col])
         elif sheet == 'Objectives':
-            data = book.parse(sheet).to_dict()
-            print(data)
+            data = book.parse(sheet).to_dict('index')
+            for col in data:
+                lD.objectives.append(data[col])
         elif sheet == 'Resources':
-            data = book.parse(sheet).to_dict()
-            print(data)
+            data = book.parse(sheet).to_dict('index')
+            for col in data:
+                lD.links.append(data[col])
         elif sheet[0:5] == 'Quiz_':
             data = book.parse(sheet).to_dict()
             quiz = {'name': sheet[5:], 'questions':[], 'keys': [], 'answers': []}
@@ -68,8 +68,7 @@ def readBook(incBook):
                     elif i > 1:
                         answers.append(data[col][row])
                 quiz['answers'].append(answers)
-            lessonData.quizList[sheet] = quiz
-            print(lessonData.quizList[sheet])
+            lD.quizList[sheet] = quiz
 
         elif sheet[0:9] == 'Progress_':
             data = book.parse(sheet).to_dict()
@@ -78,7 +77,6 @@ def readBook(incBook):
                 progress['task'].append(data['Task'][task])
             for desc in data['Description']:
                 progress['desc'].append(data['Description'][desc])
-            lessonData.progList[sheet] = progress
-            print(lessonData.progList[sheet])
-
-    return lessonData
+            lD.progList[sheet] = progress
+    print(vars(lD))
+    return lD

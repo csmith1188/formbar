@@ -32,7 +32,8 @@ h1 {
     flex-grow: 1;
 }
 
-.bigbutton {
+
+.bigbutton, .smallbutton {
     margin: auto;
     padding: 10px;
     width: 100px;
@@ -44,6 +45,13 @@ h1 {
     font-weight: bolder;
     text-align: center;
     box-shadow: 5px 5px #333333;
+}
+
+.smallbutton {
+  width: 25px;
+  height: 25px;
+  border-radius: 10px;
+  font-size: 1.0em;
 }
 
 .bigbutton a {

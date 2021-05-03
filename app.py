@@ -146,6 +146,7 @@ sessionData = {
     'currentQuiz': 0,
     'stepResults': [],
     'bgm': {
+        'nowplaying': '',
         'lastTime': 0,
         'lastPlayer': '',
         'list': {}
@@ -1020,6 +1021,7 @@ def endpoint_bgm():
                 except:
                     logging.warning("Could not convert volume to float. Setting to default.")
                     bgm_volume = 0.5
+                sessionData['bgm']['nowplaying']= bgm_file
                 if bgm_volume and type(bgm_volume) is float:
                     playBGM(bgm_file, bgm_volume)
                 else:
@@ -1029,6 +1031,7 @@ def endpoint_bgm():
                 return render_template("message.html", message = "It has only been " + str(int(time.time() - sessionData['bgm']['lastTime'])) + " seconds since the last song started. Please wait at least 60 seconds.")
         else:
             resString = '<a href="/bgmstop">Stop Music</a>'
+            resString += '<h2>Now playing: ' + sessionData['bgm']['nowplaying'] + '</h2>'
             resString += '<h2>List of available background music files:</h2><ul>'
             for key, value in bgm.bgm.items():
                 resString += '<li><a href="/bgm?file=' + key + '">' + key + '</a></li>'

@@ -9,6 +9,7 @@ import time, math
 import threading
 import netifaces as ni
 import logging
+import traceback
 
 
 logging.basicConfig(filename='info.log',
@@ -145,6 +146,7 @@ sessionData = {
     'currentProgress': 0,
     'currentQuiz': 0,
     'stepResults': [],
+    'lesson': {},
     'bgm': {
         'nowplaying': '',
         'lastTime': 0,
@@ -585,6 +587,42 @@ def endpoint_segment():
                 return "Bad ArgumentsTry <b>/color?hex=#FF00FF</b> or <b>/color?r=255&g=0&b=255</b>"
         pixels.show()
         return render_template("message.html", message = "Color sent!" )
+
+#This will take the student to the current "What are we doing?" link
+@app.route('/wawd', methods = ['POST', 'GET'])
+def endpoint_wawd():
+    return redirect(sessionData['wawdLink'])
+
+#This will take the student to the current "What are we doing?" link
+@app.route('/lesson', methods = ['POST', 'GET'])
+def endpoint_lesson():
+    if not request.remote_addr in studentList:
+        # This will have to send along the current address as "forward" eventually
+        return redirect('/login')
+    '''
+    if settingsBoolDict['locked'] == True:
+        if not request.remote_addr in whiteList:
+            return render_template("message.html", message = "You are not whitelisted. " )
+    '''
+    if studentList[request.remote_addr]['perms'] > settingsPerms['bar']:
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
+    else:
+        if request.args.get('load'):
+            try:
+                lessons.updateFiles()
+                sessionData['lesson'] = lessons.readBook(request.args.get('load'))
+                return render_template('message.html', message=sessionData['lesson'])
+            except Exception as e:
+                print(traceback.format_exc())
+                logging.error(e)
+                return render_template('message.html', message=e)
+        else:
+            lessons.updateFiles()
+            resString = '<ul>'
+            for lesson in lessons.lessons:
+                resString += '<li><a href="/lesson?load=' + lesson + '">' + lesson + '</a></li>'
+            resString +='</ul>'
+            return render_template('general.html', content=resString)
 
 #This endpoint is exclusive only to the teacher.
 @app.route('/settings', methods = ['POST', 'GET'])

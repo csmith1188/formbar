@@ -163,6 +163,11 @@ def playSFX(sound):
         return "Succesfully played: "
     except:
         return "Invalid format: "
+
+def stopSFX():
+    pygame.mixer.Sound.stop()  
+
+
 def playBGM(bgm_filename, volume=1.0):
     pygame.mixer.music.load(bgm.bgm[bgm_filename])
     pygame.mixer.music.set_volume(volume)

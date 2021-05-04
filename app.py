@@ -219,6 +219,10 @@ def playSFX(sound):
         return "Succesfully played: "
     except:
         return "Invalid format: "
+
+def stopSFX():
+    pygame.mixer.Sound.stop()  
+
 # This function allows you to choose wich background music you want
 def playBGM(bgm_filename, volume=0.5):
     pygame.mixer.music.load(bgm.bgm[bgm_filename])

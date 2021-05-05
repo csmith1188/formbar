@@ -3,10 +3,9 @@ class Session():
         self.currentStep = 0
         self.wawdLink = '/'
         self.agendaStep = 0
-        self.currentEssay = 0
-        self.currentProgress = 0
-        self.currentQuiz = 0
-        self.stepResults = []
+        self.activePrompt = ''
+        self.activeQuiz = {}
+        self.activeProgress = {}
         self.lesson = {}
         self.lessonList = {}
         self.bgm = {
@@ -15,3 +14,11 @@ class Session():
             'lastPlayer': '',
             'list': {}
         }
+
+class Student():
+    def __init__(self, username):
+        self.name = username
+        self.thumb = ''
+        self.survey = ''
+        self.progress = []
+        self.perms = 2

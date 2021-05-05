@@ -133,9 +133,6 @@
         <input type="radio" name="quizlet" value="2"><input type="text" name="qcAnswer"><br>
         <input type="radio" name="quizlet" value="3"><input type="text" name="qdAnswer"><br> -->
     </form>
-</div>
-<br>
-<div>
     <input type="range" id="studentNum" oninput="upbLabel(this)" name="studentNum" min="0" max="30" style="width:200px;">
     <button type="button" id="studentNumButton" onclick="sendStudents()">Update Students</button>
 </div>
@@ -202,21 +199,11 @@
 <div>
     <table border=1>
         <tr>
+            <td><b>Bar Mode: </b></td>
             <td><a href="/settings?mode=thumbs">Thumbs</a></td>
-        </tr>
-        <tr>
             <td><a href="/settings?mode=survey">Survey</a></td>
-        </tr>
-        <tr>
             <td><a href="/settings?mode=quiz">Quiz</a></td>
-        </tr>
-        <tr>
-            <td><a href="/settings?mode=essay">Essay</a></td>
-        </tr>
-        <tr>
             <td><a href="/settings?mode=progress">Progress</a></td>
-        </tr>
-        <tr>
             <td><a href="/settings?mode=playtime">Playtime</a></td>
         </tr>
     </table>
@@ -252,12 +239,8 @@
             <td colspan=2>Clear out submissions</td>
         </tr>
         <tr>
-            <td><a href="/settings?clear=quiz">Quiz</a></td>
-            <td><a href="/settings?clear=essay">Essay</a></td>
-        </tr>
-        <tr>
-            <td><a href="/settings?clear=formbar">Formbar</a></td>
-            <td><a href="/settings?clear=help">Help</a></td>
+            <td colspan=2><a href="/flush">Remove All Students</a></td>
+
         </tr>
     </table>
 </div>

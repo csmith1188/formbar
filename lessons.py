@@ -9,7 +9,7 @@ class Lesson():
         self.links = []
         self.quizList = {}
         self.progList = {}
-
+        self.results = {}
     # lessonModel = {
     #     'agenda': [{'time': 0, 'title': '', 'desc': '', 'step': 0}],
     #     'objectives': [{'objective': '', 'desc': ''}],

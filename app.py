@@ -1,3 +1,4 @@
+#Importing external modules
 from flask import Flask, redirect, url_for, request, render_template
 from websocket_server import WebsocketServer
 import board, neopixel
@@ -8,12 +9,16 @@ import time, math
 import threading
 import netifaces as ni
 import logging
+import traceback
+import random
+
 
 logging.basicConfig(filename='info.log',
                             filemode='a',
                             format='%(asctime)s.%(msecs)d %(levelname)s %(message)s',
                             datefmt='%H:%M:%S',
                             level=logging.DEBUG)
+
 # set up logging to console
 console = logging.StreamHandler()
 console.setLevel(logging.DEBUG)
@@ -23,85 +28,93 @@ console.setFormatter(formatter)
 # add the handler to the root logger
 logging.getLogger('').addHandler(console)
 logger = logging.getLogger(__name__)
+# Change the built-in logging for flask
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 
 #Get internal IP address
+    #for wireless connections:
 #ip = ni.ifaddresses('wlan0')[ni.AF_INET][0]['addr']
+    #for wired connections
 ip = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
 
+#Set the websocket port for chat and live actions
 WSPORT=9001
 
+#Display IP address to console for user connection
 logging.info('Running formbar server on:' + ip)
 
+#Importing customs modules
 import letters
 import sfx
 import bgm
 from colors import colors, hex2dec
 import lessons
+import sessions
 
-import logging
-log = logging.getLogger('werkzeug')
-log.setLevel(logging.ERROR)
-
+#Set the maximum number of pixels on the bar
 BARPIX = 240
+#Set the maximum number of pixels, including pixelpanels
 MAXPIX = 762
 
+#Scan the sfx and bgm folders
 sfx.updateFiles()
 bgm.updateFiles()
+#Start up pygame for sfx and bgm
 pygame.init()
 
+#Start the neopixel tracker
 pixels = neopixel.NeoPixel(board.D21, MAXPIX, brightness=1.0, auto_write=False)
 
+#Start a new flask server for http service
 app = Flask(__name__)
 
+sD = sessions.Session()
+
+#Permission levels are as follows:
 # 0 - teacher
 # 1 - mod
 # 2 - student
 # 3 - anyone
 # 4 - banned
-settingsPerms = {
-    'admin' : 0,
-    'users' : 1,
-    'api' : 3,
-    'sfx' : 1,
-    'bgm' : 1,
-    'say' : 1,
-    'bar' : 1
-}
-
-settingsBoolDict = {
-    'locked' : False,
-    'paused' : False,
-    'blind' : False,
-    'showinc' : True,
-    'captions' : True,
-    'autocount' : True
-}
-settingsIntDict = {
-    'numStudents': 8
-}
-
-settingsStrDict = {
-    'mode': 'thumbs',
-    'upcolor': 'green',
-    'wigglecolor': 'blue',
-    'downcolor': 'red'
-}
-
-settingsStrList = {
-    'modes': ['thumbs', 'survey', 'quiz', 'essay', 'help', 'kahoot', 'playtime', 'blockchest']
-}
 
 whiteList = [
     '127.0.0.1',
     '172.21.3.5'
     ]
 
-banList = []
-
-studentList = {
+settings = {
+    'perms': {
+        'admin' : 0,
+        'users' : 1,
+        'api' : 3,
+        'sfx' : 1,
+        'bgm' : 1,
+        'say' : 1,
+        'bar' : 1
+    },
+    'locked' : False,
+    'paused' : False,
+    'blind' : False,
+    'showinc' : True,
+    'captions' : True,
+    'autocount' : True,
+    'numStudents': 8,
+    'barmode': 'tutd',
+    'upcolor': 'green',
+    'wigglecolor': 'blue',
+    'downcolor': 'red',
+    'modes': ['tutd', 'survey', 'quiz', 'essay', 'progress', 'playtime'],
+    'whitelist': [
+        '127.0.0.1',
+        '172.21.3.5'
+        ]
 }
 
-settingsIntDict['numStudents'] = 8
+banList = []
+
+studentList = {}
+
 up = down = wiggle = 0
 ipList = {}
 helpList = {}
@@ -112,12 +125,6 @@ colorDict = {
         '16': (255, 96, 0),
         '56': (0, 192, 192),
         }
-
-quizQuestion = ''
-quizAnswers = []
-quizCorrect = ''
-
-backButton = "<button onclick='window.history.back()'>Go Back</button><script language='JavaScript' type='text/javascript'>setTimeout(\"window.history.back()\",5000);</script>"
 
 def aniTest():
     fillBar((0,0,0))
@@ -146,6 +153,7 @@ def newStudent(remote, username, forward='', pin=''):
             'thumb': '',
             'survey': '',
             'perms': 2,
+            'progress': []
         }
         if len(studentList) - 1:
             logging.info("New user logged in. Made them a student: " + username)
@@ -157,6 +165,7 @@ def newStudent(remote, username, forward='', pin=''):
         if forward:
             return redirect(forward, code=302)
 
+#This function Allows you to choose and play whatever sound effect you want
 def playSFX(sound):
     try:
         pygame.mixer.Sound(sfx.sound[sound]).play()
@@ -165,12 +174,16 @@ def playSFX(sound):
         return "Invalid format: "
 
 def stopSFX():
-    pygame.mixer.stop()
+    pygame.mixer.Sound.stop()
 
-def playBGM(bgm_filename, volume=1.0):
+# This function allows you to choose wich background music you want
+def playBGM(bgm_filename, volume=0.5):
+
     pygame.mixer.music.load(bgm.bgm[bgm_filename])
     pygame.mixer.music.set_volume(volume)
     pygame.mixer.music.play(loops=-1)
+
+#This function stops BGM
 def stopBGM():
     pygame.mixer.music.stop()
 
@@ -230,6 +243,7 @@ def fillBar(color=colors['default'], stop=BARPIX, start=0):
     for pix in range(start, stop):
         pixels[pix] = color
 
+#This function clears(default) the color from the formbar
 def clearBar():
     #fill with default color to clear bar
     for pix in range(0, BARPIX):
@@ -269,6 +283,7 @@ def printLetter(letter, startLocation, fg=colors['fg'], bg=colors['bg']):
     else:
         logging.warning("Warning! Not enough space for this letter!")
 
+#Shows results of test when done with surveyBar
 def surveyBar():
     results = [] # Create empty results list
     clearBar()
@@ -279,7 +294,7 @@ def surveyBar():
     #The number of results is how many have completed the survey
     complete = len(results)
     #calculate the chunk length for each student
-    chunkLength = math.floor(BARPIX / settingsIntDict['numStudents'])
+    chunkLength = math.floor(BARPIX / settings['numStudents'])
     #Sort the results by "alphabetical order"
     results.sort()
     #Loop through each result, and show the correct color
@@ -293,7 +308,7 @@ def surveyBar():
                 if i == 0:
                     pixels[pix] = colors['student']
                 else:
-                    if settingsBoolDict['blind'] and complete != settingsIntDict['numStudents']:
+                    if settings['blind'] and complete != settings['numStudents']:
                         pixels[pix] = fadein(pixRange, i, colors['blind'])
                     else:
                         pixels[pix] = fadein(pixRange, i, colors['red'])
@@ -302,7 +317,7 @@ def surveyBar():
                 if i == 0:
                     pixels[pix] = colors['student']
                 else:
-                    if settingsBoolDict['blind'] and complete != settingsIntDict['numStudents']:
+                    if settings['blind'] and complete != settings['numStudents']:
                         pixels[pix] = fadein(pixRange, i, colors['blind'])
                     else:
                         pixels[pix] = fadein(pixRange, i, colors['blue'])
@@ -311,7 +326,7 @@ def surveyBar():
                 if i == 0:
                     pixels[pix] = colors['student']
                 else:
-                    if settingsBoolDict['blind'] and complete != settingsIntDict['numStudents']:
+                    if settings['blind'] and complete != settings['numStudents']:
                         pixels[pix] = fadein(pixRange, i, colors['blind'])
                     else:
                         pixels[pix] = fadein(pixRange, i, colors['yellow'])
@@ -320,18 +335,19 @@ def surveyBar():
                 if i == 0:
                     pixels[pix] = colors['student']
                 else:
-                    if settingsBoolDict['blind'] and complete != settingsIntDict['numStudents']:
+                    if settings['blind'] and complete != settings['numStudents']:
                         pixels[pix] = fadein(pixRange, i, colors['blind'])
                     else:
                         pixels[pix] = fadein(pixRange, i, colors['green'])
-    if settingsBoolDict['captions']:
+    if settings['captions']:
         clearString()
-        showString("SRVY " + str(complete) + "/" + str(settingsIntDict['numStudents']))
+        showString("SRVY " + str(complete) + "/" + str(settings['numStudents']))
     pixels.show()
 
+#it takes the students picked answer and puts the required color for that specific choice
 def tutdBar():
     global studentList
-    if settingsBoolDict['autocount']:
+    if settings['autocount']:
         autoStudentCount()
     upFill = upCount = downFill = wiggleFill = 0
     complete = 0
@@ -347,8 +363,8 @@ def tutdBar():
             complete += 1
     for pix in range(0, BARPIX):
         pixels[pix] = colors['default']
-    if settingsBoolDict['showinc']:
-        chunkLength = math.floor(BARPIX / settingsIntDict['numStudents'])
+    if settings['showinc']:
+        chunkLength = math.floor(BARPIX / settings['numStudents'])
     else:
         chunkLength = math.floor(BARPIX / complete)
     for index, ip in enumerate(studentList):
@@ -358,7 +374,7 @@ def tutdBar():
                 if i == 0:
                     pixels[pix] = colors['student']
                 else:
-                    if settingsBoolDict['blind'] and complete != settingsIntDict['numStudents']:
+                    if settings['blind'] and complete != settings['numStudents']:
                         pixels[pix] = fadein(pixRange, i, colors['blind'])
                     else:
                         pixels[pix] = fadein(pixRange, i, colors['green'])
@@ -368,7 +384,7 @@ def tutdBar():
                 if i == 0:
                     pixels[pix] = colors['student']
                 else:
-                    if settingsBoolDict['blind'] and complete != settingsIntDict['numStudents']:
+                    if settings['blind'] and complete != settings['numStudents']:
                         pixels[pix] = fadein(pixRange, i, colors['blind'])
                     else:
                         pixels[pix] = fadein(pixRange, i, colors['blue'])
@@ -378,38 +394,40 @@ def tutdBar():
                 if i == 0:
                     pixels[pix] = colors['student']
                 else:
-                    if settingsBoolDict['blind'] and complete != settingsIntDict['numStudents']:
+                    if settings['blind'] and complete != settings['numStudents']:
                         pixels[pix] = fadein(pixRange, i, colors['blind'])
                     else:
                         pixels[pix] = fadein(pixRange, i, colors['red'])
             downFill -= 1
-    if settingsBoolDict['captions']:
+    if settings['captions']:
         clearString()
-        showString("TUTD " + str(complete) + "/" + str(settingsIntDict['numStudents']))
+        showString("TUTD " + str(complete) + "/" + str(settings['numStudents']))
         pixels.show()
-    if upCount >= settingsIntDict['numStudents']:
-        settingsBoolDict['paused'] = True
+    if upCount >= settings['numStudents']:
+        settings['paused'] = True
         pixels.fill((0,0,0))
         playSFX("sfx_success01")
         for i, pix in enumerate(range(0, BARPIX)):
                 pixels[pix] = blend(range(0, BARPIX), i, colors['blue'], colors['red'])
-        if settingsBoolDict['captions']:
+        if settings['captions']:
             clearString()
             showString("MAX GAMER!", 0, colors['purple'])
     pixels.show()
 
 def autoStudentCount():
-    settingsIntDict['numStudents'] = 0
+    settings['numStudents'] = 0
     for user in studentList:
         if studentList[user]['perms'] == 2:
-            settingsIntDict['numStudents'] += 1
-    if settingsIntDict['numStudents'] == 0:
-        settingsIntDict['numStudents'] = 1
+            settings['numStudents'] += 1
+    if settings['numStudents'] == 0:
+        settings['numStudents'] = 1
 
+#Default formbar(Main page)
 @app.route('/')
 def endpoint_home():
     return render_template('index.html')
 
+#Before choosing endpoints you are required to log in
 @app.route('/login', methods = ['POST', 'GET'])
 def endpoint_login():
     remote = request.remote_addr
@@ -431,17 +449,23 @@ def endpoint_login():
         else:
             return render_template("login.html")
 
+'''
+Change the color of the entire bar
+Query Parameters:
+    hex = six hexadecimal digit rgb color (prioritizes over RGB)
+    r, g, b = provide three color values between 0 and 255
+'''
 @app.route('/color')
 def endpoint_color():
     if not request.remote_addr in studentList:
         # This will have to send along the current address as "forward" eventually
         return redirect('/login')
     '''
-    if settingsBoolDict['locked'] == True:
+    if settings['locked'] == True:
         if not request.remote_addr in whiteList:
             return render_template("message.html", message = "You are not whitelisted. " )
     '''
-    if studentList[request.remote_addr]['perms'] > settingsPerms['bar']:
+    if studentList[request.remote_addr]['perms'] > settings['perms']['bar']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
         try:
@@ -462,6 +486,7 @@ def endpoint_color():
         pixels.show()
         return render_template("message.html", message = "Color sent!" )
 
+#This endpoint takes you to the hangman game
 @app.route('/hangman')
 def endpoint_hangman():
     return render_template("hangman.html")
@@ -471,7 +496,7 @@ def endpoint_segment():
     if not request.remote_addr in studentList:
         # This will have to send along the current address as "forward" eventually
         return redirect('/login')
-    if studentList[request.remote_addr]['perms'] > settingsPerms['bar']:
+    if studentList[request.remote_addr]['perms'] > settings['perms']['bar']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
         type = request.args.get('type')
@@ -519,35 +544,201 @@ def endpoint_segment():
         pixels.show()
         return render_template("message.html", message = "Color sent!" )
 
-@app.route('/settings', methods = ['POST', 'GET'])
-def settings():
-    global ipList
+#This will take the student to the current "What are we doing?" link
+@app.route('/wawd', methods = ['POST', 'GET'])
+def endpoint_wawd():
+    if sD.wawdLink[0] == "/":
+        return redirect(sD.wawdLink)
+    else:
+        return render_template('general.html', content='<h2>External Resource</h2><a href="' +str(sD.wawdLink) + '">' + str(sD.wawdLink) + '</a>')
 
+def updateStep():
+    step = sD.lesson.steps[sD.currentStep]
+    if step['Type'] == 'Resource':
+        sD.wawdLink = sD.lesson.links[int(step['Prompt'])]['URL']
+    elif step['Type'] == 'TUTD':
+        settings['barmode'] = 'tutd'
+        sD.activePrompt = step['Prompt']
+        sD.wawdLink = '/tutd'
+    elif step['Type'] == 'Essay':
+        settings['barmode'] = 'essay'
+        sD.activePrompt = step['Prompt']
+        sD.wawdLink = '/essay'
+    elif step['Type'] == 'Survey':
+        settings['barmode'] = 'survey'
+        sD.wawdLink = '/survey'
+    elif step['Type'] == 'Quiz':
+        settings['barmode'] = 'quiz'
+        sD.wawdLink = '/quiz'
+    elif step['Type'] == 'Progress':
+        sD.activeProgress = sD.lesson.progList[step['Prompt']]
+        settings['barmode'] = 'progress'
+        for student in studentList:
+            for task in sD.lesson.progList[step['Prompt']]['task']:
+                studentList[student]['progress'].append(False)
+        sD.wawdLink = '/progress'
+
+#This will take the student to the current "What are we doing?" link
+@app.route('/lesson', methods = ['POST', 'GET'])
+def endpoint_lesson():
     if not request.remote_addr in studentList:
         # This will have to send along the current address as "forward" eventually
         return redirect('/login')
     '''
-    if settingsBoolDict['locked'] == True:
+    if settings['locked'] == True:
         if not request.remote_addr in whiteList:
             return render_template("message.html", message = "You are not whitelisted. " )
     '''
-    if studentList[request.remote_addr]['perms'] > settingsPerms['bar']:
+    if studentList[request.remote_addr]['perms'] > settings['perms']['bar']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
-        ipList = {}
-        for student in studentList:
-            studentList[student]['thumb'] = ''
+        if request.args.get('load'):
+            try:
+                sD.lessonList = lessons.updateFiles()
+                sD.lesson = lessons.readBook(request.args.get('load'))
+                return redirect('/lesson')
+            except Exception as e:
+                print(traceback.format_exc())
+                logging.error(e)
+                return render_template('message.html', message='<b>Error:</b> ' + str(e))
+        elif request.args.get('action'):
+            if request.args.get('action') == 'next':
+                sD.currentStep += 1
+                if sD.currentStep >= len(sD.lesson.steps):
+                    sD.currentStep = len(sD.lesson.steps)
+                    return render_template('message.html', message='End of lesson!')
+                else:
+                    return redirect('/lesson')
+            elif request.args.get('action') == 'prev':
+                sD.currentStep -= 1
+                if sD.currentStep <= 0:
+                    sD.currentStep = 0
+                    return render_template('message.html', message='Already at start of lesson!')
+                else:
+                    return redirect('/lesson')
+            elif request.args.get('action') == 'unload':
+                sD.lesson = {}
+                return render_template('message.html', message='Unloaded lesson.')
+            else:
+                return redirect('/lesson')
+        else:
+            if not sD.lesson:
+                sD.lessonList = lessons.updateFiles()
+                resString = '<ul>'
+                for lesson in sD.lessonList:
+                    resString += '<li><a href="/lesson?load=' + lesson + '">' + lesson + '</a></li>'
+                resString +='</ul>'
+                return render_template('general.html', content=resString)
+            else:
+                resString = ''
+                resString += '<a href="/lesson?action=prev">Last Step</a>'
+                resString += '<a href="/lesson?action=next">Next Step</a>'
+                resString += '<h2>Current Step: ' + str(sD.lesson.steps[sD.currentStep]['Prompt']) + '</h2>'
+                resString += '<table>'
+                #Agenda
+                for i, item in enumerate(sD.lesson.agenda):
+                    resString += '<tr>'
+                    if not i:
+                        for col in item:
+                            resString += '<td class="header">' + col + '</td>'
+                        resString += '</tr><tr>'
+                    for col in item:
+                        resString += '<td class="row">' + str(item[col]) + '</td>'
+                    resString += '</div>'
+                #Steps
+                for i, item in enumerate(sD.lesson.steps):
+                    resString += '<tr>'
+                    if not i:
+                        for col in item:
+                            resString += '<td class="header">' + col + '</td>'
+                        resString += '</tr><tr>'
+                    for col in item:
+                        resString += '<td class="row">' + str(item[col]) + '</td>'
+                    resString += '</div>'
+                #Objectives
+                for i, item in enumerate(sD.lesson.objectives):
+                    resString += '<tr>'
+                    if not i:
+                        for col in item:
+                            resString += '<td class="header">' + col + '</td>'
+                        resString += '</tr><tr>'
+                    for col in item:
+                        resString += '<td class="row">' + str(item[col]) + '</td>'
+                    resString += '</div>'
+                #Resources
+                for i, item in enumerate(sD.lesson.links):
+                    resString += '<tr>'
+                    if not i:
+                        for col in item:
+                            resString += '<td class="header">' + col + '</td>'
+                        resString += '</tr><tr>'
+                    for col in item:
+                        resString += '<td class="row">' + str(item[col]) + '</td>'
+                    resString += '</div>'
+                updateStep()
+                return render_template('general.html', content=resString, style='<style>.header{font-weight: bold;}.row:nth-child(odd){background-color: #aaaaaa;}.row:nth-child(even){background-color: #cccccc;}.entry{}</style>')
+
+#This endpoint is exclusive only to the teacher.
+@app.route('/progress', methods = ['POST', 'GET'])
+def endpoint_progress():
+    if not request.remote_addr in studentList:
+        # This will have to send along the current address as "forward" eventually
+        return redirect('/login')
+    '''
+    if settings['locked'] == True:
+        if not request.remote_addr in whiteList:
+            return render_template("message.html", message = "You are not whitelisted. " )
+    '''
+    # if studentList[request.remote_addr]['perms'] > settings['perms']['bar']:
+    #     return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
+    # else:
+    if request.args.get('check'):
+        try:
+            check = int(request.args.get('check'))
+            studentList[request.remote_addr]['progress'][check] = not studentList[request.remote_addr]['progress'][check]
+            complete = [0,0,0]
+            for student in studentList:
+                for task in studentList[student]['progress']:
+                    complete[int(task)] += 1
+                if not False in studentList[student]['progress']:
+                    complete[2] += 1
+            if complete[1]:
+                percAmount = (complete[1]/(complete[0]+complete[1])) * 100
+            if settings['barmode'] == 'progress':
+                percFill(percAmount)
+            return render_template('message.html', message=str(check) + " was toggled.")
+        except Exception as e:
+            logger.error(e)
+            return render_template('message.html', message='<b>Error:</b> ' + str(e))
+    else:
+        if sD.activeProgress:
+            return render_template('progress.html', progress=sD.activeProgress)
+        else:
+            return render_template('message.html', message='There is no progress tracker active right now.')
+
+#This endpoint is exclusive only to the teacher.
+@app.route('/settings', methods = ['POST', 'GET'])
+def endpoint_settings():
+    if not request.remote_addr in studentList:
+        # This will have to send along the current address as "forward" eventually
+        return redirect('/login')
+    '''
+    if settings['locked'] == True:
+        if not request.remote_addr in whiteList:
+            return render_template("message.html", message = "You are not whitelisted. " )
+    '''
+    if studentList[request.remote_addr]['perms'] > settings['perms']['bar']:
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
+    else:
         if request.method == 'POST':
-            # quizQuestion = request.form['qQuestion']
-            # quizCorrect = int(request.form['quizlet'])
-            # quizAnswers = [request.form['qaAnswer'], request.form['qbAnswer'], request.form['qcAnswer'], request.form['qdAnswer']]
-            if settingsStrDict['mode'] == 'thumbs':
+            # Clear thumbs
+            for student in studentList:
+                studentList[student]['thumb'] = ''
+            if settings['barmode'] == 'tutd':
                 tutdBar()
-            elif settingsStrDict['mode'] == 'survey':
-                surveyBar()
             playSFX("sfx_success01")
-            settingsBoolDict['paused'] = False
-            return redirect(url_for('settings'))
+            settings['paused'] = False
+            return redirect('/settings')
         else:
             resString = ''
             #Loop through every arg that was sent as a query parameter
@@ -556,19 +747,19 @@ def settings():
                 argVal = str2bool(request.args.get(arg))
                 #if the argVal resolved to a boolean value
                 if isinstance(argVal, bool):
-                    if arg in settingsBoolDict:
-                        settingsBoolDict[arg] = argVal
+                    if arg in settings:
+                        settings[arg] = argVal
                         resString += 'Set <i>' + arg + '</i> to: <i>' + str(argVal) + "</i>"
                     else:
                         resString += 'There is no setting that takes \'true\' or \'false\' named: <i>' + arg + "</i>"
                 else:
                     try:
                         argInt = int(request.args.get(arg))
-                        if arg in settingsPerms:
+                        if arg in settings['perms']:
                             if argInt > 3 or argInt < 0:
                                 resString += "Permission value out of range! "
                             else:
-                                settingsPerms[arg] = argInt
+                                settings['perms'][arg] = argInt
                     except:
                         pass
 
@@ -577,20 +768,19 @@ def settings():
             ###
 
             if request.args.get('students'):
-                settingsIntDict['numStudents'] = int(request.args.get('students'))
-                if settingsIntDict['numStudents'] == 0:
-                    settingsBoolDict['autocount'] = True
+                settings['numStudents'] = int(request.args.get('students'))
+                if settings['numStudents'] == 0:
+                    settings['autocount'] = True
                     autoStudentCount()
                 else:
-                    settingsBoolDict['autocount'] = False
-                resString += 'Set <i>numStudents</i> to: ' + str(settingsIntDict['numStudents'])
-            if request.args.get('mode'):
-                if request.args.get('mode') in settingsStrList['modes']:
-                    ipList = {}
-                    settingsStrDict['mode'] = request.args.get('mode')
-                    resString += 'Set <i>mode</i> to: ' + settingsStrDict['mode']
+                    settings['autocount'] = False
+                resString += 'Set <i>numStudents</i> to: ' + str(settings['numStudents'])
+            if request.args.get('barmode'):
+                if request.args.get('barmode') in settings['modes']:
+                    settings['barmode'] = request.args.get('barmode')
+                    resString += 'Set <i>mode</i> to: ' + settings['barmode']
                 else:
-                    resString += 'No setting called ' + settingsStrDict['mode']
+                    resString += 'No setting called ' + settings['barmode']
             if resString == '':
                 return render_template("settings.html")
             else:
@@ -603,64 +793,46 @@ def endpoint_flush():
     if not request.remote_addr in studentList:
         # This will have to send along the current address as "forward" eventually
         return redirect('/login')
-    if studentList[request.remote_addr]['perms'] > settingsPerms['admin']:
+    if studentList[request.remote_addr]['perms'] > settings['perms']['admin']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
         for user in list(studentList):
-            if not studentList[user]['perms'] == settingsPerms['admin']:
+            if not studentList[user]['perms'] == settings['perms']['admin']:
                 del studentList[user]
         playSFX("sfx_splash01")
         return render_template("message.html", message = "Users removed from list." )
 
+#takes you to a quiz(literally)
 @app.route('/quiz')
 def endpoint_quiz():
     if not request.remote_addr in studentList:
         # This will have to send along the current address as "forward" eventually
         return redirect('/login')
     '''
-    if settingsBoolDict['locked'] == True:
+    if settings['locked'] == True:
         if not request.remote_addr in whiteList:
             return render_template("message.html", message = "You are not whitelisted. " )
     '''
-    if studentList[request.remote_addr]['perms'] > settingsPerms['bar']:
+    if studentList[request.remote_addr]['perms'] > settings['perms']['bar']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
-        answer = request.args.get('answer')
-        if answer:
-            answer = int(answer)
-            if request.remote_addr not in ipList:
-                if answer == quizCorrect:
-                    ipList[request.remote_addr] = 'up'
-                else:
-                    ipList[request.remote_addr] = 'down'
-                tutdBar()
-                return render_template("message.html", message = "Thank you for your tasty bytes..." )
-            else:
-                return render_template("message.html", message = "You have already answered this quiz." )
-        else:
-            resString = '<meta http-equiv="refresh" content="5">'
-            if request.remote_addr in ipList:
-                resString += '<b><i>You have already answered this question. Wait for a new one</b></i>'
-            resString += '<table border=1><tr><td>' + quizQuestion + '</td></tr>'
-            for i, question in enumerate(quizAnswers):
-                resString += '<tr><td><a href="/quiz?answer=' + str(i) + '">' + question + '</a></td></tr>'
-            resString += '</table>'
-            return resString
+        return "Broken"
 
+#This endpoint allows the teacher to test students.
 @app.route('/survey')
 def endpoint_survey():
     if not request.remote_addr in studentList:
         # This will have to send along the current address as "forward" eventually
         return redirect('/login')
     '''
-    if settingsBoolDict['locked'] == True:
+    if settings['locked'] == True:
         if not request.remote_addr in whiteList:
             return render_template("message.html", message = "You are not whitelisted. " )
     '''
-    if studentList[request.remote_addr]['perms'] > settingsPerms['bar']:
+    if studentList[request.remote_addr]['perms'] > settings['perms']['bar']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
-        if not settingsStrDict['mode'] == 'survey':
+        if not settings['barmode'] == 'survey':
             return render_template("message.html", message = "Not in Survey mode " )
         ip = request.remote_addr
         vote = request.args.get('vote')
@@ -669,23 +841,25 @@ def endpoint_survey():
             name = 'unknown'
         elif vote:
             logging.info("Recieved " + vote + " from " + name + " at " + ip)
-            playSFX("sfx_blip01")
-        #if settingsStrDict['mode'] != 'survey':
-            #return render_template("message.html", message = "There is no survey right now" )
-        if vote:
             if vote in ["a", "b", "c", "d"]:
-                ipList[request.remote_addr] = vote
+                studentList[request.remote_addr] = vote
+                playSFX("sfx_blip01")
                 surveyBar()
                 return render_template("message.html", message = "Thank you for your tasty bytes... (" + vote + ")" )
             elif vote == 'oops':
-                ipList.pop(ip)
-                surveyBar()
-                return render_template("message.html", message = "I won\'t mention it if you don\'t" )
+                if studentList[request.remote_addr]['thumb']:
+                    studentList[request.remote_addr]['thumb'] = ''
+                    playSFX("sfx_hit01")
+                    surveyBar()
+                    return render_template("message.html", message = "I won\'t mention it if you don\'t" )
+                else:
+                    return render_template("message.html", message = "You don't have an answer to erase." )
             else:
                 return "Bad ArgumentsTry <b>/survey?vote=a</b>"
         else:
             return render_template("thumbsrental.html")
 
+#It takes you to the thumbs panel for voting
 @app.route('/tutd')
 def endpoint_tutd():
     if not request.remote_addr in studentList:
@@ -715,8 +889,13 @@ def endpoint_tutd():
             else:
                 return "Bad ArgumentsTry <b>/tutd?thumb=wiggle</b>You can also try <b>down</b> and <b>up</b> instead of <b>wiggle</b>"
         else:
-            return render_template("thumbsrental.html")
+            if sD.activePrompt:
+                prompt = '<h2><b>'+sD.lesson.steps[sD.currentStep]['Type'] + ": </b><i>" + sD.activePrompt+'</i></h2>'
+            else:
+                prompt = ''
+            return render_template("thumbsrental.html", prompt=prompt)
 
+#This endpoint lets you switch the settings for the formbar(exclusive for teacher)
 @app.route('/help', methods = ['POST', 'GET'])
 def endpoint_help():
     if not request.remote_addr in studentList:
@@ -734,12 +913,13 @@ def endpoint_help():
     else:
         return render_template("help.html")
 
+#This endpoint allows the teacher to check tickets that students send for help.
 @app.route('/needshelp')
 def endpoint_needshelp():
     if not request.remote_addr in studentList:
         # This will have to send along the current address as "forward" eventually
         return redirect('/login')
-    if studentList[request.remote_addr]['perms'] > settingsPerms['admin']:
+    if studentList[request.remote_addr]['perms'] > settings['perms']['admin']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
         remove = request.args.get('remove')
@@ -768,27 +948,29 @@ def endpoint_needshelp():
                 resString += "</table>"
                 return render_template("needshelp.html", table = resString)
 
+#This endpoint allows students and teacher to chat realTime.
 @app.route('/chat')
 def endpoint_chat():
     if not request.remote_addr in studentList:
         # This will have to send along the current address as "forward" eventually
         return redirect('/login')
-    if studentList[request.remote_addr]['perms'] > settingsPerms['say']:
+    if studentList[request.remote_addr]['perms'] > settings['perms']['say']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
         return render_template("chat.html", username = studentList[request.remote_addr]['name'], serverIp = ip)
 
+#This endpoint allows us to see which user(Student) is logged in.
 @app.route('/users')
 def endpoint_user():
     if not request.remote_addr in studentList:
         # This will have to send along the current address as "forward" eventually
         return redirect('/login')
     '''
-    if settingsBoolDict['locked'] == True:
+    if settings['locked'] == True:
         if not request.remote_addr in whiteList:
             return render_template("message.html", message = "You are not whitelisted. " )
     '''
-    if studentList[request.remote_addr]['perms'] > settingsPerms['users']:
+    if studentList[request.remote_addr]['perms'] > settings['perms']['users']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
         user = '';
@@ -847,10 +1029,11 @@ def endpoint_emptyblocks():
     pixels.show()
     return "Emptied blocks"
 
+
 @app.route('/sendblock')
 def endpoint_sendblock():
-    if not settingsStrDict['mode'] == 'blockchest':
-        return render_template("message.html", message = "Not in blockchest settingsStrDict['mode'] " )
+    if not settings['barmode'] == 'blockchest':
+        return render_template("message.html", message = "Not in blockchest settings['barmode'] " )
     blockId = request.args.get("id")
     blockData = request.args.get("data")
     if blockId and blockData:
@@ -865,41 +1048,46 @@ def endpoint_sendblock():
         return "Bad Arguments. Requires 'id' and 'data'"
 '''
 
+#Shows the different colors the pixels take in the virtualbar.
 @app.route('/getpix')
 def endpoint_getpix():
     return '{"pixels": "'+ str(pixels[:BARPIX]) +'"}'
 
+#This endpoints shows the actions the students did EX:TUTD up
 @app.route('/getstudents')
 def endpoint_getstudents():
     if not request.remote_addr in studentList:
         # This will have to send along the current address as "forward" eventually
         return redirect('/login')
-    if studentList[request.remote_addr]['perms'] > settingsPerms['api']:
+    if studentList[request.remote_addr]['perms'] > settings['perms']['api']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
         return json.dumps(studentList)
 
+#This restrics students actions to other features in the formbar(They need to ask for permision first)
 @app.route('/getpermissions')
 def endpoint_getpermissions():
     if not request.remote_addr in studentList:
         # This will have to send along the current address as "forward" eventually
         return redirect('/login')
-    if studentList[request.remote_addr]['perms'] > settingsPerms['api']:
+    if studentList[request.remote_addr]['perms'] > settings['perms']['api']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
-        return json.dumps(settingsPerms)
+        return json.dumps(settings['perms'])
 
+#This endpoint allows you to see the formbars IP with style and shows different colors.
 @app.route('/virtualbar')
 def endpoint_virtualbar():
     return render_template("virtualbar.html", serverIp = ip)
 
+#This endpoint leads to the Sound Effect page
 @app.route('/sfx')
 def endpoint_sfx():
 
     if not request.remote_addr in studentList:
         # This will have to send along the current address as "forward" eventually
         return redirect('/login')
-    if studentList[request.remote_addr]['perms'] > settingsPerms['sfx']:
+    if studentList[request.remote_addr]['perms'] > settings['perms']['sfx']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
         sfx.updateFiles()
@@ -915,30 +1103,48 @@ def endpoint_sfx():
             resString += '</ul> You can play them by using \'/sfx?file=<b>&lt;sound file name&gt;</b>\''
             return render_template("general.html", content = resString, style = '<style>ul {columns: 2; -webkit-columns: 2; -moz-columns: 2;}</style>')
 
+#This endpoint leads to the Background music page
 @app.route('/bgm')
 def endpoint_bgm():
     if not request.remote_addr in studentList:
         # This will have to send along the current address as "forward" eventually
         return redirect('/login')
     '''
-    if settingsBoolDict['locked'] == True:
+    if settings['locked'] == True:
         if not request.remote_addr in whiteList:
             return render_template("message.html", message = "You are not whitelisted. " )
     '''
-    if studentList[request.remote_addr]['perms'] > settingsPerms['bgm']:
+    if studentList[request.remote_addr]['perms'] > settings['perms']['bgm']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
         bgm.updateFiles()
         bgm_file = request.args.get('file')
-        if bgm_file in bgm.bgm:
-            bgm_volume = request.args.get('volume')
-            if bgm_volume and type(bgm_volume) is float:
-                playBGM(bgm_file, bgm_volume)
+        if bgm_file:
+            if bgm_file == 'random':
+                bgm_file = random.choice(list(bgm.bgm.keys()))
+            if bgm_file in bgm.bgm:
+                if time.time() - sD.bgm['lastTime'] >= 60:
+                    sD.bgm['lastTime'] = time.time()
+                    bgm_volume = request.args.get('volume')
+                    try:
+                        if request.args.get('volume'):
+                            bgm_volume = float(bgm_volume)
+                    except:
+                        logging.warning("Could not convert volume to float. Setting to default.")
+                        bgm_volume = 0.5
+                    sD.bgm['nowplaying']= bgm_file
+                    if bgm_volume and type(bgm_volume) is float:
+                        playBGM(bgm_file, bgm_volume)
+                    else:
+                        playBGM(bgm_file)
+                    return render_template("message.html", message = 'Playing: ' + bgm_file )
+                else:
+                    return render_template("message.html", message = "It has only been " + str(int(time.time() - sD.bgm['lastTime'])) + " seconds since the last song started. Please wait at least 60 seconds.")
             else:
-                playBGM(bgm_file)
-            return render_template("message.html", message = 'Playing: ' + bgm_file )
+                return render_template("message.html", message = "Cannot find that filename!")
         else:
             resString = '<a href="/bgmstop">Stop Music</a>'
+            resString += '<h2>Now playing: ' + sD.bgm['nowplaying'] + '</h2>'
             resString += '<h2>List of available background music files:</h2><ul>'
             for key, value in bgm.bgm.items():
                 resString += '<li><a href="/bgm?file=' + key + '">' + key + '</a></li>'
@@ -946,16 +1152,17 @@ def endpoint_bgm():
             resString += '<br><br>You can stop them by using \'<b>/bgmstop</b>\''
             return render_template("general.html", content = resString, style = '<style>ul {columns: 2; -webkit-columns: 2; -moz-columns: 2;}</style>')
 
+#Stops the current background Music
 @app.route('/bgmstop')
 def endpoint_bgmstop():
     stopBGM()
     return render_template("message.html", message = 'Stopped music...' )
 
+
 @app.route('/sfxstop')
 def endpoint_sfxstop():
     stopSFX()
     return render_template("message.html", message = 'Stopped Sound Effects...' )
-
 
 @app.route('/perc')
 def endpoint_perc():
@@ -963,11 +1170,11 @@ def endpoint_perc():
         # This will have to send along the current address as "forward" eventually
         return redirect('/login')
     '''
-    if settingsBoolDict['locked'] == True:
+    if settings['locked'] == True:
         if not request.remote_addr in whiteList:
             return render_template("message.html", message = "You are not whitelisted. " )
     '''
-    if studentList[request.remote_addr]['perms'] > settingsPerms['bar']:
+    if studentList[request.remote_addr]['perms'] > settings['perms']['bar']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
         percAmount = request.args.get('amount')
@@ -984,11 +1191,11 @@ def endpoint_say():
         # This will have to send along the current address as "forward" eventually
         return redirect('/login')
     '''
-    if settingsBoolDict['locked'] == True:
+    if settings['locked'] == True:
         if not request.remote_addr in whiteList:
             return render_template("message.html", message = "You are not whitelisted. " )
     '''
-    if studentList[request.remote_addr]['perms'] > settingsPerms['bar']:
+    if studentList[request.remote_addr]['perms'] > settings['perms']['bar']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
         phrase = request.args.get('phrase')
@@ -1069,7 +1276,7 @@ def message_received(client, server, message):
             server.send_message(client, json.dumps(packMSG('alert', studentList[client['address'][0]]['name'], 'server', 'Your help ticket was sent. Keep working on the problem while you wait!')))
         else:
             #Check for permissions
-            if studentList[client['address'][0]]['perms'] > settingsPerms['say']:
+            if studentList[client['address'][0]]['perms'] > settings['perms']['say']:
                 messageOut = packMSG('alert', studentList[client['address'][0]]['name'], 'server', "You do not have permission to send text messages.")
                 server.send_message(client, json.dumps(messageOut))
             else:
@@ -1082,7 +1289,7 @@ def message_received(client, server, message):
                     server.send_message_to_all(json.dumps(messageOut))
                 else:
                     for student in studentList:
-                        if studentList[student]['name'] == message['to']:
+                        if studentList[student]['name'] == message['to'] or studentList[student]['name'] == message['from']:
                             for toClient in server.clients:
                                 if toClient['id'] == studentList[student]['wsID']:
                                     messageOut =  packMSG('message', message['to'], studentList[client['address'][0]]['name'], message['content'])
@@ -1095,6 +1302,7 @@ def message_received(client, server, message):
 def start_flask():
     app.run(host='0.0.0.0', use_reloader=False, debug = False)
 
+#This function activate chat and let students chat with one another.
 def start_chat():
     server = WebsocketServer(WSPORT, host='0.0.0.0')
     server.set_fn_new_client(new_client)
@@ -1104,9 +1312,9 @@ def start_chat():
 
 if __name__ == '__main__':
     chatApp = threading.Thread(target=start_chat, daemon=True)
-    chatApp.start()
+    chatApp.start()#Starts up the chat feature
     # flaskApp = threading.Thread(target=start_flask)
     # flaskApp.start()
     # flaskApp.join()
     start_flask()
-    chatApp.join()
+    chatApp.join()#Makes the chat joinable.

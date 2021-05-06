@@ -11,20 +11,42 @@
 <!-- Extra javascript here -->
 {% block script %}{% endblock %}
 
+
 <!-- Main content here -->
 {% block main %}
+{{ prompt|safe }}
 <h2>Thumbs</h2>
-<a href="/tutd?thumb=up">Up</a><br>
-<a href="/tutd?thumb=wiggle">Wiggle</a><br>
-<a href="/tutd?thumb=down">Down</a><br>
-<a href="/tutd?thumb=oops">Oops</a><br><br>
-<h2>Quiz</h2>
-<a href="/survey?vote=a">A</a><br>
-<a href="/survey?vote=b">B</a><br>
-<a href="/survey?vote=c">C</a><br>
-<a href="/survey?vote=d">D</a><br>
-<a href="/survey?vote=oops">Oops</a><br><br>
+<div class="container1-flex">
+    <div class="bigbutton bb-green" onclick="window.location = '/tutd?thumb=up';">
+        Up
+    </div>
+    <div class="bigbutton bb-blue" onclick="window.location = '/tutd?thumb=wiggle';">
+        Wiggle
+    </div>
+    <div class="bigbutton bb-red" onclick="window.location = '/tutd?thumb=down';">
+        Down
+    </div>
+    <div class="bigbutton bb-yellow" onclick="window.location = '/tutd?thumb=oops';">
+        Remove
+    </div>
+</div>
+<h2>Survey</h2>
+<div class="container1-flex">
+    <div class="bigbutton bb-green" onclick="window.location = '/survey?vote=a';">
+        A
+    </div>
+    <div class="bigbutton bb-blue" onclick="window.location = '/survey?vote=b';">
+        B
+    </div>
+    <div class="bigbutton bb-red" onclick="window.location = '/survey?vote=c';">
+        C
+    </div>
+    <div class="bigbutton bb-yellow" onclick="window.location = '/survey?vote=d';">
+        D
+    </div>
+</div>
 <h2>Help</h2>
-<a href="/quiz">Quiz</a><br>
-<a href="/help">Help</a><br>
+<div class="bigbutton bb-red" onclick="window.location = '/help';">
+    Help!<br>(/help)
+</div>
 {% endblock %}

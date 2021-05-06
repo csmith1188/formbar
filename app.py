@@ -90,7 +90,12 @@ settings = {
         'sfx' : 1,
         'bgm' : 1,
         'say' : 1,
-        'bar' : 1
+        'bar' : 1,
+        'teacher': 0,
+        'mod': 1,
+        'student': 2,
+        'anyone': 3,
+        'banned': 4
     },
     'locked' : False,
     'paused' : False,
@@ -566,6 +571,7 @@ def updateStep():
         settings['barmode'] = 'survey'
         sD.wawdLink = '/survey'
     elif step['Type'] == 'Quiz':
+        sD.activeQuiz = sD.lesson.quizList[step['Prompt']]
         settings['barmode'] = 'quiz'
         sD.wawdLink = '/quiz'
     elif step['Type'] == 'Progress':
@@ -725,7 +731,7 @@ def endpoint_settings():
         if not request.remote_addr in whiteList:
             return render_template("message.html", message = "You are not whitelisted. " )
     '''
-    if studentList[request.remote_addr]['perms'] > settings['perms']['bar']:
+    if studentList[request.remote_addr]['perms'] > settings['perms']['admin']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
         if request.method == 'POST':
@@ -811,10 +817,13 @@ def endpoint_quiz():
         if not request.remote_addr in whiteList:
             return render_template("message.html", message = "You are not whitelisted. " )
     '''
-    if studentList[request.remote_addr]['perms'] > settings['perms']['bar']:
+    if studentList[request.remote_addr]['perms'] > settings['perms']['student']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
-        return "Broken"
+        if sD.activeQuiz:
+            return render_template('quiz.html', quiz=sD.activeQuiz)
+        else:
+            return render_template('message.html', message='No quiz is currently loaded.')
 
 #This endpoint allows the teacher to test students.
 @app.route('/survey')

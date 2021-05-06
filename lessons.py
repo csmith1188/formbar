@@ -61,9 +61,10 @@ def readBook(incBook):
             for row in range(0, len(data['Question'])):
                 answers = []
                 for i, col in enumerate(data):
-                    if i == 0:
-                        quiz['questions'].append(data[col][row])
+                    print(col)
                     if i == 1:
+                        quiz['questions'].append(data[col][row])
+                    elif i == 2:
                         quiz['keys'].append(data[col][row])
                     elif i > 1:
                         answers.append(data[col][row])

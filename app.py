@@ -10,6 +10,7 @@ import threading
 import netifaces as ni
 import logging
 import traceback
+import random
 
 
 logging.basicConfig(filename='info.log',
@@ -1116,24 +1117,29 @@ def endpoint_bgm():
     else:
         bgm.updateFiles()
         bgm_file = request.args.get('file')
-        if bgm_file in bgm.bgm:
-            if time.time() - sD.bgm['lastTime'] >= 60:
-                sD.bgm['lastTime'] = time.time()
-                bgm_volume = request.args.get('volume')
-                try:
-                    if request.args.get('volume'):
-                        bgm_volume = float(bgm_volume)
-                except:
-                    logging.warning("Could not convert volume to float. Setting to default.")
-                    bgm_volume = 0.5
-                sD.bgm['nowplaying']= bgm_file
-                if bgm_volume and type(bgm_volume) is float:
-                    playBGM(bgm_file, bgm_volume)
+        if bgm_file:
+            if bgm_file == 'random':
+                bgm_file = random.choice(list(bgm.bgm.keys()))
+            if bgm_file in bgm.bgm:
+                if time.time() - sD.bgm['lastTime'] >= 60:
+                    sD.bgm['lastTime'] = time.time()
+                    bgm_volume = request.args.get('volume')
+                    try:
+                        if request.args.get('volume'):
+                            bgm_volume = float(bgm_volume)
+                    except:
+                        logging.warning("Could not convert volume to float. Setting to default.")
+                        bgm_volume = 0.5
+                    sD.bgm['nowplaying']= bgm_file
+                    if bgm_volume and type(bgm_volume) is float:
+                        playBGM(bgm_file, bgm_volume)
+                    else:
+                        playBGM(bgm_file)
+                    return render_template("message.html", message = 'Playing: ' + bgm_file )
                 else:
-                    playBGM(bgm_file)
-                return render_template("message.html", message = 'Playing: ' + bgm_file )
+                    return render_template("message.html", message = "It has only been " + str(int(time.time() - sD.bgm['lastTime'])) + " seconds since the last song started. Please wait at least 60 seconds.")
             else:
-                return render_template("message.html", message = "It has only been " + str(int(time.time() - sD.bgm['lastTime'])) + " seconds since the last song started. Please wait at least 60 seconds.")
+                return render_template("message.html", message = "Cannot find that filename!")
         else:
             resString = '<a href="/bgmstop">Stop Music</a>'
             resString += '<h2>Now playing: ' + sD.bgm['nowplaying'] + '</h2>'

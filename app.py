@@ -190,14 +190,43 @@ def stopSFX():
     pygame.mixer.Sound.stop()
 
 # This function allows you to choose wich background music you want
-def playBGM(bgm_filename, volume=0.5):
+def startBGM(bgm_filename, volume=sD.bgm['volume']):
     pygame.mixer.music.load(bgm.bgm[bgm_filename])
     pygame.mixer.music.set_volume(volume)
     pygame.mixer.music.play(loops=-1)
+    playSFX("sfx_pickup01")
 
 #This function stops BGM
 def stopBGM():
     pygame.mixer.music.stop()
+    playSFX("sfx_pickup01")
+
+#This function stops BGM
+def rewindBGM():
+    pygame.mixer.music.rewind()
+    playSFX("sfx_pickup01")
+
+def playpauseBGM():
+    print(pygame.mixer.music.get_busy())
+    if pygame.mixer.music.get_busy():
+        pygame.mixer.music.pause()
+    else:
+        pygame.mixer.music.unpause()
+    playSFX("sfx_pickup01")
+
+
+def volBGM(direction):
+    sD.bgm['volume'] = pygame.mixer.music.get_volume()
+    if direction == 'up':
+        sD.bgm['volume'] += 0.1
+    elif direction == 'down':
+        sD.bgm['volume'] -= 0.1
+    if sD.bgm['volume'] > 1.0:
+        sD.bgm['volume'] = 1.0
+    if sD.bgm['volume'] < 0:
+        sD.bgm['volume'] = 0.0
+    pygame.mixer.music.set_volume(sD.bgm['volume'])
+    playSFX("sfx_pickup01")
 
 def str2bool(strng):
     strng.lower()
@@ -1184,9 +1213,9 @@ def endpoint_bgm():
                         bgm_volume = 0.5
                     sD.bgm['nowplaying']= bgm_file
                     if bgm_volume and type(bgm_volume) is float:
-                        playBGM(bgm_file, bgm_volume)
+                        startBGM(bgm_file, bgm_volume)
                     else:
-                        playBGM(bgm_file)
+                        startBGM(bgm_file)
                     return render_template("message.html", message = 'Playing: ' + bgm_file )
                 else:
                     return render_template("message.html", message = "It has only been " + str(int(time.time() - sD.bgm['lastTime'])) + " seconds since the last song started. Please wait at least 60 seconds.")
@@ -1366,6 +1395,14 @@ def start_IR():
                     changeMode()
                 elif ir.ButtonsNames[button] == 'repeat':
                     repeatMode()
+                elif ir.ButtonsNames[button] == 'rewind':
+                    rewindBGM()
+                elif ir.ButtonsNames[button] == 'play_pause':
+                    playpauseBGM()
+                elif ir.ButtonsNames[button] == 'vol_up':
+                    volBGM('up')
+                elif ir.ButtonsNames[button] == 'vol_down':
+                    volBGM('down')
 
 if __name__ == '__main__':
     chatApp = threading.Thread(target=start_chat, daemon=True)

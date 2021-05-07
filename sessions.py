@@ -22,3 +22,4 @@ class Student():
         self.survey = ''
         self.progress = []
         self.perms = 2
+        self.quizResults = {}

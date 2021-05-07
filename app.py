@@ -807,7 +807,7 @@ def endpoint_flush():
         return render_template("message.html", message = "Users removed from list." )
 
 #takes you to a quiz(literally)
-@app.route('/quiz')
+@app.route('/quiz', methods = ['POST', 'GET'])
 def endpoint_quiz():
     if not request.remote_addr in studentList:
         # This will have to send along the current address as "forward" eventually
@@ -820,7 +820,14 @@ def endpoint_quiz():
     if studentList[request.remote_addr]['perms'] > settings['perms']['student']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
-        if sD.activeQuiz:
+        if request.method == 'POST':
+            for i, answer in enumerate(request.form):
+                if sD.activeQuiz['keys'][i] == int(request.form[answer]):
+                    print('correct!')
+                else:
+                    print('incorrect!')
+            return render_template('message.html', message="Thanks for the submission!")
+        elif sD.activeQuiz:
             return render_template('quiz.html', quiz=sD.activeQuiz)
         else:
             return render_template('message.html', message='No quiz is currently loaded.')

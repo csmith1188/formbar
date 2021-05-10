@@ -51,7 +51,7 @@ h1 {
   width: 25px;
   height: 25px;
   border-radius: 10px;
-  font-size: 1.0em;
+  font-size: 0.6em;
 }
 
 .bigbutton a {
@@ -79,7 +79,7 @@ h1 {
     background-color: #ffcccc;
 }
 
-.bigbutton:hover {
+.bigbutton:hover, .smallbutton:hover {
     border: 5px outset #eeeeee;
     background-color: #ffffff;
 }

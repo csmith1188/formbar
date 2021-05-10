@@ -610,7 +610,11 @@ def endpoint_color():
 #This endpoint takes you to the hangman game
 @app.route('/hangman')
 def endpoint_hangman():
-    return render_template("hangman.html")
+    wordObj = {
+        'place': 'your',
+        'words': 'here'
+    }
+    return render_template("hangman.html", wordObj=wordObj)
 
 @app.route('/segment')
 def endpoint_segment():

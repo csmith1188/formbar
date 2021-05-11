@@ -1,5 +1,6 @@
 import pandas#Imports pandas.
 import os#Imports operating system.
+import pprint
 
 class Lesson():
     def __init__(self):
@@ -10,6 +11,7 @@ class Lesson():
         self.quizList = {}
         self.progList = {}
         self.results = {}
+        self.vocab = {}
     # lessonModel = {
     #     'agenda': [{'time': 0, 'title': '', 'desc': '', 'step': 0}],
     #     'objectives': [{'objective': '', 'desc': ''}],
@@ -55,13 +57,16 @@ def readBook(incBook):
             data = book.parse(sheet).to_dict('index')
             for col in data:
                 lD.links.append(data[col])
+        elif sheet == 'Vocabulary':
+            data = book.parse(sheet).to_dict('index')
+            for col in data:
+                lD.vocab[data[col]['Word']] = data[col]['Definition']
         elif sheet[0:5] == 'Quiz_':
             data = book.parse(sheet).to_dict()
             quiz = {'name': sheet[5:], 'questions':[], 'keys': [], 'answers': []}
             for row in range(0, len(data['Question'])):
                 answers = []
                 for i, col in enumerate(data):
-                    print(col)
                     if i == 1:
                         quiz['questions'].append(data[col][row])
                     elif i == 2:
@@ -79,5 +84,5 @@ def readBook(incBook):
             for desc in data['Description']:
                 progress['desc'].append(data['Description'][desc])
             lD.progList[sheet] = progress
-    print(vars(lD))
+    pprint.pprint(vars(lD))
     return lD

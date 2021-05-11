@@ -27,7 +27,12 @@ class Session():
                 'sfx' : 1,
                 'bgm' : 1,
                 'say' : 1,
-                'bar' : 1
+                'bar' : 1,
+                'teacher': 0,
+                'mod': 1,
+                'student': 2,
+                'anyone': 3,
+                'banned': 4
             },
             'locked' : False,
             'paused' : False,

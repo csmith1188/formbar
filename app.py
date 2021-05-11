@@ -84,39 +84,6 @@ whiteList = [
     '172.21.3.5'
     ]
 
-settings = {
-    'perms': {
-        'admin' : 0,
-        'users' : 1,
-        'api' : 3,
-        'sfx' : 1,
-        'bgm' : 1,
-        'say' : 1,
-        'bar' : 1,
-        'teacher': 0,
-        'mod': 1,
-        'student': 2,
-        'anyone': 3,
-        'banned': 4
-    },
-    'locked' : False,
-    'paused' : False,
-    'blind' : False,
-    'showinc' : True,
-    'captions' : True,
-    'autocount' : True,
-    'numStudents': 8,
-    'barmode': 'tutd',
-    'upcolor': 'green',
-    'wigglecolor': 'blue',
-    'downcolor': 'red',
-    'modes': ['tutd', 'survey', 'quiz', 'essay', 'progress', 'playtime'],
-    'whitelist': [
-        '127.0.0.1',
-        '172.21.3.5'
-        ]
-}
-
 banList = []
 
 studentList = {}
@@ -610,10 +577,15 @@ def endpoint_color():
 #This endpoint takes you to the hangman game
 @app.route('/hangman')
 def endpoint_hangman():
-    wordObj = {
-        'place': 'your',
-        'words': 'here'
-    }
+    if sD.lesson:
+        if sD.lesson.vocab:
+            wordObj = sD.lesson.vocab
+    else:
+        #Need more generic words here
+        wordObj = {
+            'place': 'your',
+            'words': 'here'
+        }
     return render_template("hangman.html", wordObj=wordObj)
 
 @app.route('/segment')

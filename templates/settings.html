@@ -12,18 +12,22 @@
         display: flex;
         justify-content: space-around;
     }
+
     #studentBox {
         padding: 5px;
         margin: 5px;
     }
+
     .up {
-      background-color: #ccffcc;
+        background-color: #ccffcc;
     }
+
     .wiggle {
-      background-color: #ffffcc;
+        background-color: #ffffcc;
     }
+
     .down {
-      background-color: #ffcccc;
+        background-color: #ffcccc;
     }
 </style>
 {% endblock %}
@@ -107,9 +111,9 @@
                 else if (studentList[student]['thumb'] == 'wiggle') newStudent.classList.add('wiggle')
                 else if (studentList[student]['thumb'] == 'down') newStudent.classList.add('down')
                 else {
-                  newStudent.classList.remove('up')
-                  newStudent.classList.remove('wiggle')
-                  newStudent.classList.remove('down')
+                    newStudent.classList.remove('up')
+                    newStudent.classList.remove('wiggle')
+                    newStudent.classList.remove('down')
                 }
 
                 studentBox.appendChild(newStudent)
@@ -123,6 +127,7 @@
 {% block main %}
 <h1 style="color: blue">Formbar Setup</h1>
 <div>
+    <a href="/lesson">Lesson Loader</a>
     <form action="settings" method="post">
         <input type="submit" value="Start New TUTD/Survey"><br>
         <!-- <b>Question</b><br>

@@ -663,10 +663,11 @@ def updateStep():
         sD.wawdLink = '/essay'
     elif step['Type'] == 'Survey':
         sD.settings['barmode'] = 'survey'
+        sD.activePrompt = 
         sD.wawdLink = '/survey'
     elif step['Type'] == 'Quiz':
         sD.activeQuiz = sD.lesson.quizList[step['Prompt']]
-        settings['barmode'] = 'quiz'
+        sD.settings['barmode'] = 'quiz'
         sD.wawdLink = '/quiz'
     elif step['Type'] == 'Progress':
         sD.activeProgress = sD.lesson.progList[step['Prompt']]
@@ -693,6 +694,7 @@ def endpoint_lesson():
     else:
         if request.args.get('load'):
             try:
+                sD.refresh()
                 sD.lessonList = lessons.updateFiles()
                 sD.lesson = lessons.readBook(request.args.get('load'))
                 return redirect('/lesson')
@@ -890,7 +892,8 @@ def endpoint_flush():
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
         flushUsers()
-        return render_template("message.html", message = "Users removed from list." )
+        sD.refresh()
+        return render_template("message.html", message = "Session was restarted." )
 
 #takes you to a quiz(literally)
 @app.route('/quiz', methods = ['POST', 'GET'])
@@ -1433,5 +1436,3 @@ if __name__ == '__main__':
     # flaskApp.start()
     # flaskApp.join()
     start_flask()
-    chatApp.join()
-    irApp.join()

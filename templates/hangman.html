@@ -7,10 +7,12 @@
 <body onload="randomize()">
 	<center>
 		<div class="answers">
-			<div class="word">
+			<center><div class="word">
 				<h1 id="category" class="answer"></h1>
-			</div>
+			</div></center>
 			<div id="word" class="answer1"></div>
+		</div>
+		<div class="wordbank">
 		</div>
 	</center>
 	<br><br>
@@ -43,6 +45,8 @@
 		<div id="y" class="key" onclick="guess('y')">y</div>
 		<div id="z" class="key" onclick="guess('z')">z</div>
 	</div></center>
+
+
 
 	<div id="score" class="score">Score: 0</div>
 	<div id="highscore" class="highscore">Highscore: 0</div>
@@ -78,7 +82,6 @@
 			font-size: 80px;
 			left: -250px;
 		}
-
 		.score {
 			position: absolute;
 			top: 5px;
@@ -121,10 +124,11 @@
 
 
 		.answer {
-			position: fixed;
+			position: relative;
 			display: inline-block;
 			text-align: center;
 			width: 500px;
+			font-size: 50px
 		}
 
 		.answer1 {
@@ -141,6 +145,7 @@
 			position: relative;
 			border-radius: 50px;
 			width: 1000px;
+			height:250px
 		}
 
 		.key {
@@ -179,13 +184,34 @@
 		var score = 0;
 		var highscore = 0;
 		var lives = 10;
-		var words = ["minecraft0", "pacman0", "hangman0", "spaceinvaders0", "donkeykong0", "mario0", "initiald0", "scramble0", "mortalkombat0", "ddr0", "digdug0", "pong0", "spaceace0", "tempest0", "beatmania0", "tetris0", "superbreakout0", "gauntlet0",
-			"lunarlander0", "paperboy0", "accoutrements1", "equanimity1", "nidificate1", "penultimate1", "coruscant1", "winebibbe1", "idiosyncratic1", "cynosure1", "conviviality1", "perfidiousness1", "superabundant1", "unencumbered1", "usufruct1",
-			"unparagoned1", "acumen1", "cupidity1", "magnanimous1", "saxicolous1", "sesquipedalian1", "bellwether1", "teacher3", "technician3", "scientist3", "veterinarian3", "mechanic3", "physician3", "pharmacist3", "dentist3", "worker3", "plumber3",
-			"engineer3", "lawyer3", "psychologist3", "electrician3", "dietitian3", "accountant3", "architect3", "developer3", "waiter3", "policeofficer3", "broccoli4", "cheese4", "bread4", "cabbage4", "garlic4", "coffee4", "chicken4", "crabs4", "carrot4",
-			"apple4", "banana4", "asparagus4", "bean4", "celery4", "chocolate4", "bacon4", "lemon4", "grape4", "ginger4", "ham4", "elephant2", "lion2", "skink2", "alpaca2", "parrot2", "badger2", "wolf2", "crow2", "raven2", "bison2", "goose2", "bear2",
-			"rat2", "hare2", "kacal2", "turkey2", "alligator2", "bat2", "monkey2", "otter2"
-		];
+		var wordObj = {
+			"attribute": "Changes an HTML element",
+			"body": "Holds all visible elements of a web page",
+			"branch": "Split a flow chart depending upon a condition",
+			"class": "Describes many HTML elements",
+			"css": "Is used to change how HTML elements appear",
+			"declaration": "Sets a CSS property to a value",
+			"div": "A box that holds other visible HTML elements ",
+			"element": "A complete HTML object",
+			"head": "Holds things that affects how a web page looks",
+			"html": "Is used to send contents of a web page over the internet",
+			"id": "Describe a single HTML element",
+			"io": "Get data or give data to the human user",
+			"javascript": "Is used to change a web page after it has loaded",
+			"process": "Do something in a flwo chart",
+			"property": "Changes an HTML element according to its value in CSS",
+			"selector": "Gets all HTML objects with this name to give properties",
+			"switch": "Can be ON or OFF",
+			"tag": "Starts or ends something in HTML",
+			"terminator": "Starts or ends a flow chart",
+			"value": "Held by a attribute, property, key, or identifier ",
+			"variable": "Substitues a value that changes as the program runs"
+		}
+		wordList = Object.keys(wordObj)
+		document.getElementById('wordbank').innerHTML = wordList[0]
+		for (let i = 1; i < wordList.length; i++) {
+			document.getElementById('wordbank').innerHTML += ', ' + wordList[i]
+		}
 		var word;
 		var letters;
 		var displayWord = "";
@@ -194,14 +220,9 @@
 		function randomize() {
 			lives = 10;
 
-			word = words[Math.floor(Math.random() * words.length)];
+			word = wordList[Math.floor(Math.random() * wordList.length)];
 
-			let categories = ['Games', 'Big Words', 'Animals', 'Professions', 'Foods', 'Places'];
-
-			document.getElementById("category").innerHTML = categories[Number(word.substring(word.length - 1))];
-
-
-			word = word.slice(0, -1);
+			document.getElementById("category").innerHTML = wordObj[word];
 
 			letters = word.split('');
 			displayWord = "";

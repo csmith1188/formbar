@@ -1,17 +1,7 @@
 class Session():
     def __init__(self, ip='0.0.0.0'):
+        self.refresh()
         self.ip = ip
-        self.currentStep = 0
-        self.wawdLink = '/'
-        self.agendaStep = 0
-        self.activePhrase = ''
-        self.activePrompt = ''
-        self.activeCompleted = ''
-        self.activeBar = []
-        self.activeProgress = 0
-        self.activeQuiz = {}
-        self.lesson = {}
-        self.lessonList = {}
         self.bgm = {
             'nowplaying': '',
             'lastTime': 0,
@@ -27,7 +17,12 @@ class Session():
                 'sfx' : 1,
                 'bgm' : 1,
                 'say' : 1,
-                'bar' : 1
+                'bar' : 1,
+                'teacher': 0,
+                'mod': 1,
+                'student': 2,
+                'anyone': 3,
+                'banned': 4
             },
             'locked' : False,
             'paused' : False,
@@ -47,6 +42,19 @@ class Session():
                 ]
         }
 
+    def refresh(self):
+        self.currentStep = 0
+        self.wawdLink = '/'
+        self.agendaStep = 0
+        self.activePhrase = ''
+        self.activePrompt = ''
+        self.activeCompleted = ''
+        self.activeBar = []
+        self.activeProgress = 0
+        self.activeQuiz = {}
+        self.lesson = {}
+        self.lessonList = {}
+
 class Student():
     def __init__(self, username):
         self.name = username
@@ -54,3 +62,4 @@ class Student():
         self.survey = ''
         self.progress = []
         self.perms = 2
+        self.quizResults = {}

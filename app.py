@@ -577,7 +577,16 @@ def endpoint_color():
 #This endpoint takes you to the hangman game
 @app.route('/hangman')
 def endpoint_hangman():
-    return render_template("hangman.html")
+    if sD.lesson:
+        if sD.lesson.vocab:
+            wordObj = sD.lesson.vocab
+    else:
+        #Need more generic words here
+        wordObj = {
+            'place': 'your',
+            'words': 'here'
+        }
+    return render_template("hangman.html", wordObj=wordObj)
 
 @app.route('/segment')
 def endpoint_segment():
@@ -654,8 +663,10 @@ def updateStep():
         sD.wawdLink = '/essay'
     elif step['Type'] == 'Survey':
         sD.settings['barmode'] = 'survey'
+        sD.activePrompt = 
         sD.wawdLink = '/survey'
     elif step['Type'] == 'Quiz':
+        sD.activeQuiz = sD.lesson.quizList[step['Prompt']]
         sD.settings['barmode'] = 'quiz'
         sD.wawdLink = '/quiz'
     elif step['Type'] == 'Progress':
@@ -683,6 +694,7 @@ def endpoint_lesson():
     else:
         if request.args.get('load'):
             try:
+                sD.refresh()
                 sD.lessonList = lessons.updateFiles()
                 sD.lesson = lessons.readBook(request.args.get('load'))
                 return redirect('/lesson')
@@ -880,10 +892,11 @@ def endpoint_flush():
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
         flushUsers()
-        return render_template("message.html", message = "Users removed from list." )
+        sD.refresh()
+        return render_template("message.html", message = "Session was restarted." )
 
 #takes you to a quiz(literally)
-@app.route('/quiz')
+@app.route('/quiz', methods = ['POST', 'GET'])
 def endpoint_quiz():
     if not request.remote_addr in studentList:
         # This will have to send along the current address as "forward" eventually
@@ -893,10 +906,20 @@ def endpoint_quiz():
         if not request.remote_addr in whiteList:
             return render_template("message.html", message = "You are not whitelisted. " )
     '''
-    if studentList[request.remote_addr]['perms'] > sD.settings['perms']['bar']:
+    if studentList[request.remote_addr]['perms'] > sD.settings['perms']['student']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
-        return "Broken"
+        if request.method == 'POST':
+            for i, answer in enumerate(request.form):
+                if sD.activeQuiz['keys'][i] == int(request.form[answer]):
+                    print('correct!')
+                else:
+                    print('incorrect!')
+            return render_template('message.html', message="Thanks for the submission!")
+        elif sD.activeQuiz:
+            return render_template('quiz.html', quiz=sD.activeQuiz)
+        else:
+            return render_template('message.html', message='No quiz is currently loaded.')
 
 #This endpoint allows the teacher to test students.
 @app.route('/survey')
@@ -1413,5 +1436,3 @@ if __name__ == '__main__':
     # flaskApp.start()
     # flaskApp.join()
     start_flask()
-    chatApp.join()
-    irApp.join()

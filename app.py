@@ -1,5 +1,6 @@
 #Importing external modules
 from flask import Flask, redirect, url_for, request, render_template
+from werkzeug.utils import secure_filename
 from websocket_server import WebsocketServer
 import board, neopixel
 import pandas
@@ -11,6 +12,7 @@ import netifaces as ni
 import logging
 import traceback
 import random
+import os
 
 
 logging.basicConfig(filename='info.log',
@@ -171,7 +173,7 @@ def changeMode(newMode='', direction='next'):
     elif sD.settings['barmode'] == 'quiz':
         completeBar()
     elif sD.settings['barmode'] == 'progress':
-        percFill(sD.activeProgress)
+        percFill(sD.lesson.checkProg(stripUser('admin')))
     elif sD.settings['barmode'] == 'playtime':
         clearString()
         showString(sD.activePhrase)
@@ -277,7 +279,7 @@ def percFill(amount, fillColor=colors['green'], emptyColor=colors['red']):
         pixels.show()
     if sD.settings['captions']:
         clearString()
-        showString("PROG " + str(sD.activeProgress))
+        showString("PROG " + str(sD.lesson.checkProg(stripUser('admin'))))
     pixels.show()
 
 def fillBar(color=colors['default'], stop=BARPIX, start=0):
@@ -308,8 +310,7 @@ def repeatMode():
         for student in studentList:
             for task in sD.lesson.progList[step['Prompt']]['task']:
                 studentList[student]['progress'].append(False)
-        sD.activeProgress = 0
-        percFill(sD.activeProgress)
+        percFill(sD.lesson.checkProg(stripUser('admin')))
     elif sD.settings['barmode'] == 'playtime':
         sD.activePhrase = ''
         clearString()
@@ -510,6 +511,44 @@ def autoStudentCount():
     if sD.settings['numStudents'] == 0:
         sD.settings['numStudents'] = 1
 
+def stripUser(perm):
+    newList = {}
+    for student in studentList:
+        if studentList[student]['perms'] > sD.settings['perms'][perm]:
+            newList[student] = studentList[student]
+    return newList
+
+def updateStep():
+    step = sD.lesson.steps[sD.currentStep]
+    if step['Type'] == 'Resource':
+        sD.wawdLink = sD.lesson.links[int(step['Prompt'])]['URL']
+    elif step['Type'] == 'TUTD':
+        sD.settings['barmode'] = 'tutd'
+        sD.activePrompt = step['Prompt']
+        sD.wawdLink = '/tutd'
+    elif step['Type'] == 'Essay':
+        sD.settings['barmode'] = 'essay'
+        sD.activePrompt = step['Prompt']
+        sD.wawdLink = '/essay'
+    elif step['Type'] == 'Survey':
+        sD.settings['barmode'] = 'survey'
+        sD.activeQuiz = sD.lesson.quizList[step['Prompt']]
+        surveyIndex = int(sD.activeQuiz['name'].split(' ', 1))
+        sD.activePrompt = sD.activeQuiz['questions'][surveyIndex]
+        sD.wawdLink = '/survey'
+    elif step['Type'] == 'Quiz':
+        sD.activeQuiz = sD.lesson.quizList[step['Prompt']]
+        sD.settings['barmode'] = 'quiz'
+        sD.wawdLink = '/quiz'
+    elif step['Type'] == 'Progress':
+        sD.settings['barmode'] = 'progress'
+        sD.activeProgress = sD.lesson.progList[step['Prompt']]
+        for student in studentList:
+            for task in sD.activeProgress['task']:
+                studentList[student]['progress'].append(False)
+        sD.wawdLink = '/progress'
+    changeMode(sD.settings['barmode'])
+
 #Default formbar(Main page)
 @app.route('/')
 def endpoint_home():
@@ -642,41 +681,12 @@ def endpoint_segment():
         return render_template("message.html", message = "Color sent!" )
 
 #This will take the student to the current "What are we doing?" link
-@app.route('/wawd', methods = ['POST', 'GET'])
+@app.route('/wawd')
 def endpoint_wawd():
     if sD.wawdLink[0] == "/":
         return redirect(sD.wawdLink)
     else:
         return render_template('general.html', content='<h2>External Resource</h2><a href="' +str(sD.wawdLink) + '">' + str(sD.wawdLink) + '</a>')
-
-def updateStep():
-    step = sD.lesson.steps[sD.currentStep]
-    if step['Type'] == 'Resource':
-        sD.wawdLink = sD.lesson.links[int(step['Prompt'])]['URL']
-    elif step['Type'] == 'TUTD':
-        sD.settings['barmode'] = 'tutd'
-        sD.activePrompt = step['Prompt']
-        sD.wawdLink = '/tutd'
-    elif step['Type'] == 'Essay':
-        sD.settings['barmode'] = 'essay'
-        sD.activePrompt = step['Prompt']
-        sD.wawdLink = '/essay'
-    elif step['Type'] == 'Survey':
-        sD.settings['barmode'] = 'survey'
-        sD.activePrompt = 
-        sD.wawdLink = '/survey'
-    elif step['Type'] == 'Quiz':
-        sD.activeQuiz = sD.lesson.quizList[step['Prompt']]
-        sD.settings['barmode'] = 'quiz'
-        sD.wawdLink = '/quiz'
-    elif step['Type'] == 'Progress':
-        sD.activeProgress = sD.lesson.progList[step['Prompt']]
-        sD.settings['barmode'] = 'progress'
-        for student in studentList:
-            for task in sD.lesson.progList[step['Prompt']]['task']:
-                studentList[student]['progress'].append(False)
-        sD.wawdLink = '/progress'
-    changeMode()
 
 #This will take the student to the current "What are we doing?" link
 @app.route('/lesson', methods = ['POST', 'GET'])
@@ -692,7 +702,14 @@ def endpoint_lesson():
     if studentList[request.remote_addr]['perms'] > sD.settings['perms']['bar']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
-        if request.args.get('load'):
+        if request.method == 'POST':
+            if not request.files['file']:
+                return render_template('message.html', message='Lesson file required.')
+            else:
+                f = request.files['file']
+                f.save(os.path.join('lessondata', secure_filename(f.filename.strip(' '))))
+                return redirect('/lesson')
+        elif request.args.get('load'):
             try:
                 sD.refresh()
                 sD.lessonList = lessons.updateFiles()
@@ -709,6 +726,7 @@ def endpoint_lesson():
                     sD.currentStep = len(sD.lesson.steps)
                     return render_template('message.html', message='End of lesson!')
                 else:
+                    updateStep()
                     return redirect('/lesson')
             elif request.args.get('action') == 'prev':
                 sD.currentStep -= 1
@@ -716,24 +734,28 @@ def endpoint_lesson():
                     sD.currentStep = 0
                     return render_template('message.html', message='Already at start of lesson!')
                 else:
+                    updateStep()
                     return redirect('/lesson')
             elif request.args.get('action') == 'unload':
                 sD.lesson = {}
                 return render_template('message.html', message='Unloaded lesson.')
+            elif request.args.get('action') == 'upload':
+                return render_template('general.html', content='<form method=post enctype=multipart/form-data><input type=file name=file accept=".xlsx"><input type=submit value=Upload></form>')
             else:
                 return redirect('/lesson')
         else:
             if not sD.lesson:
                 sD.lessonList = lessons.updateFiles()
-                resString = '<ul>'
+                resString = '<a href="/lesson?action=upload">Upload a Lesson</a><br>'
+                resString += '<ul>'
                 for lesson in sD.lessonList:
                     resString += '<li><a href="/lesson?load=' + lesson + '">' + lesson + '</a></li>'
                 resString +='</ul>'
                 return render_template('general.html', content=resString)
             else:
-                resString = ''
-                resString += '<a href="/lesson?action=prev">Last Step</a>'
-                resString += '<a href="/lesson?action=next">Next Step</a>'
+                resString = '<a href="/lesson?action=prev">Last Step</a>'
+                resString += '<a href="/lesson?action=next">Next Step</a><br>'
+                resString += '<a href="/lesson?action=unload">Unload Lesson</a>'
                 resString += '<h2>Current Step: ' + str(sD.lesson.steps[sD.currentStep]['Prompt']) + '</h2>'
                 resString += '<table>'
                 #Agenda
@@ -797,14 +819,7 @@ def endpoint_progress():
         try:
             check = int(request.args.get('check'))
             studentList[request.remote_addr]['progress'][check] = not studentList[request.remote_addr]['progress'][check]
-            complete = [0,0,0]
-            for student in studentList:
-                for task in studentList[student]['progress']:
-                    complete[int(task)] += 1
-                if not False in studentList[student]['progress']:
-                    complete[2] += 1
-            if complete[1]:
-                percAmount = (complete[1]/(complete[0]+complete[1])) * 100
+            percAmount = sD.lesson.checkProg(studentList)
             if sD.settings['barmode'] == 'progress':
                 percFill(percAmount)
             return render_template('message.html', message=str(check) + " was toggled.")
@@ -910,12 +925,14 @@ def endpoint_quiz():
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
         if request.method == 'POST':
+            resString = '<ul>'
             for i, answer in enumerate(request.form):
+                resString += '<li>' + str(i) + ': '
                 if sD.activeQuiz['keys'][i] == int(request.form[answer]):
-                    print('correct!')
+                    resString += '<b>Correct!</b></li>'
                 else:
-                    print('incorrect!')
-            return render_template('message.html', message="Thanks for the submission!")
+                    resString += 'Incorrect</li>'
+            return render_template('general.html', content=resString)
         elif sD.activeQuiz:
             return render_template('quiz.html', quiz=sD.activeQuiz)
         else:
@@ -935,8 +952,6 @@ def endpoint_survey():
     if studentList[request.remote_addr]['perms'] > sD.settings['perms']['bar']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
-        if not sD.settings['barmode'] == 'survey':
-            return render_template("message.html", message = "Not in Survey mode " )
         ip = request.remote_addr
         vote = request.args.get('vote')
         name = request.args.get('name')
@@ -1426,6 +1441,16 @@ def start_IR():
                     volBGM('up')
                 elif ir.ButtonsNames[button] == 'vol_down':
                     volBGM('down')
+                elif ir.ButtonsNames[button] == 'up':
+                    sD.currentStep += 1
+                    if sD.currentStep >= len(sD.lesson.steps):
+                        sD.currentStep = len(sD.lesson.steps) - 1
+                    playSFX("sfx_pickup01")
+                elif ir.ButtonsNames[button] == 'down':
+                    sD.currentStep -= 1
+                    if sD.currentStep <= 0:
+                        sD.currentStep = 0
+                    playSFX("sfx_pickup01")
 
 if __name__ == '__main__':
     chatApp = threading.Thread(target=start_chat, daemon=True)

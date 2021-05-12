@@ -50,7 +50,7 @@ class Session():
         self.activePrompt = ''
         self.activeCompleted = ''
         self.activeBar = []
-        self.activeProgress = 0
+        self.activeProgress = {}
         self.activeQuiz = {}
         self.lesson = {}
         self.lessonList = {}

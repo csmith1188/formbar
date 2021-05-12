@@ -33,7 +33,7 @@
         let listString = document.createElement('ol')
         for (let i = 0; i < progress.task.length; i++) {
             let nextRow = document.createElement('li')
-            nextRow.innerHTML = `<input type="checkbox" id="check${i}" name="check${i}" value="${i}" onclick="sendCheck(this)">${progress.task[i]}<ol><li>${progress.desc[i]}</li></ol>`
+            nextRow.innerHTML = `<input type="checkbox" id="check${i}" name="check${i}" value="${i}" onclick="sendCheck(this)"><b>${progress.task[i]}</b><ul><li>${progress.desc[i]}</li></ul>`
             listString.appendChild(nextRow)
         }
         document.getElementById('progList').appendChild(listString)

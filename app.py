@@ -173,7 +173,7 @@ def changeMode(newMode='', direction='next'):
     elif sD.settings['barmode'] == 'quiz':
         completeBar()
     elif sD.settings['barmode'] == 'progress':
-        percFill(sD.activeProgress)
+        percFill(sD.lesson.checkProg(stripUser('admin')))
     elif sD.settings['barmode'] == 'playtime':
         clearString()
         showString(sD.activePhrase)
@@ -279,7 +279,7 @@ def percFill(amount, fillColor=colors['green'], emptyColor=colors['red']):
         pixels.show()
     if sD.settings['captions']:
         clearString()
-        showString("PROG " + str(sD.activeProgress))
+        showString("PROG " + str(sD.lesson.checkProg(stripUser('admin'))))
     pixels.show()
 
 def fillBar(color=colors['default'], stop=BARPIX, start=0):
@@ -310,8 +310,7 @@ def repeatMode():
         for student in studentList:
             for task in sD.lesson.progList[step['Prompt']]['task']:
                 studentList[student]['progress'].append(False)
-        sD.activeProgress = 0
-        percFill(sD.activeProgress)
+        percFill(sD.lesson.checkProg(stripUser('admin')))
     elif sD.settings['barmode'] == 'playtime':
         sD.activePhrase = ''
         clearString()
@@ -512,6 +511,44 @@ def autoStudentCount():
     if sD.settings['numStudents'] == 0:
         sD.settings['numStudents'] = 1
 
+def stripUser(perm):
+    newList = {}
+    for student in studentList:
+        if studentList[student]['perms'] > sD.settings['perms'][perm]:
+            newList[student] = studentList[student]
+    return newList
+
+def updateStep():
+    step = sD.lesson.steps[sD.currentStep]
+    if step['Type'] == 'Resource':
+        sD.wawdLink = sD.lesson.links[int(step['Prompt'])]['URL']
+    elif step['Type'] == 'TUTD':
+        sD.settings['barmode'] = 'tutd'
+        sD.activePrompt = step['Prompt']
+        sD.wawdLink = '/tutd'
+    elif step['Type'] == 'Essay':
+        sD.settings['barmode'] = 'essay'
+        sD.activePrompt = step['Prompt']
+        sD.wawdLink = '/essay'
+    elif step['Type'] == 'Survey':
+        sD.settings['barmode'] = 'survey'
+        sD.activeQuiz = sD.lesson.quizList[step['Prompt']]
+        surveyIndex = int(sD.activeQuiz['name'].split(' ', 1))
+        sD.activePrompt = sD.activeQuiz['questions'][surveyIndex]
+        sD.wawdLink = '/survey'
+    elif step['Type'] == 'Quiz':
+        sD.activeQuiz = sD.lesson.quizList[step['Prompt']]
+        sD.settings['barmode'] = 'quiz'
+        sD.wawdLink = '/quiz'
+    elif step['Type'] == 'Progress':
+        sD.settings['barmode'] = 'progress'
+        sD.activeProgress = sD.lesson.progList[step['Prompt']]
+        for student in studentList:
+            for task in sD.activeProgress['task']:
+                studentList[student]['progress'].append(False)
+        sD.wawdLink = '/progress'
+    changeMode(sD.settings['barmode'])
+
 #Default formbar(Main page)
 @app.route('/')
 def endpoint_home():
@@ -651,37 +688,6 @@ def endpoint_wawd():
     else:
         return render_template('general.html', content='<h2>External Resource</h2><a href="' +str(sD.wawdLink) + '">' + str(sD.wawdLink) + '</a>')
 
-def updateStep():
-    step = sD.lesson.steps[sD.currentStep]
-    if step['Type'] == 'Resource':
-        sD.wawdLink = sD.lesson.links[int(step['Prompt'])]['URL']
-    elif step['Type'] == 'TUTD':
-        sD.settings['barmode'] = 'tutd'
-        sD.activePrompt = step['Prompt']
-        sD.wawdLink = '/tutd'
-    elif step['Type'] == 'Essay':
-        sD.settings['barmode'] = 'essay'
-        sD.activePrompt = step['Prompt']
-        sD.wawdLink = '/essay'
-    elif step['Type'] == 'Survey':
-        sD.settings['barmode'] = 'survey'
-        sD.activeQuiz = sD.lesson.quizList[step['Prompt']]
-        surveyIndex = int(sD.activeQuiz['name'].split(' ', 1))
-        sD.activePrompt = sD.activeQuiz['questions'][surveyIndex]
-        sD.wawdLink = '/survey'
-    elif step['Type'] == 'Quiz':
-        sD.activeQuiz = sD.lesson.quizList[step['Prompt']]
-        sD.settings['barmode'] = 'quiz'
-        sD.wawdLink = '/quiz'
-    elif step['Type'] == 'Progress':
-        sD.activeProgress = 0
-        sD.settings['barmode'] = 'progress'
-        for student in studentList:
-            for task in sD.lesson.progList[step['Prompt']]['task']:
-                studentList[student]['progress'].append(False)
-        sD.wawdLink = '/progress'
-    changeMode(sD.settings['barmode'])
-
 #This will take the student to the current "What are we doing?" link
 @app.route('/lesson', methods = ['POST', 'GET'])
 def endpoint_lesson():
@@ -720,6 +726,7 @@ def endpoint_lesson():
                     sD.currentStep = len(sD.lesson.steps)
                     return render_template('message.html', message='End of lesson!')
                 else:
+                    updateStep()
                     return redirect('/lesson')
             elif request.args.get('action') == 'prev':
                 sD.currentStep -= 1
@@ -727,6 +734,7 @@ def endpoint_lesson():
                     sD.currentStep = 0
                     return render_template('message.html', message='Already at start of lesson!')
                 else:
+                    updateStep()
                     return redirect('/lesson')
             elif request.args.get('action') == 'unload':
                 sD.lesson = {}
@@ -811,14 +819,7 @@ def endpoint_progress():
         try:
             check = int(request.args.get('check'))
             studentList[request.remote_addr]['progress'][check] = not studentList[request.remote_addr]['progress'][check]
-            complete = [0,0,0]
-            for student in studentList:
-                for task in studentList[student]['progress']:
-                    complete[int(task)] += 1
-                if not False in studentList[student]['progress']:
-                    complete[2] += 1
-            if complete[1]:
-                percAmount = (complete[1]/(complete[0]+complete[1])) * 100
+            percAmount = sD.lesson.checkProg(studentList)
             if sD.settings['barmode'] == 'progress':
                 percFill(percAmount)
             return render_template('message.html', message=str(check) + " was toggled.")
@@ -974,7 +975,6 @@ def endpoint_survey():
             else:
                 return "Bad ArgumentsTry <b>/survey?vote=a</b>"
         else:
-            print(sD.activePrompt)
             return render_template("thumbsrental.html")
 
 #It takes you to the thumbs panel for voting

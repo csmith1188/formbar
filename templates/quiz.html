@@ -14,7 +14,7 @@
 
 <!-- Main content here -->
 {% block main %}
-<h1 id="quizname">Quiz</h1>
+<h1 id="quizName">Quiz</h1>
 <form id="quizList" method="POST" action="/quiz">
 
 </form>
@@ -32,6 +32,6 @@
     }
     listString.innerHTML += '<input type="submit" value="Submit">'
     document.getElementById('quizList').appendChild(listString)
-    document.getElementById('quizName').innerHTML = quiz.name
+    document.getElementById('quizName').innerHTML = "Quiz: " + quiz.name
 </script>
 {% endblock %}

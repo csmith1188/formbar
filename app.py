@@ -1213,7 +1213,6 @@ def endpoint_sfx():
             playSFX(sfx_file)
             return render_template("message.html", message = 'Playing: ' + sfx_file )
         else:
-            resString = '<a href="/sfxstop">Stop Sound Effects</a>'
             resString += '<h2>List of available sound files:</h2><ul>'
             for key, value in sfx.sound.items():
                 resString += '<li><a href="/sfx?file=' + key + '">' + key + '</a></li>'
@@ -1274,12 +1273,6 @@ def endpoint_bgm():
 def endpoint_bgmstop():
     stopBGM()
     return render_template("message.html", message = 'Stopped music...' )
-
-
-@app.route('/sfxstop')
-def endpoint_sfxstop():
-    stopSFX()
-    return render_template("message.html", message = 'Stopped Sound Effects...' )
 
 @app.route('/perc')
 def endpoint_perc():

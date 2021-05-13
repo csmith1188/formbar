@@ -1437,6 +1437,8 @@ def start_IR():
                     rewindBGM()
                 elif ir.ButtonsNames[button] == 'play_pause':
                     playpauseBGM()
+                elif ir.ButtonsNames[button] == 'eq':
+                    playSFX("sfx_up03")
                 elif ir.ButtonsNames[button] == 'vol_up':
                     volBGM('up')
                 elif ir.ButtonsNames[button] == 'vol_down':

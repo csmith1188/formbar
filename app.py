@@ -209,7 +209,6 @@ def rewindBGM():
     playSFX("sfx_pickup01")
 
 def playpauseBGM():
-    print(pygame.mixer.music.get_busy())
     if pygame.mixer.music.get_busy():
         pygame.mixer.music.pause()
     else:

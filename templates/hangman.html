@@ -227,10 +227,7 @@
 	var displayWord = "";
 	var savedWord;
 
-	var wordObj = {
-		"place": "your",
-		"words": "here"
-	}
+	var wordObj = {{ wordObj | tojson }}
 	wordList = Object.keys(wordObj)
 	document.getElementById('wordBank').innerHTML = wordList[0]
 	for (let i = 1; i < wordList.length; i++) {

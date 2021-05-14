@@ -993,7 +993,6 @@ def endpoint_tutd():
                     studentList[request.remote_addr]['thumb'] = request.args.get('thumb')
                     playSFX("sfx_blip01")
                     tutdBar()
-                    print(request.path)
                     return render_template("message.html", forward=request.path, message = "Thank you for your tasty bytes... (" + thumb + ")" )
                 else:
                     return render_template("message.html", forward=request.path, message = "You've already sunmitted this answer... (" + thumb + ")" )

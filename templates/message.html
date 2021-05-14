@@ -16,7 +16,7 @@
 {{ message|safe }}
 <br><br><button onclick='goBack()'>Go Back</button>
 <script language='JavaScript' type='text/javascript'>
-    var forward = {{ forward }}
+    var forward = '{{ forward }}'
     function goBack() {
         if (forward) location.href = forward;
         else window.history.back()

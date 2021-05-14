@@ -736,7 +736,7 @@ def endpoint_lesson():
                     updateStep()
                     return redirect('/lesson')
             elif request.args.get('action') == 'unload':
-                sD.lesson = {}
+                sD.refresh()
                 return render_template('message.html', message='Unloaded lesson.')
             elif request.args.get('action') == 'upload':
                 return render_template('general.html', content='<form method=post enctype=multipart/form-data><input type=file name=file accept=".xlsx"><input type=submit value=Upload></form>')

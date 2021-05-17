@@ -3,3 +3,5 @@ send.bat
 info.log
 __pycache__
 lessondata/*
+static/homeImages
+bgm/Take_on_me_recorder.wav

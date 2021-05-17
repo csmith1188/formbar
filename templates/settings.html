@@ -12,18 +12,22 @@
         display: flex;
         justify-content: space-around;
     }
+
     #studentBox {
         padding: 5px;
         margin: 5px;
     }
+
     .up {
-      background-color: #ccffcc;
+        background-color: #ccffcc;
     }
+
     .wiggle {
-      background-color: #ffffcc;
+        background-color: #ffffcc;
     }
+
     .down {
-      background-color: #ffcccc;
+        background-color: #ffcccc;
     }
 </style>
 {% endblock %}
@@ -107,9 +111,9 @@
                 else if (studentList[student]['thumb'] == 'wiggle') newStudent.classList.add('wiggle')
                 else if (studentList[student]['thumb'] == 'down') newStudent.classList.add('down')
                 else {
-                  newStudent.classList.remove('up')
-                  newStudent.classList.remove('wiggle')
-                  newStudent.classList.remove('down')
+                    newStudent.classList.remove('up')
+                    newStudent.classList.remove('wiggle')
+                    newStudent.classList.remove('down')
                 }
 
                 studentBox.appendChild(newStudent)
@@ -123,6 +127,7 @@
 {% block main %}
 <h1 style="color: blue">Formbar Setup</h1>
 <div>
+    <a href="/lesson">Lesson Loader</a>
     <form action="settings" method="post">
         <input type="submit" value="Start New TUTD/Survey"><br>
         <!-- <b>Question</b><br>
@@ -133,9 +138,6 @@
         <input type="radio" name="quizlet" value="2"><input type="text" name="qcAnswer"><br>
         <input type="radio" name="quizlet" value="3"><input type="text" name="qdAnswer"><br> -->
     </form>
-</div>
-<br>
-<div>
     <input type="range" id="studentNum" oninput="upbLabel(this)" name="studentNum" min="0" max="30" style="width:200px;">
     <button type="button" id="studentNumButton" onclick="sendStudents()">Update Students</button>
 </div>
@@ -202,22 +204,12 @@
 <div>
     <table border=1>
         <tr>
-            <td><a href="/settings?mode=thumbs">Thumbs</a></td>
-        </tr>
-        <tr>
-            <td><a href="/settings?mode=survey">Survey</a></td>
-        </tr>
-        <tr>
-            <td><a href="/settings?mode=quiz">Quiz</a></td>
-        </tr>
-        <tr>
-            <td><a href="/settings?mode=essay">Essay</a></td>
-        </tr>
-        <tr>
-            <td><a href="/settings?mode=progress">Progress</a></td>
-        </tr>
-        <tr>
-            <td><a href="/settings?mode=playtime">Playtime</a></td>
+            <td><b>Bar Mode: </b></td>
+            <td><a href="/settings?barmode=thumbs">Thumbs</a></td>
+            <td><a href="/settings?barmode=survey">Survey</a></td>
+            <td><a href="/settings?barmode=quiz">Quiz</a></td>
+            <td><a href="/settings?barmode=progress">Progress</a></td>
+            <td><a href="/settings?barmode=playtime">Playtime</a></td>
         </tr>
     </table>
 </div>
@@ -252,12 +244,8 @@
             <td colspan=2>Clear out submissions</td>
         </tr>
         <tr>
-            <td><a href="/settings?clear=quiz">Quiz</a></td>
-            <td><a href="/settings?clear=essay">Essay</a></td>
-        </tr>
-        <tr>
-            <td><a href="/settings?clear=formbar">Formbar</a></td>
-            <td><a href="/settings?clear=help">Help</a></td>
+            <td colspan=2><a href="/flush">Remove All Students</a></td>
+
         </tr>
     </table>
 </div>

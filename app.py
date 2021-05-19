@@ -12,6 +12,7 @@ import netifaces as ni
 import logging
 import traceback
 import random
+import sys
 import os
 
 
@@ -129,7 +130,9 @@ def newStudent(remote, username, pin=''):
             'survey': '',
             'perms': 2,
             'progress': [],
-            'complete': False
+            'complete': False,
+            'quizRes': [],
+            'essayRes': ''
         }
         if len(studentList) - 1:
             logging.info("New user logged in. Made them a student: " + username)
@@ -144,6 +147,28 @@ def flushUsers():
         if not studentList[user]['perms'] == sD.settings['perms']['admin']:
             del studentList[user]
     playSFX("sfx_splash01")
+
+#Erases student(s) answer(s) by name and category
+#Returns True if successful, and False if it failed
+def refreshUsers(selectedStudent='', category=''):
+    for student in studentList:
+        if selectedStudent:
+            student = selectedStudent
+        if category:
+            try:
+                studentList[student][category] = ''
+                return True
+            except Exception as e:
+                logging.error(e)
+                return False
+        else:
+            studentList[student]['thumb'] = '',
+            studentList[student]['survey'] = '',
+            studentList[student]['progress'] = [],
+            studentList[student]['complete'] = False,
+            studentList[student]['quizRes'] = [],
+            studentList[student]['essayRes'] = ''
+            return True
 
 def changeMode(newMode='', direction='next'):
     playSFX("sfx_pickup01")
@@ -166,17 +191,14 @@ def changeMode(newMode='', direction='next'):
         tutdBar()
     elif sD.settings['barmode'] == 'survey':
         surveyBar()
-    elif sD.settings['barmode'] == 'essay':
-        completeBar()
-    elif sD.settings['barmode'] == 'quiz':
+    elif sD.settings['barmode'] == 'essay' or sD.settings['barmode'] == 'quiz':
         completeBar()
     elif sD.settings['barmode'] == 'progress':
-        percFill(sD.lesson.checkProg(stripUser('admin')))
+        if sD.lesson:
+            percFill(sD.lesson.checkProg(stripUser('admin')))
     elif sD.settings['barmode'] == 'playtime':
         clearString()
         showString(sD.activePhrase)
-
-
 
 #This function Allows you to choose and play whatever sound effect you want
 def playSFX(sound):
@@ -328,7 +350,6 @@ def showString(toShow, startLocation=0, fg=colors['fg'], bg=colors['bg']):
     for i, letter in enumerate(toShow.lower()):
         printLetter(letter, (i * (8 * 6)) + ((startLocation * 48) + BARPIX), fg, bg)
     pixels.show()
-
 
 def printLetter(letter, startLocation, fg=colors['fg'], bg=colors['bg']):
     if (MAXPIX - startLocation) >= 48:
@@ -513,6 +534,14 @@ def stripUser(perm):
     for student in studentList:
         if studentList[student]['perms'] > sD.settings['perms'][perm]:
             newList[student] = studentList[student]
+    return newList
+
+def stripUserData(perm=''):
+    newList = {}
+    for student in studentList:
+        newList[student]['name'] = studentList[student]['name']
+        newList[student]['perms'] = studentList[student]['perms']
+        newList[student]['complete'] = studentList[student]['complete']
     return newList
 
 def updateStep():
@@ -929,9 +958,12 @@ def endpoint_quiz():
             for i, answer in enumerate(request.form):
                 resString += '<li>' + str(i) + ': '
                 if sD.activeQuiz['keys'][i] == int(request.form[answer]):
+                    studentList[request.remote_addr]['quizRes'].append(True)
                     resString += '<b>Correct!</b></li>'
                 else:
+                    studentList[request.remote_addr]['quizRes'].append(False)
                     resString += 'Incorrect</li>'
+            studentList[request.remote_addr]['complete'] = True
             return render_template('general.html', content=resString)
         elif sD.activeQuiz:
             return render_template('quiz.html', quiz=sD.activeQuiz)
@@ -1129,14 +1161,26 @@ def endpoint_user():
                             perm = int(request.args.get('perm'))
                             if user in studentList:
                                 if perm > 3 or perm < 0 :
-                                    return render_template("message.html", forward=request.path, message = "Permissions out of range. " )
+                                    return render_template("message.html", forward=request.path, message = "Permissions out of range." )
                                 else:
                                     studentList[user]['perms'] = perm
-                                    return render_template("message.html", forward=request.path, message = "Changed user permission. " )
+                                    return render_template("message.html", forward=request.path, message = "Changed user permission." )
                             else:
-                                return render_template("message.html", forward=request.path, message = "User not in list. " )
+                                return render_template("message.html", forward=request.path, message = "User not in list." )
                         except:
-                            return render_template("message.html", forward=request.path, message = "Perm was not an integer. " )
+                            return render_template("message.html", forward=request.path, message = "Perm was not an integer." )
+            if request.args.get('refresh'):
+                refresh = request.args.get('refresh')
+                if refresh == 'all':
+                    if refreshUsers(user):
+                        return render_template("message.html", forward=request.path, message = "Removed all student responses.")
+                    else:
+                        return render_template("message.html", forward=request.path, message = "Error removing responses from all students.")
+                else:
+                    if refreshUsers(user, refresh):
+                        return render_template("message.html", forward=request.path, message = "Removed " + refresh + " responses from " + user + ".")
+                    else:
+                        return render_template("message.html", forward=request.path, message = "Error removgin " + refresh + " responses from " + user + ".")
             else:
                 return render_template("message.html", forward=request.path, message = "No action given. " )
         else:
@@ -1331,7 +1375,8 @@ def endpoint_say():
 sD.activePhrase = sD.ip
 showString(sD.activePhrase)
 pixels.show()
-playSFX("sfx_bootup02")
+if '--silent' not in str(sys.argv):
+    playSFX("sfx_bootup02")
 
 '''
     Websocket Setup
@@ -1362,7 +1407,7 @@ def new_client(client, server):
         studentList[client['address'][0]]['wsID'] = client['id']
         logging.info(studentList[client['address'][0]]['name'] + " connected and was given id %d" % client['id'])
         server.send_message_to_all(json.dumps(packMSG('alert', 'all', 'server', studentList[client['address'][0]]['name'] + " has joined the server...")))
-        server.send_message_to_all(json.dumps(packMSG('userlist', 'all', 'server', studentList)))
+        server.send_message_to_all(json.dumps(packMSG('userlist', 'all', 'server', stripUserData())))
     except Exception as e:
         logging.error("Error finding user in list: " + str(e))
 
@@ -1371,14 +1416,14 @@ def client_left(client, server):
     logging.info(studentList[client['address'][0]]['name'] + " disconnected")
     del studentList[client['address'][0]]['wsID']
     server.send_message_to_all(json.dumps(packMSG('alert', 'all', 'server', studentList[client['address'][0]]['name'] + " has left the server...")))
-    server.send_message_to_all(json.dumps(packMSG('userlist', 'all', 'server', studentList)))
+    server.send_message_to_all(json.dumps(packMSG('userlist', 'all', 'server', stripUserData())))
 
 # Called when a client sends a message
 def message_received(client, server, message):
     try:
         message = json.loads(message)
         if message['type'] == 'userlist':
-            server.send_message(client, json.dumps(packMSG('userlist', studentList[client['address'][0]]['name'], 'server', studentList)))
+            server.send_message(client, json.dumps(packMSG('userlist', studentList[client['address'][0]]['name'], 'server', stripUserData())))
         if message['type'] == 'alert':
             server.send_message(client, json.dumps(packMSG('alert', studentList[client['address'][0]]['name'], 'server', 'Only the server can send alerts!')))
         if message['type'] == 'help':

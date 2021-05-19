@@ -228,13 +228,16 @@ def rewindBGM():
     pygame.mixer.music.rewind()
     playSFX("sfx_pickup01")
 
-def playpauseBGM():
+def playpauseBGM(state='none'):
     if pygame.mixer.music.get_busy():
-        pygame.mixer.music.pause()
-    else:
-        pygame.mixer.music.unpause()
+        if type(state) is bool:
+            sD.bgm['paused'] = state
+        sD.bgm['paused'] = not sD.bgm['paused']
+        if sD.bgm['paused']:
+            pygame.mixer.music.pause()
+        else:
+            pygame.mixer.music.unpause()
     playSFX("sfx_pickup01")
-
 
 def volBGM(direction):
     sD.bgm['volume'] = pygame.mixer.music.get_volume()
@@ -1319,6 +1322,7 @@ def endpoint_bgm():
 #Stops the current background Music
 @app.route('/bgmstop')
 def endpoint_bgmstop():
+    sD.bgm['paused'] = False
     stopBGM()
     return render_template("message.html", message = 'Stopped music...' )
 

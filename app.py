@@ -1207,6 +1207,10 @@ def endpoint_sendblock():
 def endpoint_getpix():
     return '{"pixels": "'+ str(pixels[:BARPIX]) +'"}'
 
+@app.route('/getmode')
+def endpoint_getmode():
+    return '{"mode": "'+ str(sD.settings['barmode']) +'"}'
+
 #This endpoints shows the actions the students did EX:TUTD up
 @app.route('/getstudents')
 def endpoint_getstudents():

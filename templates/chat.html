@@ -232,6 +232,10 @@
   #quickmenu {
     display: none;
   }
+
+  #content {
+    background-color: transparent;
+  }
 </style>
 {% endblock %}
 
@@ -361,10 +365,6 @@
                 // args = text.split(" ");
                 // args.shift();
                 ws.send(JSON.stringify(packMSG('help', receiver, username, text)));
-                output({
-                    from: 'server',
-                    content: 'Ticket sent'
-                });
             } else {
                 ws.send(JSON.stringify(packMSG('message', receiver, username, text)));
             }

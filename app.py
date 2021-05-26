@@ -3,18 +3,14 @@ from flask import Flask, redirect, url_for, request, render_template
 from werkzeug.utils import secure_filename
 from websocket_server import WebsocketServer
 import board, neopixel
-import pandas
-import json, csv
+import pandas, json, csv
 import pygame
 import time, math
 import threading
 import netifaces as ni
 import logging
 import traceback
-import random
-import sys
-import os
-
+import random, sys, os
 
 logging.basicConfig(filename='info.log',
                             filemode='a',
@@ -1215,6 +1211,12 @@ def endpoint_getpix():
 @app.route('/getmode')
 def endpoint_getmode():
     return '{"mode": "'+ str(sD.settings['barmode']) +'"}'
+
+@app.route('/getword')
+def endpoint_getword():
+    words = json.loads(open('data/words.json').read())
+    word = random.choice(list(words.keys()))
+    return str(word)
 
 #This endpoints shows the actions the students did EX:TUTD up
 @app.route('/getstudents')

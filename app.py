@@ -543,6 +543,7 @@ def stripUser(perm):
 def stripUserData(perm=''):
     newList = {}
     for student in studentList:
+        newList[student] = {}
         newList[student]['name'] = studentList[student]['name']
         newList[student]['perms'] = studentList[student]['perms']
         newList[student]['complete'] = studentList[student]['complete']
@@ -1231,18 +1232,27 @@ def endpoint_getword():
         word = random.choice(list(words.keys()))
         return str(word)
 
+#Sends back your student information
+@app.route('/getme')
+def endpoint_getme():
+    if not request.remote_addr in studentList:
+        return '{"error": "You are not logged in."}'
+    else:
+        return json.dumps(studentList[request.remote_addr])
+
 #This endpoints shows the actions the students did EX:TUTD up
 @app.route('/getstudents')
 def endpoint_getstudents():
     if not request.remote_addr in studentList:
         # This will have to send along the current address as "forward" eventually
-        return redirect('/login?forward=' + request.path)
-    if studentList[request.remote_addr]['perms'] > sD.settings['perms']['api']:
-        return render_template("message.html", forward=request.path, message = "You do not have high enough permissions to do this right now. " )
-    else:
+        return '{"error": "You are not logged in."}'
+    if studentList[request.remote_addr]['perms'] <= sD.settings['perms']['admin']:
         return json.dumps(studentList)
+    elif studentList[request.remote_addr]['perms'] <= sD.settings['perms']['api']:
+        return json.dumps(stripUserData())
+    else:
+        return '{"error": "Insufficient permissions."}'
 
-#This restrics students actions to other features in the formbar(They need to ask for permision first)
 @app.route('/getpermissions')
 def endpoint_getpermissions():
     if not request.remote_addr in studentList:
@@ -1414,8 +1424,11 @@ def new_client(client, server):
 def client_left(client, server):
     logging.info(studentList[client['address'][0]]['name'] + " disconnected")
     del studentList[client['address'][0]]['wsID']
-    server.send_message_to_all(json.dumps(packMSG('alert', 'all', 'server', studentList[client['address'][0]]['name'] + " has left the server...")))
-    server.send_message_to_all(json.dumps(packMSG('userlist', 'all', 'server', stripUserData())))
+    #Send a message to every client that isn't THIS disconnecting client, telling them the user disconnected
+    for i, user in enumerate(server.clients):
+        if not server.clients[i] == client:
+            server.send_message(server.clients[i], json.dumps(packMSG('alert', 'all', 'server', studentList[client['address'][0]]['name'] + " has left the server...")))
+            server.send_message(server.clients[i], json.dumps(packMSG('userlist', 'all', 'server', stripUserData())))
 
 # Called when a client sends a message
 def message_received(client, server, message):

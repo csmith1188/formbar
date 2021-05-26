@@ -213,6 +213,7 @@ def stopSFX():
 
 # This function allows you to choose wich background music you want
 def startBGM(bgm_filename, volume=sD.bgm['volume']):
+    sD.bgm['paused'] = True
     pygame.mixer.music.load(bgm.bgm[bgm_filename])
     pygame.mixer.music.set_volume(volume)
     pygame.mixer.music.play(loops=-1)
@@ -220,6 +221,7 @@ def startBGM(bgm_filename, volume=sD.bgm['volume']):
 
 #This function stops BGM
 def stopBGM():
+    sD.bgm['paused'] = False
     pygame.mixer.music.stop()
     playSFX("sfx_pickup01")
 
@@ -385,9 +387,9 @@ def surveyBar():
     results = [] # Create empty results list
     clearBar()
     #Go through IP list and see what each IP sent as a response
-    for x in ipList:
+    for student in studentList:
         #add this result to the results list
-        results.append(ipList[x])
+        results.append(studentList[student])
     #The number of results is how many have complete the survey
     complete = len(results)
     #calculate the chunk length for each student
@@ -583,6 +585,11 @@ def updateStep():
 def endpoint_home():
     return render_template('index.html')
 
+#Default formbar in advanced expert mode
+@app.route('/expert')
+def endpoint_expert():
+    return render_template('expert.html')
+
 #Before choosing endpoints you are required to log in
 @app.route('/login', methods = ['POST', 'GET'])
 def endpoint_login():
@@ -619,11 +626,6 @@ def endpoint_color():
     if not request.remote_addr in studentList:
         # This will have to send along the current address as "forward" eventually
         return redirect('/login?forward=' + request.path)
-    '''
-    if sD.settings['locked'] == True:
-        if not request.remote_addr in whiteList:
-            return render_template("message.html", forward=request.path, message = "You are not whitelisted. " )
-    '''
     if studentList[request.remote_addr]['perms'] > sD.settings['perms']['bar']:
         render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
@@ -979,29 +981,23 @@ def endpoint_survey():
     if not request.remote_addr in studentList:
         # This will have to send along the current address as "forward" eventually
         return redirect('/login?forward=' + request.path)
-    '''
-    if sD.settings['locked'] == True:
-        if not request.remote_addr in whiteList:
-            return render_template("message.html", forward=request.path, message = "You are not whitelisted. " )
-    '''
-    if studentList[request.remote_addr]['perms'] > sD.settings['perms']['bar']:
+    if studentList[request.remote_addr]['perms'] > sD.settings['perms']['student']:
         return render_template("message.html", forward=request.path, message = "You do not have high enough permissions to do this right now. " )
     else:
         ip = request.remote_addr
         vote = request.args.get('vote')
-        name = request.args.get('name')
-        if not name:
-            name = 'unknown'
-        elif vote:
-            logging.info("Recieved " + vote + " from " + name + " at " + ip)
+        if vote:
             if vote in ["a", "b", "c", "d"]:
-                studentList[request.remote_addr] = vote
-                playSFX("sfx_blip01")
-                surveyBar()
-                return render_template("message.html", forward=request.path, message = "Thank you for your tasty bytes... (" + vote + ")" )
+                if not studentList[request.remote_addr]['survey']:
+                    studentList[request.remote_addr]['survey'] = vote
+                    playSFX("sfx_blip01")
+                    surveyBar()
+                    return render_template("message.html", forward=request.path, message = "Thank you for your tasty bytes... (" + vote + ")" )
+                else:
+                    return render_template("message.html", forward=request.path, message = "You've already sunmitted an answer... (" + studentList[request.remote_addr]['survey'] + ")" )
             elif vote == 'oops':
-                if studentList[request.remote_addr]['thumb']:
-                    studentList[request.remote_addr]['thumb'] = ''
+                if studentList[request.remote_addr]['survey']:
+                    studentList[request.remote_addr]['survey'] = ''
                     playSFX("sfx_hit01")
                     surveyBar()
                     return render_template("message.html", forward=request.path, message = "I won\'t mention it if you don\'t" )
@@ -1121,11 +1117,6 @@ def endpoint_user():
     if not request.remote_addr in studentList:
         # This will have to send along the current address as "forward" eventually
         return redirect('/login?forward=' + request.path)
-    '''
-    if sD.settings['locked'] == True:
-        if not request.remote_addr in whiteList:
-            return render_template("message.html", forward=request.path, message = "You are not whitelisted. " )
-    '''
     if studentList[request.remote_addr]['perms'] > sD.settings['perms']['users']:
         return render_template("message.html", forward=request.path, message = "You do not have high enough permissions to do this right now. " )
     else:
@@ -1280,11 +1271,6 @@ def endpoint_bgm():
     if not request.remote_addr in studentList:
         # This will have to send along the current address as "forward" eventually
         return redirect('/login?forward=' + request.path)
-    '''
-    if sD.settings['locked'] == True:
-        if not request.remote_addr in whiteList:
-            return render_template("message.html", forward=request.path, message = "You are not whitelisted. " )
-    '''
     if studentList[request.remote_addr]['perms'] > sD.settings['perms']['bgm']:
         return render_template("message.html", forward=request.path, message = "You do not have high enough permissions to do this right now. " )
     else:
@@ -1335,11 +1321,6 @@ def endpoint_perc():
     if not request.remote_addr in studentList:
         # This will have to send along the current address as "forward" eventually
         return redirect('/login?forward=' + request.path)
-    '''
-    if sD.settings['locked'] == True:
-        if not request.remote_addr in whiteList:
-            return render_template("message.html", forward=request.path, message = "You are not whitelisted. " )
-    '''
     if studentList[request.remote_addr]['perms'] > sD.settings['perms']['bar']:
         return render_template("message.html", forward=request.path, message = "You do not have high enough permissions to do this right now. " )
     else:
@@ -1356,11 +1337,6 @@ def endpoint_say():
     if not request.remote_addr in studentList:
         # This will have to send along the current address as "forward" eventually
         return redirect('/login?forward=' + request.path)
-    '''
-    if sD.settings['locked'] == True:
-        if not request.remote_addr in whiteList:
-            return render_template("message.html", forward=request.path, message = "You are not whitelisted. " )
-    '''
     if studentList[request.remote_addr]['perms'] > sD.settings['perms']['bar']:
         return render_template("message.html", forward=request.path, message = "You do not have high enough permissions to do this right now. " )
     else:

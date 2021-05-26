@@ -71,6 +71,9 @@ app = Flask(__name__)
 
 sD = sessions.Session(ip)
 
+# Dictionary words for hangman game
+words = json.loads(open('data/words.json').read())
+
 #Permission levels are as follows:
 # 0 - teacher
 # 1 - mod
@@ -1214,9 +1217,19 @@ def endpoint_getmode():
 
 @app.route('/getword')
 def endpoint_getword():
-    words = json.loads(open('data/words.json').read())
-    word = random.choice(list(words.keys()))
-    return str(word)
+    if request.args.get('number'):
+        try:
+            number = int(request.args.get('number'))
+            wordlist = []
+            for i in range(number):
+                wordlist.append(random.choice(list(words.keys())))
+            return json.dumps(wordlist)
+        except Exception as e:
+            logging.error("Could not convert number. " + str(e))
+            return render_template("message.html", message="Could not convert number. " + str(e))
+    else:
+        word = random.choice(list(words.keys()))
+        return str(word)
 
 #This endpoints shows the actions the students did EX:TUTD up
 @app.route('/getstudents')

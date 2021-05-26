@@ -172,7 +172,11 @@
     background: white;
   }
 
-  #thumbs, #letters, #play, #segment,
+  #tutd,
+  #survey,
+  #playtime,
+  #quiz,
+  #segment,
   #color1Heading,
   #color2Div {
     display: none;
@@ -317,17 +321,19 @@
   let request = new XMLHttpRequest();
   let thumbButtons = document.querySelectorAll(".thumbButton");
   let letterButtons = document.querySelectorAll(".letterButton");
-  let chosen = false;
+  let chosenThumb = false;
+  let chosenLetter = false;
   let segment;
   let gradient;
 
   window.onload = function() {
     mode();
     logIn();
-    document.getElementById("mainWindow").src = "/chat";
+    openPage("chat");
   };
 
   function mode() {
+    //Get current mode from server
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.open("GET", '/getmode', false);
     xmlHttp.send(null);
@@ -349,21 +355,26 @@
     let name = localStorage.getItem("name");
     let nameBox = document.getElementById("name");
 
+    //If already logged in
     if (manual) {
       name = prompt("Enter your name", name);
     } else {
       while (!name) {
+        //Continue asking until something input
         name = prompt("Enter your name");
         if (!name) alert("Login required");
       }
     }
 
     if (name) {
+      //Save name to browser
       localStorage.setItem("name", name);
       nameBox.innerText = name;
       request.open("GET", "/login?name=" + name);
       request.send();
-    } else name = localStorage.getItem("name");
+    }
+    //If nothing input, reset to saved name
+    else name = localStorage.getItem("name");
 
     if (bottom.clientHeight > 186) shorten(document.getElementById("bottom"), 186, nameBox);
     else nameBox.removeAttribute("title");
@@ -395,12 +406,12 @@
   });
 
   function thumbsVote(thumb) {
-    if (chosen === thumb) {
-      chosen = false;
+    if (chosenThumb === thumb) {
+      chosenThumb = false;
       removeHighlight("thumbButton" + thumb);
       request.open("GET", "/tutd?thumb=oops");
     } else {
-      chosen = thumb;
+      chosenThumb = thumb;
       if (thumb == 0) {
         request.open("GET", "/tutd?thumb=up");
       } else if (thumb == 1) {
@@ -408,6 +419,7 @@
       } else if (thumb == 2) {
         request.open("GET", "/tutd?thumb=down");
       }
+      //Highlight selected button and reset others
       Array.from(thumbButtons).forEach(function(button, index) {
         removeHighlight("thumbButton" + index);
       });
@@ -417,13 +429,14 @@
   }
 
   function letterVote(letter) {
-    if (chosen === letter + 3) {
-      chosen = false;
+    if (chosenLetter === letter) {
+      chosenLetter = false;
       removeHighlight("letterButton" + letter);
       request.open("GET", "/survey?vote=oops");
     } else {
-      chosen = letter + 3;
+      chosenLetter = letter;
       request.open("GET", "/survey?vote=" + letter);
+      //Highlight selected button and reset others
       Array.from(letterButtons).forEach(function(button, index) {
         removeHighlight("letterButton" + index);
       });
@@ -434,13 +447,13 @@
 
   function highlight(image) {
     button = document.getElementById(image);
-    button.src = "{{ url_for('static', filename='homeImages/" + image + "-highlight.png') }}"
+    button.src = "/static/homeImages/" + image + "-highlight.png"
     button.classList.add("highlight");
   }
 
   function removeHighlight(image) {
     button = document.getElementById(image);
-    button.src = "{{ url_for('static', filename='homeImages/" + image + ".png') }}"
+    button.src = "/static/homeImages/" + image + ".png"
     button.classList.remove("highlight");
   }
 
@@ -470,7 +483,7 @@
   }
 
   function validNumber(el) {
-    //Convert value to integer
+    //Convert value to integer within range
     let number = parseInt(el.value);
     if (number < el.min || isNaN(number)) el.value = el.min;
     else if (number > el.max) el.value = el.max;
@@ -580,7 +593,6 @@
   }
 
   /*To do:
-  -Get formbar mode when changed
   -Send error messages via chat
   -Add "now playing" feature for bgm
   -Detect when mainWindow src is changed by back or forward button; update tabs & url accordingly

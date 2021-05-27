@@ -553,6 +553,10 @@ def updateStep():
 def endpoint_home():
     return render_template('index.html')
 
+@app.route('/2048')
+def endpoint_2048():
+    return render_template('2048.html')
+
 #Before choosing endpoints you are required to log in
 @app.route('/login', methods = ['POST', 'GET'])
 def endpoint_login():

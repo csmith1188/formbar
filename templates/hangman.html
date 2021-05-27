@@ -3,6 +3,10 @@
 <head onload="KeyColor()">
 	<title>cookie</title>
 	<style>
+		body {
+			margin-top: 30px;
+		}
+
 		:root {
 			--background-color: #333;
 			--bg-dark-color: #222;
@@ -30,71 +34,12 @@
 			left: -250px;
 		}
 
-		.score {
-			position: absolute;
-			top: 5px;
-			left: 5px;
-			text-align: left;
-			margin: 5px;
-		}
-
-		.lives {
-			position: absolute;
-			top: 55px;
-			left: 5px;
-			text-align: left;
-			margin: 5px;
-		}
-
-		.last {
-			position: absolute;
-			top: 105px;
-			left: 5px;
-			text-align: left;
-			margin: 5px;
-		}
-
-		.highscore {
-			position: absolute;
-			top: 5px;
-			left: 200px;
-			text-align: left;
-			margin: 5px;
-		}
-
-		.hangmanbg {
-			position: absolute;
-			top: -25px;
-			left: 1250px;
-			text-align: left;
-			margin: 5px;
-		}
-
-
-		.answer {
-			position: relative;
-			display: inline-block;
-			text-align: center;
-			width: 500px;
-			font-size: 50px
-		}
-
-		.answer1 {
-			position: absolute;
-			display: inline-block;
-			top: 105px;
-			font-size: 30px;
-			width: 500px;
-			height: 200px;
-		}
-
 		.answers {
 			border: 6px solid #FFFFFF;
 			position: relative;
 			border-radius: 50px;
 			width: 1000px;
-			height: 250px;
-
+			height: 300px;
 		}
 
 		.key {
@@ -104,26 +49,18 @@
 			border: 4px solid #FFFFFF;
 			color: black;
 			border-spacing: 15px;
-			top: 100px;
 			margin: 2px;
-			right: 200px;
 			font-size: 75px;
 			width: 100px;
 			text-align: center;
 			background-color: #FFFFFF;
-
 		}
 
 		#keys {
 			position: relative;
 			width: 1000px;
-			left: 200px;
-		}
-
-
-		.answer {
-			position: relative;
-			text-align: center;
+			top: 60px;
+			border: 4px solid #333;
 		}
 
 		#category {
@@ -132,36 +69,49 @@
 
 		#scoreBox {
 			display: flex;
+			float: left;
+			padding: 0px;
+			width: 300px;
+			margin: 0px;
+		}
+
+		* {
+			box-sizing: border-box;
 		}
 
 		#score {
 			/* position: absolute;
-				top: 5px;
-				left: 5px; */
+	top: 5px;
+	left: 5px; */
 			text-align: left;
 			margin: 5px;
+			/* position: absolute; */
 		}
 
 		#lives {
 			/* position: absolute;
-				top: 55px;
-				left: 5px; */
+	top: 55px;
+	left: 5px; */
 			text-align: left;
 			margin: 5px;
+			/* position: absolute;
+			left: 180px; */
 		}
 
 		#highscore {
 			/* position: absolute;
-				top: 5px;
-				left: 200px; */
+	top: 5px;
+	left: 200px; */
 			text-align: left;
 			margin: 5px;
+			/* position: absolute;
+			left: 80px; */
 		}
 
 		#wordBank {
-			font-size: 15px;
+			font-size: 25px;
 			top: 200px;
-			position: absolute;
+			/* position: absolute; */
 			border: 3px solid #FFFFFF;
 
 			width: 250px;
@@ -172,43 +122,69 @@
 		#last {
 			text-align: left;
 			margin: 5px;
-			position: absolute;
-			top: 50px;
+			/* position: absolute;*/
+			top: 70px;
 		}
 
 		#bank {
 			font-size: 25px;
-			position: absolute;
+			/* position: absolute; */
 			text-align: center;
 			width: 250px;
 			border: 3px solid #333;
-			top: 150px;
+			top: 150px
+		}
+
+		#left {
+			float: left;
+		}
+
+		#center {
+			padding: 0px;
+			margin: 0px;
+			width: 1000px;
+			/* position: relative; */
+		}
+
+
+
+		@media only screen and (max-width: 620px) {
+
+			/* For mobile phones: */
+			#center,
+			#scoreBox {
+				width: 100%;
+			}
+		}
+
+		#word {
+			font-size: 25px;
 		}
 	</style>
 </head>
 
 <body onload="randomize()">
-	<div id="scoreBox">
-		<div id="score">Score: 0</div>
-		<div id="highscore">Highscore: 0</div>
-		<div id="lives">Lives: 10</div>
-
-		<div id="last">Last Word: </div>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<div id="left">
+		<div id="scoreBox" style="overflow:auto">
+			<div id="score">Score: 0</div>
+			<div id="highscore">Highscore: 0</div>
+			<div id="lives">Lives: 10</div>
+			<div id="last">Last Word: </div>
+		</div>
+		<div id="bank">Word Bank</div>
+		<div id="wordBank"></div>
 	</div>
-	<div id="bank">Word Bank</div>
-	<div id="wordBank"></div>
 	<center>
-		<div class="answers">
-			<center>
+		<div id="center">
+			<div class="answers">
 				<p id="category"></p>
-			</center>
-			<div id="word" class="answer"></div>
-
+				<div id="word" class="answer"></div>
+			</div>
+			<div id="keys" class="keys"></div>
 		</div>
 	</center>
-	<center>
-		<div id="keys" class="keys"></div>
-	</center>
+
 
 	<!-- <img src="hangmanbg.png" class="hangmanbg"> -->
 
@@ -226,6 +202,7 @@
 	var letters;
 	var displayWord = "";
 	var savedWord;
+
 
 	var wordObj = {
 		"place": "your",

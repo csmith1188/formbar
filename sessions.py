@@ -7,7 +7,8 @@ class Session():
             'lastTime': 0,
             'lastPlayer': '',
             'list': {},
-            'volume': 0.5
+            'volume': 0.5,
+            'paused': False
         }
         self.settings = {
             'perms': {

@@ -23,7 +23,10 @@
 </form>
 
 <script type="text/javascript">
-    document.getElementById('forwardBox').value = null;
+    const urlParams = new URLSearchParams(window.location.search);
+    const forward = urlParams.get('forward');
+    if (forward) document.getElementById('forwardBox').value = forward;
+    else document.getElementById('forwardBox').value = null;
 </script>
 
 {% endblock %}

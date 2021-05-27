@@ -1475,7 +1475,7 @@ def new_client(client, server):
 # Called for every client disconnecting
 def client_left(client, server):
     logging.info(studentList[client['address'][0]]['name'] + " disconnected")
-    del studentList[client['address'][0]]['wsID']
+    del studentList[client['address'][0]]['wsID'].
     #Send a message to every client that isn't THIS disconnecting client, telling them the user disconnected
     for i, user in enumerate(server.clients):
         if not server.clients[i] == client:
@@ -1489,7 +1489,14 @@ def message_received(client, server, message):
         if message['type'] == 'ttt':
             server.send_message(client, json.dumps(message))
         if message['type'] == 'userlist':
-            server.send_message(client, json.dumps(packMSG('userlist', studentList[client['address'][0]]['name'], 'server', stripUserData())))
+            userlist = {}
+            for student in studentList:
+                if studentList[student]['wsID']:
+                    userlist[student] = {}
+                    userlist[student]['name'] = studentList[student]['name']
+                    userlist[student]['perms'] = studentList[student]['perms']
+                    userlist[student]['wsID'] = studentList[student]['wsID']
+            server.send_message(client, json.dumps(packMSG('userlist', studentList[client['address'][0]]['name'], 'server', json.dumps(userlist))))
         if message['type'] == 'alert':
             server.send_message(client, json.dumps(packMSG('alert', studentList[client['address'][0]]['name'], 'server', 'Only the server can send alerts!')))
         if message['type'] == 'help':

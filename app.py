@@ -590,10 +590,16 @@ def updateStep():
 def endpoint_home():
     return render_template('index.html')
 
+
+@app.route('/2048')
+def endpoint_2048():
+    return render_template('2048.html')
+
 #Default formbar in advanced expert mode
 @app.route('/expert')
 def endpoint_expert():
     return render_template('expert.html')
+
 
 #Before choosing endpoints you are required to log in
 @app.route('/login', methods = ['POST', 'GET'])

@@ -218,6 +218,17 @@
             <option value="/settings?bar=3">Anyone</option>
         </select>
     </div>
+    <br>
+    <div class="perBox">
+        <b>2048</b><br>
+        <select onchange="updatePerm(this)" id="2048permsDrop" name="2048permsDrop">
+            <option value="" disabled selected style="display:none;">(Teacher)</option>
+            <option value="/settings?api=0">Teacher</option>
+            <option value="/settings?api=1">Assistant</option>
+            <option value="/settings?api=2">Student</option>
+            <option value="/settings?api=3">Anyone</option>
+        </select>
+    </div>
 </div>
 <div id="students">
 </div>

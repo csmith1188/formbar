@@ -9,6 +9,7 @@ class Session():
             'list': {},
             'volume': 0.5
         }
+        self.ttt = []
         self.settings = {
             'perms': {
                 'admin' : 0,
@@ -63,3 +64,8 @@ class Student():
         self.progress = []
         self.perms = 2
         self.quizResults = {}
+
+
+class TTTGame():
+    def __init__(self, players):
+        self.players = players

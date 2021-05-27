@@ -129,7 +129,8 @@ def newStudent(remote, username, pin=''):
             'survey': '',
             'perms': 2,
             'progress': [],
-            'complete': False
+            'complete': False,
+            'tttGames': []
         }
         if len(studentList) - 1:
             logging.info("New user logged in. Made them a student: " + username)
@@ -1174,6 +1175,36 @@ def endpoint_sendblock():
 def endpoint_getpix():
     return '{"pixels": "'+ str(pixels[:BARPIX]) +'"}'
 
+#ttt
+@app.route('/ttt')
+def endpoint_ttt():
+    if not request.remote_addr in studentList:
+        # This will have to send along the current address as "forward" eventually
+        return redirect('/login?forward=' + request.path)
+    if studentList[request.remote_addr]['perms'] > sD.settings['perms']['student']:
+        return render_template("message.html", forward=request.path, message = "You do not have high enough permissions to do this right now. " )
+    else:
+        opponent = request.args.get('opponent')
+
+        #Loop through all existing games
+        for game in sD.ttt:
+            #If the user and the opponent is in an existing player list
+            if studentList[request.remote_addr]['name'] in game.players and opponent in game.players:
+                #Then you have found the right game and can edit it here
+                return render_template("ttt.html", game = str(game))
+                #return the response here
+
+
+        #Creating a new game
+        for student in studentList:
+            if studentList[student]['name'] == opponent:
+                sD.ttt.append(sessions.TTTGame([studentList[request.remote_addr]['name'], opponent]))
+                return render_template("ttt.html", game = json.dumps(sD.ttt[-1].__dict__))
+
+
+        #Ifthere is no game with these players
+        return render_template("message.html", message="No game found")
+
 #This endpoints shows the actions the students did EX:TUTD up
 @app.route('/getstudents')
 def endpoint_getstudents():
@@ -1377,6 +1408,8 @@ def client_left(client, server):
 def message_received(client, server, message):
     try:
         message = json.loads(message)
+        if message['type'] == 'ttt':
+            server.send_message(client, json.dumps(message))
         if message['type'] == 'userlist':
             server.send_message(client, json.dumps(packMSG('userlist', studentList[client['address'][0]]['name'], 'server', studentList)))
         if message['type'] == 'alert':

@@ -19,6 +19,7 @@ class Session():
                 'bgm' : 1,
                 'say' : 1,
                 'bar' : 1,
+                'games': 2,
                 'teacher': 0,
                 'mod': 1,
                 'student': 2,

@@ -503,7 +503,10 @@ def tutdBar():
         pixels.show()
     if upCount >= sD.settings['numStudents']:
         pixels.fill((0,0,0))
-        playSFX("sfx_success01")
+        if sD.settings['numStudents'] == 9 and complete == 6:
+            playSFX("clicknice")
+        else:
+            playSFX("sfx_success01")
         for i, pix in enumerate(range(0, BARPIX)):
                 pixels[pix] = blend(range(0, BARPIX), i, colors['blue'], colors['red'])
         if sD.settings['captions']:

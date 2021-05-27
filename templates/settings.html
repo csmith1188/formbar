@@ -82,6 +82,7 @@
         };
         xhr.send();
     }
+
     setInterval(function() {
         checkUpdates('/getstudents');
         if (studentData != oldStudentData) {
@@ -107,6 +108,26 @@
                     <option value="/users?name=${studentList[student]['name']}&action=perm&perm=2">${permNames[2]}</option>
                     <option value="/users?name=${studentList[student]['name']}&action=perm&perm=3" selected="selected">${permNames[3]}</option>
                 </select>`
+                if (studentList[student]['complete']) var checked = 'checked'; else var checked = '';
+                newStudent.innerHTML += `[<input type="checkbox" disabled ${checked}>]`
+                if (studentList[student]['progress']) {
+                    let newProg = 0;
+                    let newProgMax = 0;
+                    for (let i = 0; i < studentList[student]['progress'].length; i++) {
+                        newProgMax++;
+                        if (studentList[student]['progress'][i]) newProg++;
+                    }
+                    newStudent.innerHTML += ` [Prog: ${newProg}/${newProgMax}]`
+                }
+                if (studentList[student]['quizRes']) {
+                    let newQuiz = 0;
+                    let newQuizMax = 0;
+                    for (let i = 0; i < studentList[student]['quizRes'].length; i++) {
+                        newQuizMax++;
+                        if (studentList[student]['quizRes'][i]) newQuiz++;
+                    }
+                    newStudent.innerHTML += ` [Quiz: ${newQuiz}/${newQuizMax}]`
+                }
                 if (studentList[student]['thumb'] == 'up') newStudent.classList.add('up')
                 else if (studentList[student]['thumb'] == 'wiggle') newStudent.classList.add('wiggle')
                 else if (studentList[student]['thumb'] == 'down') newStudent.classList.add('down')
@@ -115,7 +136,6 @@
                     newStudent.classList.remove('wiggle')
                     newStudent.classList.remove('down')
                 }
-
                 studentBox.appendChild(newStudent)
             }
         }
@@ -196,6 +216,17 @@
             <option value="/settings?bar=1">Assistant</option>
             <option value="/settings?bar=2">Student</option>
             <option value="/settings?bar=3">Anyone</option>
+        </select>
+    </div>
+    <br>
+    <div class="perBox">
+        <b>2048</b><br>
+        <select onchange="updatePerm(this)" id="2048permsDrop" name="2048permsDrop">
+            <option value="" disabled selected style="display:none;">(Teacher)</option>
+            <option value="/settings?games=0">Teacher</option>
+            <option value="/settings?games=1">Assistant</option>
+            <option value="/settings?games=2">Student</option>
+            <option value="/settings?games=3">Anyone</option>
         </select>
     </div>
 </div>

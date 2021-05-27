@@ -7,7 +7,8 @@ class Session():
             'lastTime': 0,
             'lastPlayer': '',
             'list': {},
-            'volume': 0.5
+            'volume': 0.5,
+            'paused': False
         }
         self.ttt = []
         self.settings = {
@@ -19,6 +20,7 @@ class Session():
                 'bgm' : 1,
                 'say' : 1,
                 'bar' : 1,
+                'games': 2,
                 'teacher': 0,
                 'mod': 1,
                 'student': 2,

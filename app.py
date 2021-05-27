@@ -130,7 +130,7 @@ def newStudent(remote, username, pin=''):
             'perms': 2,
             'progress': [],
             'complete': False,
-            'tttGames': []
+            'tttGames': [],
             'quizRes': [],
             'essayRes': ''
         }

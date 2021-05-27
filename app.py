@@ -503,15 +503,17 @@ def tutdBar():
         pixels.show()
     if upCount >= sD.settings['numStudents']:
         pixels.fill((0,0,0))
-        if sD.settings['numStudents'] == 9 and complete == 6:
-            playSFX("clicknice")
-        else:
-            playSFX("sfx_success01")
+        playSFX("sfx_success01")
         for i, pix in enumerate(range(0, BARPIX)):
                 pixels[pix] = blend(range(0, BARPIX), i, colors['blue'], colors['red'])
         if sD.settings['captions']:
             clearString()
             showString("MAX GAMER!", 0, colors['purple'])
+    #The Funny Number
+    if sD.settings['numStudents'] == 9 and complete == 6:
+        playSFX("clicknice")
+    else:
+        playSFX("sfx_blip01")
     pixels.show()
 
 def countComplete():
@@ -1025,7 +1027,6 @@ def endpoint_tutd():
             if thumb == 'up' or thumb == 'down' or thumb == 'wiggle' :
                 if not studentList[request.remote_addr]['thumb']:
                     studentList[request.remote_addr]['thumb'] = request.args.get('thumb')
-                    playSFX("sfx_blip01")
                     tutdBar()
                     return render_template("message.html", forward=request.path, message = "Thank you for your tasty bytes... (" + thumb + ")" )
                 else:
@@ -1308,7 +1309,7 @@ def endpoint_bgm():
             if bgm_file == 'random':
                 bgm_file = random.choice(list(bgm.bgm.keys()))
             if bgm_file in bgm.bgm:
-                if time.time() - sD.bgm['lastTime'] >= 60:
+                if time.time() - sD.bgm['lastTime'] >= 60 or studentList[request.remote_addr]['perms'] <= sD.settings['perms']['mod']:
                     sD.bgm['lastTime'] = time.time()
                     bgm_volume = request.args.get('volume')
                     try:

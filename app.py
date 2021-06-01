@@ -546,13 +546,23 @@ def stripUser(perm):
             newList[student] = studentList[student]
     return newList
 
-def stripUserData(perm=''):
-    newList = {}
+def stripUserData(perm='', sList={}):
+    newList = sList
     for student in studentList:
         newList[student] = {}
         newList[student]['name'] = studentList[student]['name']
         newList[student]['perms'] = studentList[student]['perms']
         newList[student]['complete'] = studentList[student]['complete']
+    return newList
+
+def chatUsers():
+    newList = {}
+    for student in studentList:
+        if 'wsID' in studentList[student].keys():
+            newList[student] = {}
+            newList[student]['name'] = studentList[student]['name']
+            newList[student]['perms'] = studentList[student]['perms']
+            newList[student]['wsID'] = studentList[student]['wsID']
     return newList
 
 def updateStep():
@@ -595,7 +605,6 @@ def endpoint_home():
 @app.route('/2048')
 def endpoint_2048():
     if not request.remote_addr in studentList:
-        # This will have to send along the current address as "forward" eventually
         return redirect('/login?forward=' + request.path)
     if studentList[request.remote_addr]['perms'] > sD.settings['perms']['games']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
@@ -641,7 +650,6 @@ Query Parameters:
 @app.route('/color')
 def endpoint_color():
     if not request.remote_addr in studentList:
-        # This will have to send along the current address as "forward" eventually
         return redirect('/login?forward=' + request.path)
     if studentList[request.remote_addr]['perms'] > sD.settings['perms']['bar']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
@@ -668,7 +676,6 @@ def endpoint_color():
 @app.route('/hangman')
 def endpoint_hangman():
     if not request.remote_addr in studentList:
-        # This will have to send along the current address as "forward" eventually
         return redirect('/login?forward=' + request.path)
     if studentList[request.remote_addr]['perms'] > sD.settings['perms']['games']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
@@ -687,7 +694,6 @@ def endpoint_hangman():
 @app.route('/segment')
 def endpoint_segment():
     if not request.remote_addr in studentList:
-        # This will have to send along the current address as "forward" eventually
         return redirect('/login?forward=' + request.path)
     if studentList[request.remote_addr]['perms'] > sD.settings['perms']['bar']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
@@ -749,7 +755,6 @@ def endpoint_wawd():
 @app.route('/lesson', methods = ['POST', 'GET'])
 def endpoint_lesson():
     if not request.remote_addr in studentList:
-        # This will have to send along the current address as "forward" eventually
         return redirect('/login?forward=' + request.path)
     '''
     if sD.settings['locked'] == True:
@@ -862,7 +867,6 @@ def endpoint_lesson():
 @app.route('/progress', methods = ['POST', 'GET'])
 def endpoint_progress():
     if not request.remote_addr in studentList:
-        # This will have to send along the current address as "forward" eventually
         return redirect('/login?forward=' + request.path)
     '''
     if sD.settings['locked'] == True:
@@ -893,7 +897,6 @@ def endpoint_progress():
 @app.route('/settings', methods = ['POST', 'GET'])
 def endpoint_settings():
     if not request.remote_addr in studentList:
-        # This will have to send along the current address as "forward" eventually
         return redirect('/login?forward=' + request.path)
     '''
     if sD.settings['locked'] == True:
@@ -958,7 +961,6 @@ def endpoint_settings():
 @app.route('/flush')
 def endpoint_flush():
     if not request.remote_addr in studentList:
-        # This will have to send along the current address as "forward" eventually
         return redirect('/login?forward=' + request.path)
     if studentList[request.remote_addr]['perms'] > sD.settings['perms']['admin']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
@@ -971,7 +973,6 @@ def endpoint_flush():
 @app.route('/quiz', methods = ['POST', 'GET'])
 def endpoint_quiz():
     if not request.remote_addr in studentList:
-        # This will have to send along the current address as "forward" eventually
         return redirect('/login?forward=' + request.path)
     '''
     if sD.settings['locked'] == True:
@@ -1002,7 +1003,6 @@ def endpoint_quiz():
 @app.route('/survey')
 def endpoint_survey():
     if not request.remote_addr in studentList:
-        # This will have to send along the current address as "forward" eventually
         return redirect('/login?forward=' + request.path)
     if studentList[request.remote_addr]['perms'] > sD.settings['perms']['student']:
         return render_template("message.html", forward=request.path, message = "You do not have high enough permissions to do this right now. " )
@@ -1035,7 +1035,6 @@ def endpoint_survey():
 @app.route('/tutd')
 def endpoint_tutd():
     if not request.remote_addr in studentList:
-        # This will have to send along the current address as "forward" eventually
         return redirect('/login?forward=' + request.path)
     else:
         ip = request.remote_addr
@@ -1073,7 +1072,6 @@ def endpoint_tutd():
 @app.route('/help', methods = ['POST', 'GET'])
 def endpoint_help():
     if not request.remote_addr in studentList:
-        # This will have to send along the current address as "forward" eventually
         return redirect('/login?forward=' + request.path)
     if request.method == 'POST':
         name = studentList[request.remote_addr]['name']
@@ -1091,7 +1089,6 @@ def endpoint_help():
 @app.route('/needshelp')
 def endpoint_needshelp():
     if not request.remote_addr in studentList:
-        # This will have to send along the current address as "forward" eventually
         return redirect('/login?forward=' + request.path)
     if studentList[request.remote_addr]['perms'] > sD.settings['perms']['admin']:
         return render_template("message.html", forward=request.path, message = "You do not have high enough permissions to do this right now. " )
@@ -1126,7 +1123,6 @@ def endpoint_needshelp():
 @app.route('/chat')
 def endpoint_chat():
     if not request.remote_addr in studentList:
-        # This will have to send along the current address as "forward" eventually
         return redirect('/login?forward=' + request.path)
     if studentList[request.remote_addr]['perms'] > sD.settings['perms']['say']:
         return render_template("message.html", forward=request.path, message = "You do not have high enough permissions to do this right now. " )
@@ -1137,7 +1133,6 @@ def endpoint_chat():
 @app.route('/users')
 def endpoint_user():
     if not request.remote_addr in studentList:
-        # This will have to send along the current address as "forward" eventually
         return redirect('/login?forward=' + request.path)
     if studentList[request.remote_addr]['perms'] > sD.settings['perms']['users']:
         return render_template("message.html", forward=request.path, message = "You do not have high enough permissions to do this right now. " )
@@ -1238,7 +1233,6 @@ def endpoint_getpix():
 @app.route('/ttt')
 def endpoint_ttt():
     if not request.remote_addr in studentList:
-        # This will have to send along the current address as "forward" eventually
         return redirect('/login?forward=' + request.path)
     if studentList[request.remote_addr]['perms'] > sD.settings['perms']['student']:
         return render_template("message.html", forward=request.path, message = "You do not have high enough permissions to do this right now. " )
@@ -1296,7 +1290,6 @@ def endpoint_getme():
 @app.route('/getstudents')
 def endpoint_getstudents():
     if not request.remote_addr in studentList:
-        # This will have to send along the current address as "forward" eventually
         return '{"error": "You are not logged in."}'
     if studentList[request.remote_addr]['perms'] <= sD.settings['perms']['admin']:
         return json.dumps(studentList)
@@ -1308,7 +1301,6 @@ def endpoint_getstudents():
 @app.route('/getpermissions')
 def endpoint_getpermissions():
     if not request.remote_addr in studentList:
-        # This will have to send along the current address as "forward" eventually
         return redirect('/login?forward=' + request.path)
     if studentList[request.remote_addr]['perms'] > sD.settings['perms']['api']:
         return render_template("message.html", forward=request.path, message = "You do not have high enough permissions to do this right now. " )
@@ -1325,7 +1317,6 @@ def endpoint_virtualbar():
 def endpoint_sfx():
 
     if not request.remote_addr in studentList:
-        # This will have to send along the current address as "forward" eventually
         return redirect('/login?forward=' + request.path)
     if studentList[request.remote_addr]['perms'] > sD.settings['perms']['sfx']:
         return render_template("message.html", forward=request.path, message = "You do not have high enough permissions to do this right now. " )
@@ -1346,7 +1337,6 @@ def endpoint_sfx():
 @app.route('/bgm')
 def endpoint_bgm():
     if not request.remote_addr in studentList:
-        # This will have to send along the current address as "forward" eventually
         return redirect('/login?forward=' + request.path)
     if studentList[request.remote_addr]['perms'] > sD.settings['perms']['bgm']:
         return render_template("message.html", forward=request.path, message = "You do not have high enough permissions to do this right now. " )
@@ -1396,7 +1386,6 @@ def endpoint_bgmstop():
 @app.route('/perc')
 def endpoint_perc():
     if not request.remote_addr in studentList:
-        # This will have to send along the current address as "forward" eventually
         return redirect('/login?forward=' + request.path)
     if studentList[request.remote_addr]['perms'] > sD.settings['perms']['bar']:
         return render_template("message.html", forward=request.path, message = "You do not have high enough permissions to do this right now. " )
@@ -1412,7 +1401,6 @@ def endpoint_perc():
 @app.route('/say')
 def endpoint_say():
     if not request.remote_addr in studentList:
-        # This will have to send along the current address as "forward" eventually
         return redirect('/login?forward=' + request.path)
     if studentList[request.remote_addr]['perms'] > sD.settings['perms']['bar']:
         return render_template("message.html", forward=request.path, message = "You do not have high enough permissions to do this right now. " )
@@ -1464,23 +1452,23 @@ def packMSG(type, rx, tx, content):
 
 # Called for every client connecting (after handshake)
 def new_client(client, server):
-    try:
+    # try:
         studentList[client['address'][0]]['wsID'] = client['id']
         logging.info(studentList[client['address'][0]]['name'] + " connected and was given id %d" % client['id'])
         server.send_message_to_all(json.dumps(packMSG('alert', 'all', 'server', studentList[client['address'][0]]['name'] + " has joined the server...")))
-        server.send_message_to_all(json.dumps(packMSG('userlist', 'all', 'server', stripUserData())))
-    except Exception as e:
-        logging.error("Error finding user in list: " + str(e))
+        server.send_message_to_all(json.dumps(packMSG('userlist', 'all', 'server', chatUsers())))
+    # except Exception as e:
+    #     logging.error("Error finding user in list: " + str(e))
 
 # Called for every client disconnecting
 def client_left(client, server):
     logging.info(studentList[client['address'][0]]['name'] + " disconnected")
-    del studentList[client['address'][0]]['wsID'].
+    del studentList[client['address'][0]]['wsID']
     #Send a message to every client that isn't THIS disconnecting client, telling them the user disconnected
     for i, user in enumerate(server.clients):
         if not server.clients[i] == client:
             server.send_message(server.clients[i], json.dumps(packMSG('alert', 'all', 'server', studentList[client['address'][0]]['name'] + " has left the server...")))
-            server.send_message(server.clients[i], json.dumps(packMSG('userlist', 'all', 'server', stripUserData())))
+            server.send_message(server.clients[i], json.dumps(packMSG('userlist', 'all', 'server', chatUsers())))
 
 # Called when a client sends a message
 def message_received(client, server, message):
@@ -1489,14 +1477,7 @@ def message_received(client, server, message):
         if message['type'] == 'ttt':
             server.send_message(client, json.dumps(message))
         if message['type'] == 'userlist':
-            userlist = {}
-            for student in studentList:
-                if studentList[student]['wsID']:
-                    userlist[student] = {}
-                    userlist[student]['name'] = studentList[student]['name']
-                    userlist[student]['perms'] = studentList[student]['perms']
-                    userlist[student]['wsID'] = studentList[student]['wsID']
-            server.send_message(client, json.dumps(packMSG('userlist', studentList[client['address'][0]]['name'], 'server', json.dumps(userlist))))
+            server.send_message(client, json.dumps(packMSG('userlist', studentList[client['address'][0]]['name'], 'server', chatUsers())))
         if message['type'] == 'alert':
             server.send_message(client, json.dumps(packMSG('alert', studentList[client['address'][0]]['name'], 'server', 'Only the server can send alerts!')))
         if message['type'] == 'help':

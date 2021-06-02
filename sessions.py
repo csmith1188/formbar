@@ -2,6 +2,7 @@ class Session():
     def __init__(self, ip='0.0.0.0'):
         self.refresh()
         self.ip = ip
+        self.studentDict = {}
         self.bgm = {
             'nowplaying': '',
             'lastTime': 0,

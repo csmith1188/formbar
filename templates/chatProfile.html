@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Profile</title>
+    <style>
+      :root {
+        --background-color: #303234;
+        --bg-dark-color: #202123;
+        --bg-highlight-color: #404345;
+        --main-color: #bfcfff;
+      }
+
+      body {
+        background-color: var(--background-color);
+        color: white;
+        font: 16px "Segoe UI", sans-serif;
+      }
+
+      input {
+        width: 256px;
+        height: 32px;
+        padding: 2px 4px;
+        vertical-align: middle;
+        background: var(--bg-dark-color);
+        color: white;
+        border: 1px solid var(--main-color);
+        font: 20px "Segoe UI", sans-serif;
+      }
+
+      input:focus {
+        outline: 1px solid var(--main-color);
+      }
+
+      .color {
+        width: 26.6px;
+        height: 26.6px;
+        margin: 13.3px;
+        border-radius: 50%;
+      }
+
+      .colorBox {
+        width: 53.2px;
+        height: 53.2px;
+        display: inline-block;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+      .colorBox:hover, .colorBox.selected {
+        background: var(--bg-highlight-color);
+      }
+
+      button {
+        width: 266px;
+        height: 42px;
+        border-radius: 10.5px;
+        background: var(--main-color);
+        color: var(--background-color);
+        border: none;
+        font: 20px "Segoe UI", sans-serif;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div style="width: fit-content; margin: auto;">
+
+      Username<br>
+      <input id="username"></input><br><br>
+
+      Color
+      <div>
+        <div class="colorBox" onclick="select(this);"><div class="color" style="background: #ff8f80;"></div></div
+        ><div class="colorBox" onclick="select(this);"><div class="color" style="background: #ffbf00;"></div></div
+        ><div class="colorBox" onclick="select(this);"><div class="color" style="background: #80ff80;"></div></div
+        ><div class="colorBox selected" onclick="select(this);"><div class="color" style="background: var(--main-color);"></div></div
+        ><div class="colorBox" onclick="select(this);"><div class="color" style="background: #df80ff;"></div></div>
+      </div><br>
+
+      Profile picture (optional)<br>
+      <img src="{{ url_for('static', filename='img/avatar.png') }}" id="avatar" style="width: 38px; height: 38px; display: inline-block; vertical-align: middle; margin-right: 8px; border-radius: 19px;"><input id="username" style="width: 210px;" placeholder="Paste image address" oninput="updateAvatar(this.value)"></input><br><br>
+
+      <button>Update profile</button>
+    </div>
+  </body>
+
+  <script>
+    document.getElementById("username").value = localStorage.getItem("name");
+
+    function select(box) {
+      let boxes = document.querySelectorAll(".colorBox");
+      Array.from(boxes).forEach(function(box) {
+        box.classList.remove("selected");
+      });
+      box.classList.add("selected");
+    }
+
+    function updateAvatar(address) {
+      let avatar = document.getElementById("avatar");
+      avatar.src = address;
+    }
+  </script>
+</html>

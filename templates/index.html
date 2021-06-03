@@ -62,5 +62,14 @@
   </div>
 </div>
 
+<script>
+  //ep will be true if user made expert mode their default
+  let ep = localStorage.getItem("expertPreference");
+  let urlParams = new URLSearchParams(window.location.search);
+  let ud = urlParams.get('useDefault');
+
+  //Redirect to /expert if ep is true, unless url parameter "useDefault" is true
+  if (ep && !ud) window.location = "/expert";
+</script>
 
 {% endblock %}

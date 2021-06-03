@@ -198,35 +198,35 @@
 
 <!-- Main content here -->
 {% block main %}
-<div id="virtualBar" style="position: absolute; top: 0; left: 0; width: 100%; box-sizing: border-box; padding: 8px; background: black;">
-  <div id="vbText" style="height: 24px; width: 119.97px; padding: 0 4px; box-sizing: border-box; border: 1px white; border-style: solid solid none; font: 20px monospace; text-transform: uppercase;"></div>
-  <span id="pixBox" style="width: 100%; height: 16px; box-sizing: border-box; border: 1px solid white; display: flex; justify-content: space-around;"></span>
+<div id="virtualBar" style="position: absolute; top: 0; left: 0; width: 100%; height: 200px; padding: 8px; background: black;">
+  <span id="vbText" style="font: 24px monospace; text-transform: uppercase;"></span>
+  <span id="pixBox" style="width: calc(100%; height: 16px; border: 1px solid white; display: flex; justify-content: space-around;"></span>
 </div>
 
-<div style="position: fixed; left: 0; bottom: 0; width: 250px; height: calc(100% - 56px); box-sizing: border-box; background: white;">
+<div style="position: fixed; left: 0; bottom: 0; width: 250px; height: calc(100% - 50px); box-sizing: border-box; background: white;">
   <div id="sidebarScroll" style="height: calc(100% - 8px - 228px); margin: 8px 8px 0; overflow: auto;">
     <div id="tutd" style="text-align: center; width: 100%;">
-      <img src="{{ url_for('static', filename='img/thumbButton0.png') }}" id="thumbButton0" class="thumbButton" title="Thumbs up" onclick="thumbsVote(0);" tabindex="0" style="color: #00bf00;">
+      <img src="{{ url_for('static', filename='homeImages/thumbButton0.png') }}" id="thumbButton0" class="thumbButton" title="Thumbs up" onclick="thumbsVote(0);" tabindex="0" style="color: #00bf00;">
       <br>
-      <img src="{{ url_for('static', filename='img/thumbButton1.png') }}" id="thumbButton1" class="thumbButton" title="Wiggle" onclick="thumbsVote(1);" tabindex="0" style="color: #0040bf;">
+      <img src="{{ url_for('static', filename='homeImages/thumbButton1.png') }}" id="thumbButton1" class="thumbButton" title="Wiggle" onclick="thumbsVote(1);" tabindex="0" style="color: #0040bf;">
       <br>
-      <img src="{{ url_for('static', filename='img/thumbButton2.png') }}" id="thumbButton2" class="thumbButton" title="Thumbs down" onclick="thumbsVote(2);" tabindex="0" style="color: #bf0000;">
+      <img src="{{ url_for('static', filename='homeImages/thumbButton2.png') }}" id="thumbButton2" class="thumbButton" title="Thumbs down" onclick="thumbsVote(2);" tabindex="0" style="color: #bf0000;">
     </div>
 
     <div id="survey" style="text-align: center; width: 100%">
-      <img src="{{ url_for('static', filename='img/letterButton0.png') }}" id="letterButton0" class="letterButton" title="Vote A" onclick="letterVote(0);" tabindex="0" style="color: #bf0000;">
+      <img src="{{ url_for('static', filename='homeImages/letterButton0.png') }}" id="letterButton0" class="letterButton" title="Vote A" onclick="letterVote(0);" tabindex="0" style="color: #bf0000;">
       <br>
-      <img src="{{ url_for('static', filename='img/letterButton1.png') }}" id="letterButton1" class="letterButton" title="Vote B" onclick="letterVote(1);" tabindex="0" style="color: #ffbf00;">
+      <img src="{{ url_for('static', filename='homeImages/letterButton1.png') }}" id="letterButton1" class="letterButton" title="Vote B" onclick="letterVote(1);" tabindex="0" style="color: #ffbf00;">
       <br>
-      <img src="{{ url_for('static', filename='img/letterButton2.png') }}" id="letterButton2" class="letterButton" title="Vote C" onclick="letterVote(2);" tabindex="0" style="color: #00bf00;">
+      <img src="{{ url_for('static', filename='homeImages/letterButton2.png') }}" id="letterButton2" class="letterButton" title="Vote C" onclick="letterVote(2);" tabindex="0" style="color: #00bf00;">
       <br>
-      <img src="{{ url_for('static', filename='img/letterButton3.png') }}" id="letterButton3" class="letterButton" title="Vote D" onclick="letterVote(3);" tabindex="0" style="color: #0040bf;">
+      <img src="{{ url_for('static', filename='homeImages/letterButton3.png') }}" id="letterButton3" class="letterButton" title="Vote D" onclick="letterVote(3);" tabindex="0" style="color: #0040bf;">
     </div>
 
     <div id="playtime">
       <h1>Change text</h1>
       <input type="text" id="text" style="text-transform: uppercase; font-family: monospace;" placeholder="Phrase">
-      <img src="{{ url_for('static', filename='img/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendText();">
+      <img src="{{ url_for('static', filename='homeImages/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendText();">
       <br><br><br>
 
       <h1>Change color</h1>
@@ -248,29 +248,29 @@
         <h2>Color 2</h2>
         <input type="color" id="color2">
       </div>
-      <img src="{{ url_for('static', filename='img/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendColor();">
+      <img src="{{ url_for('static', filename='homeImages/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendColor();">
       <br><br><br>
 
       <h1>Sound effects</h1>
       <input type="text" id="sound" placeholder="Filename" list="sfxFiles">
       <datalist id="sfxFiles"></datalist>
-      <img src="{{ url_for('static', filename='img/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendSound();">
+      <img src="{{ url_for('static', filename='homeImages/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendSound();">
       <br><br><br>
 
       <h1>Play music</h1>
       <label for="volume">Volume: </label><input type="range" id="volume" value="1" max="1" step="0.1">
       <br>
-      <img src="{{ url_for('static', filename='img/random.png') }}" class="smallImg" style="margin: 0 4px 0 0; border-radius: 0;" title="Submit" onclick="randomBGM()">
+      <img src="{{ url_for('static', filename='homeImages/random.png') }}" class="smallImg" style="margin: 0 4px 0 0; border-radius: 0;" title="Submit" onclick="randomBGM()">
       <input type="text" id="music" placeholder="Filename" list="bgmFiles">
       <datalist id="bgmFiles"></datalist>
-      <img src="{{ url_for('static', filename='img/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendMusic();"><br>
+      <img src="{{ url_for('static', filename='homeImages/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendMusic();"><br>
       <div id="nowPlaying">Now playing: <b id="nowPlayingTitle" title="Song">Song</b></div>
       <button id="stopMusicButton" style="margin-top: 12px;" onclick="stopMusic();">Stop music</button>
       <br><br><br>
 
       <h1>Fill percentage</h1>
       <input type="number" id="percent" value="0" min="0" max="100" onchange="validNumber(this);"><label for="percent">%</label>
-      <img src="{{ url_for('static', filename='img/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendPercent();">
+      <img src="{{ url_for('static', filename='homeImages/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendPercent();">
       <br><br>
     </div>
 
@@ -292,14 +292,14 @@
       <span style="filter: opacity(70%);">/help</span>
       <div class="tabArrow">➤</div>
     </div>
-    <div id="gamesTab" class="tab" onclick="openPage('games');">
-      Games
-      <span style="filter: opacity(70%);">/games</span>
+    <div id="hangmanTab" class="tab" onclick="openPage('hangman');">
+      Hangman
+      <span style="filter: opacity(70%);">/hangman</span>
       <div class="tabArrow">➤</div>
     </div>
-    <div id="debugTab" class="tab" onclick="openPage('debug');">
-      Debugging
-      <span style="filter: opacity(70%);">/debug</span>
+    <div id="getpixTab" class="tab" onclick="openPage('getpix');">
+      Get all pixels
+      <span style="filter: opacity(70%);">/getpix</span>
       <div class="tabArrow">➤</div>
     </div>
 
@@ -315,7 +315,7 @@
   </div>
 </div>
 
-<div style="position: fixed; right: 0; bottom: 0; width: calc(100% - 250px); height: calc(100% - 56px);">
+<div style="position: fixed; right: 0; bottom: 0; width: calc(100% - 250px); height: calc(100% - 50px);">
     <div style="display: flex; background: #30549b; color: white;">
       <div style="display: flex; left: 87px; width: calc(100% - 48px); padding: 4px;">
           <label for="url" style="filter: opacity(70%); cursor: text;">172.21.3.4:5000/</label><input type="text" id="url" value="chat" autocomplete="off" style="width: 100%; padding: 0; color: white; border: none;">
@@ -489,13 +489,13 @@
 
   function highlight(image) {
     button = document.getElementById(image);
-    button.src = "/static/img/" + image + "-highlight.png"
+    button.src = "/static/homeImages/" + image + "-highlight.png"
     button.classList.add("highlight");
   }
 
   function removeHighlight(image) {
     button = document.getElementById(image);
-    button.src = "/static/img/" + image + ".png"
+    button.src = "/static/homeImages/" + image + ".png"
     button.classList.remove("highlight");
   }
 
@@ -661,7 +661,7 @@
 
   /*To do:
   -Send error messages via chat
-  -Detect when mainWindow src is changed & update tabs & url accordingly
+  -Detect when mainWindow src is changed by back or forward button; update tabs & url accordingly
   -Automatically get sfx and bgm arrays from server
   */
 </script>

@@ -8,18 +8,18 @@
 		}
 
 		:root {
-			--background-color: #333;
-			--bg-dark-color: #222;
-			--bg-highlight-color: #444;
-			--bg-green-color: #243;
-			--bg-purple-color: #423;
-			--bg-yellow-color: #430;
-			--main-color: #bfbfff;
-			--alt-color: #8f8fbf;
-			--green-color: #80ffbf;
-			--purple-color: #ff80bf;
-			--yellow-color: #ffbf00;
-			--gray-color: #aaa;
+	    --background-color: #303234;
+	    --bg-dark-color: #202123;
+	    --bg-highlight-color: #404345;
+	    --bg-green-color: #242;
+	    --bg-purple-color: #423;
+	    --bg-yellow-color: #430;
+	    --main-color: #bfcfff;
+	    --alt-color: #8f9bbf;
+	    --green-color: #80ffbf;
+	    --purple-color: #ff80bf;
+	    --yellow-color: #ffaf60;
+	    --gray-color: #ccc;
 		}
 
 		body {
@@ -38,8 +38,9 @@
 			border: 6px solid #FFFFFF;
 			position: relative;
 			border-radius: 50px;
-			width: 1000px;
-			height: 300px;
+			width: 100%;
+			min-height: 250px;
+
 		}
 
 		.key {
@@ -58,9 +59,14 @@
 
 		#keys {
 			position: relative;
-			width: 1000px;
-			top: 60px;
-			border: 4px solid #333;
+			width: 100%;
+			margin: auto;
+		}
+
+
+		.answer {
+			position: relative;
+			text-align: center;
 		}
 
 		#category {
@@ -180,7 +186,9 @@
 			<div class="answers">
 				<p id="category"></p>
 				<div id="word" class="answer"></div>
+				<br>
 			</div>
+			<br>
 			<div id="keys" class="keys"></div>
 		</div>
 	</center>
@@ -202,15 +210,68 @@
 	var letters;
 	var displayWord = "";
 	var savedWord;
+	var newWord;
+	var newDefinition;
 
+	var wordObj = {{wordObj | tojson}}
+	var wordList = [];
 
-	var wordObj = {{ wordObj | tojson }}
+	function createList() {
+		wordList = Object.keys(wordObj)
+		document.getElementById('wordBank').innerHTML = wordList[0]
+		for (let i = 1; i < wordList.length; i++) {
+			document.getElementById('wordBank').innerHTML += ', ' + wordList[i]
+			document.getElementById("category").innerHTML = wordList[i];
 
-	wordList = Object.keys(wordObj)
-	document.getElementById('wordBank').innerHTML = wordList[0]
-	for (let i = 1; i < wordList.length; i++) {
-		document.getElementById('wordBank').innerHTML += ', ' + wordList[i]
+			letters = wordList[i].split('');
+			displayWord = "";
+			for (var j = 0; j < wordList[i].length; j++) {
+				//Add an underscore for each character
+				displayWord = displayWord + "_ ";
+				savedWord = displayWord.split('');
+			}
+
+			document.getElementById("word").innerHTML = displayWord;
+		}
 	}
+	createList();
+
+	function newWord() {
+		if (wordObj.place == "your" && wordObj.words == "here") {
+			var wordRequest = new XMLHttpRequest();
+			wordRequest.open('GET', "/getword");
+			wordRequest.onload = function() {
+				newWord = wordRequest.response;
+				var definitionRequest = new XMLHttpRequest();
+				definitionRequest.open('GET', "https://api.dictionaryapi.dev/api/v2/entries/en_US/" + newWord);
+				definitionRequest.onload = function() {
+					newDefinition = JSON.parse(definitionRequest.response);
+					if (newDefinition.title == "No Definitions Found") console.log("noDef");
+					//To do: if word does not have a definition, end this function and generate a new one
+					newDefinition = newDefinition[0].meanings[0].definitions[0].definition;
+					console.log(newDefinition);
+					wordObj = {};
+					wordObj[newWord] = newDefinition;
+					word = newWord;
+					letters = newWord.split('');
+					//To do: add an underscore for each letter
+					console.log(wordObj);
+					document.getElementById("category").innerHTML = wordObj[newWord];
+					displayWord = "";
+					console.log(newWord.length);
+					for (let i = 0; i < newWord.length; i++) {
+						//Add an underscore for each character
+						displayWord = displayWord + "_ ";
+						savedWord = displayWord.split('');
+					}
+					document.getElementById("word").innerHTML = displayWord;
+				};
+				definitionRequest.send();
+			};
+			wordRequest.send();
+		}
+	}
+	newWord();
 
 	function keycolor() {
 		elements = document.getElementsByClassName("keys")

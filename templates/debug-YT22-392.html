@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Games</title>
+    <style>
+      :root {
+        --main-color: #ff8f80;
+      }
+
+      body {
+        background: #303234;
+        color: white;
+      }
+
+      input {
+        color: var(--main-color);
+      }
+    </style>
+  </head>
+  <body>
+    <div style="position: fixed; left: 0; top: 0; width: 100%; height: 48px; box-sizing: border-box; padding: 4px; background: #646567;">
+      <img src="{{ url_for('static', filename='img/backArrowGreen.png') }}" style="width: 32px; margin: 4px;">
+    </div>
+  </body>
+</html>

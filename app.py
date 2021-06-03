@@ -1315,6 +1315,10 @@ def endpoint_getpermissions():
     else:
         return json.dumps(sD.settings['perms'])
 
+@app.route('/getbgm')
+def endpoint_getbgm():
+    return '{"bgm": "'+ str(sD.bgm['nowplaying']) +'"}'
+
 #This endpoint allows you to see the formbars IP with style and shows different colors.
 @app.route('/virtualbar')
 def endpoint_virtualbar():
@@ -1475,7 +1479,7 @@ def new_client(client, server):
 # Called for every client disconnecting
 def client_left(client, server):
     logging.info(studentList[client['address'][0]]['name'] + " disconnected")
-    del studentList[client['address'][0]]['wsID'].
+    del studentList[client['address'][0]]['wsID']
     #Send a message to every client that isn't THIS disconnecting client, telling them the user disconnected
     for i, user in enumerate(server.clients):
         if not server.clients[i] == client:

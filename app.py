@@ -590,11 +590,11 @@ def endpoint_expert():
     return render_template('expert.html')
 
 @app.route('/games')
-def endpoint_expert():
+def endpoint_games():
     return render_template('games.html')
 
 @app.route('/debug')
-def endpoint_expert():
+def endpoint_debug():
     return render_template('debug.html')
 
 #Before choosing endpoints you are required to log in

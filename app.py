@@ -589,6 +589,14 @@ def endpoint_home():
 def endpoint_expert():
     return render_template('expert.html')
 
+@app.route('/games')
+def endpoint_expert():
+    return render_template('games.html')
+
+@app.route('/debug')
+def endpoint_expert():
+    return render_template('debug.html')
+
 #Before choosing endpoints you are required to log in
 @app.route('/login', methods = ['POST', 'GET'])
 def endpoint_login():

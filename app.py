@@ -589,6 +589,14 @@ def endpoint_home():
 def endpoint_expert():
     return render_template('expert.html')
 
+@app.route('/games')
+def endpoint_expert():
+    return render_template('games.html')
+
+@app.route('/debug')
+def endpoint_expert():
+    return render_template('debug.html')
+
 #Before choosing endpoints you are required to log in
 @app.route('/login', methods = ['POST', 'GET'])
 def endpoint_login():
@@ -1289,6 +1297,10 @@ def endpoint_getpermissions():
         return render_template("message.html", forward=request.path, message = "You do not have high enough permissions to do this right now. " )
     else:
         return json.dumps(sD.settings['perms'])
+
+@app.route('/getbgm')
+def endpoint_getbgm():
+    return '{"bgm": "'+ str(sD.bgm['nowplaying']) +'"}'
 
 #This endpoint allows you to see the formbars IP with style and shows different colors.
 @app.route('/virtualbar')

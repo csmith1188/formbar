@@ -9,18 +9,18 @@ First click anywhere on the square box to start the game. To play the game use u
 </head>
 <style>
   :root {
-    --background-color: #333;
-    --bg-dark-color: #222;
-    --bg-highlight-color: #444;
-    --bg-green-color: #243;
+    --background-color: #303234;
+    --bg-dark-color: #202123;
+    --bg-highlight-color: #404345;
+    --bg-green-color: #242;
     --bg-purple-color: #423;
     --bg-yellow-color: #430;
-    --main-color: #bfbfff;
-    --alt-color: #8f8fbf;
+    --main-color: #bfcfff;
+    --alt-color: #8f9bbf;
     --green-color: #80ffbf;
     --purple-color: #ff80bf;
-    --yellow-color: #ffbf00;
-    --gray-color: #aaa;
+    --yellow-color: #ffaf60;
+    --gray-color: #ccc;
   }
 
   html {
@@ -56,7 +56,7 @@ First click anywhere on the square box to start the game. To play the game use u
     width: 40%;
     font-size: 70px;
     font-weight: bold;
-    color: #005744;
+    color: #00ae88;
     float: left;
     position: relative;
     top: 10px;
@@ -85,14 +85,19 @@ First click anywhere on the square box to start the game. To play the game use u
     margin-top: -20px;
   }
 
-  #score {
-    font-size: 50px;
+  #score, #highScore {
+    font-size: 30px;
     color: #7f7e83;
   }
 
-  #addScore {
+  #highScore {
     position: absolute;
-    bottom: 0px;
+    right: 10px;
+    top: 28px;
+  }
+
+  #addScore {
+    display: inline-block;
     font-size: 30px;
     color: #999;
     opacity: .8;
@@ -453,9 +458,12 @@ First click anywhere on the square box to start the game. To play the game use u
     <div class="logo">2048
     SPARTANS</div>
     <div class="scoreBar">
-      <label style="position: relative; top:-13px;">score:</label>
-      <label id="score"> 0</label>
+      <label>Score</label><br>
+      <label id="score">0</label>
       <div id="addScore"></div>
+
+      <label style="position: absolute; right: 10px; top: 10px;">High score</label><br>
+      <label id="highScore">0</label>
     </div>
     <div id="stage"></div>
     <!--<div id="gameOver hide">-->
@@ -463,6 +471,8 @@ First click anywhere on the square box to start the game. To play the game use u
     <!--</div>-->
   </div>
   <script>
+    if (localStorage.getItem("2048HighScore")) document.getElementById("highScore").innerHTML = localStorage.getItem("2048HighScore");
+
     var gameObj = {
       points: {
         score: 0,
@@ -559,7 +569,7 @@ First click anywhere on the square box to start the game. To play the game use u
         return false;
       },
       gameOver: function() {
-        alert('GAVE OVER!');
+        alert('GAME OVER!');
       },
       moveTo: function(obj1, obj2) {
         obj2.boxObj = obj1.boxObj;
@@ -579,6 +589,14 @@ First click anywhere on the square box to start the game. To play the game use u
         var scoreBar = document.getElementById('score');
         scoreBar.innerText = this.points.score;
         scoreBar.textContent = this.points.score;
+        var highScoreBar = document.getElementById('highScore');
+        var highScore = localStorage.getItem("2048HighScore");
+        if (this.points.score > highScore) {
+          highScoreBar.innerText = this.points.score;
+          highScoreBar.textContent = this.points.score;
+          highScoreBar.style.color = "#f04040"
+          localStorage.setItem("2048HighScore", this.points.score);
+        }
         return obj2.boxObj.value;
 
 

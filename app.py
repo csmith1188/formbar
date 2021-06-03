@@ -392,7 +392,7 @@ def surveyBar():
     #Go through IP list and see what each IP sent as a response
     for student in sD.studentDict:
         #add this result to the results list
-        results.append(sD.studentDict[student])
+        results.append(sD.studentDict[student]['survey'])
     #The number of results is how many have complete the survey
     complete = len(results)
     #calculate the chunk length for each student
@@ -405,42 +405,23 @@ def surveyBar():
         pixRange = range((chunkLength * index), (chunkLength * index) + chunkLength)
         #Fill in that chunk with the correct color
         if result == 'a':
-            for i, pix in enumerate(pixRange):
-                #If it's the first pixel of the chunk, make it a special color
-                if i == 0:
-                    pixels[pix] = colors['student']
-                else:
-                    if sD.settings['blind'] and complete != sD.settings['numStudents']:
-                        pixels[pix] = fadein(pixRange, i, colors['blind'])
-                    else:
-                        pixels[pix] = fadein(pixRange, i, colors['red'])
+            answerColor = colors['red']
         elif result == 'b':
-            for i, pix in enumerate(pixRange):
-                if i == 0:
-                    pixels[pix] = colors['student']
-                else:
-                    if sD.settings['blind'] and complete != sD.settings['numStudents']:
-                        pixels[pix] = fadein(pixRange, i, colors['blind'])
-                    else:
-                        pixels[pix] = fadein(pixRange, i, colors['blue'])
+            answerColor = colors['blue']
         elif result == 'c':
-            for i, pix in enumerate(pixRange):
-                if i == 0:
-                    pixels[pix] = colors['student']
-                else:
-                    if sD.settings['blind'] and complete != sD.settings['numStudents']:
-                        pixels[pix] = fadein(pixRange, i, colors['blind'])
-                    else:
-                        pixels[pix] = fadein(pixRange, i, colors['yellow'])
+            answerColor = colors['yellow']
         elif result == 'd':
-            for i, pix in enumerate(pixRange):
-                if i == 0:
-                    pixels[pix] = colors['student']
+            answerColor = colors['green']
+        for i, pix in enumerate(pixRange):
+            #If it's the first pixel of the chunk, make it a special color
+            if i == 0:
+                pixels[pix] = colors['student']
+            else:
+                if sD.settings['blind'] and complete != sD.settings['numStudents']:
+                    pixels[pix] = fadein(pixRange, i, colors['blind'])
                 else:
-                    if sD.settings['blind'] and complete != sD.settings['numStudents']:
-                        pixels[pix] = fadein(pixRange, i, colors['blind'])
-                    else:
-                        pixels[pix] = fadein(pixRange, i, colors['green'])
+                    pixels[pix] = fadein(pixRange, i, answerColor)
+
     if sD.settings['captions']:
         clearString()
         showString("SRVY " + str(complete) + "/" + str(sD.settings['numStudents']))
@@ -488,7 +469,7 @@ def tutdBar():
                     if sD.settings['blind'] and complete != sD.settings['numStudents']:
                         pixels[pix] = fadein(pixRange, i, colors['blind'])
                     else:
-                        pixels[pix] = fadein(pixRange, i, colors['blue'])
+                        pixels[pix] = fadein(pixRange, i, colors['cyan'])
             wiggleFill -= 1
         elif downFill > 0:
             for i, pix in enumerate(pixRange):
@@ -603,16 +584,6 @@ def updateStep():
 def endpoint_home():
     return render_template('index.html')
 
-
-@app.route('/2048')
-def endpoint_2048():
-    if not request.remote_addr in sD.studentDict:
-        return redirect('/login?forward=' + request.path)
-    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
-        return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
-    else:
-        return render_template('2048.html')
-
 #Default formbar in advanced expert mode
 @app.route('/expert')
 def endpoint_expert():
@@ -673,25 +644,6 @@ def endpoint_color():
             return "Bad ArgumentsTry <b>/color?hex=#FF00FF</b> or <b>/color?r=255&g=0&b=255</b>"
         pixels.show()
         return render_template("message.html", message = "Color sent!" )
-
-#This endpoint takes you to the hangman game
-@app.route('/hangman')
-def endpoint_hangman():
-    if not request.remote_addr in sD.studentDict:
-        return redirect('/login?forward=' + request.path)
-    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
-        return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
-    else:
-        if sD.lesson:
-            if sD.lesson.vocab:
-                wordObj = sD.lesson.vocab
-        else:
-            #Need more generic words here
-            wordObj = {
-                'place': 'your',
-                'words': 'here'
-            }
-        return render_template("hangman.html", wordObj=wordObj)
 
 @app.route('/segment')
 def endpoint_segment():
@@ -1113,7 +1065,7 @@ def endpoint_needshelp():
             resString = '<meta http-equiv="refresh" content="5">'
             if not helpList:
                 resString += "No tickets yet. <button onclick='location.reload();'>Try Again</button>"
-                return resString
+                return render_template("needshelp.html", table = resString)
             else:
                 resString += "<table border=1>"
                 for ticket in helpList:
@@ -1230,6 +1182,35 @@ def endpoint_sendblock():
 @app.route('/getpix')
 def endpoint_getpix():
     return '{"pixels": "'+ str(pixels[:BARPIX]) +'"}'
+
+
+@app.route('/2048')
+def endpoint_2048():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
+    else:
+        return render_template('2048.html')
+
+#This endpoint takes you to the hangman game
+@app.route('/hangman')
+def endpoint_hangman():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
+    else:
+        if sD.lesson:
+            if sD.lesson.vocab:
+                wordObj = sD.lesson.vocab
+        else:
+            #Need more generic words here
+            wordObj = {
+                'place': 'your',
+                'words': 'here'
+            }
+        return render_template("hangman.html", wordObj=wordObj)
 
 #Tic Tac Toe
 @app.route('/ttt')

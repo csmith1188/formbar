@@ -1302,7 +1302,11 @@ def endpoint_getpermissions():
 
 @app.route('/getbgm')
 def endpoint_getbgm():
-    return '{"bgm": "'+ str(sD.bgm['nowplaying']) +'"}'
+    return json.dumps(sD.bgm)
+
+@app.route('/getsession')
+def endpoint_getsession():
+    return json.dumps(sD)
 
 #This endpoint allows you to see the formbars IP with style and shows different colors.
 @app.route('/virtualbar')

@@ -7,6 +7,9 @@
     <title>{% block title %}{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='homeImages/favicon.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tabs.css') }}">
+    <script src="{{ url_for('static', filename='jquery/external/jquery/jquery.js') }}" charset="utf-8"></script>
+    <script src="{{ url_for('static', filename='jquery/jquery-ui.min.js') }}" charset="utf-8"></script>
     {% block style %}{% endblock %}
     {% block script %}{% endblock %}
 </head>

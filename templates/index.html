@@ -4,10 +4,8 @@
 
 <!-- Change title here -->
 {% block title %}Formbar Home{% endblock %}
-{% block style %}
-<link rel="stylesheet" href="../static/css/tabs.css">{% endblock %}
-{% block script %}<script src="../static/jquery/external/jquery/jquery.js" charset="utf-8"></script>
-<script src="../static/jquery/jquery-ui.min.js" charset="utf-8"></script>
+{% block style %}{% endblock %}
+{% block script %}
 <script>
     $(function() {
         $("#tabcontainer").accordion();
@@ -73,7 +71,7 @@
         <div class="entrylink -red" onclick="window.location = '/needshelp';">
             Help Tickets (/needshelp)
         </div>
-        <div class="entrylink -red" onclick="window.location = '/debug';">
+        <div class="entrylink -yellow" onclick="window.location = '/debug';">
             API Debug (/debug)
         </div>
     </div>

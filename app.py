@@ -412,6 +412,8 @@ def surveyBar():
             answerColor = colors['yellow']
         elif result == 'd':
             answerColor = colors['green']
+        else:
+            answerColor = colors['default']
         for i, pix in enumerate(pixRange):
             #If it's the first pixel of the chunk, make it a special color
             if i == 0:

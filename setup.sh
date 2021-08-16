@@ -7,6 +7,7 @@ sudo apt-get -y install python3-pip
 sudo apt-get -y install libatlas-base-dev
 sudo apt-get -y install libsdl-ttf2.0-0
 sudo apt-get -y install python3-sdl2
+sudo apt-get -y install screen
 #install modules
 sudo pip3 install rpi_ws281x adafruit-circuitpython-neopixel
 sudo python3 -m pip install --force-reinstall adafruit-blinka

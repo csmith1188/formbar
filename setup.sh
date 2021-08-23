@@ -2,7 +2,7 @@
 
 #install packages
 sudo apt update
-sudo apt upgrade
+sudo apt upgrade -y
 sudo apt-get -y install python3-pip
 sudo apt-get -y install libatlas-base-dev
 sudo apt-get -y install libsdl-ttf2.0-0

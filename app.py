@@ -589,7 +589,7 @@ def endpoint_home():
 #Default formbar in advanced expert mode
 @app.route('/expert')
 def endpoint_expert():
-    return render_template('expert.html')
+    return render_template('expert.html', username = sD.studentDict[request.remote_addr]['name'], serverIp = ip, bgm = bgm.bgm.items(), sfx = sfx.sound.items())
 
 @app.route('/games')
 def endpoint_games():
@@ -598,6 +598,10 @@ def endpoint_games():
 @app.route('/debug')
 def endpoint_debug():
     return render_template('debug.html')
+
+@app.route('/fighter')
+def endpoint_fighter():
+    return render_template('fighter.html', username = sD.studentDict[request.remote_addr]['name'], serverIp = ip)
 
 #Before choosing endpoints you are required to log in
 @app.route('/login', methods = ['POST', 'GET'])
@@ -1193,6 +1197,10 @@ def endpoint_sendblock():
 def endpoint_getpix():
     return '{"pixels": "'+ str(pixels[:BARPIX]) +'"}'
 
+@app.route('/getphrase')
+def endpoint_getphrase():
+    return '{"phrase": "'+ str(sD.activePhrase) +'"}'
+
 
 @app.route('/2048')
 def endpoint_2048():
@@ -1303,6 +1311,10 @@ def endpoint_getpermissions():
 @app.route('/getbgm')
 def endpoint_getbgm():
     return '{"bgm": "'+ str(sD.bgm['nowplaying']) +'"}'
+
+@app.route('/getquizname')
+def endpoint_getquizname():
+return '{"quizname": "'+ str(sD.activeQuiz['name']) +'"}'
 
 #This endpoint allows you to see the formbars IP with style and shows different colors.
 @app.route('/virtualbar')
@@ -1471,6 +1483,8 @@ def client_left(client, server):
 def message_received(client, server, message):
     try:
         message = json.loads(message)
+        if message['game'] == 'fighter':
+            server.send_message(message.to, json.dumps(message))
         if message['type'] == 'ttt':
             #For now, this will only forward the gamestate. We'll do validation later.
             #server.send_message(message.to, json.dumps(message))

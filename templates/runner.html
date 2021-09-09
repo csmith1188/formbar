@@ -1,0 +1,38 @@
+{% extends 'header.html' %}
+<!-- ^^ This means add this file to the end of the contents of header.html -->
+<!-- This is where the title, top buttons, and stylesheet is located -->
+
+<!-- Change title here -->
+{% block title %}Runner{% endblock %}
+
+<!-- Extra style declarations here -->
+{% block style %}
+  <style>
+    body {
+      background: var(--bg-dark);
+      color: white;
+      font: 16px "Segoe UI", sans-serif;
+    }
+  </style>
+{% endblock %}
+
+<!-- Extra javascript here -->
+{% block script %}{% endblock %}
+
+<!-- Main content here -->
+{% block main %}
+  <div id="howToPlay">
+    <h1>How to play</h1>
+    You are the blue dot.<br>
+    Press space or up to dodge red dots.<br>
+    Press down to dodge orange dots.
+    <h2>Power-ups</h2>
+    <h3>Dash</h3>
+    , destroying all obstacles in your path.
+    <h3>Bonus</h3>
+    Adds five gold dots that increase your score when touched.
+    <h3>Shield</h3>
+    Protects you from obstacles. Disappears after 15 seconds or when you hit an obstacle.
+    <h2>Vs. mode</h2>
+  </div>
+{% endblock %}

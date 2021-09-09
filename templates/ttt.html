@@ -146,12 +146,12 @@
 
       if (player.shape == "X") {
         var x = document.createElement("img");
-        x.setAttribute("src", "{{ url_for('static', filename='img/X.png') }}");
+        x.setAttribute("src", "{{ url_for('static', filename='img/ttt/X.png') }}");
 
         document.getElementById(square).appendChild(x);
       } else if (player.shape == "O") {
         var o = document.createElement("img");
-        o.setAttribute("src", "{{ url_for('static', filename='img/O.png') }}");
+        o.setAttribute("src", "{{ url_for('static', filename='img/ttt/O.png') }}");
 
         document.getElementById(square).appendChild(o);
       }

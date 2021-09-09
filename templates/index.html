@@ -58,8 +58,13 @@
         <div class="entrylink -red" onclick="window.location = '/ttt';">
             Tic-Tac-Toe (/ttt)
         </div>
+<<<<<<< Updated upstream
         <div class="entrylink -yellow" onclick="window.location = '/games';">
             All Games (/games)
+=======
+        <div class="entrylink -yellow" onclick="window.location = '/fighter';">
+            Turn-Based Fighter (/fighter)
+>>>>>>> Stashed changes
         </div>
     </div>
     <h3 class="tab">Teacher</h3>
@@ -83,10 +88,10 @@
   //ep will be true if user made expert mode their default
   let ep = localStorage.getItem("expertPreference");
   let urlParams = new URLSearchParams(window.location.search);
-  let ud = urlParams.get('useDefault');
+  let nr = urlParams.get('noRedirect');
 
-  //Redirect to /expert if ep is true, unless url parameter "useDefault" is true
-  if (ep && !ud) window.location = "/expert";
+  //Redirect to /expert if ep is true, unless url parameter "noRedirect" is true
+  if (ep && !nr) window.location = "/expert";
 </script>
 
 {% endblock %}

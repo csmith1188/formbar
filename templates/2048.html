@@ -8,21 +8,6 @@ First click anywhere on the square box to start the game. To play the game use u
   <script type="text/javascript" src="game2048.js"></script>
 </head>
 <style>
-  :root {
-    --background-color: #303234;
-    --bg-dark-color: #202123;
-    --bg-highlight-color: #404345;
-    --bg-green-color: #242;
-    --bg-purple-color: #423;
-    --bg-yellow-color: #430;
-    --main-color: #bfcfff;
-    --alt-color: #8f9bbf;
-    --green-color: #80ffbf;
-    --purple-color: #ff80bf;
-    --yellow-color: #ffaf60;
-    --gray-color: #ccc;
-  }
-
   html {
     height: 100%;
     -moz-user-select: none;
@@ -39,7 +24,7 @@ First click anywhere on the square box to start the game. To play the game use u
   }
 
   body {
-    background-color: var(--background-color);
+    background-color: var(--bg-dark);
     color: white;
     font-family: "Times New Roman", Times, serif;
   }
@@ -56,7 +41,7 @@ First click anywhere on the square box to start the game. To play the game use u
     width: 40%;
     font-size: 70px;
     font-weight: bold;
-    color: #00ae88;
+    color: var(--color-green);
     float: left;
     position: relative;
     top: 10px;
@@ -124,16 +109,26 @@ First click anywhere on the square box to start the game. To play the game use u
     -webkit-transition: all .5s ease;
   }
 
+  #gameOver {
+    position: fixed;
+    color: var(--light-red);
+    left: 50%;
+    transform: translateX(-50%);
+    top: 27%;
+    font-size: 32px;
+    display: none;
+  }
+
   #stage {
-    background: #000000;
-    cursor: pointer;
+    background: var(--bg-darker);
+    cursor: move;
     -moz-user-select: none;
     -khtml-user-select: none;
     user-select: none;
     position: absolute;
     width: 450px;
     height: 450px;
-    top: 50%;
+    top: 55%;
     left: 0;
     margin-top: -200px;
     border: 1px solid #eee;
@@ -142,16 +137,18 @@ First click anywhere on the square box to start the game. To play the game use u
 
   #undo {
     position: relative;
-    z-index: 990;
+    z-index: 2;
   }
 
-  .cover {
+  #cover {
     position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    z-index: 999;
+    z-index: 2;
     opacity: 0.1;
-    cursor: pointer;
+    cursor: move;
   }
 
   .row0 {
@@ -233,7 +230,7 @@ First click anywhere on the square box to start the game. To play the game use u
     position: absolute;
     text-align: center;
     line-height: 100px;
-    cursor: pointer;
+    cursor: move;
     background: #fff;
     font-size: 43px;
     -moz-user-select: none;
@@ -393,6 +390,41 @@ First click anywhere on the square box to start the game. To play the game use u
     -webkit-transition: all .2s ease;
   }
 
+  #newGameButton {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 87%;
+    padding: 8px 16px;
+    font: 30px "Times New Roman", Times, serif;
+    border-radius: 12px;
+    background: var(--bg-darker);
+    color: var(--color-green);
+    border: 2px solid;
+    cursor: pointer;
+    z-index: 3;
+  }
+
+  #newGameButton:hover {
+    background: var(--bg-dark-highlight);
+  }
+
+  .newButtonAnimation:not(:hover) {
+    animation: oscillate 1.5s infinite;
+  }
+
+  @keyframes oscillate {
+    0% {
+      background: var(--bg-darker);
+    }
+    50% {
+      background: var(--bg-dark-highlight);
+    }
+    100% {
+      background: var(--bg-darker);
+    }
+  }
+
   @keyframes myfirst {
     0% {
       opacity: 0;
@@ -453,7 +485,7 @@ First click anywhere on the square box to start the game. To play the game use u
 
 <body>
 
-  <div class="cover"></div>
+  <div id="cover"></div>
   <div class="container">
     <div class="logo">2048
     SPARTANS</div>
@@ -465,10 +497,12 @@ First click anywhere on the square box to start the game. To play the game use u
       <label style="position: absolute; right: 10px; top: 10px;">High score</label><br>
       <label id="highScore">0</label>
     </div>
+    <div id="gameOver">GAME OVER!</div>
     <div id="stage"></div>
     <!--<div id="gameOver hide">-->
     <!--<div class="overText">GameOver!</div>-->
     <!--</div>-->
+    <button id="newGameButton" onclick="window.location.reload();">New game</button>
   </div>
   <script>
     if (localStorage.getItem("2048HighScore")) document.getElementById("highScore").innerHTML = localStorage.getItem("2048HighScore");
@@ -569,7 +603,9 @@ First click anywhere on the square box to start the game. To play the game use u
         return false;
       },
       gameOver: function() {
-        alert('GAME OVER!');
+        document.getElementById("gameOver").style.display = "block";
+        document.getElementById("cover").style.cursor = "not-allowed";
+        document.getElementById("newGameButton").classList.add("newButtonAnimation");
       },
       moveTo: function(obj1, obj2) {
         obj2.boxObj = obj1.boxObj;

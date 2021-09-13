@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <!-- Defines color variables, e.g. var(--color-red) -->
+    <!-- Defines color variables, e.g. var(color--red) -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/colors.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='homeImages/favicon.png') }}">
     {% block style %}{% endblock %}

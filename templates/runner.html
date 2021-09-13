@@ -10,8 +10,19 @@
   <style>
     body {
       background: var(--bg-dark);
+      background: black;
       color: white;
       font: 16px "Segoe UI", sans-serif;
+    }
+
+    #pixBox {
+      width: 100%;
+      height: 16px;
+      box-sizing: border-box;
+      border: 1px solid white;
+      display: flex;
+      justify-content: space-around;
+      user-select: none;
     }
   </style>
 {% endblock %}
@@ -23,16 +34,74 @@
 {% block main %}
   <div id="howToPlay">
     <h1>How to play</h1>
-    You are the blue dot.<br>
-    Press space or up to dodge red dots.<br>
-    Press down to dodge orange dots.
+    You are the green dot. Click the "Jump" button or press space to dodge red dots. Click on a power-up to use it.<br>
     <h2>Power-ups</h2>
-    <h3>Dash</h3>
-    , destroying all obstacles in your path.
+    <h3>Boost</h3>
+    Dash 100 points ahead, destroying all obstacles in your path.
     <h3>Bonus</h3>
     Adds five gold dots that increase your score when touched.
     <h3>Shield</h3>
     Protects you from obstacles. Disappears after 15 seconds or when you hit an obstacle.
     <h2>Vs. mode</h2>
   </div>
+  <span id="pixBox"></span>
+
+  <script>
+    let pix = Array(80).fill("black");
+    function updatePix() {
+      pixBox.innerHTML = null;
+      for (let i = pix.length - 1; i >= 0; i--) pixBox.innerHTML += `<div style="display: inline; flex-grow: 1; overflow: hidden; background-color: ${pix[i]};">&nbsp;</div>`;
+    }
+    let redChance = 0.05;
+    let jumping = false;
+    let score = 0;
+    let speed = 100;
+    let bonus = 0;
+    let shield = true;
+    updatePix();
+
+    let move = setInterval(() => {
+      if (pix[78] == "red" && pix[79] == "lime") {
+        alert("Game over");
+        clearInterval(move);
+      } else if (pix[78] == "red" && pix[79] == "cyan") {
+        shield = false;
+      } else if (pix[78] == "gold" && (pix[79] == "lime" || pix[79] == "cyan")) {
+        score += 2000;
+      }
+      let newPix = "black";
+      if (Math.random() < redChance && ![pix[1], pix[2]].includes("red")) newPix = "red";
+      else if (bonus && Math.random() < 0.05) {
+        newPix = "gold";
+        bonus--;
+      }
+      pix.unshift(newPix);
+      pix.pop();
+      if (!jumping) {
+        if (shield) pix[79] = "cyan";
+        else pix[79] = "lime";
+      }
+      updatePix();
+      score += 100;
+      console.log(score);
+      redChance +=  0.0001; //Slightly increase the rate at which obstacles spawn
+      speed -= 0;
+    }, speed);
+
+    function jump() {
+      jumping = true;
+      pix[79] = "black";
+      updatePix();
+      setTimeout(() => {
+        jumping = false;
+        if (shield) pix[79] = "cyan";
+        else pix[79] = "lime";
+        updatePix();
+      }, speed * 3);
+    }
+
+    document.onkeydown = () => {
+      if (event.code == "Space") jump();
+    };
+  </script>
 {% endblock %}

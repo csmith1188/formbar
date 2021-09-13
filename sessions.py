@@ -12,6 +12,7 @@ class Session():
             'paused': False
         }
         self.ttt = []
+        self.fighter = {}
         self.settings = {
             'perms': {
                 'admin' : 0,

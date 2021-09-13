@@ -589,7 +589,7 @@ def endpoint_home():
 #Default formbar in advanced expert mode
 @app.route('/expert')
 def endpoint_expert():
-    return render_template('expert.html', username = sD.studentDict[request.remote_addr]['name'], serverIp = ip, bgm = bgm.bgm.items(), sfx = sfx.sound.items())
+    return render_template('expert.html')
 
 @app.route('/games')
 def endpoint_games():
@@ -979,7 +979,7 @@ def endpoint_survey():
         vote = request.args.get('vote')
         if vote:
             if vote in ["a", "b", "c", "d"]:
-                if not sD.studentDict[request.remote_addr]['survey']:
+                if sD.studentDict[request.remote_addr]['survey'] != vote:
                     sD.studentDict[request.remote_addr]['survey'] = vote
                     playSFX("sfx_blip01")
                     surveyBar()
@@ -1010,8 +1010,8 @@ def endpoint_tutd():
         if thumb:
             # logging.info("Recieved " + thumb + " from " + name + " at ip: " + ip)
             if thumb == 'up' or thumb == 'down' or thumb == 'wiggle' :
-                if not sD.studentDict[request.remote_addr]['thumb']:
-                    sD.studentDict[request.remote_addr]['thumb'] = request.args.get('thumb')
+                if sD.studentDict[request.remote_addr]['thumb'] != thumb: #!test
+                    sD.studentDict[request.remote_addr]['thumb'] = thumb
                     tutdBar()
                     return render_template("message.html", forward=request.path, message = "Thank you for your tasty bytes... (" + thumb + ")" )
                 else:
@@ -1314,7 +1314,20 @@ def endpoint_getbgm():
 
 @app.route('/getquizname')
 def endpoint_getquizname():
-return '{"quizname": "'+ str(sD.activeQuiz['name']) +'"}'
+    return '{"quizname": "'+ str(sD.activeQuiz['name']) +'"}'
+
+@app.route('/getfightermatches')
+def endpoint_getfightermatches():
+    return '{"matches": "'+ str(sD.fighter) +'"}'
+
+@app.route('/createfightermatch')
+def endpoint_createfightermatch():
+    sD.fighter['match' + request.args.get('code')] = {} #Create new object for match
+    sD.fighter['match' + request.args.get('code')]['leader'] = request.args.get('name') #Set "leader" of object to arg "name"
+
+@app.route('/addfighteropponent')
+def endpoint_addfighteropponent():
+    sD.fighter['match' + request.args.get('code')]['opponent'] = request.args.get('name') #Set "leader" of object to arg "name"
 
 #This endpoint allows you to see the formbars IP with style and shows different colors.
 @app.route('/virtualbar')

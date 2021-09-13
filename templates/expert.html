@@ -8,39 +8,6 @@
 <!-- Extra style declarations here -->
 {% block style %}
 <style>
-  :root {
-    --color-red: #bf0000;
-    --color-brown: #802000;
-    --color-orange: #ff4000;
-    --color-gold: #fa0;
-    --color-yellow: #ffbf00;
-    --color-green: #00bf00;
-    --color-cyan: #009fbf;
-    --color-blue: #0040bf;
-    --color-purple: #bf00ff;
-    --color-pink: #ff4080;
-    --dark-gray: #555;
-
-    --light-red: #ff6860;
-    --light-brown: #bf6040;
-    --light-orange: #ffaf60;
-    --light-yellow: #ffdf80;
-    --light-green: #80ff80;
-    --light-cyan: #80ffbf;
-    --ice-blue: #bfcfff;
-    --light-blue: #8f9bbf;
-    --light-purple: #df80ff;
-    --light-pink: #ff80bfff;
-    --light-gray: #ccc;
-
-    --bg-dark: #303234;
-    --bg-darker: #202123;
-    --bg-dark-highlight: #404345;
-    --bg-dark-purple: #423;
-    --bg-dark-green: #423;
-    --bg-dark-yellow: #430;
-  }
-
   body {
     font: 16px "Segoe UI", sans-serif;
     background: var(--bg-dark);
@@ -160,6 +127,10 @@
     color: var(--color-green);
   }
 
+  .cyan {
+    color: var(--color-cyan);
+  }
+
   .blue {
     color: var(--color-blue);
   }
@@ -236,7 +207,7 @@
   }
 
   #logIn {
-    color: #0040bf;
+    color: var(--color-blue);
     text-decoration: underline;
     cursor: pointer;
   }
@@ -252,6 +223,7 @@
   #tabs {
     width: 100%;
     height: 32px;
+    box-sizing: border-box;
     display: flex;
     background: var(--bg-darker);
     border-bottom: 1px solid var(--dark-gray);
@@ -311,16 +283,20 @@
     background: var(--color-purple);
   }
 
+  #debugTab.open {
+    background: var(--color-red);
+  }
+
   #gamesTab.open, #gamesMenu > .open {
     background: var(--color-green);
   }
 
   #teacherTab.open, #teacherMenu > .open {
-    background: var(--color-red);
+    background: var(--color-orange);
   }
 
   #urlLabel {
-    color: gray;
+    color: var(--light-gray);
     cursor: pointer;
   }
 
@@ -362,7 +338,7 @@
     <div id="tutdDiv" class="hidden">
       <img src="{{ url_for('static', filename='img/expert/thumbButton0.png') }}" id="thumbButton0" class="thumbButton green" title="Thumbs up" onclick="thumbsVote(0);" tabindex="0">
       <br>
-      <img src="{{ url_for('static', filename='img/expert/thumbButton1.png') }}" id="thumbButton1" class="thumbButton blue" title="Wiggle" onclick="thumbsVote(1);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/expert/thumbButton1.png') }}" id="thumbButton1" class="thumbButton cyan" title="Wiggle" onclick="thumbsVote(1);" tabindex="0">
       <br>
       <img src="{{ url_for('static', filename='img/expert/thumbButton2.png') }}" id="thumbButton2" class="thumbButton red" title="Thumbs down" onclick="thumbsVote(2);" tabindex="0">
       <br><br><br>
@@ -461,6 +437,7 @@
   <div id="tabs">
     <div id="chatTab" class="tab" title="/chat" onclick="openPage('chat');"><img src="{{ url_for('static', filename='img/expert/chat.png') }}" class="icon"> <span id="newMessages" style="color: var(--light-red);"></span> Chat</div>
     <div id="wawdTab" class="tab" title="/wawd" onclick="openPage('wawd');"><img src="{{ url_for('static', filename='img/expert/wawd.png') }}" class="icon"> WAWD?</div>
+    <div id="debugTab" class="tab" title="/debug" onclick="openPage('debug');"><img src="{{ url_for('static', filename='img/expert/debug.png') }}" class="icon"> API debug & virtual bar</div>
     <div id="gamesTab" class="tab dropdown" onclick="showMenu('games');"><img src="{{ url_for('static', filename='img/expert/games.png') }}" class="icon"> Games</div>
     <div id="gamesMenu" class="menu hidden" tabindex="-1">
       <div id="fighterTab" class="tab" title="/fighter" onclick="openPage('fighter');">Turn-Based Fighter</div>
@@ -473,25 +450,24 @@
       <div id="settingsTab" class="tab" title="/settings" onclick="openPage('settings');">Settings</div>
       <div id="lessonTab" class="tab" title="/lesson" onclick="openPage('lesson');">Lesson</div>
       <div id="needshelpTab" class="tab" title="/needshelp" onclick="openPage('needshelp');">Help tickets</div>
-      <div id="debugTab" class="tab" title="/debug" onclick="openPage('debug');">API debug & virtual bar</div>
     </div>
     <div id="urlTab" class="tab" onclick="inputURL();">
       <img src="{{ url_for('static', filename='img/expert/search.png') }}" class="icon">
       <span id="url" class="hidden">
-        <label for="urlInput" id="urlLabel">{{ serverIp }}/</label><input type="text" id="urlInput"></input>
+        <label for="urlInput" id="urlLabel">192.168.10.82/</label><input type="text" id="urlInput"></input>
       </span>
     </div>
     <div id="reload" class="tab" style="margin-left: auto;" title="Reload" onclick="document.getElementById('mainWindow').contentWindow.location.reload();"><img src="{{ url_for('static', filename='img/expert/reload.png') }}" class="icon"></div>
   </div>
 
   <div>
-    <iframe src="/chat" id="mainWindow" onload="pageOpened(this.contentWindow.location.pathname);"></iframe>
+    <iframe src="file:///C:/Users/Admin/OneDrive%20-%20York%20County%20School%20of%20Technology/Programming/GitHub/formbar/templates/fighter.html" id="mainWindow" onload="pageOpened(this.contentWindow.location.pathname);"></iframe>
   </div>
 </div>
 
 <script>
   let request = new XMLHttpRequest();
-  let ws = new WebSocket("ws://{{ serverIp }}:9001");
+  let ws = new WebSocket("ws://192.168.10.82:9001");
   let ep = localStorage.getItem("expertPreference");
   let thumbButtons = document.querySelectorAll(".thumbButton");
   let letterButtons = document.querySelectorAll(".letterButton");
@@ -507,21 +483,23 @@
 
   window.onload = () => {
     mode();
-    bottomPosition();
     setMenuWidths();
+    updateVotes();
     nowPlaying();
-    quizName();
     logIn();
+    showEnabled();
+    bottomPosition();
+    //quizName();
     if (ep === null) ep = confirm("Do you want to use expert mode by default? " + "You will be redirected to this page automatically." + "\n" + "Choose \"Cancel\" to continue using the standard homepage.");
     setDefault(ep);
     openPage("chat");
     setInterval(() => {
       mode();
-      showEnabled();
-      bottomPosition();
       updateVotes();
       nowPlaying();
-      quizName();
+      showEnabled();
+      bottomPosition();
+      //quizName();
     }, 3000);
   };
 
@@ -552,18 +530,18 @@
     let meRes = JSON.parse(request.responseText);
     let myPerms = meRes.perms;
 
-    request.open("GET", '/getme', false);
+    request.open("GET", '/getpermissions', false);
     request.send(null);
     let permsRes = JSON.parse(request.responseText);
     let sfxPerm = permsRes.sfx;
     let bgmPerm = permsRes.bgm;
     let ledPerm = permsRes.bar;
 
-    if (myPersm <= sfxPerm) soundDiv.classList.remove("hidden");
+    if (myPerms <= sfxPerm) soundDiv.classList.remove("hidden");
     else soundDiv.classList.add("hidden");
-    if (myPerms <= bgmPerm) soundDiv.classList.remove("hidden");
+    if (myPerms <= bgmPerm) musicDiv.classList.remove("hidden");
     else musicDiv.classList.add("hidden");
-    ["textDiv", "colorDiv", "percentDiv"].forEach(div => {
+    [textDiv, colorDiv, percentDiv].forEach(div => {
       if (myPerms <= ledPerm) div.classList.remove("hidden");
       else div.classList.add("hidden");
     });
@@ -584,7 +562,7 @@
   window.addEventListener("resize", bottomPosition);
 
   function setMenuWidths() {
-    ["games", "teacher"].forEach(group => document.getElementById(group + "Menu").style.left = document.getElementById(group + "Tab").getBoundingClientRect().left); //Give menu same X position as tab
+    ["games", "teacher"].forEach(group => document.getElementById(group + "Menu").style.left = document.getElementById(group + "Tab").getBoundingClientRect().left + "px"); //Give menu same X position as tab
   }
 
   function logIn(manual) {
@@ -631,8 +609,7 @@
 
   Array.from(thumbButtons).forEach((button, i) => {
     button.addEventListener("keydown", event => {
-      //Enter key
-      if (event.keyCode == 13) {
+      if (event.code == "Enter") {
         thumbsVote(i);
       }
     });
@@ -640,8 +617,7 @@
 
   Array.from(letterButtons).forEach((button, i) => {
     button.addEventListener("keydown", event => {
-      //Enter key
-      if (event.keyCode == 13) {
+      if (event.code == "Enter") {
         letterVote(i);
       }
     });
@@ -688,7 +664,7 @@
       }
       //Highlight selected button and reset others
       Array.from(letterButtons).forEach((button, i) => {
-        if (i == thumb) highlight("letterButton" + letter);
+        if (i == letter) highlight("letterButton" + letter);
         else removeHighlight("letterButton" + i);
       });
     }
@@ -702,12 +678,13 @@
     let thumb;
     if (res.thumb == "up") thumb = 0;
     else if (res.thumb == "wiggle") thumb = 1;
-    else if (res.thumb == "up") thumb = 2;
-    let letter = "";
-    if (!thumb) thumbsVote(chosenThumb); //Remove the vote
-    else if (thumb != chosenThumb) thumbsVote(thumb);
-    if (!letter) thumbsVote(chosenLetter); //Remove the vote
-    else if (letter != chosenLetter) letterVote(letter);
+    else if (res.thumb == "down") thumb = 2;
+    else thumb = false;
+    let letter;
+    if (thumb === false && chosenThumb) thumbsVote(chosenThumb); //Remove the vote
+    else if (thumb !== chosenThumb) thumbsVote(thumb);
+    ////if (letter === false && chosenLetter) thumbsVote(chosenLetter); //Remove the vote
+    ////else if (letter != chosenLetter) letterVote(letter);
   }
 
   function highlight(image) {
@@ -719,7 +696,7 @@
 
   function removeHighlight(image) {
     let button = document.getElementById(image);
-    button.src = "/static/img/expert/" + image + ".png') }}"
+    button.src = "/static/img/expert/" + image + ".png"
     button.classList.remove("highlight");
     if (image == "thumbButton0") button.title = "Thumbs up";
     if (image == "thumbButton1") button.title = "Wiggle";
@@ -743,8 +720,7 @@
   }
 
   document.getElementById("sound").addEventListener("keydown", event => {
-    //Enter key
-    if (event.keyCode == 13) sendSound();
+    if (event.code == "Enter") sendSound();
   });
 
   document.getElementById("volume").addEventListener("input", () => {
@@ -772,8 +748,7 @@
   }
 
   document.getElementById("music").addEventListener("keydown", event => {
-    //Enter key
-    if (event.keyCode == 13) sendMusic();
+    if (event.code == "Enter") sendMusic();
   });
 
   document.getElementById("nowPlayingTitle").innerText = "aaa";
@@ -816,8 +791,7 @@
   }
 
   document.getElementById("text").addEventListener("keydown", event => {
-    //Enter key
-    if (event.keyCode == 13) sendText();
+    if (event.code == "Enter") sendText();
   });
 
   function hideSegment() {
@@ -871,15 +845,15 @@
   }
 
   document.getElementById("percent").addEventListener("keydown", event => {
-    //Enter key
-    if (event.keyCode == 13) sendPercent();
+    if (event.code == "Enter") sendPercent();
   });
 
   function quizName() {
     request.open("GET", '/getquizname', false);
     request.send(null);
     let res = JSON.parse(request.responseText);
-    let quizName = res.quizname;
+    let quizName;
+    if (res) quizName = res.quizname;
 
     if (quizName) document.getElementById("quizName").innerText = quizName;
   }
@@ -896,9 +870,8 @@
   }
 
   document.getElementById("urlInput").addEventListener("click", event => event.stopPropagation()); //Don't hide input when clicked
-  document.getElementById("urlInput").addEventListener("keydown", event => {
-    //Enter key
-    if (event.keyCode == 13) openPage(this.value);
+  document.getElementById("urlInput").addEventListener("keydown", function(event) {
+    if (event.code == "Enter") openPage(this.value);
   });
 
   function openPage(page) {
@@ -911,11 +884,14 @@
 
     if (path == "/") mainWindow.contentWindow.location = "/?noRedirect=true";
     else if (path == "/expert") openPage("chat");
-    else if (content.innerHTML.includes("Go back")) { //Detects if the page has an error message (Is there a better way to do this?)
+    else if (!content) {
       //Put error message in alert and go back
+      let message = mainWindow.contentWindow.document.body.innerText;
+      mainWindow.contentWindow.history.back();
+      setTimeout(() => alert(message), 20); //Add a brief delay so page doesn't change
+    } else if (content.innerHTML.includes("Go Back")) { //Detects if the page has an error message (Is there a better way to do this?)
       let message = content.innerText.slice(0, -9);
       mainWindow.contentWindow.history.back();
-      setTimeout(() => alert(message), 20); ////Add a brief delay so page doesn't change
     }
 
     let tabs = document.querySelectorAll(".tab");
@@ -943,7 +919,7 @@
   }
 
   menus.forEach(menu => menu.addEventListener("blur", function() {this.classList.add("hidden");})) //Hide menu when user clicks elsewhere
-  menus.forEach(menu => menu.addEventListener("keydown", function(event) {if (event.keyCode == 27) this.blur();})) //Hide menu when Esc key pressed
+  menus.forEach(menu => menu.addEventListener("keydown", function(event) {if (event.code == "Escape") this.blur();})) //Hide menu when Esc key pressed
 
   ws.onmessage = message => {
     let data = JSON.parse(message.data);
@@ -962,7 +938,6 @@
   document.addEventListener("visibilitychange", () => {if (!document.hidden && mainWindow.contentWindow.location.pathname == "chat") document.title = "Expert Homepage"}); //When user goes to this page, if chat is open, remove number of new messages from title
 
   /*To do:
-  -updateVotes()
   -Automatically get sfx and bgm arrays from server
   -Enable/disable features individually instead of by mode
   -Alerts from sidebar

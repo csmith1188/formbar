@@ -94,12 +94,12 @@
 
     h3 {
       margin: 0;
-      font-size: 22px;
+      font-size: 20px;
     }
 
     h4 {
       margin: 0;
-      font-size: 18px;
+      font-size: 16px;
     }
 
     button {
@@ -242,11 +242,12 @@
     }
 
     .fighter {
-      width: 515px;
-      height: 305px;
+      width: 450px;
+      height: 280px;
       padding: 8px;
       border-radius: 8px;
       color: var(--bg-dark);
+      font-size: 14px;
     }
 
     .red {
@@ -424,8 +425,8 @@
       width: 90%;
       padding: 16px;
       display: grid;
-      grid-template-columns: repeat(4, 515px);
-      grid-template-rows: repeat(2, 305px);
+      grid-template-columns: repeat(4, 450px);
+      grid-template-rows: repeat(2, 280px);
       gap: 32px;
       overflow: auto;
     }
@@ -518,7 +519,7 @@
     #gameContainer {
       top: 0;
       left: 0;
-      width: calc(100% - 452px);
+      width: 80%;
       height: 100%;
       padding: 8px;
       overflow: auto;
@@ -528,9 +529,9 @@
       top: 0;
       left: 0;
       width: 100%;
-      min-width: 1468px;
+      min-width: 1200px;
       height: 100%;
-      min-height: 920px;
+      min-height: 900px;
       padding: 8px;
     }
 
@@ -641,7 +642,7 @@
     #gameChat {
       top: 0;
       right: 0;
-      width: 452px;
+      width: 20%;
       height: 100%;
       border: none;
       border-left: 1px solid;
@@ -1158,6 +1159,9 @@
     let defeated = [];
     let damageProperties = ["damage", "minDamage", "maxDamage", "critDamage", "secondaryDamage", "combinedDamage", "teamDamage"];
 
+
+    let request = new XMLHttpRequest();
+    let match;
     let matchCode;
     let itemsArr = [];
     let opponent = {};
@@ -1203,7 +1207,7 @@
     }
 
     function sendMessage(content, recipient = opponent.name) {
-      console.log(content); ////for testing
+      console.log(content); ///for testing
       let messageObj = {
         type: "message",
         to: recipient,
@@ -1225,7 +1229,7 @@
       moveObj.from = me.name;
       ws.send(JSON.stringify(moveObj));
 
-      ////for testing
+      ///for testing
       receiveMove(moveObj);
     }
 
@@ -1292,10 +1296,15 @@
     }
 
     function joinMatch(code) {
-      ////get leader
-      let leader;
-      ////check if match is full or doesn't exist
-      if (false) {
+      request.open("GET", '/getfighter', false);
+      request.send(null);
+      let res = JSON.parse(request.responseText);
+      match = res["match" + code];
+      if (!match) {
+        alert("Match does not exist.");
+      } else if (match.opponent) {
+        alert("Match is already full.");
+      } else {
         me.team = 2;
         opponent.name = leader;
         ws.send(JSON.stringify({
@@ -1304,16 +1313,13 @@
           to: opponent.name
         }));
         fighterOptions();
-      } else {
-        alert("Couldn't join match. It may be full, or your code may be incorrect.");
       }
     }
 
     function rematch() {
       me.team = 1;
-      ////get leader
-      let leader;
-      opponent.name = leader;
+      ////get match
+      opponent.name = match.leader;
       fighterOptions();
     }
 
@@ -1322,13 +1328,7 @@
       matchCode = pickRandom(1000000).toString();
       while (matchCode.length < 6) matchCode = "0" + matchCode;
       me.team = 1;
-      ////let other students input match code and see who leader is
-      /*something like this:
-      activeFighterMatches = {
-        match123456: {
-          leader: "Oley"
-        }
-      }*/
+      request.open("GET", "/createfightermatch?code=" + matchCode + "&name=" + me.name);
       fighterOptions();
     }
 
@@ -1337,7 +1337,7 @@
       document.getElementById("chooseFighters").classList.remove("hidden");
 
       lockedColors.forEach((color) => {
-        ////for testing
+        ///for testing
         if ((color.unlockWins && me.wins >= color.unlockWins)/* || localStorage.getItem(color.color + "Unlocked")*/) { //If player has enough wins to unlock or already unlocked
           colors.push(color);
           lockedColors = lockedColors.filter(locked => locked != color);
@@ -1345,7 +1345,7 @@
           let el = document.getElementById(color.color + "Fighter");
           let lockedMessage;
           if (color.unlockWins) lockedMessage = color.unlockWins + " wins to unlock";
-          ////for testing
+          ///for testing
           else if (localStorage.getItem(color.color + "Unlocked")) lockedMessage = "Temporarily disabled<br>due to bugs";
           else lockedMessage = color.unlockStreak + "-win streak to unlock";
           el.classList.add("fighter", "locked");
@@ -1550,7 +1550,7 @@
         }
       });
 
-      ////for testing
+      ///for testing
       let of1 = colors[pickRandom(7)];
       let of2;
       do {of2 = colors[pickRandom(7)]} while (of2 == of1);
@@ -1569,7 +1569,7 @@
       }
 
       if (me.team == 1) wait();
-      else if (false) { ////if match full
+      else if (match.opponent) {
         alert("Match is already full.");
         window.location = "/fighter";
       }
@@ -1608,7 +1608,7 @@
       ////document.getElementById("video").src = "https://www.youtube.com/embed/" + videos[randomVideo] + "?autoplay=1&fs=0&modestbranding=1";
       ////if (true) document.getElementById("video").src += "&cc_load_policy=1&mute=1";
 
-      ////for testing
+      ///for testing
       receivePlayerReady({
         name: "Player 2",
         team: 2,
@@ -1625,7 +1625,7 @@
     function receivePlayerReady(player) {
       opponent = player;
       if (me.team == 1) {
-        ////set property "opponent" to opponent.name in match object
+        request.open("GET", "/addfighteropponent?code=" + matchCode + "&name=" + me.name);
         sendPlayerReady();
       }
       else matchCode = player.match;
@@ -1716,7 +1716,7 @@
       if (active == me) inactive = opponent;
       else inactive = me;
 
-      ////For testing
+      ///for testing
       me = active;
       opponent = inactive;
 
@@ -2210,7 +2210,7 @@
         slot: slot
       }));
 
-      ////for testing
+      ///for testing
       receiveItem({
         item: item,
         target: target,

@@ -3,38 +3,6 @@
 {% block title %}Debugging{% endblock %}
 {% block style %}
 <style>
-  :root {
-    --color-red: #bf0000;
-    --color-brown: #802000;
-    --color-orange: #ff4000;
-    --color-gold: #fa0;
-    --color-yellow: #ffbf00;
-    --color-green: #00bf00;
-    --color-cyan: #009fbf;
-    --color-blue: #0040bf;
-    --color-purple: #bf00ff;
-    --color-pink: #ff4080;
-    --dark-gray: #555;
-
-    --light-red: #ff6860;
-    --light-brown: #bf6040;
-    --light-orange: #ffaf60;
-    --light-yellow: #ffdf80;
-    --light-green: #80ff80;
-    --light-cyan: #80ffbf;
-    --ice-blue: #bfcfff;
-    --light-blue: #8f9bbf;
-    --light-purple: #df80ff;
-    --light-pink: #ff80bfff;
-    --light-gray: #ccc;
-
-    --bg-dark: #303234;
-    --bg-darker: #202123;
-    --bg-dark-highlight: #404345;
-    --bg-dark-purple: #423;
-    --bg-dark-green: #423;
-    --bg-dark-yellow: #430;
-  }
   body {
     background: var(--bg-dark);
     color: white;
@@ -53,7 +21,7 @@
 
   #vbText {
     height: 24px;
-    width: 119.97px;
+    width: 10ch;
     padding: 0 4px;
     box-sizing:
     border-box; border: 1px white;
@@ -167,6 +135,7 @@
     let xhr = new XMLHttpRequest();
     let urls = ["/getpix", "/getme", "/getstudents", "/getpermissions"];
     let timeLeft = 3;
+    let dataURL = "/getpix";
 
     function updateBar() {
       xhr.open("GET", '/getphrase', false);
@@ -177,9 +146,9 @@
       vbText.innerText = phrase;
       //To do: update color
 
-      request.open("GET", '/getpix', false);
-      request.send(null);
-      let pixRes = JSON.parse(request.responseText);
+      xhr.open("GET", '/getpix', false);
+      xhr.send(null);
+      let pixRes = JSON.parse(xhr.responseText);
       let pix = eval(pixRes.pixels);
       let pixBox = document.getElementById("pixBox");
       pixBox.innerHTML = '';
@@ -205,20 +174,23 @@
     countdown();
 
     function request(newURL) {
+      dataURL = newURL;
       xhr.open('GET', newURL);
       xhr.onload = function() {
           data = xhr.response;
-          urls.forEach(url => {
-            let el = document.getElementById(url);
-            if (url == newUrl) el.classList.remove("open");
-            else el.classList.add("open");
-          });
-          document.getElementById("data").innerText = data;
+          if (newURL) {
+            urls.forEach(url => {
+              let el = document.getElementById(url);
+              if (url == newURL) el.classList.add("open");
+              else el.classList.remove("open");
+            });
+            document.getElementById("data").innerText = data;
+          }
       };
       xhr.send();
     }
 
-    setTimeout(function() {request(newURL)}, 1000);
-    request("/getpix");
+    request(dataURL);
+    setInterval(() => request(dataURL), 3000);
   </script>
 {% endblock %}

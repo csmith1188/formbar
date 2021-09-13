@@ -1,12 +1,12 @@
-<!--{% extends 'header.html' %}
+{% extends 'header.html' %}
 <!-- ^^ This means add this file to the end of the contents of header.html -->
 <!-- This is where the title, top buttons, and stylesheet is located -->
 
 <!-- Change title here -->
-<!-- {% block title %}Chat{% endblock %}
+{% block title %}Chat{% endblock %}
 
 <!-- Extra style declarations here -->
-<!-- {% block style %}-->
+{% block style %}
 <style>
   body {
     background-color: var(--bg-dark);
@@ -242,14 +242,14 @@
     background-color: transparent;
   }
 </style>
-<!-- {% endblock %}
+{% endblock %}
 
 <!-- Extra javascript here -->
-<!-- {% block script %}
-{% endblock %}-->
+{% block script %}
+{% endblock %}
 
 <!-- Main content here -->
-<!-- {% block main %}-->
+{% block main %}
 <div id="container-full-width">
     <div id="outputBox"></div>
     <div id="userlist">
@@ -439,4 +439,4 @@
       document.getElementById("removeRec").style.display = "none";
     }
 </script>
-<!-- {% endblock %} -->
+{% endblock %}

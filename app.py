@@ -613,7 +613,7 @@ def endpoint_debug():
 @app.route('/fighter')
 def endpoint_fighter():
     #return render_template('fighter.html', serverIp = ip)
-    return render_template("message.html", forward=forward, message="Fighter will be ready to play soon.")
+    return render_template("message.html", forward=request.path, message = "Fighter will be ready to play soon.")
 
 #Before choosing endpoints you are required to log in
 @app.route('/login', methods = ['POST', 'GET'])

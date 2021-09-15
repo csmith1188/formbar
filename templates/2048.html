@@ -1,474 +1,528 @@
-<html>
-<!--Play the game in fullscreen for better view.
-First click anywhere on the square box to start the game. To play the game use up, down, right and left arrows or use mouse to direct the tiles -->
+{% extends 'header.html' %}
+<!-- ^^ This means add this file to the end of the contents of header.html -->
+<!-- This is where the title, top buttons, and stylesheet is located -->
 
-<head>
-  <title>2048</title>
-  <link rel="stylesheet" href="game2048.css" />
-  <script type="text/javascript" src="game2048.js"></script>
-</head>
-<style>
-  :root {
-    --background-color: #303234;
-    --bg-dark-color: #202123;
-    --bg-highlight-color: #404345;
-    --bg-green-color: #242;
-    --bg-purple-color: #423;
-    --bg-yellow-color: #430;
-    --main-color: #bfcfff;
-    --alt-color: #8f9bbf;
-    --green-color: #80ffbf;
-    --purple-color: #ff80bf;
-    --yellow-color: #ffaf60;
-    --gray-color: #ccc;
-  }
+<!-- Change title here -->
+{% block title %}2048{% endblock %}
 
-  html {
-    height: 100%;
-    -moz-user-select: none;
-    -khtml-user-select: none;
-    user-select: none;
-  }
+<!-- Extra style declarations here -->
+{% block style %}
+  <style>
+    html {
+      height: 100%;
+      -moz-user-select: none;
+      -khtml-user-select: none;
+      user-select: none;
+    }
 
-  p {
-    color: black;
-    font-family: "microsoft yahei";
-    font-weight: bold;
-    left: -10px;
+    p {
+      color: black;
+      font-family: "microsoft yahei";
+      font-weight: bold;
+      left: -10px;
 
-  }
+    }
 
-  body {
-    background-color: var(--background-color);
-    color: white;
-    font-family: "Times New Roman", Times, serif;
-  }
+    body, #content {
+      background-color: var(--bg-dark);
+      color: white;
+      font-family: "Times New Roman", Times, serif;
+    }
 
-  .container {
-    margin: auto;
-    width: 452px;
-    height: 100%;
-    overflow: hidden;
-    position: relative;
-  }
+    .container {
+      position: fixed;
+      width: fit-content;
+      left: 50%;
+      transform: translateX(calc(-100% + 226px));
+      height: 100%;
+      overflow: hidden;
+      position: relative;
+    }
 
-  .logo {
-    width: 40%;
-    font-size: 70px;
-    font-weight: bold;
-    color: #00ae88;
-    float: left;
-    position: relative;
-    top: 10px;
-  }
+    .logo {
+      width: 40%;
+      font-size: 70px;
+      font-weight: bold;
+      color: var(--color-green);
+      float: left;
+      position: relative;
+      top: 10px;
+    }
 
-  .scoreBar {
-    width: 50%;
-    float: right;
-    background: #fff;
-    color: #111;
+    .scoreBar {
+      width: 50%;
+      float: right;
+      background: #fff;
+      color: #111;
 
-    padding: 10px;
-    position: relative;
-    margin-top: 10px;
-  }
+      padding: 10px;
+      position: relative;
+      margin-top: 10px;
+    }
 
-  .scoreBar:before {
-    content: "";
-    display: block;
-    border-width: 20px;
-    border-color: transparent #fff transparent transparent;
-    border-style: solid;
-    position: absolute;
-    top: 50%;
-    left: -40px;
-    margin-top: -20px;
-  }
+    .scoreBar:before {
+      content: "";
+      display: block;
+      border-width: 20px;
+      border-color: transparent #fff transparent transparent;
+      border-style: solid;
+      position: absolute;
+      top: 50%;
+      left: -40px;
+      margin-top: -20px;
+    }
 
-  #score, #highScore {
-    font-size: 30px;
-    color: #7f7e83;
-  }
+    #score, #highScore {
+      font-size: 30px;
+      color: #7f7e83;
+    }
 
-  #highScore {
-    position: absolute;
-    right: 10px;
-    top: 28px;
-  }
+    #highScore {
+      position: absolute;
+      right: 10px;
+      top: 28px;
+    }
 
-  #addScore {
-    display: inline-block;
-    font-size: 30px;
-    color: #999;
-    opacity: .8;
-    top: 4px;
-    right: 0;
-  }
+    #addScore {
+      display: inline-block;
+      font-size: 30px;
+      color: #999;
+      opacity: .8;
+      top: 4px;
+      right: 0;
+    }
 
-  #addScore.show {
-    opacity: .8;
-    transition: all .5s ease;
-    -ms-transition: all .5s ease;
-    -moz-transition: all .5s ease;
-    -o-transition: all .5s ease;
-    -webkit-transition: all .5s ease;
+    #addScore.show {
+      opacity: .8;
+      transition: all .5s ease;
+      -ms-transition: all .5s ease;
+      -moz-transition: all .5s ease;
+      -o-transition: all .5s ease;
+      -webkit-transition: all .5s ease;
 
-  }
+    }
 
-  #addScore.hide {
-    opacity: 0;
-    transition: all .5s ease;
-    -ms-transition: all .5s ease;
-    -moz-transition: all .5s ease;
-    -o-transition: all .5s ease;
-    -webkit-transition: all .5s ease;
-  }
+    #addScore.hide {
+      opacity: 0;
+      transition: all .5s ease;
+      -ms-transition: all .5s ease;
+      -moz-transition: all .5s ease;
+      -o-transition: all .5s ease;
+      -webkit-transition: all .5s ease;
+    }
 
-  #stage {
-    background: #000000;
-    cursor: pointer;
-    -moz-user-select: none;
-    -khtml-user-select: none;
-    user-select: none;
-    position: absolute;
-    width: 450px;
-    height: 450px;
-    top: 50%;
-    left: 0;
-    margin-top: -200px;
-    border: 1px solid #eee;
-    z-index: 1;
-  }
+    #gameOver {
+      position: fixed;
+      color: var(--light-red);
+      left: 50%;
+      transform: translateX(-50%);
+      top: 27%;
+      font-size: 32px;
+      display: none;
+    }
 
-  #undo {
-    position: relative;
-    z-index: 990;
-  }
+    #stage {
+      background: var(--bg-darker);
+      cursor: move;
+      -moz-user-select: none;
+      -khtml-user-select: none;
+      user-select: none;
+      position: absolute;
+      width: 450px;
+      height: 450px;
+      top: 55%;
+      left: 0;
+      margin-top: -200px;
+      border: 1px solid #eee;
+      z-index: 1;
+    }
 
-  .cover {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    z-index: 999;
-    opacity: 0.1;
-    cursor: pointer;
-  }
+    #undo {
+      position: relative;
+      z-index: 2;
+    }
 
-  .row0 {
-    top: 10px;
-    transition: all .2s ease;
-    -ms-transition: all .2s ease;
-    -moz-transition: all .2s ease;
-    -o-transition: all .2s ease;
-    -webkit-transition: all .2s ease;
-  }
+    #cover {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      opacity: 0.1;
+      cursor: move;
+    }
 
-  .row1 {
-    top: 120px;
-    transition: all .2s ease;
-    -ms-transition: all .2s ease;
-    -moz-transition: all .2s ease;
-    -o-transition: all .2s ease;
-    -webkit-transition: all .2s ease;
-  }
+    .row0 {
+      top: 10px;
+      transition: all .2s ease;
+      -ms-transition: all .2s ease;
+      -moz-transition: all .2s ease;
+      -o-transition: all .2s ease;
+      -webkit-transition: all .2s ease;
+    }
 
-  .row2 {
-    top: 230px;
-    transition: all .2s ease;
-    -ms-transition: all .2s ease;
-    -moz-transition: all .2s ease;
-    -o-transition: all .2s ease;
-    -webkit-transition: all .2s ease;
-  }
+    .row1 {
+      top: 120px;
+      transition: all .2s ease;
+      -ms-transition: all .2s ease;
+      -moz-transition: all .2s ease;
+      -o-transition: all .2s ease;
+      -webkit-transition: all .2s ease;
+    }
 
-  .row3 {
-    top: 340px;
-    transition: all .2s ease;
-    -ms-transition: all .2s ease;
-    -moz-transition: all .2s ease;
-    -o-transition: all .2s ease;
-    -webkit-transition: all .2s ease;
-  }
+    .row2 {
+      top: 230px;
+      transition: all .2s ease;
+      -ms-transition: all .2s ease;
+      -moz-transition: all .2s ease;
+      -o-transition: all .2s ease;
+      -webkit-transition: all .2s ease;
+    }
 
-  .cell0 {
-    left: 10px;
-    transition: all .2s ease;
-    -ms-transition: all .2s ease;
-    -moz-transition: all .2s ease;
-    -o-transition: all .2s ease;
-    -webkit-transition: all .2s ease;
-  }
+    .row3 {
+      top: 340px;
+      transition: all .2s ease;
+      -ms-transition: all .2s ease;
+      -moz-transition: all .2s ease;
+      -o-transition: all .2s ease;
+      -webkit-transition: all .2s ease;
+    }
 
-  .cell1 {
-    left: 120px;
-    transition: all .2s ease;
-    -ms-transition: all .2s ease;
-    -moz-transition: all .2s ease;
-    -o-transition: all .2s ease;
-    -webkit-transition: all .2s ease;
-  }
+    .cell0 {
+      left: 10px;
+      transition: all .2s ease;
+      -ms-transition: all .2s ease;
+      -moz-transition: all .2s ease;
+      -o-transition: all .2s ease;
+      -webkit-transition: all .2s ease;
+    }
 
-  .cell2 {
-    left: 230px;
-    transition: all .2s ease;
-    -ms-transition: all .2s ease;
-    -moz-transition: all .2s ease;
-    -o-transition: all .2s ease;
-    -webkit-transition: all .2s ease;
-  }
+    .cell1 {
+      left: 120px;
+      transition: all .2s ease;
+      -ms-transition: all .2s ease;
+      -moz-transition: all .2s ease;
+      -o-transition: all .2s ease;
+      -webkit-transition: all .2s ease;
+    }
 
-  .cell3 {
-    left: 340px;
-    transition: all .2s ease;
-    -ms-transition: all .2s ease;
-    -moz-transition: all .2s ease;
-    -o-transition: all .2s ease;
-    -webkit-transition: all .2s ease;
-  }
+    .cell2 {
+      left: 230px;
+      transition: all .2s ease;
+      -ms-transition: all .2s ease;
+      -moz-transition: all .2s ease;
+      -o-transition: all .2s ease;
+      -webkit-transition: all .2s ease;
+    }
 
-  span {
-    display: block;
-    width: 100px;
-    height: 100px;
-    position: absolute;
-    text-align: center;
-    line-height: 100px;
-    cursor: pointer;
-    background: #fff;
-    font-size: 43px;
-    -moz-user-select: none;
-    -khtml-user-select: none;
-    user-select: none;
-  }
+    .cell3 {
+      left: 340px;
+      transition: all .2s ease;
+      -ms-transition: all .2s ease;
+      -moz-transition: all .2s ease;
+      -o-transition: all .2s ease;
+      -webkit-transition: all .2s ease;
+    }
 
-  div {
-    -moz-user-select: none;
-    -khtml-user-select: none;
-    user-select: none;
+    span {
+      display: block;
+      width: 100px;
+      height: 100px;
+      position: absolute;
+      text-align: center;
+      line-height: 100px;
+      cursor: move;
+      background: #fff;
+      font-size: 43px;
+      -moz-user-select: none;
+      -khtml-user-select: none;
+      user-select: none;
+    }
 
-  }
+    div {
+      -moz-user-select: none;
+      -khtml-user-select: none;
+      user-select: none;
 
-  .num2 {
-    background: #FFFFFF;
-    color: #7f7e83;
-    font-size: 100px;
-    transition: all .2s ease;
-    -ms-transition: all .2s ease;
-    -moz-transition: all .2s ease;
-    -o-transition: all .2s ease;
-    -webkit-transition: all .2s ease;
-    animation: myfirst .5s;
-    -moz-animation: myfirst .5s;
+    }
+
+    .num2 {
+      background: #FFFFFF;
+      color: #7f7e83;
+      font-size: 100px;
+      transition: all .2s ease;
+      -ms-transition: all .2s ease;
+      -moz-transition: all .2s ease;
+      -o-transition: all .2s ease;
+      -webkit-transition: all .2s ease;
+      animation: myfirst .5s;
+      -moz-animation: myfirst .5s;
+      /* Firefox */
+      -webkit-animation: myfirst .5s;
+      /* Safari or Chrome or opera */
+    }
+
+    .num4 {
+      background: #FFFFFF;
+      color: #005744;
+      font-size: 100px;
+      transition: all .2s ease;
+      -ms-transition: all .2s ease;
+      -moz-transition: all .2s ease;
+      -o-transition: all .2s ease;
+      -webkit-transition: all .2s ease;
+      animation: myfirst .5s;
+      -moz-animation: myfirst .5s;
+      /* Firefox */
+      -webkit-animation: myfirst .5s;
+      /* Safari or Chrome */
+    }
+
+    .num8 {
+      background: #FFFFFF;
+      color: #7f7e83;
+      font-size: 100px;
+      transition: all .2s ease;
+      -ms-transition: all .2s ease;
+      -moz-transition: all .2s ease;
+      -o-transition: all .2s ease;
+      -webkit-transition: all .2s ease;
+      animation: myfirst .5s;
+    }
+
+    .num16 {
+      background: #FFFFFF;
+      color: #005744;
+      font-size: 80px;
+      transition: all .2s ease;
+      -ms-transition: all .2s ease;
+      -moz-transition: all .2s ease;
+      -o-transition: all .2s ease;
+      -webkit-transition: all .2s ease;
+      animation: myfirst .5s;
+    }
+
+    .num32 {
+      background: #FFFFFF;
+      color: #7f7e83;
+      font-size: 80px;
+      transition: all .2s ease;
+      -ms-transition: all .2s ease;
+      -moz-transition: all .2s ease;
+      -o-transition: all .2s ease;
+      -webkit-transition: all .2s ease;
+    }
+
+    .num64 {
+      background: #FFFFFF;
+      color: #005744;
+      font-size: 80px;
+      transition: all .2s ease;
+      -ms-transition: all .2s ease;
+      -moz-transition: all .2s ease;
+      -o-transition: all .2s ease;
+      -webkit-transition: all .2s ease;
+    }
+
+    .num128 {
+      background: #FFFFFF;
+      color: #7f7e83;
+      font-size: 52px;
+      transition: all .2s ease;
+      -ms-transition: all .2s ease;
+      -moz-transition: all .2s ease;
+      -o-transition: all .2s ease;
+      -webkit-transition: all .2s ease;
+    }
+
+    .num256 {
+      background: #FFFFFF;
+      color: #005744;
+      font-size: 52px;
+      transition: all .2s ease;
+      -ms-transition: all .2s ease;
+      -moz-transition: all .2s ease;
+      -o-transition: all .2s ease;
+      -webkit-transition: all .2s ease;
+    }
+
+    .num512 {
+      background: #FFFFFF;
+      color: #7f7e83;
+      font-size: 52px;
+      transition: all .2s ease;
+      -ms-transition: all .2s ease;
+      -moz-transition: all .2s ease;
+      -o-transition: all .2s ease;
+      -webkit-transition: all .2s ease;
+    }
+
+    .num1024 {
+      background: #FFFFFF;
+      color: #005744;
+      font-size: 52px;
+      transition: all .2s ease;
+      -ms-transition: all .2s ease;
+      -moz-transition: all .2s ease;
+      -o-transition: all .2s ease;
+      -webkit-transition: all .2s ease;
+    }
+
+    .num2048 {
+      background: #FFFFFF;
+      color: #7f7e83;
+      font-size: 52px;
+
+      transition: all .2s ease;
+      -ms-transition: all .2s ease;
+      -moz-transition: all .2s ease;
+      -o-transition: all .2s ease;
+      -webkit-transition: all .2s ease;
+    }
+
+    .num4096 {
+      background: #FFFFFF;
+      color: #005744;
+      font-size: 52px;
+      transition: all .2s ease;
+      -ms-transition: all .2s ease;
+      -moz-transition: all .2s ease;
+      -o-transition: all .2s ease;
+      -webkit-transition: all .2s ease;
+    }
+
+    #newGameButton {
+      position: absolute;
+      left: 226px;
+      transform: translateX(-50%);
+      top: 87%;
+      padding: 8px 16px;
+      font: 30px "Times New Roman", Times, serif;
+      border-radius: 12px;
+      background: var(--bg-darker);
+      color: var(--color-green);
+      border: 2px solid;
+      cursor: pointer;
+      z-index: 3;
+    }
+
+    #newGameButton:hover {
+      background: var(--bg-dark-highlight);
+    }
+
+    .newButtonAnimation:not(:hover) {
+      animation: oscillate 1.5s infinite;
+    }
+
+    @keyframes oscillate {
+      0% {
+        background: var(--bg-darker);
+      }
+      50% {
+        background: var(--bg-dark-highlight);
+      }
+      100% {
+        background: var(--bg-darker);
+      }
+    }
+
+    @keyframes myfirst {
+      0% {
+        opacity: 0;
+        transform: scale(0)
+      }
+
+      50% {
+        opacity: .5;
+        transform: scale(1.5)
+      }
+
+      100% {
+        opacity: 1;
+        transform: scale(1)
+      }
+    }
+
+    @-moz-keyframes myfirst
+
     /* Firefox */
-    -webkit-animation: myfirst .5s;
-    /* Safari or Chrome or opera */
-  }
+      {
+      0% {
+        opacity: 0;
+        -moz-transform: scale(0)
+      }
 
-  .num4 {
-    background: #FFFFFF;
-    color: #005744;
-    font-size: 100px;
-    transition: all .2s ease;
-    -ms-transition: all .2s ease;
-    -moz-transition: all .2s ease;
-    -o-transition: all .2s ease;
-    -webkit-transition: all .2s ease;
-    animation: myfirst .5s;
-    -moz-animation: myfirst .5s;
-    /* Firefox */
-    -webkit-animation: myfirst .5s;
+      50% {
+        opacity: .5;
+        -moz-transform: scale(1.5)
+      }
+
+      100% {
+        opacity: 1;
+        -moz-transform: scale(1)
+      }
+    }
+
+    @-webkit-keyframes myfirst
+
     /* Safari or Chrome */
-  }
+      {
+      0% {
+        opacity: 0;
+        -webkit-transform: scale(0)
+      }
 
-  .num8 {
-    background: #FFFFFF;
-    color: #7f7e83;
-    font-size: 100px;
-    transition: all .2s ease;
-    -ms-transition: all .2s ease;
-    -moz-transition: all .2s ease;
-    -o-transition: all .2s ease;
-    -webkit-transition: all .2s ease;
-    animation: myfirst .5s;
-  }
+      50% {
+        opacity: .5;
+        -webkit-transform: scale(1.5)
+      }
 
-  .num16 {
-    background: #FFFFFF;
-    color: #005744;
-    font-size: 80px;
-    transition: all .2s ease;
-    -ms-transition: all .2s ease;
-    -moz-transition: all .2s ease;
-    -o-transition: all .2s ease;
-    -webkit-transition: all .2s ease;
-    animation: myfirst .5s;
-  }
-
-  .num32 {
-    background: #FFFFFF;
-    color: #7f7e83;
-    font-size: 80px;
-    transition: all .2s ease;
-    -ms-transition: all .2s ease;
-    -moz-transition: all .2s ease;
-    -o-transition: all .2s ease;
-    -webkit-transition: all .2s ease;
-  }
-
-  .num64 {
-    background: #FFFFFF;
-    color: #005744;
-    font-size: 80px;
-    transition: all .2s ease;
-    -ms-transition: all .2s ease;
-    -moz-transition: all .2s ease;
-    -o-transition: all .2s ease;
-    -webkit-transition: all .2s ease;
-  }
-
-  .num128 {
-    background: #FFFFFF;
-    color: #7f7e83;
-    font-size: 52px;
-    transition: all .2s ease;
-    -ms-transition: all .2s ease;
-    -moz-transition: all .2s ease;
-    -o-transition: all .2s ease;
-    -webkit-transition: all .2s ease;
-  }
-
-  .num256 {
-    background: #FFFFFF;
-    color: #005744;
-    font-size: 52px;
-    transition: all .2s ease;
-    -ms-transition: all .2s ease;
-    -moz-transition: all .2s ease;
-    -o-transition: all .2s ease;
-    -webkit-transition: all .2s ease;
-  }
-
-  .num512 {
-    background: #FFFFFF;
-    color: #7f7e83;
-    font-size: 52px;
-    transition: all .2s ease;
-    -ms-transition: all .2s ease;
-    -moz-transition: all .2s ease;
-    -o-transition: all .2s ease;
-    -webkit-transition: all .2s ease;
-  }
-
-  .num1024 {
-    background: #FFFFFF;
-    color: #005744;
-    font-size: 52px;
-    transition: all .2s ease;
-    -ms-transition: all .2s ease;
-    -moz-transition: all .2s ease;
-    -o-transition: all .2s ease;
-    -webkit-transition: all .2s ease;
-  }
-
-  .num2048 {
-    background: #FFFFFF;
-    color: #7f7e83;
-    font-size: 52px;
-
-    transition: all .2s ease;
-    -ms-transition: all .2s ease;
-    -moz-transition: all .2s ease;
-    -o-transition: all .2s ease;
-    -webkit-transition: all .2s ease;
-  }
-
-  .num4096 {
-    background: #FFFFFF;
-    color: #005744;
-    font-size: 52px;
-    transition: all .2s ease;
-    -ms-transition: all .2s ease;
-    -moz-transition: all .2s ease;
-    -o-transition: all .2s ease;
-    -webkit-transition: all .2s ease;
-  }
-
-  @keyframes myfirst {
-    0% {
-      opacity: 0;
-      transform: scale(0)
+      100% {
+        opacity: 1;
+        -webkit-transform: scale(1)
+      }
     }
 
-    50% {
-      opacity: .5;
-      transform: scale(1.5)
+    #quickmenu {
+      display: none;
     }
 
-    100% {
-      opacity: 1;
-      transform: scale(1)
+    #content {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
     }
-  }
+  </style>
+{% endblock %}
 
-  @-moz-keyframes myfirst
+<!-- Extra javascript here -->
+{% block script %}{% endblock %}
 
-  /* Firefox */
-    {
-    0% {
-      opacity: 0;
-      -moz-transform: scale(0)
-    }
+<!-- Main content here -->
+{% block main %}
+  <div id="cover"></div>
+  <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%;">
+    <div class="container">
+      <div class="logo">2048
+      SPARTANS</div>
+      <div class="scoreBar">
+        <label>Score</label><br>
+        <label id="score">0</label>
+        <div id="addScore"></div>
 
-    50% {
-      opacity: .5;
-      -moz-transform: scale(1.5)
-    }
-
-    100% {
-      opacity: 1;
-      -moz-transform: scale(1)
-    }
-  }
-
-  @-webkit-keyframes myfirst
-
-  /* Safari or Chrome */
-    {
-    0% {
-      opacity: 0;
-      -webkit-transform: scale(0)
-    }
-
-    50% {
-      opacity: .5;
-      -webkit-transform: scale(1.5)
-    }
-
-    100% {
-      opacity: 1;
-      -webkit-transform: scale(1)
-    }
-  }
-</style>
-
-<body>
-
-  <div class="cover"></div>
-  <div class="container">
-    <div class="logo">2048
-    SPARTANS</div>
-    <div class="scoreBar">
-      <label>Score</label><br>
-      <label id="score">0</label>
-      <div id="addScore"></div>
-
-      <label style="position: absolute; right: 10px; top: 10px;">High score</label><br>
-      <label id="highScore">0</label>
+        <label style="position: absolute; right: 10px; top: 10px;">High score</label><br>
+        <label id="highScore">0</label>
+      </div>
+      <div id="gameOver">GAME OVER!</div>
+      <div id="stage"></div>
+      <!--<div id="gameOver hide">-->
+      <!--<div class="overText">GameOver!</div>-->
+      <!--</div>-->
+      <button id="newGameButton" onclick="window.location.reload();">New game</button>
     </div>
-    <div id="stage"></div>
-    <!--<div id="gameOver hide">-->
-    <!--<div class="overText">GameOver!</div>-->
-    <!--</div>-->
   </div>
   <script>
     if (localStorage.getItem("2048HighScore")) document.getElementById("highScore").innerHTML = localStorage.getItem("2048HighScore");
@@ -569,7 +623,9 @@ First click anywhere on the square box to start the game. To play the game use u
         return false;
       },
       gameOver: function() {
-        alert('GAME OVER!');
+        document.getElementById("gameOver").style.display = "block";
+        document.getElementById("cover").style.cursor = "not-allowed";
+        document.getElementById("newGameButton").classList.add("newButtonAnimation");
       },
       moveTo: function(obj1, obj2) {
         obj2.boxObj = obj1.boxObj;
@@ -770,7 +826,7 @@ First click anywhere on the square box to start the game. To play the game use u
         controller.end(x, y);
       }
 
-      function keyUp(e) {
+      function keyDown(e) {
         var currKey = 0,
           e = e || event;
         currKey = e.keyCode || e.which || e.charCode;
@@ -791,10 +847,8 @@ First click anywhere on the square box to start the game. To play the game use u
         }
         //        alert("key code: " + currKey + " Character: " + keyName);
       }
-      document.onkeyup = keyUp;
+      document.onkeydown = keyDown;
       //    disableSelection(document.body);
     }
   </script>
-</body>
-
-</html>
+{% endblock %}

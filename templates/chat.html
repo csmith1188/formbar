@@ -1,32 +1,22 @@
-<!--{% extends 'header.html' %}
+{% extends 'header.html' %}
 <!-- ^^ This means add this file to the end of the contents of header.html -->
 <!-- This is where the title, top buttons, and stylesheet is located -->
 
 <!-- Change title here -->
-<!-- {% block title %}Chat{% endblock %}
+{% block title %}Chat{% endblock %}
 
 <!-- Extra style declarations here -->
-<!-- {% block style %}-->
+{% block style %}
 <style>
-  :root {
-    --background-color: #303234;
-    --bg-dark-color: #202123;
-    --bg-highlight-color: #404345;
-    --bg-green-color: #242;
-    --bg-purple-color: #423;
-    --bg-yellow-color: #430;
-    --main-color: #bfcfff;
-    --alt-color: #8f9bbf;
-    --green-color: #80ffbf;
-    --purple-color: #ff80bf;
-    --yellow-color: #ffaf60;
-    --gray-color: #ccc;
-  }
-
   body {
-    background-color: var(--background-color);
+    background-color: var(--bg-dark);
     color: white;
     font: 16px "Segoe UI", sans-serif;
+  }
+
+  ::selection {
+    background: var(--ice-blue);
+    color: var(--bg-dark);
   }
 
   ::-webkit-scrollbar {
@@ -35,7 +25,7 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    box-shadow: inset 0 0 5px 5px var(--main-color);
+    box-shadow: inset 0 0 5px 5px var(--ice-blue);
     border: solid 5px transparent;
   }
 
@@ -58,7 +48,7 @@
     top: 0;
     left: 0;
     width: calc(100% - 300px);
-    height: calc(100% - 125px);
+    height: calc(100% - 130px); /*Subtract height of controlChat*/
     box-sizing: border-box;
     padding: 0 10px;
     overflow: auto;
@@ -70,33 +60,33 @@
   }
 
   .them .username {
-    color: var(--main-color);
+    color: var(--ice-blue);
     cursor: pointer;
   }
 
   .msg.whisper {
-    background-color: var(--bg-purple-color);
+    background-color: var(--bg-dark-purple);
   }
 
   .me {
-    background-color: var(--bg-highlight-color);
+    background-color: var(--bg-dark-highlight);
   }
 
   .date {
-    color: var(--alt-color);
+    color: var(--light-blue);
     margin-right: 5px;
   }
 
   .alert .content {
     font-style: italic;
-    color: var(--alt-color);
+    color: var(--ice-blue);
   }
 
   #userlist {
     width: 300px;
     box-sizing: border-box;
-    height: calc(100% - 125px);
-    background-color: var(--bg-dark-color);
+    height: calc(100% - 130px);
+    background-color: var(--bg-darker);
     position: fixed;
     top: 0;
     right: 0;
@@ -119,13 +109,13 @@
   }
 
   .ulName.them:hover {
-    background-color: var(--main-color);
-    color: var(--background-color);
+    background-color: var(--ice-blue);
+    color: var(--bg-dark);
   }
 
   #controlChat {
-    background-color: var(--background-color);
-    border-top: 1px solid var(--main-color);
+    background-color: var(--bg-dark);
+    border-top: 1px solid var(--ice-blue);
     position: fixed;
     width: 100%;
     bottom: 0;
@@ -135,8 +125,8 @@
 
   #removeRec {
     display: none;
-    margin-left: 4px;
-    color: var(--gray-color);
+    margin-left: 8px;
+    color: var(--light-gray);
     cursor: pointer;
   }
 
@@ -148,20 +138,20 @@
     width: 75%;
     height: 32px;
     box-sizing: border-box;
-    background-color: var(--bg-dark-color);
+    background-color: var(--bg-darker);
     color: white;
     resize: none;
-    border: 1px solid var(--main-color);
+    border: 1px solid var(--ice-blue);
     font-family: "Segoe UI", sans-serif;
     font-size: 16px;
   }
 
   #input:focus {
-    outline: 1px solid var(--main-color);
+    outline: 1px solid var(--ice-blue);
   }
 
   #input::-webkit-scrollbar-thumb {
-    box-shadow: inset 0 0 5px 5px var(--main-color);
+    box-shadow: inset 0 0 5px 5px var(--ice-blue);
     border: solid 5px transparent;
   }
 
@@ -176,10 +166,9 @@
 
   #sendButton, button {
     box-sizing: border-box;
-    margin-left: 5px;
-    background-color: var(--background-color);
-    color: var(--main-color);
-    border: 1px var(--main-color) solid;
+    background-color: var(--bg-dark);
+    color: var(--ice-blue);
+    border: 1px solid var(--ice-blue);
     cursor: pointer;
   }
 
@@ -187,31 +176,56 @@
     width: 64px;
     height: 32px;
     border-radius: 8px;
+    margin: 0 0 0 5px;
     font: 20px "Segoe UI", sans-serif;
     vertical-align: top;
+    transition-duration: 0.2s;
   }
 
   button {
+    margin-top: 5px;
     border-radius: 5.5px;
     font: 14px "Segoe UI", sans-serif;
   }
 
-  #sendButton:hover, button:hover {
-    background-color: var(--main-color);
-    color: var(--background-color);
+  #sendButton:hover, #sendButton:focus, button:hover, button:focus {
+    background-color: var(--ice-blue);
+    color: var(--bg-dark);
+    outline: none;
   }
 
   #sendButton:active, button:active {
     background-color: white;
     border-color: white;
+    color: var(--bg-dark);
+  }
+
+  #sendButton:active {
+    transform: translateX(4px);
+  }
+
+  #sendButton.rec {
+    color: var(--light-purple);
+    border-color: var(--light-purple);
+  }
+
+  #sendButton.rec:hover, #sendButton.rec:focus {
+    background-color: var(--light-purple);
+    color: var(--bg-dark);
+  }
+
+  #sendButton.rec:active {
+    background-color: white;
+    border-color: white;
+    color: var(--bg-dark);
   }
 
   a {
-    color: var(--main-color);
+    color: var(--ice-blue);
   }
 
   a:visited {
-    color: var(--alt-color);
+    color: var(--light-blue);
   }
 
   a:active {
@@ -220,14 +234,44 @@
 
   h1 {
     margin: 0;
-    color: var(--main-color);
+    color: var(--ice-blue);
     font-size: 24px;
   }
 
   h2 {
     margin: 0;
-    color: var(--main-color);
+    color: var(--ice-blue);
     font-size: 20px;
+  }
+
+  select {
+    box-sizing: border-box;
+    background-color: var(--bg-darker);
+    color: white;
+    border: 1px var(--ice-blue) solid;
+    font: 14px "Segoe UI", sans-serif;
+  }
+
+  .game #outputBox {
+    width: 100%;
+    height: calc(100% - 115px);
+  }
+
+  .game #userlist, .game #recContainer, .game #commands {
+    display: none;
+  }
+
+  .game #input, .game #sendButton {
+    width: calc(100% - 40px);
+  }
+
+  .game #sendButton {
+    display: block;
+    margin: 10px 0 0 0;
+  }
+
+  .game #sendButton:active {
+    transform: none;
   }
 
   #quickmenu {
@@ -238,14 +282,14 @@
     background-color: transparent;
   }
 </style>
-<!-- {% endblock %}
+{% endblock %}
 
 <!-- Extra javascript here -->
-<!-- {% block script %}
-{% endblock %}-->
+{% block script %}
+{% endblock %}
 
 <!-- Main content here -->
-<!-- {% block main %}-->
+{% block main %}
 <div id="container-full-width">
     <div id="outputBox"></div>
     <div id="userlist">
@@ -253,12 +297,12 @@
     </div>
 </div>
 <div id="controlChat">
-    <div style="font-size: 14px; margin-bottom: 5px;">To <span id="recipient">all</span><span id="removeRec" onclick="removeRec()" title="Reset recipients to all">✕</span></div>
+    <div id="recContainer" style="font-size: 14px; margin-bottom: 5px;">To <span id="recipient">all</span><span id="removeRec" onclick="removeRec()" title="Reset recipients to all">✕</span></div>
     <form onsubmit="event.preventDefault(); onSubmit(); return false;" style="margin: 0;">
         <input id="input" placeholder="Enter a message" autocomplete="off">
         <input type="submit" value="Send" id="sendButton">
     </form>
-    <div style="font-size: 14px; margin-top: 5px;">Commands: <button onclick="enterCommand('!#help')">!#help</button></div>
+    <div id="commands" style="font-size: 14px; margin-top: 5px;">Commands: <button onclick="enterCommand('!#help')">!#help</button></div>
 </div>
 <script type="text/javascript">
     // Connect to Web Socket
@@ -329,7 +373,8 @@
     function changeRec(name, el) {
           receiver = name;
           boxes.recBox.innerHTML = receiver;
-          boxes.recBox.style.color = "var(--purple-color)";
+          boxes.recBox.style.color = "var(--light-purple)";
+          boxes.sendButton.classList.add("rec");
           //sendButton.value = "Send to " + receiver;
           //el.classList.add('whisper');
           document.getElementById("removeRec").style.display = "initial";
@@ -339,6 +384,7 @@
         receiver = 'all';
         boxes.recBox.innerHTML = "all";
         boxes.recBox.style.color = "white";
+        boxes.sendButton.style.color = "var(--ice-blue)";
         //sendButton.value = "Send";
         //el.classList.remove('whisper');
         document.getElementById("removeRec").style.display = "none";
@@ -391,11 +437,26 @@
         }
         else {
           newMSG.classList.add('them')
-          var usernameOnclick = "changeRec(\"" + message.from + "\", this)";
+          var usernameOnclick = `changeRec('${message.from}', this)`;
           var usernameTitle = "Send a private message";
         }
+
+        let date = new Date();
+        let month = date.getMonth() + 1;
+        let day = date.getDate();
+        let year = date.getFullYear().toString().slice(2);
+        let hour = date.getHours();
+        if (hour > 12) {
+          hour -= 12;
+          ampm = "PM";
+        } else {
+          if (hour == 0) hour = 12;
+          ampm = "AM";
+        }
+        let minute = date.getMinutes().toString();
+        if (minute.length == 1) minute = "0" + minute;
         //Use this if you want to allow HTML
-        newMSG.innerHTML = "<b class='username' onclick='" + usernameOnclick + "' title='" + usernameTitle + "'>" + message.from + "</b><div class='content'>" + message.content + "</div>"
+        newMSG.innerHTML = `<b class="username" onclick="${usernameOnclick}" title="${usernameTitle}">${message.from}</b> <span style="color: var(--light-blue);">${month}/${day}/${year} ${hour}:${minute} ${ampm}</span> <div class="content">${message.content}</div>`;
         //Use this if you want to convert HTML into text
         // newMSG.appendChild(document.createTextNode(message.from + ": " + message.content))
         boxes.outputBox.appendChild(newMSG);
@@ -406,5 +467,13 @@
       boxes.inputBox.value = command;
       boxes.inputBox.focus();
     }
+
+    let urlParams = new URLSearchParams(window.location.search);
+    let gamePlayer = urlParams.get("game");
+    if (gamePlayer) {
+      document.documentElement.classList.add("game");
+      changeRec(gamePlayer);
+      boxes.sendButton.value += " to " + gamePlayer;
+    }
 </script>
-<!-- {% endblock %} -->
+{% endblock %}

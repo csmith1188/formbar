@@ -589,7 +589,18 @@ def endpoint_home():
 #Default formbar in advanced expert mode
 @app.route('/expert')
 def endpoint_expert():
-    return render_template('expert.html')
+    if sD.studentDict:
+        username = sD.studentDict[request.remote_addr]['name']
+    else:
+        username = ''
+    sfx.updateFiles()
+    sounds = []
+    music = []
+    for key, value in sfx.sound.items():
+        sounds.append(key)
+    for key, value in bgm.bgm.items():
+        music.append(key)
+    return render_template('expert.html', username = username, serverIp = ip, sfx = sounds, bgm = music)
 
 @app.route('/games')
 def endpoint_games():
@@ -598,6 +609,11 @@ def endpoint_games():
 @app.route('/debug')
 def endpoint_debug():
     return render_template('debug.html')
+
+@app.route('/fighter')
+def endpoint_fighter():
+    #return render_template('fighter.html', serverIp = ip)
+    return render_template("message.html", forward=request.path, message = "Fighter will be ready to play soon.")
 
 #Before choosing endpoints you are required to log in
 @app.route('/login', methods = ['POST', 'GET'])
@@ -975,7 +991,7 @@ def endpoint_survey():
         vote = request.args.get('vote')
         if vote:
             if vote in ["a", "b", "c", "d"]:
-                if not sD.studentDict[request.remote_addr]['survey']:
+                if sD.studentDict[request.remote_addr]['survey'] != vote:
                     sD.studentDict[request.remote_addr]['survey'] = vote
                     playSFX("sfx_blip01")
                     surveyBar()
@@ -1006,8 +1022,8 @@ def endpoint_tutd():
         if thumb:
             # logging.info("Recieved " + thumb + " from " + name + " at ip: " + ip)
             if thumb == 'up' or thumb == 'down' or thumb == 'wiggle' :
-                if not sD.studentDict[request.remote_addr]['thumb']:
-                    sD.studentDict[request.remote_addr]['thumb'] = request.args.get('thumb')
+                if sD.studentDict[request.remote_addr]['thumb'] != thumb:
+                    sD.studentDict[request.remote_addr]['thumb'] = thumb
                     tutdBar()
                     return render_template("message.html", forward=request.path, message = "Thank you for your tasty bytes... (" + thumb + ")" )
                 else:
@@ -1193,6 +1209,10 @@ def endpoint_sendblock():
 def endpoint_getpix():
     return '{"pixels": "'+ str(pixels[:BARPIX]) +'"}'
 
+@app.route('/getphrase')
+def endpoint_getphrase():
+    return '{"phrase": "'+ str(sD.activePhrase) +'"}'
+
 
 @app.route('/2048')
 def endpoint_2048():
@@ -1303,6 +1323,26 @@ def endpoint_getpermissions():
 @app.route('/getbgm')
 def endpoint_getbgm():
     return '{"bgm": "'+ str(sD.bgm['nowplaying']) +'"}'
+
+@app.route('/getquizname')
+def endpoint_getquizname():
+    if sD.activeQuiz:
+        return '{"quizname": "'+ str(sD.activeQuiz['name']) +'"}'
+    else:
+        return '{"quizname": "''"}'
+
+@app.route('/getfightermatches')
+def endpoint_getfightermatches():
+    return '{"matches": "'+ str(sD.fighter) +'"}'
+
+@app.route('/createfightermatch')
+def endpoint_createfightermatch():
+    sD.fighter['match' + request.args.get('code')] = {} #Create new object for match
+    sD.fighter['match' + request.args.get('code')]['leader'] = request.args.get('name') #Set "leader" of object to arg "name"
+
+@app.route('/addfighteropponent')
+def endpoint_addfighteropponent():
+    sD.fighter['match' + request.args.get('code')]['opponent'] = request.args.get('name') #Set "leader" of object to arg "name"
 
 #This endpoint allows you to see the formbars IP with style and shows different colors.
 @app.route('/virtualbar')
@@ -1471,6 +1511,8 @@ def client_left(client, server):
 def message_received(client, server, message):
     try:
         message = json.loads(message)
+        if message['game'] == 'fighter':
+            server.send_message(message.to, json.dumps(message))
         if message['type'] == 'ttt':
             #For now, this will only forward the gamestate. We'll do validation later.
             #server.send_message(message.to, json.dumps(message))

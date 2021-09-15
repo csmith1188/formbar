@@ -73,13 +73,13 @@
   }
 
   .date {
-    color: var(--alt-color);
+    color: var(--light-blue);
     margin-right: 5px;
   }
 
   .alert .content {
     font-style: italic;
-    color: var(--alt-color);
+    color: var(--ice-blue);
   }
 
   #userlist {
@@ -188,18 +188,36 @@
     font: 14px "Segoe UI", sans-serif;
   }
 
-  #sendButton:hover, button:hover {
+  #sendButton:hover, #sendButton:focus, button:hover, button:focus {
     background-color: var(--ice-blue);
     color: var(--bg-dark);
+    outline: none;
   }
 
   #sendButton:active, button:active {
     background-color: white;
     border-color: white;
+    color: var(--bg-dark);
   }
 
   #sendButton:active {
     transform: translateX(4px);
+  }
+
+  #sendButton.rec {
+    color: var(--light-purple);
+    border-color: var(--light-purple);
+  }
+
+  #sendButton.rec:hover, #sendButton.rec:focus {
+    background-color: var(--light-purple);
+    color: var(--bg-dark);
+  }
+
+  #sendButton.rec:active {
+    background-color: white;
+    border-color: white;
+    color: var(--bg-dark);
   }
 
   a {
@@ -207,7 +225,7 @@
   }
 
   a:visited {
-    color: var(--alt-color);
+    color: var(--light-blue);
   }
 
   a:active {
@@ -234,6 +252,28 @@
     font: 14px "Segoe UI", sans-serif;
   }
 
+  .game #outputBox {
+    width: 100%;
+    height: calc(100% - 115px);
+  }
+
+  .game #userlist, .game #recContainer, .game #commands {
+    display: none;
+  }
+
+  .game #input, .game #sendButton {
+    width: calc(100% - 40px);
+  }
+
+  .game #sendButton {
+    display: block;
+    margin: 10px 0 0 0;
+  }
+
+  .game #sendButton:active {
+    transform: none;
+  }
+
   #quickmenu {
     display: none;
   }
@@ -257,7 +297,7 @@
     </div>
 </div>
 <div id="controlChat">
-    <div style="font-size: 14px; margin-bottom: 5px;">To <span id="recipient">all</span><span id="removeRec" onclick="removeRec()" title="Reset recipients to all">✕</span></div>
+    <div id="recContainer" style="font-size: 14px; margin-bottom: 5px;">To <span id="recipient">all</span><span id="removeRec" onclick="removeRec()" title="Reset recipients to all">✕</span></div>
     <form onsubmit="event.preventDefault(); onSubmit(); return false;" style="margin: 0;">
         <input id="input" placeholder="Enter a message" autocomplete="off">
         <input type="submit" value="Send" id="sendButton">
@@ -334,7 +374,7 @@
           receiver = name;
           boxes.recBox.innerHTML = receiver;
           boxes.recBox.style.color = "var(--light-purple)";
-          boxes.sendButton.style.color = "var(--light-purple)";
+          boxes.sendButton.classList.add("rec");
           //sendButton.value = "Send to " + receiver;
           //el.classList.add('whisper');
           document.getElementById("removeRec").style.display = "initial";
@@ -416,7 +456,7 @@
         let minute = date.getMinutes().toString();
         if (minute.length == 1) minute = "0" + minute;
         //Use this if you want to allow HTML
-        newMSG.innerHTML = `<b class="username" onclick="${usernameOnclick}" title="${usernameTitle}">${message.from}</b> <span style="color: var(--light-gray);">${month}/${day}/${year} ${hour}:${minute} ${ampm}</span> <div class="content">${message.content}</div>`;
+        newMSG.innerHTML = `<b class="username" onclick="${usernameOnclick}" title="${usernameTitle}">${message.from}</b> <span style="color: var(--light-blue);">${month}/${day}/${year} ${hour}:${minute} ${ampm}</span> <div class="content">${message.content}</div>`;
         //Use this if you want to convert HTML into text
         // newMSG.appendChild(document.createTextNode(message.from + ": " + message.content))
         boxes.outputBox.appendChild(newMSG);
@@ -431,12 +471,9 @@
     let urlParams = new URLSearchParams(window.location.search);
     let gamePlayer = urlParams.get("game");
     if (gamePlayer) {
-      document.getElementById("userlist").style.display = "none";
-      document.getElementById("commands").style.display = "none";
-      document.getElementById("outputBox").style.width = "100%";
-      document.getElementById("outputBox").style.height = "calc(100% - 97px)";
+      document.documentElement.classList.add("game");
       changeRec(gamePlayer);
-      document.getElementById("removeRec").style.display = "none";
+      boxes.sendButton.value += " to " + gamePlayer;
     }
 </script>
 {% endblock %}

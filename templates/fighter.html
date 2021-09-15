@@ -46,7 +46,7 @@
       --bg-dark-yellow: #430;
     }
 
-    body {
+    body, #content {
       background: var(--bg-dark);
       color: white;
       font: 16px "Segoe UI", sans-serif;
@@ -1328,7 +1328,6 @@
       matchCode = pickRandom(1000000).toString();
       while (matchCode.length < 6) matchCode = "0" + matchCode;
       me.team = 1;
-      request.open("GET", "/createfightermatch?code=" + matchCode + "&name=" + me.name);
       fighterOptions();
     }
 
@@ -1589,7 +1588,7 @@
 
       if (rematchCode) sendPlayerReady();
 
-      ////add match to app.py + leader, if full
+      request.open("GET", "/createfightermatch?code=" + matchCode + "&name=" + me.name);
 
       let tips = [
         "While in a match, look at the bottom of the screen for instructions.",

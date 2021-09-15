@@ -74,7 +74,7 @@
     background: transparent;
     border: 1px solid;
     border-radius: 6px;
-    color: #0040bf;
+    color: var(--color-blue);
     font-family: "Segoe UI", sans-serif;
     font-weight: bold;
   }
@@ -97,8 +97,7 @@
   button:hover,
   input[type="color"]:hover,
   .thumbButton:hover,
-  .letterButton:hover,
-  .smallImg:active {
+  .letterButton:hover {
     background: var(--light-gray);
   }
 
@@ -167,6 +166,17 @@
     border-radius: 48px;
   }
 
+  #quizName {
+    color: black;
+    font-weight: normal;
+  }
+
+  #quizButton {
+    height: 28px;
+    border-radius: 7px;
+    font-size: 16px;
+  }
+
   #text {
     text-transform: uppercase;
     font-family: monospace;
@@ -181,17 +191,6 @@
     border-radius: 0;
   }
 
-  #quizName {
-    color: black;
-    font-weight: normal;
-  }
-
-  #quizButton {
-    height: 28px;
-    border-radius: 7px;
-    font-size: 16px;
-  }
-
   #bottom {
     position: absolute;
     left: 0;
@@ -204,12 +203,6 @@
   .alert {
     font-weight: bold;
     color: #ff8040;
-  }
-
-  #logIn {
-    color: var(--color-blue);
-    text-decoration: underline;
-    cursor: pointer;
   }
 
   #rightSide {
@@ -256,7 +249,7 @@
 
   .menu {
     position: fixed;
-    top: 33px;
+    top: 32px;
     border: 1px var(--dark-gray);
     border-style: none solid solid;
     z-index: 2;
@@ -355,6 +348,12 @@
       <br><br><br>
     </div>
 
+    <div id="quizDiv" class="hidden">
+      <h1>Quiz: <span id="quizName"></h1>
+      <button id="quizButton" onclick="openPage('quiz');">Start quiz ▶</button>
+      <br><br><br>
+    </div>
+
     <div id="soundDiv" class="hidden">
       <h1>Sound effects</h1>
       <input type="text" id="sound" placeholder="Filename" list="sfxFiles">
@@ -414,18 +413,12 @@
       <img src="{{ url_for('static', filename='img/expert/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendPercent();">
       <br><br><br>
     </div>
-
-    <div id="quizDiv" class="hidden">
-      <h1>Quiz: <span id="quizName"></h1>
-      <button id="quizButton" onclick="openPage('quiz');">Start quiz ▶</button>
-      <br><br><br>
-    </div>
   </div>
 
   <div id="bottom">
     Mode: <span id="mode"></span>
     <br>
-    Name: <span id="name"></span> | <a id="logIn" onclick="logIn(true);">Log in again</a>
+    Name: <span id="name"></span> <button id="logIn" onclick="logIn(true);">Log in again</button>
     <br>
     <input type="checkbox" id="defaultCheckbox" style="margin-left: 0;" onchange="setDefault(this.checked);"><label for="defaultCheckbox">Use expert mode by default</label>
     <br>
@@ -438,14 +431,14 @@
     <div id="chatTab" class="tab" title="/chat" onclick="openPage('chat');"><img src="{{ url_for('static', filename='img/expert/chat.png') }}" class="icon"> <span id="newMessages" style="color: var(--light-red);"></span> Chat</div>
     <div id="wawdTab" class="tab" title="/wawd" onclick="openPage('wawd');"><img src="{{ url_for('static', filename='img/expert/wawd.png') }}" class="icon"> WAWD?</div>
     <div id="debugTab" class="tab" title="/debug" onclick="openPage('debug');"><img src="{{ url_for('static', filename='img/expert/debug.png') }}" class="icon"> API debug & virtual bar</div>
-    <div id="gamesTab" class="tab dropdown" onclick="showMenu('games');"><img src="{{ url_for('static', filename='img/expert/games.png') }}" class="icon"> Games</div>
+    <div id="gamesTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/expert/games.png') }}" class="icon"> Games</div>
     <div id="gamesMenu" class="menu hidden" tabindex="-1">
       <div id="fighterTab" class="tab" title="/fighter" onclick="openPage('fighter');">Turn-Based Fighter</div>
       <div id="hangmanTab" class="tab" title="/hangman" onclick="openPage('hangman');">Hangman</div>
       <div id="2048Tab" class="tab" title="/2048" onclick="openPage('2048');">2048</div>
       <div id="tttTab" class="tab" title="/ttt" onclick="openPage('ttt');">Tic-tac-toe</div>
     </div>
-    <div id="teacherTab" class="tab dropdown" onclick="showMenu('teacher');"><img src="{{ url_for('static', filename='img/expert/teacher.png') }}" class="icon"> Teacher</div>
+    <div id="teacherTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/expert/teacher.png') }}" class="icon"> Teacher</div>
     <div id="teacherMenu" class="menu hidden" tabindex="-1">
       <div id="settingsTab" class="tab" title="/settings" onclick="openPage('settings');">Settings</div>
       <div id="lessonTab" class="tab" title="/lesson" onclick="openPage('lesson');">Lesson</div>
@@ -461,7 +454,7 @@
   </div>
 
   <div>
-    <iframe src="file:///C:/Users/Admin/OneDrive%20-%20York%20County%20School%20of%20Technology/Programming/GitHub/formbar/templates/fighter.html" id="mainWindow" onload="pageOpened(this.contentWindow.location.pathname);"></iframe>
+    <iframe src="/chat" id="mainWindow" onload="pageOpened(this.contentWindow.location.pathname);"></iframe>
   </div>
 </div>
 
@@ -486,10 +479,11 @@
     setMenuWidths();
     updateVotes();
     nowPlaying();
+    let name = "{{ username }}";
     logIn();
     showEnabled();
     bottomPosition();
-    //quizName();
+    quizName();
     if (ep === null) ep = confirm("Do you want to use expert mode by default? " + "You will be redirected to this page automatically." + "\n" + "Choose \"Cancel\" to continue using the standard homepage.");
     setDefault(ep);
     openPage("chat");
@@ -499,7 +493,7 @@
       nowPlaying();
       showEnabled();
       bottomPosition();
-      //quizName();
+      quizName();
     }, 3000);
   };
 
@@ -566,12 +560,11 @@
   }
 
   function logIn(manual) {
-    let name = "{{ username }}";
     let nameBox = document.getElementById("name");
 
     //If already logged in
     if (manual) {
-      name = prompt("Enter your name", name);
+      name = prompt("Enter your name", name) || name; //If nothing input, do not change
     } else {
       while (!name) {
         //Continue asking until something input
@@ -581,13 +574,9 @@
     }
 
     let oldHeight = bottom.clientHeight;
-    if (name) {
-      nameBox.innerText = name;
-      request.open("GET", "/login?name=" + name);
-      request.send();
-    }
-    //If nothing input, reset to saved name
-    else name = "{{ username }}";
+    nameBox.innerText = name;
+    request.open("GET", "/login?name=" + name);
+    request.send();
 
     if (bottom.clientHeight > oldHeight) shorten(bottom, oldHeight, nameBox)
     else nameBox.removeAttribute("title");
@@ -654,13 +643,13 @@
     } else {
       chosenLetter = letter;
       if (letter == 0) {
-        request.open("GET", "/tutd?vote=a");
+        request.open("GET", "/survey?vote=a");
       } else if (letter == 1) {
-        request.open("GET", "/tutd?vote=b");
+        request.open("GET", "/survey?vote=b");
       } else if (letter == 2) {
-        request.open("GET", "/tutd?vote=c");
+        request.open("GET", "/survey?vote=c");
       } else if (letter == 3) {
-        request.open("GET", "/tutd?vote=d");
+        request.open("GET", "/survey?vote=d");
       }
       //Highlight selected button and reset others
       Array.from(letterButtons).forEach((button, i) => {
@@ -681,10 +670,15 @@
     else if (res.thumb == "down") thumb = 2;
     else thumb = false;
     let letter;
-    if (thumb === false && chosenThumb) thumbsVote(chosenThumb); //Remove the vote
+    if (res.survey == "a") letter = 0;
+    else if (res.survey == "b") letter = 1;
+    else if (res.survey == "c") letter = 2;
+    else if (res.survey == "d") letter = 3;
+    else letter = false;
+    if (thumb === false && chosenThumb !== false) thumbsVote(chosenThumb); //Remove the vote
     else if (thumb !== chosenThumb) thumbsVote(thumb);
-    ////if (letter === false && chosenLetter) thumbsVote(chosenLetter); //Remove the vote
-    ////else if (letter != chosenLetter) letterVote(letter);
+    if (letter === false && chosenLetter !== false) thumbsVote(chosenLetter); //Remove the vote
+    else if (letter !== chosenLetter) letterVote(letter);
   }
 
   function highlight(image) {
@@ -707,11 +701,11 @@
     if (image == "letterButton3") button.title = "Vote D";
   }
 
-  let sfx = "{{ sfx }}";
+  let sfx = eval("{{ sfx }}".replaceAll("&#39;", "'"));
 
-  /*sfx.forEach(sound => {
+  sfx.forEach(sound => {
     document.getElementById("sfxFiles").innerHTML += "<option value='" + sound + "'></option>";
-  });*/
+  });
 
   function sendSound() {
     let soundFile = document.getElementById("sound").value;
@@ -729,11 +723,11 @@
     document.getElementById("volNumber").innerText = volume;
   });
 
-  let bgm = "{{ bgm }}";
+  let bgm = eval("{{ bgm }}".replaceAll("&#39;", "'"));
 
-  /*bgm.forEach(song => {
+  bgm.forEach(song => {
     document.getElementById("bgmFiles").innerHTML += "<option value='" + song + "'></option>";
-  });*/
+  });
 
   function randomBGM() {
     document.getElementById("music").value = bgm[Math.floor(Math.random() * bgm.length)];
@@ -852,8 +846,7 @@
     request.open("GET", '/getquizname', false);
     request.send(null);
     let res = JSON.parse(request.responseText);
-    let quizName;
-    if (res) quizName = res.quizname;
+    let quizName = res.quizname;
 
     if (quizName) document.getElementById("quizName").innerText = quizName;
   }
@@ -892,13 +885,14 @@
     } else if (content.innerHTML.includes("Go Back")) { //Detects if the page has an error message (Is there a better way to do this?)
       let message = content.innerText.slice(0, -9);
       mainWindow.contentWindow.history.back();
+      setTimeout(() => alert(message), 20);
     }
 
     let tabs = document.querySelectorAll(".tab");
     let tabEl = document.getElementById(path.substring(1) + "Tab");
     Array.from(tabs).forEach(tab => tab.classList.remove("open"));
     if (["/fighter", "/hangman", "/2048", "/ttt"].includes(path)) document.getElementById("gamesTab").classList.add("open");
-    else if (["/settings", "/lesson", "/needshelp", "/debug"].includes(path)) document.getElementById("teacherTab").classList.add("open");
+    else if (["/settings", "/lesson", "/needshelp"].includes(path)) document.getElementById("teacherTab").classList.add("open");
     if (tabEl) tabEl.classList.add("open");
     if (path == "/chat") {
       newMessages = 0;
@@ -918,8 +912,16 @@
     });
   }
 
-  menus.forEach(menu => menu.addEventListener("blur", function() {this.classList.add("hidden");})) //Hide menu when user clicks elsewhere
-  menus.forEach(menu => menu.addEventListener("keydown", function(event) {if (event.code == "Escape") this.blur();})) //Hide menu when Esc key pressed
+  document.getElementById("gamesTab").onclick = () => showMenu("games");
+  document.getElementById("teacherTab").onclick = () => showMenu("teacher");
+  menus.forEach(menu => {
+    menu.addEventListener("blur", function() {
+      this.classList.add("hidden"); //Hide menu when user clicks elsewhere
+    });
+    menu.addEventListener("keydown", function() {
+      if (event.code == "Escape") this.blur(); //Hide menu when Esc key pressed
+    });
+  });
 
   ws.onmessage = message => {
     let data = JSON.parse(message.data);
@@ -938,8 +940,6 @@
   document.addEventListener("visibilitychange", () => {if (!document.hidden && mainWindow.contentWindow.location.pathname == "chat") document.title = "Expert Homepage"}); //When user goes to this page, if chat is open, remove number of new messages from title
 
   /*To do:
-  -Automatically get sfx and bgm arrays from server
-  -Enable/disable features individually instead of by mode
   -Alerts from sidebar
   */
 </script>

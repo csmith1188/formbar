@@ -589,7 +589,18 @@ def endpoint_home():
 #Default formbar in advanced expert mode
 @app.route('/expert')
 def endpoint_expert():
-    return render_template('expert.html')
+    if sD.studentDict:
+        username = sD.studentDict[request.remote_addr]['name']
+    else:
+        username = ''
+    sfx.updateFiles()
+    sounds = []
+    music = []
+    for key, value in sfx.sound.items():
+        sounds.append(key)
+    for key, value in bgm.bgm.items():
+        music.append(key)
+    return render_template('expert.html', username = username, serverIp = ip, sfx = sounds, bgm = music)
 
 @app.route('/games')
 def endpoint_games():
@@ -601,7 +612,8 @@ def endpoint_debug():
 
 @app.route('/fighter')
 def endpoint_fighter():
-    return render_template('fighter.html', username = sD.studentDict[request.remote_addr]['name'], serverIp = ip)
+    #return render_template('fighter.html', serverIp = ip)
+    return render_template("message.html", forward=forward, message="Fighter will be ready to play soon.")
 
 #Before choosing endpoints you are required to log in
 @app.route('/login', methods = ['POST', 'GET'])
@@ -1010,7 +1022,7 @@ def endpoint_tutd():
         if thumb:
             # logging.info("Recieved " + thumb + " from " + name + " at ip: " + ip)
             if thumb == 'up' or thumb == 'down' or thumb == 'wiggle' :
-                if sD.studentDict[request.remote_addr]['thumb'] != thumb: #!test
+                if sD.studentDict[request.remote_addr]['thumb'] != thumb:
                     sD.studentDict[request.remote_addr]['thumb'] = thumb
                     tutdBar()
                     return render_template("message.html", forward=request.path, message = "Thank you for your tasty bytes... (" + thumb + ")" )
@@ -1314,7 +1326,10 @@ def endpoint_getbgm():
 
 @app.route('/getquizname')
 def endpoint_getquizname():
-    return '{"quizname": "'+ str(sD.activeQuiz['name']) +'"}'
+    if sD.activeQuiz:
+        return '{"quizname": "'+ str(sD.activeQuiz['name']) +'"}'
+    else:
+        return '{"quizname": "''"}'
 
 @app.route('/getfightermatches')
 def endpoint_getfightermatches():

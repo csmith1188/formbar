@@ -20,7 +20,7 @@ class Session():
                 'api' : 3,
                 'sfx' : 1,
                 'bgm' : 1,
-                'say' : 1,
+                'say' : 3,
                 'bar' : 1,
                 'games': 2,
                 'teacher': 0,

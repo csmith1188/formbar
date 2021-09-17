@@ -161,6 +161,7 @@
     }
 
     #content {
+      /*Paste this to make a full-screen page*/
       position: fixed;
       left: 0;
       top: 0;
@@ -236,17 +237,19 @@
   		document.getElementById('wordBank').innerHTML = wordList[0]
   		for (let i = 1; i < wordList.length; i++) {
   			document.getElementById('wordBank').innerHTML += ', ' + wordList[i]
-  			document.getElementById("category").innerHTML = wordList[i];
+  			if (wordObj[word] && !(wordObj.place == "your" && wordObj.words == "here")) {
+          document.getElementById("category").innerHTML = wordList[i];
 
-  			letters = wordList[i].split('');
-  			displayWord = "";
-  			for (var j = 0; j < wordList[i].length; j++) {
-  				//Add an underscore for each character
-  				displayWord = displayWord + "_ ";
-  				savedWord = displayWord.split('');
-  			}
+    			letters = wordList[i].split('');
+    			displayWord = "";
+    			for (var j = 0; j < wordList[i].length; j++) {
+    				//Add an underscore for each character
+    				displayWord = displayWord + "_ ";
+    				savedWord = displayWord.split('');
+    			}
 
-  			document.getElementById("word").innerHTML = displayWord;
+    			document.getElementById("word").innerHTML = displayWord;
+        }
   		}
   	}
   	createList();
@@ -261,7 +264,6 @@
 				definitionRequest.onload = function() {
 					newDefinition = JSON.parse(definitionRequest.response);
 					if (newDefinition.title == "No Definitions Found") {
-            console.log("noDef");
             getNewWord();
           } else {
             newDefinition = newDefinition[0].meanings[0].definitions[0].definition;
@@ -299,16 +301,18 @@
 
   		word = wordList[Math.floor(Math.random() * wordList.length)];
 
-  		if (wordObj[word] && !(wordObj.place == "your" && wordObj.words == "here")) document.getElementById("category").innerHTML = wordObj[word];
+      if (wordObj[word] && !(wordObj.place == "your" && wordObj.words == "here")) {
+        document.getElementById("category").innerHTML = wordObj[word];
 
-  		letters = word.split('');
-  		displayWord = "";
-  		for (var i = 0; i < word.length; i++) {
-  			displayWord = displayWord + "_ ";
-  			savedWord = displayWord.split('');
-  		}
+    		letters = word.split('');
+    		displayWord = "";
+    		for (var i = 0; i < word.length; i++) {
+    			displayWord = displayWord + "_ ";
+    			savedWord = displayWord.split('');
+    		}
 
-  		document.getElementById("word").innerHTML = displayWord;
+    		document.getElementById("word").innerHTML = displayWord;
+      }
 
   	}
 

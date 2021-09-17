@@ -30,10 +30,8 @@
     }
 
     .container {
-      position: fixed;
-      width: fit-content;
-      left: 50%;
-      transform: translateX(calc(-100% + 226px));
+      margin: auto;
+      width: 452px;
       height: 100%;
       overflow: hidden;
       position: relative;
@@ -394,7 +392,7 @@
 
     #newGameButton {
       position: absolute;
-      left: 226px;
+      left: 50%;
       transform: translateX(-50%);
       top: 87%;
       padding: 8px 16px;
@@ -489,11 +487,16 @@
     }
 
     #content {
+      /*Paste this to make a full-screen page*/
       position: fixed;
-      top: 0;
       left: 0;
+      top: 0;
       width: 100%;
+      max-width: 100%; /*For some reason, this only works if max-width is present*/
       height: 100%;
+      box-sizing: border-box;
+      border-radius: 0;
+      background-color: transparent;
     }
   </style>
 {% endblock %}
@@ -504,25 +507,23 @@
 <!-- Main content here -->
 {% block main %}
   <div id="cover"></div>
-  <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%;">
-    <div class="container">
-      <div class="logo">2048
-      SPARTANS</div>
-      <div class="scoreBar">
-        <label>Score</label><br>
-        <label id="score">0</label>
-        <div id="addScore"></div>
+  <div class="container">
+    <div class="logo">2048
+    SPARTANS</div>
+    <div class="scoreBar">
+      <label>Score</label><br>
+      <label id="score">0</label>
+      <div id="addScore"></div>
 
-        <label style="position: absolute; right: 10px; top: 10px;">High score</label><br>
-        <label id="highScore">0</label>
-      </div>
-      <div id="gameOver">GAME OVER!</div>
-      <div id="stage"></div>
-      <!--<div id="gameOver hide">-->
-      <!--<div class="overText">GameOver!</div>-->
-      <!--</div>-->
-      <button id="newGameButton" onclick="window.location.reload();">New game</button>
+      <label style="position: absolute; right: 10px; top: 10px;">High score</label><br>
+      <label id="highScore">0</label>
     </div>
+    <div id="gameOver">GAME OVER!</div>
+    <div id="stage"></div>
+    <!--<div id="gameOver hide">-->
+    <!--<div class="overText">GameOver!</div>-->
+    <!--</div>-->
+    <button id="newGameButton" onclick="window.location.reload();">New game</button>
   </div>
   <script>
     if (localStorage.getItem("2048HighScore")) document.getElementById("highScore").innerHTML = localStorage.getItem("2048HighScore");

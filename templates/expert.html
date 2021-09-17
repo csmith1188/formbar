@@ -479,7 +479,7 @@
     setMenuWidths();
     updateVotes();
     nowPlaying();
-    let name = "{{ username }}";
+    let name = "{{ username }}" || localStorage.getItem("username");
     logIn();
     showEnabled();
     bottomPosition();
@@ -580,6 +580,8 @@
 
     if (bottom.clientHeight > oldHeight) shorten(bottom, oldHeight, nameBox)
     else nameBox.removeAttribute("title");
+
+    localStorage.setItem("username", name);
   }
 
   function shorten(container, maxHeight, text) {
@@ -875,8 +877,7 @@
   function pageOpened(path) {
     let content = mainWindow.contentWindow.document.getElementById("content");
 
-    if (path == "/") mainWindow.contentWindow.location = "/?noRedirect=true";
-    else if (path == "/expert") openPage("chat");
+    if (path == "/expert") openPage("chat");
     else if (!content) {
       //Put error message in alert and go back
       let message = mainWindow.contentWindow.document.body.innerText;

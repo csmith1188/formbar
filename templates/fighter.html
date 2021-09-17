@@ -659,7 +659,14 @@
     }
 
     #content {
-      background-color: transparent;
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100%;
+      max-width: 100%; /*For some reason, this only works if max-width is present*/
+      height: 100%;
+      box-sizing: border-box;
+      border-radius: 0;
     }
   </style>
 {% endblock %}
@@ -1296,17 +1303,18 @@
     }
 
     function joinMatch(code) {
-      request.open("GET", '/getfighter', false);
+      /*request.open("GET", '/getfightermatches', false);
       request.send(null);
       let res = JSON.parse(request.responseText);
-      match = res["match" + code];
+      match = res["match" + code];*/
+      match = {leader: me.name}; ////
       if (!match) {
         alert("Match does not exist.");
       } else if (match.opponent) {
         alert("Match is already full.");
       } else {
         me.team = 2;
-        opponent.name = leader;
+        opponent.name = match.leader;
         ws.send(JSON.stringify({
           game: "fighter",
           type: "join",
@@ -1481,7 +1489,7 @@
         document.getElementById("itemOptions").innerHTML +=
         `<div class="itemNameAndImage">
           <h3>${capitalize(itemObj.name)}</h3><br>
-          <img id="${item}" class="item targetOption" src="{{ url_for('static', filename='img/fighter/${item}.png') }}" draggable="false">
+          <img id="${item}" class="item targetOption" src="/static/img/fighter/${item}.png" draggable="false">
         </div>`;
       });
       itemsArr.forEach(item => {
@@ -1524,7 +1532,7 @@
         let slotEl = document.getElementById("myItemSlot" + i);
         let imgEl = document.getElementById("myItem" + i);
         if (me.items[i]) {
-          imgEl.src = "{{ url_for('static', filename='img/fighter/" + me.items[i] + ".png') }}";
+          imgEl.src = "/static/img/fighter/" + me.items[i] + ".png";
           imgEl.classList.add("removable");
           imgEl.title = "Remove";
           slotEl.classList.add("filled");
@@ -1680,13 +1688,13 @@
       //Add item images and give them titles
       me.items.forEach((item, i) => {
         let el = document.getElementById("p" + me.team + "-item" + i);
-        el.src = "{{ url_for('static', filename='img/fighter/" + item + ".png') }}";
+        el.src = "/static/img/fighter/" + item + ".png";
         el.title = items[item].description;
       });
 
       opponent.items.forEach((item, i) => {
         let el = document.getElementById("p" + opponent.team + "-item" + i);
-        el.src = "{{ url_for('static', filename='img/fighter/" + item + ".png') }}";
+        el.src = "/static/img/fighter/" + item + ".png";
         el.title = items[item].description;
       });
 

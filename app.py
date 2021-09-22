@@ -602,18 +602,18 @@ def endpoint_expert():
         music.append(key)
     return render_template('expert.html', username = username, serverIp = ip, sfx = sounds, bgm = music)
 
-@app.route('/games')
-def endpoint_games():
-    return render_template('games.html')
-
 @app.route('/debug')
 def endpoint_debug():
     return render_template('debug.html')
 
 @app.route('/fighter')
 def endpoint_fighter():
-    #return render_template('fighter.html', serverIp = ip)
-    return render_template("message.html", forward=request.path, message = "Fighter will be ready to play soon.")
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
+    else:
+        return render_template('fighter.html', username = sD.studentDict[request.remote_addr]['name'], serverIp = ip)
 
 #Before choosing endpoints you are required to log in
 @app.route('/login', methods = ['POST', 'GET'])
@@ -1333,16 +1333,21 @@ def endpoint_getquizname():
 
 @app.route('/getfightermatches')
 def endpoint_getfightermatches():
-    return '{"matches": "'+ str(sD.fighter) +'"}'
+    return json.dumps(sD.fighter)
 
 @app.route('/createfightermatch')
 def endpoint_createfightermatch():
-    sD.fighter['match' + request.args.get('code')] = {} #Create new object for match
-    sD.fighter['match' + request.args.get('code')]['leader'] = request.args.get('name') #Set "leader" of object to arg "name"
+    code = request.args.get('code')
+    name = request.args.get('name')
+    sD.fighter['match' + code] = {} #Create new object for match
+    sD.fighter['match' + code]['creator'] = name #Set "creator" of object to arg "name"
+    return 'Match ' + code + ' created by ' + name
 
 @app.route('/addfighteropponent')
 def endpoint_addfighteropponent():
-    sD.fighter['match' + request.args.get('code')]['opponent'] = request.args.get('name') #Set "leader" of object to arg "name"
+    code = request.args.get('code')
+    name = request.args.get('name')
+    sD.fighter['match' + code]['opponent'] = name #Set "opponent" of object to arg "name"
 
 #This endpoint allows you to see the formbars IP with style and shows different colors.
 @app.route('/virtualbar')

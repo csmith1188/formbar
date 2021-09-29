@@ -122,7 +122,6 @@
   <div id="buttonContainer">
     <button id="/getpix" onclick="request('/getpix')">/getpix</button>
     <button id="/getme" onclick="request('/getme')">/getme</button>
-    <button id="/getstudents" onclick="request('/getstudents')">/getstudents</button>
     <button id="/getpermissions" onclick="request('/getpermissions')">/getpermissions</button>
   </div>
 
@@ -133,7 +132,7 @@
 
   <script>
     let xhr = new XMLHttpRequest();
-    let urls = ["/getpix", "/getme", "/getstudents", "/getpermissions"];
+    let urls = ["/getpix", "/getme", "/getpermissions"];
     let timeLeft = 3;
     let dataURL = "/getpix";
 

@@ -13,37 +13,6 @@
     :root {
       --attack-x: 0;
       --attack-y: 0;
-
-      --color-red: #bf0000;
-      --color-brown: #802000;
-      --color-orange: #ff4000;
-      --color-gold: #fa0;
-      --color-yellow: #ffbf00;
-      --color-green: #00bf00;
-      --color-cyan: #009fbf;
-      --color-blue: #0040bf;
-      --color-purple: #bf00ff;
-      --color-pink: #ff4080;
-      --dark-gray: #555;
-
-      --light-red: #ff6860;
-      --light-brown: #bf6040;
-      --light-orange: #ffaf60;
-      --light-yellow: #ffdf80;
-      --light-green: #80ff80;
-      --light-cyan: #80ffbf;
-      --ice-blue: #bfcfff;
-      --light-blue: #8f9bbf;
-      --light-purple: #df80ff;
-      --light-pink: #ff80bfff;
-      --light-gray: #ccc;
-
-      --bg-dark: #303234;
-      --bg-darker: #202123;
-      --bg-dark-highlight: #404345;
-      --bg-dark-purple: #423;
-      --bg-dark-green: #423;
-      --bg-dark-yellow: #430;
     }
 
     body, #content {
@@ -1216,7 +1185,8 @@
     }
 
     function sendMessage(content, recipient = opponent.name) {
-      console.log(content); ///for testing
+      /*//for testing
+      console.log(content); ///et*/
       let messageObj = {
         type: "message",
         to: recipient,
@@ -1238,8 +1208,8 @@
       moveObj.from = me.name;
       ws.send(JSON.stringify(moveObj));
 
-      ///for testing
-      receiveMove(moveObj);
+      /*//for testing
+      receiveMove(moveObj); ///et*/
     }
 
     ws.onmessage = message => {
@@ -1305,18 +1275,21 @@
     }
 
     function joinMatch(code) {
-      /*request.open("GET", '/getfightermatches', false);
+      request.open("GET", '/getfightermatches', false);
       request.send(null);
       let res = JSON.parse(request.responseText);
-      match = res["match" + code];*/
-      match = {leader: me.name}; ////
+      match = res["match" + code];
+      /*//for testing
+      match = {creator: me.name}; ///et*/
       if (!match) {
         alert("Match does not exist.");
       } else if (match.opponent) {
         alert("Match is already full.");
+      } else if (match.creator == me.name) {
+        alert("You can't join your own match.");
       } else {
         me.team = 2;
-        opponent.name = match.leader;
+        opponent.name = match.creator;
         ws.send(JSON.stringify({
           game: "fighter",
           type: "join",
@@ -1329,7 +1302,7 @@
     function rematch() {
       me.team = 1;
       ////get match
-      opponent.name = match.leader;
+      opponent.name = match.creator;
       fighterOptions();
     }
 
@@ -1346,7 +1319,7 @@
       document.getElementById("chooseFighters").classList.remove("hidden");
 
       lockedColors.forEach((color) => {
-        ///for testing
+        /*//for testing ///et*/
         if ((color.unlockWins && me.wins >= color.unlockWins)/* || localStorage.getItem(color.color + "Unlocked")*/) { //If player has enough wins to unlock or already unlocked
           colors.push(color);
           lockedColors = lockedColors.filter(locked => locked != color);
@@ -1354,7 +1327,7 @@
           let el = document.getElementById(color.color + "Fighter");
           let lockedMessage;
           if (color.unlockWins) lockedMessage = color.unlockWins + " wins to unlock";
-          ///for testing
+          /*//for testing ///et*/
           else if (localStorage.getItem(color.color + "Unlocked")) lockedMessage = "Temporarily disabled<br>due to bugs";
           else lockedMessage = color.unlockStreak + "-win streak to unlock";
           el.classList.add("fighter", "locked");
@@ -1559,7 +1532,7 @@
         }
       });
 
-      ///for testing
+      /*//for testing
       let of1 = colors[pickRandom(7)];
       let of2;
       do {of2 = colors[pickRandom(7)]} while (of2 == of1);
@@ -1571,6 +1544,7 @@
         if (typeof of2[property] == "object") fighter2b[property] = JSON.parse(JSON.stringify(of2[property])); //Perform a "deep copy" so object can be modified without changing original
         else fighter2b[property] = of2[property];
       }
+      ///et*/
 
       while (me.items.length < 3) {
         let random = pickRandom(itemsArr.length);
@@ -1599,6 +1573,7 @@
       if (rematchCode) sendPlayerReady();
 
       request.open("GET", "/createfightermatch?code=" + matchCode + "&name=" + me.name);
+      request.send();
 
       let tips = [
         "While in a match, look at the bottom of the screen for instructions.",
@@ -1617,7 +1592,7 @@
       ////document.getElementById("video").src = "https://www.youtube.com/embed/" + videos[randomVideo] + "?autoplay=1&fs=0&modestbranding=1";
       ////if (true) document.getElementById("video").src += "&cc_load_policy=1&mute=1";
 
-      ///for testing
+      /*//for testing
       receivePlayerReady({
         name: "Player 2",
         team: 2,
@@ -1629,12 +1604,14 @@
         losses: 0,
         winStreak: 0,
       });
+      ///et*/
     }
 
     function receivePlayerReady(player) {
       opponent = player;
       if (me.team == 1) {
-        request.open("GET", "/addfighteropponent?code=" + matchCode + "&name=" + me.name);
+        request.open("GET", "/addfighteropponent?code=" + matchCode + "&name=" + player.name);
+        request.send();
         sendPlayerReady();
       }
       else matchCode = player.match;
@@ -1725,9 +1702,10 @@
       if (active == me) inactive = opponent;
       else inactive = me;
 
-      ///for testing
+      /*//for testing
       me = active;
       opponent = inactive;
+      ///et*/
 
       let activeNameEl = document.getElementById("p" + active.team + "-name");
       activeNameEl.style.color = "var(--light-red)";
@@ -2219,12 +2197,13 @@
         slot: slot
       }));
 
-      ///for testing
+      /*//for testing
       receiveItem({
         item: item,
         target: target,
         slot: slot
       });
+      ///et*/
     }
 
     function removeItemtargets() {
@@ -2481,5 +2460,7 @@
         window.location = "/fighter";
       }
     }
+
+    ////delete own matches on disconnect
   </script>
 {% endblock %}

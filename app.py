@@ -613,7 +613,8 @@ def endpoint_fighter():
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
-        return render_template('fighter.html', username = sD.studentDict[request.remote_addr]['name'], serverIp = ip)
+        #return render_template('fighter.html', username = sD.studentDict[request.remote_addr]['name'], serverIp = ip)
+        return render_template("message.html", forward=request.path, message = "Fighter will be ready to play soon.")
 
 #Before choosing endpoints you are required to log in
 @app.route('/login', methods = ['POST', 'GET'])

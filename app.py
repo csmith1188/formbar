@@ -35,9 +35,9 @@ log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
 #Get internal IP address
-    #for wireless connections:
+#for wireless connections:
 #ip = ni.ifaddresses('wlan0')[ni.AF_INET][0]['addr']
-    #for wired connections
+#for wired connections
 ip = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
 
 #Set the websocket port for chat and live actions
@@ -45,6 +45,9 @@ WSPORT=9001
 
 #Display IP address to console for user connection
 logging.info('Running formbar server on:' + ip)
+
+#Enable/Disable basic debugging w/o logging
+DEBUG = True
 
 #Importing customs modules
 import letters
@@ -56,9 +59,9 @@ import sessions
 import ir
 
 #Set the maximum number of pixels on the bar
-BARPIX = 240
+BARPIX = 300
 #Set the maximum number of pixels, including pixelpanels
-MAXPIX = 762
+MAXPIX = 812
 
 #Scan the sfx and bgm folders
 sfx.updateFiles()
@@ -84,15 +87,7 @@ words = json.loads(open('data/words.json').read())
 # 3 - anyone
 # 4 - banned
 
-whiteList = [
-    '127.0.0.1',
-    '172.21.3.5'
-    ]
-
 banList = []
-
-up = down = wiggle = 0
-ipList = {}
 helpList = {}
 blockList = []
 colorDict = {
@@ -123,6 +118,11 @@ def endpoint_anitest():
     else:
         return 'Too many threads'
 '''
+
+def dbug(message='Checkpoint Reached'):
+    global DEBUG
+    if DEBUG:
+        print("[DEBUG] " + str(message))
 
 def newStudent(remote, username, pin=''):
     if not remote in sD.studentDict:
@@ -391,8 +391,10 @@ def surveyBar():
     clearBar()
     #Go through IP list and see what each IP sent as a response
     for student in sD.studentDict:
-        #add this result to the results list
-        results.append(sD.studentDict[student]['survey'])
+        #if the survey answer is a valid a, b, c, or d:
+        if sD.studentDict[student]['survey'] in ['a', 'b', 'c', 'd']:
+            #add this result to the results list
+            results.append(sD.studentDict[student]['survey'])
     #The number of results is how many have complete the survey
     complete = len(results)
     #calculate the chunk length for each student
@@ -524,11 +526,12 @@ def autoStudentCount():
     if sD.settings['numStudents'] == 0:
         sD.settings['numStudents'] = 1
 
-def stripUser(perm):
+def stripUser(perm, exclude=True):
     newList = {}
     for student in sD.studentDict:
         if sD.studentDict[student]['perms'] > sD.settings['perms'][perm]:
-            newList[student] = sD.studentDict[student]
+            if exclude and sD.studentDict[student]['perms'] < 4:
+                newList[student] = sD.studentDict[student]
     return newList
 
 def stripUserData(perm='', sList={}):
@@ -576,6 +579,7 @@ def updateStep():
         sD.settings['barmode'] = 'progress'
         sD.activeProgress = sD.lesson.progList[step['Prompt']]
         for student in sD.studentDict:
+            sD.studentDict[student]['progress'] = []
             for task in sD.activeProgress['task']:
                 sD.studentDict[student]['progress'].append(False)
         sD.wawdLink = '/progress'
@@ -627,7 +631,12 @@ def endpoint_login():
             username = request.form['username']
             forward = request.form['forward']
             #pin = request.form['pin']
-            if username.strip():
+            print(remote)
+            if username.strip() and remote == '127.0.0.1':
+                newStudent(remote, username)
+                sD.studentDict[remote]['perms'] = sD.settings['perms']['admin']
+                return "success"
+            elif username.strip():
                 newStudent(remote, username)
                 if forward:
                     return redirect(forward, code=302)
@@ -651,7 +660,7 @@ Query Parameters:
 def endpoint_color():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
-    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['bar']:
+    elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['bar']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
         try:
@@ -676,7 +685,7 @@ def endpoint_color():
 def endpoint_segment():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
-    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['bar']:
+    elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['bar']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
         type = request.args.get('type')
@@ -737,12 +746,7 @@ def endpoint_wawd():
 def endpoint_lesson():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
-    '''
-    if sD.settings['locked'] == True:
-        if not request.remote_addr in whiteList:
-            return render_template("message.html", message = "You are not whitelisted. " )
-    '''
-    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['bar']:
+    elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['bar']:
         return render_template("message.html", forward=request.path, message = "You do not have high enough permissions to do this right now. " )
     else:
         if request.method == 'POST':
@@ -849,12 +853,7 @@ def endpoint_lesson():
 def endpoint_progress():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
-    '''
-    if sD.settings['locked'] == True:
-        if not request.remote_addr in whiteList:
-            return render_template("message.html", message = "You are not whitelisted. " )
-    '''
-    # if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['bar']:
+    #el if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['bar']:
     #     return render_template("message.html", forward=request.path, message = "You do not have high enough permissions to do this right now. " )
     # else:
     if request.args.get('check'):
@@ -879,11 +878,6 @@ def endpoint_progress():
 def endpoint_settings():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
-    '''
-    if sD.settings['locked'] == True:
-        if not request.remote_addr in whiteList:
-            return render_template("message.html", message = "You are not whitelisted. " )
-    '''
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['admin']:
         return render_template("message.html", forward=request.path, message = "You do not have high enough permissions to do this right now. " )
     else:
@@ -907,7 +901,7 @@ def endpoint_settings():
                     try:
                         argInt = int(request.args.get(arg))
                         if arg in sD.settings['perms']:
-                            if argInt > 3 or argInt < 0:
+                            if argInt > 4 or argInt < 0:
                                 resString += "Permission value out of range! "
                             else:
                                 sD.settings['perms'][arg] = argInt
@@ -955,11 +949,6 @@ def endpoint_flush():
 def endpoint_quiz():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
-    '''
-    if sD.settings['locked'] == True:
-        if not request.remote_addr in whiteList:
-            return render_template("message.html", message = "You are not whitelisted. " )
-    '''
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['student']:
         return render_template("message.html", forward=request.path, message = "You do not have high enough permissions to do this right now. " )
     else:
@@ -1062,7 +1051,7 @@ def endpoint_help():
         else:
             helpList[name] = "Help ticket"
             playSFX("sfx_up04")
-            return render_template("message.html", forward=request.path, message = "Your ticket was sent. Keep working on the problem the best you can while you wait." )
+            return render_template("message.html", forward=request.path, message = "Your ticket was sent. <b>Keep working on the problem the best you can while you wait.</b>" )
     else:
         return render_template("help.html")
 
@@ -1152,7 +1141,7 @@ def endpoint_user():
                         try:
                             perm = int(request.args.get('perm'))
                             if user in sD.studentDict:
-                                if perm > 3 or perm < 0 :
+                                if perm > 4 or perm < 0 :
                                     return render_template("message.html", forward=request.path, message = "Permissions out of range." )
                                 else:
                                     sD.studentDict[user]['perms'] = perm
@@ -1409,6 +1398,15 @@ def endpoint_bgm():
                     return render_template("message.html", forward=request.path, message = "It has only been " + str(int(time.time() - sD.bgm['lastTime'])) + " seconds since the last song started. Please wait at least 60 seconds.")
             else:
                 return render_template("message.html", forward=request.path, message = "Cannot find that filename!")
+        elif request.args.get('voladj'):
+            if request.args.get('voladj') == 'up':
+                volBGM('up')
+                return render_template("message.html", message = 'Music volume increased by one increment.' )
+            elif request.args.get('voladj') == 'down':
+                volBGM('down')
+                return render_template("message.html", message = 'Music volume decreased by one increment.' )
+            else:
+                return render_template("message.html", message = 'Invalid voladj. Use \'up\' or \'down\'.' )
         else:
             resString = '<a href="/bgmstop">Stop Music</a>'
             resString += '<h2>Now playing: ' + sD.bgm['nowplaying'] + '</h2>'
@@ -1430,7 +1428,7 @@ def endpoint_bgmstop():
 def endpoint_perc():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
-    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['bar']:
+    elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['bar']:
         return render_template("message.html", forward=request.path, message = "You do not have high enough permissions to do this right now. " )
     else:
         percAmount = request.args.get('amount')
@@ -1445,7 +1443,7 @@ def endpoint_perc():
 def endpoint_say():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
-    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['bar']:
+    elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['bar']:
         return render_template("message.html", forward=request.path, message = "You do not have high enough permissions to do this right now. " )
     else:
         sD.activePhrase = request.args.get('phrase')
@@ -1605,8 +1603,8 @@ def start_IR():
 if __name__ == '__main__':
     chatApp = threading.Thread(target=start_chat, daemon=True)
     chatApp.start()#Starts up the chat feature
-    irApp = threading.Thread(target=start_IR, daemon=True)
-    irApp.start()#Starts up the chat feature
+    #irApp = threading.Thread(target=start_IR, daemon=True)
+    #irApp.start()#Starts up the chat feature
     # flaskApp = threading.Thread(target=start_flask)
     # flaskApp.start()
     # flaskApp.join()

@@ -3,3 +3,4 @@ send.bat
 info.log
 __pycache__
 lessondata/*
+run.bat

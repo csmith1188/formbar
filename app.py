@@ -53,14 +53,14 @@ if ONRPi:
     import board, neopixel
 
 #Importing customs modules
-import letters
-import sfx
-import bgm
-from colors import colors, hex2dec
-import lessons
-import sessions
+from modules import letters
+from modules import sfx
+from modules import bgm
+from modules.colors import colors, hex2dec
+from modules import lessons
+from modules import sessions
 if ONRPi:
-    import ir
+    from modules import ir
 
 #Get internal IP address
 #for wireless connections:

@@ -40,7 +40,7 @@ def updateFiles():
         #Check last five letters are the correct file extension
         if file[-5:] == '.xlsx':
             #Add them to the lessonsFiles list if so
-            lessons[file[:-5]] = os.path.dirname(os.path.abspath(__file__)) + "/../lessondata/" + file
+            lessons[file[:-5]] = "/home/pi/formbar/lessondata/" + file
     return lessons
 
 def readBook(incBook):

@@ -16,9 +16,11 @@
 
 <h1 style="color: blue">Login</h1>
 <form action="login" method="post">
-    <h3>Name</h3>
-    <input type="text" id="usernameBox" name="username" value="">
+    <p>Leave password box blank to sign in as a <b>Guest</b>.</p>
+    <input type="text" id="usernameBox" name="username" placeholder="Username" value="">
+    <input type="password" id="passwordBox" name="password" placeholder="Password" value="">
     <input type="hidden" id="forwardBox" name="forward">
+    <input type="hidden" id="botBox" name="bot" value="False">
     <input type="submit" value="Log In">
 </form>
 

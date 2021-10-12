@@ -76,9 +76,9 @@ if ONRPi:
 #for wireless connections:
 #ip = ni.ifaddresses('wlan0')[ni.AF_INET][0]['addr']
 #for wired connections
-# ip = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
+ip = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
 #for manual addresses
-ip = "127.0.0.1"
+#ip = "127.0.0.1"
 
 #Set the websocket port for chat and live actions
 WSPORT=9001
@@ -271,7 +271,7 @@ def changeMode(newMode='', direction='next'):
         completeBar()
     elif sD.settings['barmode'] == 'progress':
         if sD.lesson:
-            percFill(sD.lesson.checkProg(stripUser('admin')))
+            percFill(sD.lesson.checkProg(stripUser()))
     elif sD.settings['barmode'] == 'playtime':
         clearString()
         showString(sD.activePhrase)
@@ -388,7 +388,7 @@ def percFill(amount, fillColor=colors['green'], emptyColor=colors['red']):
             pixels.show()
     if sD.settings['captions']:
         clearString()
-        showString("PROG " + str(sD.lesson.checkProg(stripUser('admin'))))
+        showString("PROG " + str(sD.lesson.checkProg(stripUser())))
     if ONRPi:
         pixels.show()
 
@@ -422,7 +422,7 @@ def repeatMode():
         for student in sD.studentDict:
             for task in sD.lesson.progList[step['Prompt']]['task']:
                 sD.studentDict[student]['progress'].append(False)
-        percFill(sD.lesson.checkProg(stripUser('admin')))
+        percFill(sD.lesson.checkProg(stripUser()))
     elif sD.settings['barmode'] == 'playtime':
         sD.activePhrase = ''
         clearString()
@@ -534,14 +534,15 @@ def tutdBar():
         autoStudentCount()
     upFill = upCount = downFill = wiggleFill = 0
     complete = 0
-    for x in sD.studentDict:
-        if sD.studentDict[x]['thumb']:
-            if sD.studentDict[x]['thumb'] == 'up':
+    tempDict = stripUser(minperm=sD.settings['perms']['bar'])
+    for student in tempDict:
+        if tempDict[student]['thumb']:
+            if tempDict[student]['thumb'] == 'up':
                 upFill += 1
                 upCount += 1
-            elif sD.studentDict[x]['thumb'] == 'down':
+            elif tempDict[student]['thumb'] == 'down':
                 downFill += 1
-            elif sD.studentDict[x]['thumb'] == 'wiggle':
+            elif tempDict[student]['thumb'] == 'wiggle':
                 wiggleFill += 1
             complete += 1
     for pix in range(0, BARPIX):
@@ -550,7 +551,7 @@ def tutdBar():
         chunkLength = math.floor(BARPIX / sD.settings['numStudents'])
     else:
         chunkLength = math.floor(BARPIX / complete)
-    for index, ip in enumerate(sD.studentDict):
+    for index, ip in enumerate(tempDict):
         pixRange = range((chunkLength * index), (chunkLength * index) + chunkLength)
         if upFill > 0:
             for i, pix in enumerate(pixRange):
@@ -629,11 +630,11 @@ def autoStudentCount():
     if sD.settings['numStudents'] == 0:
         sD.settings['numStudents'] = 1
 
-def stripUser(perm, exclude=True):
+def stripUser(maxperm='mod', minperm='student'):
     newList = {}
     for student in sD.studentDict:
-        if sD.studentDict[student]['perms'] > sD.settings['perms'][perm]:
-            if exclude and sD.studentDict[student]['perms'] < 4:
+        if sD.studentDict[student]['perms'] >= sD.settings['perms'][maxperm]:
+            if sD.studentDict[student]['perms'] <= sD.settings['perms'][minperm]:
                 newList[student] = sD.studentDict[student]
     return newList
 
@@ -1678,21 +1679,23 @@ def endpoint_ttt():
 def endpoint_tutd():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['student']:
+        return render_template("message.html", forward=request.path, message = "You do not have high enough permissions to do this right now. " )
     else:
         ip = request.remote_addr
         thumb = request.args.get('thumb')
         if thumb:
             # print("[info] " + "Recieved " + thumb + " from " + name + " at ip: " + ip)
             if thumb in ['up', 'down', 'wiggle']:
-                if sD.studentDict[request.remote_addr]['thumb'] != thumb:
-                    sD.studentDict[request.remote_addr]['thumb'] = thumb
+                if sD.studentDict[ip]['thumb'] != thumb:
+                    sD.studentDict[ip]['thumb'] = thumb
                     tutdBar()
                     return render_template("message.html", forward=request.path, message = "Thank you for your tasty bytes... (" + thumb + ")" )
                 else:
                     return render_template("message.html", forward=request.path, message = "You've already sunmitted this answer... (" + thumb + ")" )
             elif thumb == 'oops':
-                if sD.studentDict[request.remote_addr]['thumb']:
-                    sD.studentDict[request.remote_addr]['thumb'] = ''
+                if sD.studentDict[ip]['thumb']:
+                    sD.studentDict[ip]['thumb'] = ''
                     playSFX("sfx_hit01")
                     tutdBar()
                     return render_template("message.html", forward=request.path, message = "I won\'t mention it if you don\'t" )
@@ -1719,7 +1722,7 @@ def endpoint_tutd():
 
 #This endpoint allows us to see which user(Student) is logged in.
 @app.route('/users')
-def endpoint_user():
+def endpoint_users():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['users']:
@@ -1763,6 +1766,13 @@ def endpoint_user():
                                     return render_template("message.html", forward=request.path, message = "Permissions out of range." )
                                 else:
                                     sD.studentDict[user]['perms'] = perm
+                                    #Open and connect to database
+                                    db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+                                    dbcmd = db.cursor()
+                                    userFound = dbcmd.execute("UPDATE users SET permissions=:perms WHERE username=:uname", {"uname": sD.studentDict[user]['name'], "perms": sD.studentDict[user]['perms']})
+                                    db.commit()
+                                    db.close()
+                                    print("[info] " + "")
                                     return render_template("message.html", forward=request.path, message = "Changed user permission." )
                             else:
                                 return render_template("message.html", forward=request.path, message = "User not in list." )

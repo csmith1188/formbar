@@ -29,6 +29,7 @@ class Session():
                 'anyone': 3,
                 'banned': 4
             },
+            'permname': ['Teacher', 'Mod', 'Student', 'Guest', 'Banned'],
             'locked' : False,
             'paused' : False,
             'blind' : False,

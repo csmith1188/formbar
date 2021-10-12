@@ -3,4 +3,6 @@ send.bat
 info.log
 __pycache__
 lessondata/*
+data/database.db
 run.bat
+key.py

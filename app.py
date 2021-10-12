@@ -24,7 +24,7 @@
 
 
 #Set to True for RPi, False for PC
-ONRPi = False
+ONRPi = True
 
 #Enable/Disable dbug() blurbs
 DEBUG = True
@@ -1211,10 +1211,7 @@ def endpoint_login():
             passwordCrypt = cipher.encrypt(password.encode()) #Required to be bytes?
             forward = request.form['forward']
             bot = request.form['bot']
-            if bot == "True":
-                bot = True
-            else:
-                bot = False
+            bot = bot.lower() == "true"
             if username and password:
                 #Open and connect to database
                 db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
@@ -1240,7 +1237,7 @@ def endpoint_login():
                 else:
                     db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
                     dbcmd = db.cursor()
-                    userFound = dbcmd.execute("INSERT INTO users (username, password, permissions, bot) VALUES (?, ?, ?)", (username, passwordCrypt, sD.settings['perms']['anyone'], str(bot)))
+                    userFound = dbcmd.execute("INSERT INTO users (username, password, permissions, bot) VALUES (?, ?, ?, ?)", (username, passwordCrypt, sD.settings['perms']['anyone'], str(bot)))
                     db.commit()
                     db.close()
                     newStudent(remote, username, bot=bot)

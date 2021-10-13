@@ -1094,30 +1094,25 @@
     let fighter1a = {
       team: 1,
       name: "1a",
-      el: document.getElementById("fighter1a")
     };
 
     let fighter1b = {
       team: 1,
       name: "1b",
-      el: document.getElementById("fighter1b")
     };
 
     let fighter2a = {
       team: 2,
       name: "2a",
-      el: document.getElementById("fighter2a")
     };
 
     let fighter2b = {
       team: 2,
       name: "2b",
-      el: document.getElementById("fighter2b")
     };
 
     let me = {
       name: "{{ username }}",
-      fighters: [fighter1a, fighter1b],
       defeated: [],
       colors: [],
       items: [],
@@ -1126,14 +1121,11 @@
       wins: +localStorage.getItem("fighterWins") || 0,
       losses: +localStorage.getItem("fighterLosses") || 0,
       winStreak: +localStorage.getItem("fighterWinStreak") || 0,
-      //For sending
-      game: "fighter",
-      type: "player",
     };
 
     let colors = [red, yellow, green, blue];
     let lockedColors = [orange, magenta, gray, gold];
-    let fighters = [fighter1a, fighter1b, fighter2a, fighter2b];
+    let fighters = [];
     let defeated = [];
     let damageProperties = ["damage", "minDamage", "maxDamage", "critDamage", "secondaryDamage", "combinedDamage", "teamDamage"];
 
@@ -1180,8 +1172,16 @@
     }
 
     function sendPlayerReady() {
-      me.to = opponent.name;
-      ws.send(JSON.stringify(me));
+      let sendObj = {
+        type: "fighter",
+        to: opponent.name,
+        from: me.name,
+        content: {
+          type: "player",
+          player: me
+        },
+      }
+      ws.send(JSON.stringify(sendObj));
     }
 
     function sendMessage(content, recipient = opponent.name) {
@@ -1201,12 +1201,19 @@
     }
 
     function sendMove(moveObj) {
-      moveObj.game = "fighter";
-      moveObj.match = matchCode;
-      moveObj.type = "move";
-      moveObj.to = opponent.name;
-      moveObj.from = me.name;
-      ws.send(JSON.stringify(moveObj));
+      let sendObj = {
+        type: "fighter",
+        to: opponent.name,
+        from: me.name,
+        content: {
+          match: matchCode,
+          type: "move",
+          move: moveObj
+        }
+      };
+      console.log("sm");
+      console.log(sendObj);
+      ws.send(JSON.stringify(sendObj));
 
       /*//for testing
       receiveMove(moveObj); ///et*/
@@ -1214,13 +1221,15 @@
 
     ws.onmessage = message => {
       let data = JSON.parse(message.data);
-      if (data.game == "fighter") {
-        if (data.type == "join" && data.from != me.name) document.getElementById("opponentStatus").innerText = "Opponent is getting ready…";
-        if (data.type == "player" && data.from != me.name) receivePlayerReady(data);
-        else if (data.match == matchCode) { //Only receive if sent from current match
-          if (data.type == "move") receiveMove(data);
-          else if (data.type == "item") receiveItem(data);
-          else if (data.type == "rematch" && players.every(player => player.rematch) && me.team == 1) window.location = "/fighter?rematch=" + matchCode;
+      console.log(data);
+      if (data.type == "fighter") {
+        if (data.content.type == "join" && data.from != me.name) document.getElementById("opponentStatus").innerText = "Opponent is getting ready…";
+        if (data.content.type == "player" && data.from != me.name) receivePlayerReady(data.content.player);
+        else if (data.content.match == matchCode) { //Only receive if sent from current match
+          console.log(data.content.type);
+          if (data.content.type == "move") receiveMove(data.content.move);
+          else if (data.content.type == "item") receiveItem(data.content);
+          else if (data.content.type == "rematch" && players.every(player => player.rematch) && me.team == 1) window.location = "/fighter?rematch=" + matchCode;
         }
       }
     };
@@ -1289,11 +1298,13 @@
         alert("You can't join your own match.");
       } else {
         me.team = 2;
+        me.fighters = [fighter2a, fighter2b];
         opponent.name = match.creator;
         ws.send(JSON.stringify({
-          game: "fighter",
-          type: "join",
-          to: opponent.name
+          type: "fighter",
+          to: opponent.name,
+          from: me.name,
+          content: {type: "join"}
         }));
         fighterOptions();
       }
@@ -1311,6 +1322,8 @@
       matchCode = pickRandom(1000000).toString();
       while (matchCode.length < 6) matchCode = "0" + matchCode;
       me.team = 1;
+      me.fighters = [fighter1a, fighter1b];
+      pickRandom(2) ? me.firstMove = true : me.firstMove = false; //Decide which player goes first
       fighterOptions();
     }
 
@@ -1578,7 +1591,7 @@
       let tips = [
         "While in a match, look at the bottom of the screen for instructions.",
         "Pay attention to the game chat; it contains useful information.",
-        "Using an item won't end you turn.",
+        "Using an item won't end your turn.",
         "You can't use items while charging an attack.",
         "You can hover over items and effects for more information.",
         "You will receive a loss if you leave an ongoing match.",
@@ -1610,11 +1623,19 @@
     function receivePlayerReady(player) {
       opponent = player;
       if (me.team == 1) {
+        fighter2a = opponent.fighters[0];
+        fighter2b = opponent.fighters[1];
         request.open("GET", "/addfighteropponent?code=" + matchCode + "&name=" + player.name);
         request.send();
         sendPlayerReady();
+      } else {
+        fighter1a = opponent.fighters[0];
+        fighter1b = opponent.fighters[1];
+        matchCode = player.match;
+        opponent.firstMove ? me.firstMove = false : me.firstMove = true;
       }
-      else matchCode = player.match;
+      fighters = [fighter1a, fighter1b, fighter2a, fighter2b];
+      fighters.forEach(fighter => fighter.el = document.getElementById("fighter" + fighter.name));
 
       ////!get ready at same time
       if (me.rematch) window.location = "/fighter?match=" + matchCode; //Join match if you are player 2 and waiting for rematch
@@ -1677,6 +1698,8 @@
         el.title = items[item].description;
       });
 
+      me.firstMove ? active = me : active = opponent;
+
       let giveUpEl = document.getElementById("p" + me.team + "-giveUp");
       giveUpEl.classList.add("enabled");
       giveUpEl.onclick = () => {
@@ -1687,10 +1710,6 @@
         sendMessage(me.name + " forfeited the match.");
       };
 
-      //Decide which player goes first
-      let randomPlayer = pickRandom(players.length);
-      active = players[randomPlayer];
-
       document.getElementById("gameChat").src = "/chat?game=" + opponent.name;
 
       startTurn();
@@ -1699,8 +1718,7 @@
     function startTurn() {
       if (matchOver) return;
 
-      if (active == me) inactive = opponent;
-      else inactive = me;
+      active == me ? inactive = opponent : inactive = me;
 
       /*//for testing
       me = active;
@@ -2042,6 +2060,8 @@
     }
 
     function receiveMove(data) {
+      console.log("rm");
+      console.log(data);
       if (data.move) {
         if (data.move == "give up") {
           matchOver = true;
@@ -2189,12 +2209,16 @@
       removeItemtargets();
       sendMessage(me.name + " used the \"" + itemObj.name + "\" item.");
       ws.send(JSON.stringify({
-        game: "fighter",
-        match: matchCode,
-        type: "item",
-        item: item,
-        target: target,
-        slot: slot
+        type: "fighter",
+        to: opponent.name,
+        from: me.name,
+        content: {
+          match: matchCode,
+          type: "item",
+          item: item,
+          target: target,
+          slot: slot
+        }
       }));
 
       /*//for testing
@@ -2436,11 +2460,13 @@
       el.onclick = null;
       me.rematch = true;
       ws.send(JSON.stringify({
-        game: "fighter",
-        match: matchCode,
-        type: "rematch",
+        type: "fighter",
         to: opponent.name,
-        from: me.name
+        from: me.name,
+        content: {
+          match: matchCode,
+          type: "rematch"
+        }
       }));
       sendMessage(me.name + " wants to rematch.");
     }

@@ -15,7 +15,7 @@
 {% block main %}
 
 <h1 style="color: blue">Login</h1>
-<form action="login" method="post">
+<form action="login" method="post" onsubmit="saveInfo();">
     <h3>Name</h3>
     <input type="text" id="usernameBox" name="username" value="">
     <input type="hidden" id="forwardBox" name="forward">
@@ -27,6 +27,14 @@
     const forward = urlParams.get('forward');
     if (forward) document.getElementById('forwardBox').value = forward;
     else document.getElementById('forwardBox').value = null;
+
+    function saveInfo() {
+      localStorage.setItem("username", document.getElementById("usernameBox").value);
+      localStorage.setItem("password", document.getElementById("passwordBox").value);
+    }
+
+    //Log in automatically if username & password are stored locally. Users can log out in expert mode.
+    if (localStorage.getItem("username") && (localStorage.getItem("password")) {};
 </script>
 
 {% endblock %}

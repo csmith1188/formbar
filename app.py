@@ -589,18 +589,18 @@ def endpoint_home():
 #Default formbar in advanced expert mode
 @app.route('/expert')
 def endpoint_expert():
-    if sD.studentDict:
-        username = sD.studentDict[request.remote_addr]['name']
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
     else:
-        username = ''
-    sfx.updateFiles()
-    sounds = []
-    music = []
-    for key, value in sfx.sound.items():
-        sounds.append(key)
-    for key, value in bgm.bgm.items():
-        music.append(key)
-    return render_template('expert.html', username = username, serverIp = ip, sfx = sounds, bgm = music)
+        username = sD.studentDict[request.remote_addr]['name']
+        sfx.updateFiles()
+        sounds = []
+        music = []
+        for key, value in sfx.sound.items():
+            sounds.append(key)
+        for key, value in bgm.bgm.items():
+            music.append(key)
+        return render_template('expert.html', username = username, serverIp = ip, sfx = sounds, bgm = music)
 
 @app.route('/debug')
 def endpoint_debug():
@@ -613,8 +613,7 @@ def endpoint_fighter():
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
     else:
-        #return render_template('fighter.html', username = sD.studentDict[request.remote_addr]['name'], serverIp = ip)
-        return render_template("message.html", forward=request.path, message = "Fighter will be ready to play soon.")
+        return render_template('fighter.html', username = sD.studentDict[request.remote_addr]['name'], serverIp = ip)
 
 #Before choosing endpoints you are required to log in
 @app.route('/login', methods = ['POST', 'GET'])
@@ -1349,6 +1348,7 @@ def endpoint_addfighteropponent():
     code = request.args.get('code')
     name = request.args.get('name')
     sD.fighter['match' + code]['opponent'] = name #Set "opponent" of object to arg "name"
+    return 'Added opponent ' + name + ' to match ' + code
 
 #This endpoint allows you to see the formbars IP with style and shows different colors.
 @app.route('/virtualbar')
@@ -1476,7 +1476,7 @@ if '--silent' not in str(sys.argv):
 
     A message to or from the server should be a stringified JSON object:
     {
-        type: <alert|userlist|help|message>,
+        type: <alert|userlist|help|message|fighter>,
         to: <*username*|server|all>,
         from: <*username*|server>,
         content: <message>
@@ -1517,17 +1517,22 @@ def client_left(client, server):
 def message_received(client, server, message):
     try:
         message = json.loads(message)
-        if message['game'] == 'fighter':
-            server.send_message(message.to, json.dumps(message))
-        if message['type'] == 'ttt':
+        if message['type'] == 'fighter':
+            for student in sD.studentDict:
+                if sD.studentDict[student]['name'] == message['to'] or sD.studentDict[student]['name'] == message['from']:
+                    for toClient in server.clients:
+                        if toClient['id'] == sD.studentDict[student]['wsID']:
+                            server.send_message(toClient, json.dumps(message))
+                            break
+        elif message['type'] == 'ttt':
             #For now, this will only forward the gamestate. We'll do validation later.
             #server.send_message(message.to, json.dumps(message))
             pass
-        if message['type'] == 'userlist':
+        elif message['type'] == 'userlist':
             server.send_message(client, json.dumps(packMSG('userlist', sD.studentDict[client['address'][0]]['name'], 'server', chatUsers())))
-        if message['type'] == 'alert':
+        elif message['type'] == 'alert':
             server.send_message(client, json.dumps(packMSG('alert', sD.studentDict[client['address'][0]]['name'], 'server', 'Only the server can send alerts!')))
-        if message['type'] == 'help':
+        elif message['type'] == 'help':
             name = sD.studentDict[client['address'][0]]['name']
             name = name.replace(" ", "")
             helpList[name] = message['content']

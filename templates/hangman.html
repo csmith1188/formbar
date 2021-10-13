@@ -350,6 +350,8 @@
   					localStorage.setItem("hangmanHighScore", score);
   					highscore = score;
   				}
+          document.getElementById("catgory").innerText = "Getting new word…";
+          document.getElementById("word").innerText = null;
   				randomize();
   				resetLetters();
           getNewWord();

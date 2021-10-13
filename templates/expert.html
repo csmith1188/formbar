@@ -420,7 +420,7 @@
   <div id="bottom">
     Mode: <span id="mode"></span>
     <br>
-    Name: <span id="name"></span> <button id="logIn" onclick="logIn(true);">Log in again</button>
+    Name: <span id="name"></span> <button id="logOut" onclick="window.location = '/login?forward=/chat'">Log out</button>
     <br>
     <input type="checkbox" id="defaultCheckbox" style="margin-left: 0;" onchange="setDefault(this.checked);"><label for="defaultCheckbox">Use expert mode by default</label>
     <br>
@@ -477,14 +477,14 @@
   let gradient;
   let urlOpen;
   let newMessages = 0;
-  let username = "{{ username }}" || localStorage.getItem("username");
+  let username = "{{ username }}";
 
   window.onload = () => {
     mode();
     setMenuWidths();
     updateVotes();
     nowPlaying();
-    logIn();
+    showUsername();
     showEnabled();
     bottomPosition();
     quizName();
@@ -563,29 +563,12 @@
     ["games", "teacher"].forEach(group => document.getElementById(group + "Menu").style.left = document.getElementById(group + "Tab").getBoundingClientRect().left + "px"); //Give menu same X position as tab
   }
 
-  function logIn(manual) {
+  function showUsername() {
     let nameBox = document.getElementById("name");
-
-    //If already logged in
-    if (manual) {
-      username = prompt("Enter your name", username) || username; //If nothing input, do not change
-    } else {
-      while (!username) {
-        //Continue asking until something input
-        username = prompt("Enter your name");
-        if (!username) alert("Login required");
-      }
-    }
-
     let oldHeight = bottom.clientHeight;
     nameBox.innerText = username;
-    request.open("GET", "/login?name=" + username);
-    request.send();
-
-    if (bottom.clientHeight > oldHeight) shorten(bottom, oldHeight, nameBox)
+    if (bottom.clientHeight > oldHeight) shorten(bottom, oldHeight, nameBox);
     else nameBox.removeAttribute("title");
-
-    localStorage.setItem("username", username);
   }
 
   function shorten(container, maxHeight, text) {
@@ -771,7 +754,7 @@
       //Show "Now Playing"
       np.classList.remove("hidden");
       npTitle.innerText = songName;
-      if (np.clientHeight > 21) shorten(np, 21, npTitle)
+      if (np.clientHeight > 21) shorten(np, 21, npTitle);
       else nameBox.removeAttribute("title");
     }
     //If no song is playing, hide

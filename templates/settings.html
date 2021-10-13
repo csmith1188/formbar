@@ -71,7 +71,7 @@
 
     var studentData;
     var oldStudentData;
-    var permNames = ['Teacher', 'Assistant', 'Student', 'Guest']
+    var permNames = ['Teacher', 'Assistant', 'Student', 'Guest', 'Excluded']
 
 
     function checkUpdates(url) {
@@ -98,6 +98,7 @@
                 newStudent.innerHTML += permNames[studentList[student]['perms']];
                 newStudent.innerHTML += "	&nbsp; ";
                 newStudent.innerHTML += `<a href="users?name=${studentList[student]['name']}&action=kick">Remove</a>`;
+                newStudent.innerHTML += `<a href="users?name=${studentList[student]['name']}&action=ban">Ban</a>`;
                 // newStudent.innerHTML += "	&nbsp; ";
                 // newStudent.innerHTML += `<a href="users?name=${studentList[student]['name']}&action=ban">Ban</a>`;
                 newStudent.innerHTML +=
@@ -107,6 +108,7 @@
                     <option value="/users?name=${studentList[student]['name']}&action=perm&perm=1">${permNames[1]}</option>
                     <option value="/users?name=${studentList[student]['name']}&action=perm&perm=2">${permNames[2]}</option>
                     <option value="/users?name=${studentList[student]['name']}&action=perm&perm=3" selected="selected">${permNames[3]}</option>
+                    <option value="/users?name=${studentList[student]['name']}&action=perm&perm=3">${permNames[4]}</option>
                 </select>`
                 if (studentList[student]['complete']) var checked = 'checked'; else var checked = '';
                 newStudent.innerHTML += `[<input type="checkbox" disabled ${checked}>]`

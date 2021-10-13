@@ -13,4 +13,4 @@ def updateFiles():
         #Check last four letters are the correct file extension
         if file[-4:] == '.wav' or file[-4:] == '.mp3':
             #Add them to the bgmFiles list if so
-            bgm[file[:-4]] = "/home/pi/formbar/bgm/" + file
+            bgm[file[:-4]] = os.path.dirname(os.path.abspath(__file__)) + "/bgm/" + file

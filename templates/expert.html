@@ -36,7 +36,7 @@
     margin: 0 0 12px;
     font-size: 24px;
     color: var(--color-green);
-    text-align: left;
+    text-align: center;
   }
 
   h2 {
@@ -332,6 +332,7 @@
 <div id="sidebar">
   <div id="sidebarContent">
     <div id="tutdDiv" class="hidden">
+      <h1>Thumbs</h1>
       <img src="{{ url_for('static', filename='img/expert/thumbButton0.png') }}" id="thumbButton0" class="thumbButton green" title="Up" onclick="thumbsVote(0);" tabindex="0">
       <br>
       <img src="{{ url_for('static', filename='img/expert/thumbButton1.png') }}" id="thumbButton1" class="thumbButton cyan" title="Wiggle" onclick="thumbsVote(1);" tabindex="0">
@@ -341,6 +342,7 @@
     </div>
 
     <div id="surveyDiv" class="hidden">
+      <h1>Survey</h1>
       <img src="{{ url_for('static', filename='img/expert/letterButton0.png') }}" id="letterButton0" class="letterButton red" title="Vote A" onclick="letterVote(0);" tabindex="0">
       <br>
       <img src="{{ url_for('static', filename='img/expert/letterButton1.png') }}" id="letterButton1" class="letterButton blue" title="Vote B" onclick="letterVote(1);" tabindex="0">
@@ -420,7 +422,7 @@
   <div id="bottom">
     Mode: <span id="mode"></span>
     <br>
-    Name: <span id="name"></span> <button id="logOut" onclick="window.location = '/login?forward=/chat'">Log out</button>
+    Name: <span id="name"></span> <button id="logOut" onclick="window.location = '/login?forward=/expert'">Log in again</button>
     <br>
     <input type="checkbox" id="defaultCheckbox" style="margin-left: 0;" onchange="setDefault(this.checked);"><label for="defaultCheckbox">Use expert mode by default</label>
     <br>

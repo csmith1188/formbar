@@ -295,6 +295,8 @@
   	}
 
   	function randomize() {
+      document.getElementById("category").innerText = "Getting new word…";
+      document.getElementById("word").innerText = null;
   		lives = 10;
 
   		document.getElementById("lives").innerHTML = "Lives: " + lives;
@@ -350,8 +352,6 @@
   					localStorage.setItem("hangmanHighScore", score);
   					highscore = score;
   				}
-          document.getElementById("catgory").innerText = "Getting new word…";
-          document.getElementById("word").innerText = null;
   				randomize();
   				resetLetters();
           getNewWord();

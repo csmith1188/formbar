@@ -5,7 +5,7 @@
 <!-- This is where the title, top buttons, and stylesheet is located -->
 
 <!-- Change title here -->
-{% block title %}Turn-Based Fighter{% endblock %}
+{% block title %}Turn-Cringe Fighter{% endblock %}
 
 <!-- Extra style declarations here -->
 {% block style %}
@@ -1193,10 +1193,10 @@
         from: "server",
         content: content
       };
-      ws.send(JSON.stringify(messageObj));
+      //ws.send(JSON.stringify(messageObj));
       if (!recipient != "all") { //If message is private, send to sender in addition to recipient
         messageObj.to = me.name;
-        ws.send(JSON.stringify(messageObj));
+        //ws.send(JSON.stringify(messageObj));
       }
     }
 

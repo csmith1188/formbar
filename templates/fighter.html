@@ -1414,7 +1414,7 @@
       if (fighter.hp < 10) barColor = "red";
       else if (fighter.hp < 25) barColor = "orange";
       else if (fighter.hp < 50) barColor = "yellow";
-      el.style.background = "linear-gradient(to left, var(--color-" + barColor + ") 0 " + fighter.hp + "%, var(--bg-dark) " + fighter.hp + "% 100%)";
+      el.style.background = `linear-gradient(to left, var(--color-${barColor}) 0 ${fighter.hp}%, var(--bg-dark) ${fighter.hp}% 100%)`;
     }
 
     function randomFighters() {

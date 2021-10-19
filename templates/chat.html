@@ -460,7 +460,11 @@
         let minute = date.getMinutes().toString();
         if (minute.length == 1) minute = "0" + minute;
         //Use this if you want to allow HTML
-        newMSG.innerHTML = `<b class="username" onclick="${usernameOnclick}" title="${usernameTitle}">${message.from}</b> <span style="color: var(--light-blue);">${month}/${day}/${year} ${hour}:${minute} ${ampm}</span> <div class="content">${message.content}</div>`;
+        newMSG.innerHTML = `
+          <b class="username" onclick="${usernameOnclick}" title="${usernameTitle}">${message.from}</b>
+          <span style="color: var(--light-blue);">${month}/${day}/${year} ${hour}:${minute} ${ampm} ${message.to != "all" ? "· Private message" : ""}</span>
+          <div class="content">${message.content}</div>
+        `;
         //Use this if you want to convert HTML into text
         // newMSG.appendChild(document.createTextNode(message.from + ": " + message.content))
         boxes.outputBox.appendChild(newMSG);

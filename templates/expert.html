@@ -695,15 +695,14 @@
 
   let sfx = eval("{{ sfx }}".replaceAll("&#39;", "'"));
 
-  sfx.forEach(sound => {
-    document.getElementById("sfxFiles").innerHTML += "<option value='" + sound + "'></option>";
-  });
+  sfx.forEach(sound => document.getElementById("sfxFiles").innerHTML += "<option value='" + sound + "'></option>");
 
   function sendSound() {
     let soundFile = document.getElementById("sound").value;
     request.open("GET", "/sfx?file=" + soundFile);
     request.send();
-    document.getElementById("sound").value = null;
+    if (sfx.includes(soundFile)) document.getElementById("sound").value = null;
+    else alert("File does not exist");
   }
 
   document.getElementById("sound").addEventListener("keydown", event => {
@@ -718,9 +717,7 @@
 
   let bgm = eval("{{ bgm }}".replaceAll("&#39;", "'"));
 
-  bgm.forEach(song => {
-    document.getElementById("bgmFiles").innerHTML += "<option value='" + song + "'></option>";
-  });
+  bgm.forEach(song => document.getElementById("bgmFiles").innerHTML += "<option value='" + song + "'></option>");
 
   function randomBGM() {
     document.getElementById("music").value = bgm[Math.floor(Math.random() * bgm.length)];
@@ -732,7 +729,8 @@
     if (volume == 0 || volume == 1) volume += ".0";
     request.open("GET", "/bgm?file=" + musicFile + "&volume=" + volume);
     request.send();
-    document.getElementById("music").value = null;
+    if (bgm.includes(musicFile)) document.getElementById("music").value = null;
+    else alert("File does not exist");
   }
 
   document.getElementById("music").addEventListener("keydown", event => {

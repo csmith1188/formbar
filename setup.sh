@@ -16,5 +16,7 @@ sudo pip3 install websocket_server
 sudo pip3 install pygame
 sudo pip3 install openpyxl
 sudo pip3 install netifaces
+sudo pip3 install cryptography
 sudo pip3 --default-timeout=1000 install pandas
-
+cp formapp/data/database_template.db data/database.db
+cp formapp/key_template.py key.py

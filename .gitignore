@@ -1,6 +1,8 @@
-testing/
+formapp/testing/
 send.bat
 info.log
 __pycache__
-lessondata/*
+formapp/lessondata/*
+formapp/data/database.db
 run.bat
+formapp/key.py

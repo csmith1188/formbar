@@ -6,3 +6,5 @@ formapp/lessondata/*
 formapp/data/database.db
 run.bat
 formapp/key.py
+__pycache__
+*/__pycache__

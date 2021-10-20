@@ -23,16 +23,7 @@
 #  ██████  ██████  ██   ████ ██      ██  ██████   ██████  ██   ██ ██   ██    ██    ██  ██████  ██   ████
 
 
-#Set to True for RPi, False for PC
-ONRPi = False
-
-#Enable/Disable dbug() blurbs
-DEBUG = True
-
-#Set the maximum number of pixels on the bar
-BARPIX = 300
-#Set the maximum number of pixels, including pixelpanels
-MAXPIX = 812
+from config import *
 
 #Permission levels are as follows:
 # 0 - teacher
@@ -122,7 +113,7 @@ sD = sessions.Session(ip)
 cipher = Fernet(key)
 
 # Dictionary words for hangman game
-words = json.loads(open('data/words.json').read())
+words = json.loads(open(os.path.dirname(os.path.abspath(__file__)) + "/data/words.json").read())
 
 banList = []
 helpList = {}
@@ -180,7 +171,7 @@ def newStudent(remote, username, bot=False):
             'name': username,
             'thumb': '',
             'survey': '',
-            'perms': 2,
+            'perms': 3,
             'progress': [],
             'complete': False,
             'tttGames': [],
@@ -209,7 +200,7 @@ def newStudent(remote, username, bot=False):
         '''
 
         #Login bots as guest
-        if bot == 'True':
+        if bot:
             print("[info] " +"Bot successful login. Made them a guest: " + username)
             sD.studentDict[remote]['perms'] = sD.settings['perms']['anyone']
 

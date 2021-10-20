@@ -188,24 +188,6 @@ def newStudent(remote, username, bot=False):
             'essayRes': '',
             'bot': bot
         }
-        #Track if this is the first human login or not
-        firstlog = True
-        #Check each student so far to make sure that none of them are bots
-        for user in sD.studentDict:
-            if not sD.studentDict[user]['bot']:
-                firstlog = False
-        #Login bots as guest
-        if bot:
-            print("[info] " +"Bot successful login. Made them a guest: " + username)
-            sD.studentDict[remote]['perms'] = sD.settings['perms']['anyone']
-        #Login first user as teacher
-        elif firstlog:
-            print("[info] " +username + " logged in. Made them the teacher...")
-            sD.studentDict[remote]['perms'] = sD.settings['perms']['admin']
-        #Login other users as guests (students until database is installed)
-        else:
-            print("[info] " +username + " logged in.")
-            sD.studentDict[remote]['perms'] = NEWACCOUNTPERMISSIONS
         #Overwrite permissions with those retrieved from database here
         #Open and connect to database
         db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
@@ -216,6 +198,30 @@ def newStudent(remote, username, bot=False):
             if username in user:
                 print("[info] " +"Found user in database, adjusting permissions: " + username)
                 sD.studentDict[remote]['perms'] = int(user[3])
+
+        #Track if this is the first human login or not
+        firstlog = True
+        #Check each student so far to make sure that none of them are bots
+        '''
+        for user in sD.studentDict:
+            if not sD.studentDict[user]['bot']:
+                firstlog = False
+        '''
+
+        #Login bots as guest
+        if bot == 'True':
+            print("[info] " +"Bot successful login. Made them a guest: " + username)
+            sD.studentDict[remote]['perms'] = sD.settings['perms']['anyone']
+
+        #Login first user as teacher
+        elif firstlog:
+            print("[info] " +username + " logged in. Made them the teacher...")
+            sD.studentDict[remote]['perms'] = sD.settings['perms']['admin']
+
+        #Login other users as guests (students until database is installed)
+        else:
+            print("[info] " +username + " logged in.")
+            sD.studentDict[remote]['perms'] = NEWACCOUNTPERMISSIONS
         playSFX("sfx_up02")
 
 def flushUsers():

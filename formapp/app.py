@@ -24,7 +24,7 @@
 
 
 #Set to True for RPi, False for PC
-ONRPi = True
+ONRPi = False
 
 #Enable/Disable dbug() blurbs
 DEBUG = True
@@ -54,7 +54,7 @@ os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame
 import time, math
 import threading
-import netifaces as ni
+#import netifaces as ni
 import logging
 import traceback
 import sqlite3
@@ -76,9 +76,9 @@ if ONRPi:
 #for wireless connections:
 #ip = ni.ifaddresses('wlan0')[ni.AF_INET][0]['addr']
 #for wired connections
-ip = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
+#ip = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
 #for manual addresses
-#ip = "127.0.0.1"
+ip = "127.0.0.1"
 
 #Set the websocket port for chat and live actions
 WSPORT=9001

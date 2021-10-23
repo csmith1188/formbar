@@ -64,6 +64,7 @@ class Session():
 class Student():
     def __init__(self, username):
         self.name = username
+        self.help = False
         self.thumb = ''
         self.survey = ''
         self.progress = []

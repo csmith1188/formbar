@@ -45,6 +45,9 @@
       padding-top: 2px;
       padding-bottom: 2px;
     }
+    .help {
+      color: #FF0000;
+    }
 </style>
 {% endblock %}
 
@@ -56,7 +59,10 @@
     $(function() {
         $("#tabcontainer").accordion({
           active: false,
-          collapsible: true
+          collapsible: true,
+          animate: {
+            duration: 100
+          }
         });
     });
 </script>
@@ -202,6 +208,11 @@
                 newDetails.innerHTML += `<a href="users?name=${studentList[student]['name']}&action=kick">Remove</a>`;
                 newDetails.innerHTML += "	&nbsp; ";
                 newDetails.innerHTML += `<a href="users?name=${studentList[student]['name']}&action=ban">Ban</a>`;
+                if (studentList[student]['help'] == true) {
+                  newStudent.classList.add('help')
+                  newDetails.innerHTML += "	&nbsp; ";
+                  newDetails.innerHTML += `<a href=\'/needshelp?remove=${studentList[student]['name']}\'>Clear Help</a>`;
+                }
             }
         }
     }, 1000);

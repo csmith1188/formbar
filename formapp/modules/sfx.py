@@ -7,7 +7,7 @@ def updateFiles():
     #Empty sound file list
     sound = {}
     #Scan folder for all filenames
-    availableFiles = os.listdir(os.path.dirname(os.path.abspath(__file__)) + "/../bgm/")
+    availableFiles = os.listdir(os.path.dirname(os.path.abspath(__file__)) + "/../sfx/")
     #Loop through each file
     for file in sorted(availableFiles):
         #Check last four letters are the correct file extension

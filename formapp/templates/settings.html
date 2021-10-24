@@ -7,8 +7,13 @@
 
 <!-- Extra style declarations here -->
 {% block style %}
+<link rel="stylesheet" href="../static/css/tabs.css">
 <style media="screen">
     #perms {
+        background-color: gray;
+        border-radius: 5px;
+        border: solid black 2px;
+        padding: 5px;
         display: flex;
         justify-content: space-around;
     }
@@ -20,20 +25,47 @@
 
     .up {
         background-color: #ccffcc;
+        color: black;
     }
 
     .wiggle {
         background-color: #ffffcc;
+        color: black;
     }
 
     .down {
         background-color: #ffcccc;
+        color: black;
+    }
+    .user {
+      margin-left: 5px;
+      margin-right: 5px;
+    }
+    .tab {
+      padding-top: 2px;
+      padding-bottom: 2px;
+    }
+    .help {
+      color: #FF0000;
     }
 </style>
 {% endblock %}
 
 <!-- Extra javascript here -->
 {% block script %}
+<script src="../static/jquery/external/jquery/jquery.js" charset="utf-8"></script>
+<script src="../static/jquery/jquery-ui.min.js" charset="utf-8"></script>
+<script>
+    $(function() {
+        $("#tabcontainer").accordion({
+          active: false,
+          collapsible: true,
+          animate: {
+            duration: 100
+          }
+        });
+    });
+</script>
 <script type="text/javascript">
     function getSettings() {
 
@@ -88,57 +120,99 @@
         if (studentData != oldStudentData) {
             oldStudentData = studentData;
             let studentList = JSON.parse(studentData);
-            let studentBox = document.getElementById('students');
+            let studentBox = document.getElementById('tabcontainer');
             studentBox.innerHTML = '';
+            console.log(studentList);
+            //Loop through each student in the list
             for (student in studentList) {
-                let newStudent = document.createElement('div');
-                newStudent.classList.add('user');
+                let newStudent = document.createElement('h3');
                 newStudent.innerHTML = studentList[student].name;
-                newStudent.innerHTML += "	&nbsp; ";
-                newStudent.innerHTML += permNames[studentList[student]['perms']];
-                newStudent.innerHTML += "	&nbsp; ";
-                newStudent.innerHTML += `<a href="users?name=${studentList[student]['name']}&action=kick">Remove</a>`;
-                newStudent.innerHTML += `<a href="users?name=${studentList[student]['name']}&action=ban">Ban</a>`;
-                // newStudent.innerHTML += "	&nbsp; ";
-                // newStudent.innerHTML += `<a href="users?name=${studentList[student]['name']}&action=ban">Ban</a>`;
-                newStudent.innerHTML +=
+                newStudent.classList.add('tab');
+                let newDetails = document.createElement('div');
+                newDetails.classList.add('user');
+                newDetails.innerHTML += permNames[studentList[student]['perms']];
+                newDetails.innerHTML += "	&nbsp; ";
+                newDetails.innerHTML +=
                     `
-                <select onchange="updatePerm(this)" id="userpermsDrop" name="userpermsDrop">
+                    <select onchange="updatePerm(this)" id="userpermsDrop" name="userpermsDrop">
                     <option value="/users?name=${studentList[student]['name']}&action=perm&perm=0">${permNames[0]}</option>
                     <option value="/users?name=${studentList[student]['name']}&action=perm&perm=1">${permNames[1]}</option>
                     <option value="/users?name=${studentList[student]['name']}&action=perm&perm=2">${permNames[2]}</option>
                     <option value="/users?name=${studentList[student]['name']}&action=perm&perm=3" selected="selected">${permNames[3]}</option>
                     <option value="/users?name=${studentList[student]['name']}&action=perm&perm=3">${permNames[4]}</option>
-                </select>`
+                    </select>
+                    `
+                //Check to see if the student's complete flag is checked
                 if (studentList[student]['complete']) var checked = 'checked'; else var checked = '';
-                newStudent.innerHTML += `[<input type="checkbox" disabled ${checked}>]`
-                if (studentList[student]['progress']) {
+                newDetails.innerHTML += `[<input type="checkbox" disabled ${checked}>]`
+                //Check the results of the student's current progress bar
+                if (studentList[student]['progress'] && studentList[student]['progress'].length) {
+                    let dotbox = document.createElement('div');
+                    dotbox.style.styleFloat = 'right';
+                    dotbox.style.cssFloat = 'right';
                     let newProg = 0;
                     let newProgMax = 0;
                     for (let i = 0; i < studentList[student]['progress'].length; i++) {
                         newProgMax++;
-                        if (studentList[student]['progress'][i]) newProg++;
+                        var img = document.createElement("img");
+                        img.width = 16;
+                        img.height = 16;
+                        if (studentList[student]['progress'][i]) {
+                          newProg++;
+                          img.src = "{{ url_for('static', filename='img/dot_green.png') }}";
+                        } else {
+                          img.src = "{{ url_for('static', filename='img/dot_red.png') }}";
+                        }
+                        dotbox.appendChild(img)
                     }
-                    newStudent.innerHTML += ` [Prog: ${newProg}/${newProgMax}]`
+                    newStudent.appendChild(dotbox)
+                    newDetails.innerHTML += ` [Prog: ${newProg}/${newProgMax}]`
                 }
-                if (studentList[student]['quizRes']) {
+                //Get the results of the student's current quiz
+                if (studentList[student]['quizRes'] && studentList[student]['quizRes'].length) {
+                  let dotbox = document.createElement('div');
+                  dotbox.style.styleFloat = 'right';
+                  dotbox.style.cssFloat = 'right';
                     let newQuiz = 0;
                     let newQuizMax = 0;
                     for (let i = 0; i < studentList[student]['quizRes'].length; i++) {
                         newQuizMax++;
-                        if (studentList[student]['quizRes'][i]) newQuiz++;
+                        if (studentList[student]['quizRes'][i]) {
+                          var img = document.createElement("img");
+                          img.width = 16;
+                          img.height = 16;
+                          if (studentList[student]['quizRes'][i]) {
+                            newQuiz++;
+                            img.src = "{{ url_for('static', filename='img/dot_green.png') }}";
+                          } else {
+                            img.src = "{{ url_for('static', filename='img/dot_red.png') }}";
+                          }
+                          dotbox.appendChild(img)
                     }
-                    newStudent.innerHTML += ` [Quiz: ${newQuiz}/${newQuizMax}]`
+                  }
+                    newDetails.innerHTML += ` [Quiz: ${newQuiz}/${newQuizMax}]`
                 }
+                //Change student color according to thumb response
                 if (studentList[student]['thumb'] == 'up') newStudent.classList.add('up')
                 else if (studentList[student]['thumb'] == 'wiggle') newStudent.classList.add('wiggle')
                 else if (studentList[student]['thumb'] == 'down') newStudent.classList.add('down')
                 else {
-                    newStudent.classList.remove('up')
-                    newStudent.classList.remove('wiggle')
-                    newStudent.classList.remove('down')
+                    newDetails.classList.remove('up')
+                    newDetails.classList.remove('wiggle')
+                    newDetails.classList.remove('down')
                 }
                 studentBox.appendChild(newStudent)
+                studentBox.appendChild(newDetails)
+                $( "#tabcontainer" ).accordion( "refresh" );
+                newDetails.innerHTML += "	&nbsp; ";
+                newDetails.innerHTML += `<a href="users?name=${studentList[student]['name']}&action=kick">Remove</a>`;
+                newDetails.innerHTML += "	&nbsp; ";
+                newDetails.innerHTML += `<a href="users?name=${studentList[student]['name']}&action=ban">Ban</a>`;
+                if (studentList[student]['help'] == true) {
+                  newStudent.classList.add('help')
+                  newDetails.innerHTML += "	&nbsp; ";
+                  newDetails.innerHTML += `<a href=\'/needshelp?remove=${studentList[student]['name']}\'>Clear Help</a>`;
+                }
             }
         }
     }, 1000);
@@ -148,20 +222,14 @@
 <!-- Main content here -->
 {% block main %}
 <h1 style="color: blue">Formbar Setup</h1>
+
+
 <div>
-    <a href="/lesson">Lesson Loader</a>
     <form action="settings" method="post">
-        <input type="submit" value="Start New TUTD/Survey"><br>
-        <!-- <b>Question</b><br>
-        <input type="text" name="qQuestion"><br>
-        <b>Answers</b><br>
-        <input type="radio" name="quizlet" value="0" checked><input type="text" name="qaAnswer"><br>
-        <input type="radio" name="quizlet" value="1"><input type="text" name="qbAnswer"><br>
-        <input type="radio" name="quizlet" value="2"><input type="text" name="qcAnswer"><br>
-        <input type="radio" name="quizlet" value="3"><input type="text" name="qdAnswer"><br> -->
-    </form>
+    <input type="submit" value="Start New TUTD/Survey">
     <input type="range" id="studentNum" oninput="upbLabel(this)" name="studentNum" min="0" max="30" style="width:200px;">
     <button type="button" id="studentNumButton" onclick="sendStudents()">Update Students</button>
+  </form>
 </div>
 <br>
 <div id="perms">
@@ -232,7 +300,7 @@
         </select>
     </div>
 </div>
-<div id="students">
+<div id="tabcontainer">
 </div>
 <div>
     <table border=1>

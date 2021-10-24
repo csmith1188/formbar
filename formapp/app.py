@@ -23,16 +23,7 @@
 #  ██████  ██████  ██   ████ ██      ██  ██████   ██████  ██   ██ ██   ██    ██    ██  ██████  ██   ████
 
 
-#Set to True for RPi, False for PC
-ONRPi = True
-
-#Enable/Disable dbug() blurbs
-DEBUG = True
-
-#Set the maximum number of pixels on the bar
-BARPIX = 300
-#Set the maximum number of pixels, including pixelpanels
-MAXPIX = 812
+from config import *
 
 #Permission levels are as follows:
 # 0 - teacher
@@ -54,7 +45,6 @@ os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame
 import time, math
 import threading
-import netifaces as ni
 import logging
 import traceback
 import sqlite3
@@ -71,14 +61,6 @@ from modules import sessions
 from key import key
 if ONRPi:
     from modules import ir
-
-#Get internal IP address
-#for wireless connections:
-#ip = ni.ifaddresses('wlan0')[ni.AF_INET][0]['addr']
-#for wired connections
-ip = ni.ifaddresses('eth0')[ni.AF_INET][0]['addr']
-#for manual addresses
-#ip = "127.0.0.1"
 
 #Set the websocket port for chat and live actions
 WSPORT=9001
@@ -122,7 +104,7 @@ sD = sessions.Session(ip)
 cipher = Fernet(key)
 
 # Dictionary words for hangman game
-words = json.loads(open('data/words.json').read())
+words = json.loads(open(os.path.dirname(os.path.abspath(__file__)) + "/data/words.json").read())
 
 banList = []
 helpList = {}
@@ -180,7 +162,7 @@ def newStudent(remote, username, bot=False):
             'name': username,
             'thumb': '',
             'survey': '',
-            'perms': 2,
+            'perms': 3,
             'progress': [],
             'complete': False,
             'tttGames': [],
@@ -188,28 +170,16 @@ def newStudent(remote, username, bot=False):
             'essayRes': '',
             'bot': bot
         }
-        #Overwrite permissions with those retrieved from database here
-        #Open and connect to database
-        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
-        dbcmd = db.cursor()
-        userFound = dbcmd.execute("SELECT * FROM users WHERE username=:uname", {"uname": username}).fetchall()
-        db.close()
-        for user in userFound:
-            if username in user:
-                print("[info] " +"Found user in database, adjusting permissions: " + username)
-                sD.studentDict[remote]['perms'] = int(user[3])
-
         #Track if this is the first human login or not
         firstlog = True
+
         #Check each student so far to make sure that none of them are bots
-        '''
         for user in sD.studentDict:
             if not sD.studentDict[user]['bot']:
                 firstlog = False
-        '''
 
         #Login bots as guest
-        if bot == 'True':
+        if bot:
             print("[info] " +"Bot successful login. Made them a guest: " + username)
             sD.studentDict[remote]['perms'] = sD.settings['perms']['anyone']
 
@@ -222,6 +192,20 @@ def newStudent(remote, username, bot=False):
         else:
             print("[info] " +username + " logged in.")
             sD.studentDict[remote]['perms'] = NEWACCOUNTPERMISSIONS
+
+        #Overwrite permissions with those retrieved from database here
+        #Open and connect to database
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        userFound = dbcmd.execute("SELECT * FROM users WHERE username=:uname", {"uname": username}).fetchall()
+        db.close()
+        for user in userFound:
+            if username in user:
+                if firstlog:
+                    sD.studentDict[remote]['perms'] = sD.settings['perms']['admin']
+                else:
+                    sD.studentDict[remote]['perms'] = int(user[3])
+
         playSFX("sfx_up02")
 
 def flushUsers():
@@ -541,7 +525,7 @@ def tutdBar():
     upFill = upCount = downFill = wiggleFill = 0
     complete = 0
     for x in sD.studentDict:
-        if sD.studentDict[x]['thumb']:
+        if sD.studentDict[x]['perms'] == sD.settings['perms']['student'] and sD.studentDict[x]['thumb']:
             if sD.studentDict[x]['thumb'] == 'up':
                 upFill += 1
                 upCount += 1
@@ -1038,11 +1022,11 @@ def endpoint_getword():
         word = random.choice(list(words.keys()))
         return str(word)
 
-        # ██   ██
-        # ██   ██
-        # ███████
-        # ██   ██
-        # ██   ██
+# ██   ██
+# ██   ██
+# ███████
+# ██   ██
+# ██   ██
 
 
 #This endpoint takes you to the hangman game
@@ -1070,11 +1054,12 @@ def endpoint_help():
         return redirect('/login?forward=' + request.path)
     if request.method == 'POST':
         name = sD.studentDict[request.remote_addr]['name']
-        name = name.replace(" ", "")
+        name = name.strip()
         if name in helpList:
             return render_template("message.html", forward=request.path, message = "You already have a help ticket in. If your problem is time-sensitive, or your last ticket was not cleared, please get the teacher's attention manually." )
         else:
             helpList[name] = "Help ticket"
+            sD.studentDict[request.remote_addr]['help'] = True
             playSFX("sfx_up04")
             return render_template("message.html", forward=request.path, message = "Your ticket was sent. <b>Keep working on the problem the best you can while you wait.</b>" )
     else:
@@ -1278,6 +1263,33 @@ def endpoint_logout():
         playSFX('sfx_laser01')
         return redirect('/')
 
+# ███    ███
+# ████  ████
+# ██ ████ ██
+# ██  ██  ██
+# ██      ██
+
+
+'''
+    /minesweeper
+'''
+@app.route('/minesweeper')
+def endpoint_mnsw():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
+        return render_template("message.html", forward=request.path, message = "You do not have high enough permissions to do this right now. " )
+    else:
+        cols = 20
+        rows = 20
+        dense = 10
+        if request.args.get('cols'):
+            cols = request.args.get('cols')
+        if request.args.get('rows'):
+            rows = request.args.get('rows')
+        if request.args.get('dense'):
+            dense = request.args.get('dense')
+        return render_template("mnsw.html", cols=cols, rows=rows, dense=dense)
 
 # ███    ██
 # ████   ██
@@ -1311,10 +1323,17 @@ def endpoint_needshelp():
         '''
         if remove:
             if remove in helpList:
+                #Seacrch through each student
+                for student in sD.studentDict:
+                    #If the name with no whitespaces equals the name we want to remove
+                    if sD.studentDict[student]['name'].strip() == remove:
+                        #Remove the help flag from their user and break loop
+                        sD.studentDict[student]['help'] = False
+                        break
                 del helpList[remove]
-                return render_template("message.html", forward=request.path, message = "Removed ticket for: " + remove +"" )
+                return render_template("message.html", forward=request.referrer, message = "Removed ticket for: " + remove +"" )
             else:
-                return render_template("message.html", forward=request.path, message = "Couldn't find ticket for: " + remove +"" )
+                return render_template("message.html", forward=request.referrer, message = "Couldn't find ticket for: " + remove +"" )
         else:
             resString = '<meta http-equiv="refresh" content="5">'
             if not helpList:
@@ -1609,7 +1628,21 @@ def endpoint_sfx():
             resString += '</ul> You can play them by using \'/sfx?file=<b>&lt;sound file name&gt;</b>\''
             return render_template("general.html", content = resString, style = '<style>ul {columns: 2; -webkit-columns: 2; -moz-columns: 2;}</style>')
 
-#This endpoint allows the teacher to test students.
+'''
+    /speedtype
+'''
+@app.route('/speedtype')
+def endpoint_speedtype():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
+        return render_template("message.html", forward=request.path, message = "You do not have high enough permissions to do this right now. " )
+    else:
+        return render_template("speedtype.html")
+
+'''
+    /survey
+'''
 @app.route('/survey')
 def endpoint_survey():
     if not request.remote_addr in sD.studentDict:

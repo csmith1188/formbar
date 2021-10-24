@@ -5,14 +5,17 @@
 <!-- Change title here -->
 {% block title %}Formbar Home{% endblock %}
 {% block style %}
-<link rel="stylesheet" href="../static/css/tabs.css">{% endblock %}
-{% block script %}<script src="../static/jquery/external/jquery/jquery.js" charset="utf-8"></script>
+<link rel="stylesheet" href="../static/css/tabs.css">
+{% endblock %}
+{% block script %}
+<script src="../static/jquery/external/jquery/jquery.js" charset="utf-8"></script>
 <script src="../static/jquery/jquery-ui.min.js" charset="utf-8"></script>
 <script>
     $(function() {
         $("#tabcontainer").accordion();
     });
-</script>{% endblock %}
+</script>
+{% endblock %}
 {% block main %}
 <h1>Formbar</h1>
 <div id="tabcontainer">

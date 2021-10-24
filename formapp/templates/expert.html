@@ -35,14 +35,14 @@
   h1 {
     margin: 0 0 12px;
     font-size: 24px;
-    color: var(--color-green);
+    color: var(--color-blue);
     text-align: center;
   }
 
   h2 {
     margin: 0 0 10px;
     font-size: 20px;
-    color: var(--color-green);
+    color: var(--color-blue);
   }
 
   input[type="text"],
@@ -437,11 +437,12 @@
     <div id="debugTab" class="tab" title="/debug" onclick="openPage('debug');"><img src="{{ url_for('static', filename='img/expert/debug.png') }}" class="icon"> API debug & virtual bar</div>
     <div id="gamesTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/expert/games.png') }}" class="icon"> Games</div>
     <div id="gamesMenu" class="menu hidden" tabindex="-1">
-      <div id="fighterTab" class="tab" title="/fighter" onclick="openPage('fighter');">Turn-Based Fighter</div>
-      <div id="hangmanTab" class="tab" title="/hangman" onclick="openPage('hangman');">Hangman</div>
       <div id="2048Tab" class="tab" title="/2048" onclick="openPage('2048');">2048</div>
-      <div id="tttTab" class="tab" title="/ttt" onclick="openPage('ttt');">Tic-tac-toe</div>
       <div id="flappybirdTab" class="tab" title="/flappybird" onclick="openPage('flappybird');">Flappy Bird</div>
+      <div id="hangmanTab" class="tab" title="/hangman" onclick="openPage('hangman');">Hangman</div>
+      <div id="mnswTab" class="tab" title="/mnswbird" onclick="openPage('mnswbird');">Minesweeper</div>
+      <div id="tttTab" class="tab" title="/ttt" onclick="openPage('ttt');">Tic-tac-toe</div>
+      <div id="fighterTab" class="tab" title="/fighter" onclick="openPage('fighter');">Turn-Based Fighter</div>
     </div>
     <div id="teacherTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/expert/teacher.png') }}" class="icon"> Teacher</div>
     <div id="teacherMenu" class="menu hidden" tabindex="-1">
@@ -888,7 +889,7 @@
     let tabs = document.querySelectorAll(".tab");
     let tabEl = document.getElementById(path.substring(1) + "Tab");
     Array.from(tabs).forEach(tab => tab.classList.remove("open"));
-    if (["/fighter", "/hangman", "/2048", "/ttt", "/flappybird"].includes(path)) document.getElementById("gamesTab").classList.add("open");
+    if (["/2048", "/flappybird", "/hangman", "mnsw", "/ttt", "/fighter"].includes(path)) document.getElementById("gamesTab").classList.add("open");
     else if (["/settings", "/lesson", "/needshelp", "/users"].includes(path)) document.getElementById("teacherTab").classList.add("open");
     if (tabEl) tabEl.classList.add("open");
     if (path == "/chat") {

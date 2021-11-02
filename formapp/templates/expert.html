@@ -302,7 +302,7 @@
     border-color: white;
   }
 
-  #mainWindow {
+  #mainPage {
     position: absolute;
     bottom: 0;
     width: 100%;
@@ -446,9 +446,9 @@
     </div>
     <div id="teacherTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/expert/teacher.png') }}" class="icon"> Teacher</div>
     <div id="teacherMenu" class="menu hidden" tabindex="-1">
-      <div id="settingsTab" class="tab" title="/settings" onclick="openPage('settings');">Settings</div>
-      <div id="lessonTab" class="tab" title="/lesson" onclick="openPage('lesson');">Lesson</div>
       <div id="needshelpTab" class="tab" title="/needshelp" onclick="openPage('needshelp');">Help tickets</div>
+      <div id="lessonTab" class="tab" title="/lesson" onclick="openPage('lesson');">Lesson</div>
+      <div id="settingsTab" class="tab" title="/settings" onclick="openPage('settings');">Settings</div>
       <div id="usersTab" class="tab" title="/users" onclick="openPage('users');">User list</div>
     </div>
     <div id="urlTab" class="tab" onclick="inputURL();">
@@ -457,11 +457,11 @@
         <label for="urlInput" id="urlLabel">192.168.10.82/</label><input type="text" id="urlInput"></input>
       </span>
     </div>
-    <div id="reload" class="tab" style="margin-left: auto;" title="Reload" onclick="document.getElementById('mainWindow').contentWindow.location.reload();"><img src="{{ url_for('static', filename='img/expert/reload.png') }}" class="icon"></div>
+    <div id="reload" class="tab" style="margin-left: auto;" title="Reload" onclick="document.getElementById('mainPage').contentWindow.location.reload();"><img src="{{ url_for('static', filename='img/expert/reload.png') }}" class="icon"></div>
   </div>
 
   <div>
-    <iframe src="/chat" id="mainWindow" onload="pageOpened(this.contentWindow.location.pathname);"></iframe>
+    <iframe src="/chat" id="mainPage" onload="pageOpened(this.contentWindow.location.pathname);"></iframe>
   </div>
 </div>
 
@@ -473,7 +473,7 @@
   let letterButtons = document.querySelectorAll(".letterButton");
   let bottom = document.getElementById("bottom");
   let menus = document.querySelectorAll(".menu");
-  let mainWindow = document.getElementById("mainWindow");
+  let mainPage = document.getElementById("mainPage");
   let chosenThumb = false;
   let chosenLetter = false;
   let segment;
@@ -512,7 +512,7 @@
     let currentMode = res.mode;
     document.getElementById("mode").innerText = currentMode;
 
-    ["tutd", "survey", "quiz"].forEach(mode => {
+    ["quiz", "tutd", "survey"].forEach(mode => {
       let el = document.getElementById(mode + "Div");
       if (mode == currentMode) el.classList.remove("hidden");
       else el.classList.add("hidden");
@@ -865,23 +865,23 @@
   });
 
   function openPage(page) {
-    mainWindow.contentWindow.location = "/" + page;
+    mainPage.contentWindow.location = "/" + page;
     Array.from(menus).forEach(menu => menu.classList.add("hidden"));
   }
 
   function pageOpened(path) {
-    let content = mainWindow.contentWindow.document.getElementById("content");
+    let content = mainPage.contentWindow.document.getElementById("content");
 
     if (path == "/expert") openPage("chat");
     else if (!content) {
       //Put error message in alert and go back
-      let message = mainWindow.contentWindow.document.body.innerText;
-      mainWindow.contentWindow.history.back();
+      let message = mainPage.contentWindow.document.body.innerText;
+      mainPage.contentWindow.history.back();
       //alert(message);
       setTimeout(() => alert(message), 40); //Add a brief delay so page doesn't change
     } else if (content.innerHTML.includes("Go Back")) { //Detects if the page has an error message (Is there a better way to do this?)
       let message = content.innerText.slice(0, -9);
-      mainWindow.contentWindow.history.back();
+      mainPage.contentWindow.history.back();
       //alert(message);
       setTimeout(() => alert(message), 40);
     }
@@ -890,7 +890,7 @@
     let tabEl = document.getElementById(path.substring(1) + "Tab");
     Array.from(tabs).forEach(tab => tab.classList.remove("open"));
     if (["/2048", "/flappybird", "/hangman", "mnsw", "/ttt", "/fighter"].includes(path)) document.getElementById("gamesTab").classList.add("open");
-    else if (["/settings", "/lesson", "/needshelp", "/users"].includes(path)) document.getElementById("teacherTab").classList.add("open");
+    else if (["/needshelp", "/lesson", "/settings", "/users"].includes(path)) document.getElementById("teacherTab").classList.add("open");
     if (tabEl) tabEl.classList.add("open");
     if (path == "/chat") {
       newMessages = 0;
@@ -934,10 +934,10 @@
   ws.onmessage = message => {
     let data = JSON.parse(message.data);
     if (data.type == 'message' || data.type == 'alert') {
-      if (document.hidden || !mainWindow.contentWindow.location.pathname == "/chat") {
+      if (document.hidden || !mainPage.contentWindow.location.pathname == "/chat") {
         newMessages++;
-        document.title = "(" + newMessages + ") Expert Homepage";
-        if (mainWindow.contentWindow.location.pathname != "chat") {
+        document.title = `(${newMessages}) Expert Homepage`;
+        if (mainPage.contentWindow.location.pathname != "chat") {
           document.getElementById("newMessages").innerText = "(" + newMessages + ")";
           setMenuWidths();
         }
@@ -945,10 +945,6 @@
     }
   }
 
-  document.addEventListener("visibilitychange", () => {if (!document.hidden && mainWindow.contentWindow.location.pathname == "chat") document.title = "Expert Homepage"}); //When user goes to this page, if chat is open, remove number of new messages from title
-
-  /*To do:
-  -Alerts from sidebar
-  */
+  document.addEventListener("visibilitychange", () => {if (!document.hidden && mainPage.contentWindow.location.pathname == "chat") document.title = "Expert Homepage"}); //When user goes to this page, if chat is open, remove number of new messages from title
 </script>
 {% endblock %}

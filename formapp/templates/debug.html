@@ -63,8 +63,14 @@
     cursor: pointer;
   }
 
-  button.open, button:hover {
+  button:not(.open):hover {
     background: var(--light-red);
+    color: var(--bg-dark);
+  }
+
+  button.open {
+    background: white;
+    border-color: white;
     color: var(--bg-dark);
   }
 

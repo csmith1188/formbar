@@ -756,7 +756,7 @@
       np.classList.remove("hidden");
       npTitle.innerText = songName;
       if (np.clientHeight > 21) shorten(np, 21, npTitle);
-      else nameBox.removeAttribute("title");
+      else np.removeAttribute("title");
     }
     //If no song is playing, hide
     else np.classList.add("hidden");

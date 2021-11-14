@@ -8,11 +8,8 @@
 <!-- Extra style declarations here -->
 {% block style %}
   <style>
-    body, #content {
+    body {
       margin-top: 30px;
-      background-color: var(--bg-dark);
-      color: white;
-      font-family: "Times New Roman", Times, serif;
     }
 
     h1 {
@@ -34,15 +31,21 @@
       position: relative;
       display: inline-block;
       border-radius: 5px;
-      border: 4px solid #FFFFFF;
-      color: black;
-      border-spacing: 15px;
-      margin: 2px;
+      color: var(--bg-dark);
+      margin: 5px;
       font-size: 75px;
+      font-weight: 600;
+      line-height: 125px;
       width: 100px;
+      height: 125px;
       text-align: center;
       background-color: #FFFFFF;
+      cursor: pointer;
       user-select: none;
+    }
+
+    .key:not(.unselectable):hover {
+      background-color: var(--light-gray);
     }
 
     #keys {
@@ -63,44 +66,20 @@
     }
 
     #scoreBox {
-      display: flex;
-      float: left;
-      padding: 0px;
-      width: 300px;
-      margin: 0px;
+      width: 250px;
+    }
+
+    h3 {
+      margin: 0;
+    }
+
+    #score, #highscore, #lives, #last {
+      font-size: 30px;
+      margin-bottom: 20px;
     }
 
     * {
       box-sizing: border-box;
-    }
-
-    #score {
-      /* position: absolute;
-  top: 5px;
-  left: 5px; */
-      text-align: left;
-      margin: 5px;
-      /* position: absolute; */
-    }
-
-    #lives {
-      /* position: absolute;
-  top: 55px;
-  left: 5px; */
-      text-align: left;
-      margin: 5px;
-      /* position: absolute;
-      left: 180px; */
-    }
-
-    #highscore {
-      /* position: absolute;
-  top: 5px;
-  left: 200px; */
-      text-align: left;
-      margin: 5px;
-      /* position: absolute;
-      left: 80px; */
     }
 
     #wordBank {
@@ -114,31 +93,35 @@
       text-align: center
     }
 
-    #last {
-      text-align: left;
-      margin: 5px;
-      /* position: absolute;*/
-      top: 70px;
-    }
-
     #bank {
-      font-size: 25px;
+      font-size: 30px;
       /* position: absolute; */
       text-align: center;
       width: 250px;
-      border: 3px solid #333;
-      top: 150px
+    }
+
+    h2 {
+      margin-top: 0;
     }
 
     #left {
-      float: left;
+      position: fixed;
+      left: 30px;
+      top: 100px;
     }
 
     #center {
       padding: 0px;
       margin: 0px;
       width: 1000px;
+      max-width: 60%;
       /* position: relative; */
+    }
+
+    #right {
+      position: fixed;
+      right: 30px;
+      top: 100px;
     }
 
 
@@ -182,14 +165,16 @@
 {% block main %}
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<div id="left">
-		<div id="scoreBox" style="overflow:auto">
-			<div id="score">Score: 0</div>
-			<div id="highscore">Highscore: 0</div>
-			<div id="lives">Lives: 10</div>
-			<div id="last">Last Word: </div>
+		<div id="scoreBox" style="overflow-wrap: break-word;">
+      <h3>Score</h3>
+			<div id="score">0</div>
+      <h3>High score</h3>
+			<div id="highscore">0</div>
+      <h3>Lives</h3>
+			<div id="lives">10</div>
+      <h3>Previous word</h3>
+			<div id="last"></div>
 		</div>
-		<div id="bank">Word Bank</div>
-		<div id="wordBank"></div>
 	</div>
 	<center>
 		<div id="center">
@@ -202,6 +187,10 @@
 			<div id="keys" class="keys"></div>
 		</div>
 	</center>
+	<div id="right">
+		<h2 id="bank">Word Bank</h2>
+		<div id="wordBank"></div>
+	</div>
 
 
 	<!-- <img src="hangmanbg.png" class="hangmanbg"> -->
@@ -229,7 +218,7 @@
   	window.onload = () => {
   		keyColor();
   		randomize();
-      document.getElementById("highscore").innerHTML = "Highscore: " + highscore;
+      document.getElementById("highscore").innerHTML = highscore;
   	};
 
   	function createList() {
@@ -252,7 +241,7 @@
         }
   		}
   	}
-  	createList();
+  	if (!(wordObj.place == "your" && wordObj.words == "here")) createList();
 
   	function getNewWord() {
 			var wordRequest = new XMLHttpRequest();
@@ -299,7 +288,7 @@
       document.getElementById("word").innerText = null;
   		lives = 10;
 
-  		document.getElementById("lives").innerHTML = "Lives: " + lives;
+  		document.getElementById("lives").innerHTML = lives;
 
   		word = wordList[Math.floor(Math.random() * wordList.length)];
 
@@ -319,7 +308,6 @@
   	}
 
   	function guess(l) {
-  		closeLetter(l);
   		var check = false;
   		for (var i = 0; i < letters.length; i++) {
 
@@ -327,6 +315,8 @@
   				check = true;
   			}
   		}
+
+      closeLetter(l, check);
 
   		if (check == true) {
   			displayWord = "";
@@ -346,20 +336,21 @@
   			if (displayWord.slice(0, -1) == word.split('').join(' ')) {
   				//they solved the word
   				lastword = word
-  				document.getElementById("last").innerHTML = "Previous Word: " + lastword;
+  				document.getElementById("last").innerHTML = lastword;
   				score += lives;
   				if (score > highscore) {
   					localStorage.setItem("hangmanHighScore", score);
   					highscore = score;
+      			document.getElementById("highscore").style.color = "var(--light-red)";
   				}
   				randomize();
   				resetLetters();
           getNewWord();
   			}
 
-  			document.getElementById("score").innerHTML = "Score: " + score;
-  			document.getElementById("highscore").innerHTML = "Highscore: " + highscore;
-  			document.getElementById("lives").innerHTML = "Lives: " + lives;
+  			document.getElementById("score").innerHTML = score;
+  			document.getElementById("highscore").innerHTML = highscore;
+  			document.getElementById("lives").innerHTML = lives;
 
   		} else {
   			//they guessed a wrong letter
@@ -371,24 +362,29 @@
   					score = 0;
   					randomize();
   					resetLetters();
-  					document.getElementById("last").innerHTML = "Previous Word: " + lastword;
+  					document.getElementById("last").innerHTML = lastword;
   				}
   			}
-  			document.getElementById("score").innerHTML = "Score: " + score;
-  			document.getElementById("lives").innerHTML = "Lives: " + lives;
+  			document.getElementById("score").innerHTML = score;
+  			document.getElementById("lives").innerHTML = lives;
+        if (lives == 1) document.getElementById("lives").style.color = "var(--light-red)";
   		}
   	}
 
-  	function closeLetter(letter) {
-  		document.getElementById(letter).style.backgroundColor = "#b5b5b5";
+  	function closeLetter(letter, correct) {
+      let el = document.getElementById(letter);
+  		el.classList.add("unselectable");
+      if (correct) el.style.background = "var(--light-green)";
+      else el.style.background = "var(--light-red)";
   	}
 
-  	function resetLetters() {
-  		elements = document.getElementsByClassName("key");
-  		for (var i = 0; i < elements.length; i++) {
-  			elements[i].style.backgroundColor = "#FFFFFF";
-  		}
-  	}
+    function resetLetters() {
+    	elements = document.getElementsByClassName("key");
+    	for (var i = 0; i < elements.length; i++) {
+    	  elements[i].classList.remove("unselectable");
+    		elements[i].style.backgroundColor = "#FFFFFF";
+    	}
+    }
 
   	document.addEventListener("keypress", event => {
   		if (/^[a-z]{1}$/.test(event.key)) guess(event.key); //If a letter key is pressed, guess that letter

@@ -26,68 +26,76 @@
     body, #content {
       background-color: var(--bg-dark);
       color: white;
-      font-family: "Times New Roman", Times, serif;
     }
 
     .container {
-      margin: auto;
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
       width: 452px;
       height: 100%;
       overflow: hidden;
-      position: relative;
     }
 
     .logo {
-      width: 40%;
-      font-size: 70px;
-      font-weight: bold;
+      position: absolute;
+      left: 0;
+      top: 20px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .logo > span {
+      position: static;
+      font-size: 100px;
+      background: white;
+      font-family: monospace;
+      font-weight: 600;
+    }
+
+    #logo2 {
+      color: var(--color-blue);
+    }
+
+    #logo0 {
+      color: var(--color-cyan);
+    }
+
+    #logo4 {
       color: var(--color-green);
-      float: left;
-      position: relative;
-      top: 10px;
+    }
+
+    #logo8 {
+      color: var(--color-yellow);
     }
 
     .scoreBar {
-      width: 50%;
-      float: right;
-      background: #fff;
-      color: #111;
-
-      padding: 10px;
-      position: relative;
-      margin-top: 10px;
+      position: absolute;
+      left: 0;
+      top: 140px;
+      width: 100%;
+      height: 108px;
+      display: flex;
+      justify-content: space-evenly;
     }
 
-    .scoreBar:before {
-      content: "";
-      display: block;
-      border-width: 20px;
-      border-color: transparent #fff transparent transparent;
-      border-style: solid;
-      position: absolute;
-      top: 50%;
-      left: -40px;
-      margin-top: -20px;
+    .scoreContainer, .highScoreContainer {
+      width: 175px;
+      box-sizing: border-box;
+      background: var(--dark-gray);
+      padding: 10px;
+      text-align: center;
     }
 
     #score, #highScore {
       font-size: 30px;
-      color: #7f7e83;
-    }
-
-    #highScore {
-      position: absolute;
-      right: 10px;
-      top: 28px;
     }
 
     #addScore {
-      display: inline-block;
-      font-size: 30px;
-      color: #999;
-      opacity: .8;
-      top: 4px;
-      right: 0;
+      font-size: 20px;
+      color: var(--light-gray);
     }
 
     #addScore.show {
@@ -109,12 +117,17 @@
       -webkit-transition: all .5s ease;
     }
 
+    #newBest {
+      font-size: 20px;
+      color: var(--light-red);
+    }
+
     #gameOver {
       position: fixed;
       color: var(--light-red);
       left: 50%;
       transform: translateX(-50%);
-      top: 27%;
+      top: 29%;
       font-size: 32px;
       display: none;
     }
@@ -128,10 +141,10 @@
       position: absolute;
       width: 450px;
       height: 450px;
-      top: 55%;
+      top: 57%;
       left: 0;
       margin-top: -200px;
-      border: 1px solid #eee;
+      border: 1px solid var(--light-gray);
       z-index: 1;
     }
 
@@ -245,10 +258,16 @@
 
     }
 
+    .blank {
+      background: var(--bg-dark);
+    }
+
     .num2 {
-      background: #FFFFFF;
-      color: #7f7e83;
+      color: var(--color-blue);
       font-size: 100px;
+      background: white;
+      font-family: monospace;
+      font-weight: 600;
       transition: all .2s ease;
       -ms-transition: all .2s ease;
       -moz-transition: all .2s ease;
@@ -262,9 +281,11 @@
     }
 
     .num4 {
-      background: #FFFFFF;
-      color: #005744;
+      color: var(--color-cyan);
       font-size: 100px;
+      background: white;
+      font-family: monospace;
+      font-weight: 600;
       transition: all .2s ease;
       -ms-transition: all .2s ease;
       -moz-transition: all .2s ease;
@@ -274,132 +295,210 @@
       -moz-animation: myfirst .5s;
       /* Firefox */
       -webkit-animation: myfirst .5s;
-      /* Safari or Chrome */
+      /* Safari or Chrome or opera */
     }
 
     .num8 {
-      background: #FFFFFF;
-      color: #7f7e83;
+      color: var(--color-green);
       font-size: 100px;
+      background: white;
+      font-family: monospace;
+      font-weight: 600;
       transition: all .2s ease;
       -ms-transition: all .2s ease;
       -moz-transition: all .2s ease;
       -o-transition: all .2s ease;
       -webkit-transition: all .2s ease;
       animation: myfirst .5s;
+      -moz-animation: myfirst .5s;
+      /* Firefox */
+      -webkit-animation: myfirst .5s;
+      /* Safari or Chrome or opera */
     }
 
     .num16 {
-      background: #FFFFFF;
-      color: #005744;
-      font-size: 80px;
+      color: var(--color-yellow);
+      font-size: 75px;
+      background: white;
+      font-family: monospace;
+      font-weight: 600;
       transition: all .2s ease;
       -ms-transition: all .2s ease;
       -moz-transition: all .2s ease;
       -o-transition: all .2s ease;
       -webkit-transition: all .2s ease;
       animation: myfirst .5s;
+      -moz-animation: myfirst .5s;
+      /* Firefox */
+      -webkit-animation: myfirst .5s;
+      /* Safari or Chrome or opera */
     }
 
     .num32 {
-      background: #FFFFFF;
-      color: #7f7e83;
-      font-size: 80px;
+      color: var(--color-orange);
+      font-size: 75px;
+      background: white;
+      font-family: monospace;
+      font-weight: 600;
       transition: all .2s ease;
       -ms-transition: all .2s ease;
       -moz-transition: all .2s ease;
       -o-transition: all .2s ease;
       -webkit-transition: all .2s ease;
+      animation: myfirst .5s;
+      -moz-animation: myfirst .5s;
+      /* Firefox */
+      -webkit-animation: myfirst .5s;
+      /* Safari or Chrome or opera */
     }
 
     .num64 {
-      background: #FFFFFF;
-      color: #005744;
-      font-size: 80px;
+      color: var(--color-red);
+      font-size: 75px;
+      background: white;
+      font-family: monospace;
+      font-weight: 600;
       transition: all .2s ease;
       -ms-transition: all .2s ease;
       -moz-transition: all .2s ease;
       -o-transition: all .2s ease;
       -webkit-transition: all .2s ease;
+      animation: myfirst .5s;
+      -moz-animation: myfirst .5s;
+      /* Firefox */
+      -webkit-animation: myfirst .5s;
+      /* Safari or Chrome or opera */
     }
 
     .num128 {
-      background: #FFFFFF;
-      color: #7f7e83;
-      font-size: 52px;
+      box-shadow: inset 0 0 10px 3px var(--color-red);
+      color: var(--color-blue);
+      font-size: 50px;
+      background: white;
+      font-family: monospace;
+      font-weight: 600;
       transition: all .2s ease;
       -ms-transition: all .2s ease;
       -moz-transition: all .2s ease;
       -o-transition: all .2s ease;
       -webkit-transition: all .2s ease;
+      animation: myfirst .5s;
+      -moz-animation: myfirst .5s;
+      /* Firefox */
+      -webkit-animation: myfirst .5s;
+      /* Safari or Chrome or opera */
     }
 
     .num256 {
-      background: #FFFFFF;
-      color: #005744;
-      font-size: 52px;
+      box-shadow: inset 0 0 10px 3px var(--color-red);
+      color: var(--color-cyan);
+      font-size: 50px;
+      background: white;
+      font-family: monospace;
+      font-weight: 600;
       transition: all .2s ease;
       -ms-transition: all .2s ease;
       -moz-transition: all .2s ease;
       -o-transition: all .2s ease;
       -webkit-transition: all .2s ease;
+      animation: myfirst .5s;
+      -moz-animation: myfirst .5s;
+      /* Firefox */
+      -webkit-animation: myfirst .5s;
+      /* Safari or Chrome or opera */
     }
 
     .num512 {
-      background: #FFFFFF;
-      color: #7f7e83;
-      font-size: 52px;
+      box-shadow: inset 0 0 10px 3px var(--color-red);
+      color: var(--theme-color);
+      font-size: 50px;
+      background: white;
+      font-family: monospace;
+      font-weight: 600;
       transition: all .2s ease;
       -ms-transition: all .2s ease;
       -moz-transition: all .2s ease;
       -o-transition: all .2s ease;
       -webkit-transition: all .2s ease;
+      animation: myfirst .5s;
+      -moz-animation: myfirst .5s;
+      /* Firefox */
+      -webkit-animation: myfirst .5s;
+      /* Safari or Chrome or opera */
     }
 
     .num1024 {
-      background: #FFFFFF;
-      color: #005744;
-      font-size: 52px;
+      box-shadow: inset 0 0 10px 3px var(--color-red);
+      color: var(--color-yellow);
+      font-size: 50px;
+      line-height: 50px;
+      background: white;
+      font-family: monospace;
+      font-weight: 600;
       transition: all .2s ease;
       -ms-transition: all .2s ease;
       -moz-transition: all .2s ease;
       -o-transition: all .2s ease;
       -webkit-transition: all .2s ease;
+      animation: myfirst .5s;
+      -moz-animation: myfirst .5s;
+      /* Firefox */
+      -webkit-animation: myfirst .5s;
+      /* Safari or Chrome or opera */
     }
 
     .num2048 {
-      background: #FFFFFF;
-      color: #7f7e83;
-      font-size: 52px;
-
+      box-shadow: inset 0 0 10px 3px var(--color-red);
+      color: var(--color-orange);
+      font-size: 50px;
+      line-height: 50px;
+      background: white;
+      font-family: monospace;
+      font-weight: 600;
       transition: all .2s ease;
       -ms-transition: all .2s ease;
       -moz-transition: all .2s ease;
       -o-transition: all .2s ease;
       -webkit-transition: all .2s ease;
+      animation: myfirst .5s;
+      -moz-animation: myfirst .5s;
+      /* Firefox */
+      -webkit-animation: myfirst .5s;
+      /* Safari or Chrome or opera */
     }
 
     .num4096 {
-      background: #FFFFFF;
-      color: #005744;
-      font-size: 52px;
+      box-shadow: inset 0 0 10px 3px var(--color-red);
+      color: black;
+      font-size: 50px;
+      line-height: 50px;
+      background: white;
+      font-family: monospace;
+      font-weight: 600;
       transition: all .2s ease;
       -ms-transition: all .2s ease;
       -moz-transition: all .2s ease;
       -o-transition: all .2s ease;
       -webkit-transition: all .2s ease;
+      animation: myfirst .5s;
+      -moz-animation: myfirst .5s;
+      /* Firefox */
+      -webkit-animation: myfirst .5s;
+      /* Safari or Chrome or opera */
     }
 
     #newGameButton {
-      position: absolute;
+      position: fixed;
       left: 50%;
       transform: translateX(-50%);
-      top: 87%;
-      padding: 8px 16px;
-      font: 30px "Times New Roman", Times, serif;
-      border-radius: 12px;
+      top: 88%;
+      width: fit-content;
+      height: fit-content;
+      padding: 7px 14px;
+      font-size: 28px;
+      border-radius: 28px;
       background: var(--bg-darker);
-      color: var(--color-green);
+      color: var(--theme-color);
       border: 2px solid;
       cursor: pointer;
       z-index: 3;
@@ -508,23 +607,48 @@
 {% block main %}
   <div id="cover"></div>
   <div class="container">
-    <div class="logo">2048
-    SPARTANS</div>
+    <div class="logo">
+      <span id="logo2">2</span>
+      <span id="logo0">0</span>
+      <span id="logo4">4</span>
+      <span id="logo8">8</span>
+    </div>
     <div class="scoreBar">
-      <label>Score</label><br>
-      <label id="score">0</label>
-      <div id="addScore"></div>
-
-      <label style="position: absolute; right: 10px; top: 10px;">High score</label><br>
-      <label id="highScore">0</label>
+      <div class="scoreContainer">
+        <label>Score</label><br>
+        <label id="score">0</label>
+        <div id="addScore"></div>
+      </div>
+      <div class="highScoreContainer">
+        <label>High score</label><br>
+        <label id="highScore">0</label><br>
+        <div id="newBest"></div>
+      </div>
     </div>
     <div id="gameOver">GAME OVER!</div>
-    <div id="stage"></div>
+    <div id="stage">
+      <span class="row0 cell0 blank"></span>
+      <span class="row0 cell1 blank"></span>
+      <span class="row0 cell2 blank"></span>
+      <span class="row0 cell3 blank"></span>
+      <span class="row1 cell0 blank"></span>
+      <span class="row1 cell1 blank"></span>
+      <span class="row1 cell2 blank"></span>
+      <span class="row1 cell3 blank"></span>
+      <span class="row2 cell0 blank"></span>
+      <span class="row2 cell1 blank"></span>
+      <span class="row2 cell2 blank"></span>
+      <span class="row2 cell3 blank"></span>
+      <span class="row3 cell0 blank"></span>
+      <span class="row3 cell1 blank"></span>
+      <span class="row3 cell2 blank"></span>
+      <span class="row3 cell3 blank"></span>
+    </div>
     <!--<div id="gameOver hide">-->
     <!--<div class="overText">GameOver!</div>-->
     <!--</div>-->
-    <button id="newGameButton" onclick="window.location.reload();">New game</button>
   </div>
+  <button id="newGameButton" onclick="window.location.reload();">New game</button>
   <script>
     if (localStorage.getItem("2048HighScore")) document.getElementById("highScore").innerHTML = localStorage.getItem("2048HighScore");
 
@@ -647,11 +771,14 @@
         scoreBar.innerText = this.points.score;
         scoreBar.textContent = this.points.score;
         var highScoreBar = document.getElementById('highScore');
+        var newBest = document.getElementById('newBest');
         var highScore = localStorage.getItem("2048HighScore");
         if (this.points.score > highScore) {
           highScoreBar.innerText = this.points.score;
           highScoreBar.textContent = this.points.score;
-          highScoreBar.style.color = "#f04040"
+          highScoreBar.style.color = "var(--light-red)";
+          newBest.innerText = "New best!";
+          newBest.textContent = "New best!";
           localStorage.setItem("2048HighScore", this.points.score);
         }
         return obj2.boxObj.value;

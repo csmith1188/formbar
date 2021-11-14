@@ -3,43 +3,43 @@
 <!-- This is where the title, top buttons, and stylesheet is located -->
 
 <!-- Change title here -->
-{% block title %}Expert Homepage{% endblock %}
+{% block title %}Formbar{% endblock %}
 
 <!-- Extra style declarations here -->
 {% block style %}
 <style>
-  body {
-    font: 16px "Segoe UI", sans-serif;
-    background: var(--bg-dark);
-  }
-
   ::-webkit-scrollbar {
     width: 15px;
     height: 15px;
   }
 
   ::-webkit-scrollbar-thumb {
-    box-shadow: inset 0 0 5px 5px #777;
+    box-shadow: inset 0 0 5px 5px gray;
     border: solid 5px transparent;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    box-shadow: inset 0 0 5px 5px #444;
+    box-shadow: inset 0 0 5px 5px var(--dark-gray);
   }
 
   ::-webkit-scrollbar-thumb:active {
-    box-shadow: inset 0 0 15px 15px #444;
+    box-shadow: inset 0 0 15px 15px var(--dark-gray);
     border: none;
   }
 
   h1 {
+    font-size: 30px;
+    color: var(--color-blue);
+  }
+
+  h2 {
     margin: 0 0 12px;
     font-size: 24px;
     color: var(--color-blue);
     text-align: center;
   }
 
-  h2 {
+  h3 {
     margin: 0 0 10px;
     font-size: 20px;
     color: var(--color-blue);
@@ -68,28 +68,9 @@
     width: 48px;
   }
 
-  button,
-  input[type="color"] {
-    height: 24px;
-    background: transparent;
-    border: 1px solid;
-    border-radius: 6px;
-    color: var(--color-blue);
-    font-family: "Segoe UI", sans-serif;
-    font-weight: bold;
-  }
-
   input[type="color"] {
     width: 80px;
     height: 20px;
-  }
-
-  button,
-  input[type="color"],
-  .thumbButton,
-  .letterButton {
-    transition-duration: 0.2s;
-    cursor: pointer;
   }
 
   a:active {
@@ -101,12 +82,6 @@
     width: 144px;
     margin: 12px;
     border-radius: 48px;
-  }
-
-  button:hover,
-  input[type="color"]:hover {
-    transform: translate(2px, -2px);
-    box-shadow: -1px 1px, -2px 2px;
   }
 
   .thumbButton:not(.highlight):hover:not(:active),
@@ -160,24 +135,12 @@
     height: 100%;
     box-sizing: border-box;
     padding: 8px;
-    background: white;
     overflow: auto;
   }
 
   #tutdDiv, #surveyDiv {
     width: 100%;
     text-align: center;
-  }
-
-  #quizName {
-    color: black;
-    font-weight: normal;
-  }
-
-  #quizButton {
-    height: 28px;
-    border-radius: 7px;
-    font-size: 16px;
   }
 
   #text {
@@ -302,7 +265,7 @@
     border-color: white;
   }
 
-  #mainPage {
+  #innerPage {
     position: absolute;
     bottom: 0;
     width: 100%;
@@ -329,66 +292,62 @@
 
 <!-- Main content here -->
 {% block main %}
-<div id="sidebar">
+<div id="sidebar" class="light">
   <div id="sidebarContent">
+    <h2>Formbar Features</h2>
+    <p style="margin: 0; text-align: center;">Features will appear when the teacher makes them available.</p>
     <div id="tutdDiv" class="hidden">
-      <h1>Thumbs</h1>
-      <img src="{{ url_for('static', filename='img/expert/thumbButton0.png') }}" id="thumbButton0" class="thumbButton green" title="Up" onclick="thumbsVote(0);" tabindex="0">
+      <h2>Thumbs</h2>
+      <img src="{{ url_for('static', filename='img/home/thumbButton0.png') }}" id="thumbButton0" class="thumbButton green" title="Up" onclick="thumbsVote(0);" tabindex="0">
       <br>
-      <img src="{{ url_for('static', filename='img/expert/thumbButton1.png') }}" id="thumbButton1" class="thumbButton cyan" title="Wiggle" onclick="thumbsVote(1);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/home/thumbButton1.png') }}" id="thumbButton1" class="thumbButton cyan" title="Wiggle" onclick="thumbsVote(1);" tabindex="0">
       <br>
-      <img src="{{ url_for('static', filename='img/expert/thumbButton2.png') }}" id="thumbButton2" class="thumbButton red" title="Down" onclick="thumbsVote(2);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/home/thumbButton2.png') }}" id="thumbButton2" class="thumbButton red" title="Down" onclick="thumbsVote(2);" tabindex="0">
       <br><br><br>
     </div>
 
     <div id="surveyDiv" class="hidden">
-      <h1>Survey</h1>
-      <img src="{{ url_for('static', filename='img/expert/letterButton0.png') }}" id="letterButton0" class="letterButton red" title="Vote A" onclick="letterVote(0);" tabindex="0">
+      <h2>Survey</h2>
+      <img src="{{ url_for('static', filename='img/home/letterButton0.png') }}" id="letterButton0" class="letterButton red" title="Vote A" onclick="letterVote(0);" tabindex="0">
       <br>
-      <img src="{{ url_for('static', filename='img/expert/letterButton1.png') }}" id="letterButton1" class="letterButton blue" title="Vote B" onclick="letterVote(1);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/home/letterButton1.png') }}" id="letterButton1" class="letterButton blue" title="Vote B" onclick="letterVote(1);" tabindex="0">
       <br>
-      <img src="{{ url_for('static', filename='img/expert/letterButton2.png') }}" id="letterButton2" class="letterButton yellow" title="Vote C" onclick="letterVote(2);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/home/letterButton2.png') }}" id="letterButton2" class="letterButton yellow" title="Vote C" onclick="letterVote(2);" tabindex="0">
       <br>
-      <img src="{{ url_for('static', filename='img/expert/letterButton3.png') }}" id="letterButton3" class="letterButton green" title="Vote D" onclick="letterVote(3);" tabindex="0">
-      <br><br><br>
-    </div>
-
-    <div id="quizDiv" class="hidden">
-      <h1>Quiz: <span id="quizName"></h1>
-      <button id="quizButton" onclick="openPage('quiz');">Start quiz ▶</button>
+      <img src="{{ url_for('static', filename='img/home/letterButton3.png') }}" id="letterButton3" class="letterButton green" title="Vote D" onclick="letterVote(3);" tabindex="0">
       <br><br><br>
     </div>
 
     <div id="soundDiv" class="hidden">
-      <h1>Sound effects</h1>
+      <h2>Sound effects</h2>
       <input type="text" id="sound" placeholder="Filename" list="sfxFiles">
       <datalist id="sfxFiles"></datalist>
-      <img src="{{ url_for('static', filename='img/expert/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendSound();">
+      <img src="{{ url_for('static', filename='img/home/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendSound();">
       <br><br><br>
     </div>
 
     <div id="musicDiv" class="hidden">
-      <h1>Play music</h1>
+      <h2>Play music</h2>
       <label for="volume">Volume: </label><input type="range" id="volume" value="1" max="1" step="0.1">
       <span id="volNumber">1.0</span>
       <br>
-      <img src="{{ url_for('static', filename='img/expert/random.png') }}" id="randomMusic" class="smallImg" title="Random" onclick="randomBGM()"><input type="text" id="music" placeholder="Filename" list="bgmFiles">
+      <img src="{{ url_for('static', filename='img/home/random.png') }}" id="randomMusic" class="smallImg" title="Random" onclick="randomBGM()"><input type="text" id="music" placeholder="Filename" list="bgmFiles">
       <datalist id="bgmFiles"></datalist>
-      <img src="{{ url_for('static', filename='img/expert/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendMusic();"><br>
+      <img src="{{ url_for('static', filename='img/home/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendMusic();"><br>
       <div id="nowPlaying" class="hidden">Now playing: <b id="nowPlayingTitle" title="Song">Song</b></div>
-      <button id="stopMusicButton" style="margin-top: 12px;" onclick="stopMusic();">Stop music</button>
+      <button id="stopMusicButton" class="inline popOut" style="margin-top: 12px;" onclick="stopMusic();">Stop music</button>
       <br><br><br>
     </div>
 
     <div id="textDiv" class="hidden">
-      <h1>Change text</h1>
+      <h2>Change text</h2>
       <input type="text" id="text" placeholder="Phrase">
-      <img src="{{ url_for('static', filename='img/expert/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendText();">
+      <img src="{{ url_for('static', filename='img/home/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendText();">
       <br><br><br>
     </div>
 
     <div id="colorDiv" class="hidden">
-      <h1>Change color</h1>
+      <h2>Change color</h2>
       <input type="radio" id="hideSegment" name="segment" checked onclick="hideSegment();" style="margin-left: 0;"><label for="hideSegment">Entire bar</label>
       <input type="radio" id="showSegment" name="segment" onclick="showSegment();"><label for="showSegment">Segment</label>
       <br>
@@ -400,80 +359,69 @@
       <input type="radio" id="showColor2" name="gradient" onclick="showColor2();"><label for="showColor2">Gradient</label>
       <br>
       <div style="display: inline-block;">
-        <h2 id="color1Heading" class="hidden">Color 1</h2>
+        <h3 id="color1Heading" class="hidden">Color 1</h3>
         <input type="color" id="color1">
       </div>
       <div id="color2Div" class="hidden" style="margin-left: 8px;">
-        <h2>Color 2</h2>
+        <h3>Color 2</h3>
         <input type="color" id="color2">
       </div>
-      <img src="{{ url_for('static', filename='img/expert/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendColor();">
+      <img src="{{ url_for('static', filename='img/home/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendColor();">
       <br><br><br>
     </div>
 
     <div id="percentDiv" class="hidden">
-      <h1>Fill percentage</h1>
+      <h2>Fill percentage</h2>
       <input type="number" id="percent" value="0" min="0" max="100" onchange="validNumber(this);"><label for="percent">%</label>
-      <img src="{{ url_for('static', filename='img/expert/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendPercent();">
+      <img src="{{ url_for('static', filename='img/home/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendPercent();">
       <br><br><br>
     </div>
   </div>
 
   <div id="bottom">
-    Mode: <span id="mode"></span>
+    Name: <span id="name"></span> <button id="logOut" class="inline popOut" onclick="window.location = '/logout'">Log out</button>
     <br>
-    Name: <span id="name"></span> <button id="logOut" onclick="window.location = '/login?forward=/expert'">Log in again</button>
-    <br>
-    <input type="checkbox" id="defaultCheckbox" style="margin-left: 0;" onchange="setDefault(this.checked);"><label for="defaultCheckbox">Use expert mode by default</label>
-    <br>
-    <a href="/?noRedirect=true" class="red">Back to standard homepage</a>
+    <button class="inline popOut" style="margin-top: 4px;" onclick="openPage('feedback');">Send feedback ▶</button>
   </div>
 </div>
 
 <div id="rightSide">
   <div id="tabs">
-    <div id="chatTab" class="tab" title="/chat" onclick="openPage('chat');"><img src="{{ url_for('static', filename='img/expert/chat.png') }}" class="icon"> <b id="newMessages" style="color: var(--light-red);"></b> Chat</div>
-    <div id="wawdTab" class="tab" title="/wawd" onclick="openPage('wawd');"><img src="{{ url_for('static', filename='img/expert/wawd.png') }}" class="icon"> WAWD?</div>
-    <div id="debugTab" class="tab" title="/debug" onclick="openPage('debug');"><img src="{{ url_for('static', filename='img/expert/debug.png') }}" class="icon"> API debug & virtual bar</div>
-    <div id="gamesTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/expert/games.png') }}" class="icon"> Games</div>
+    <div id="chatTab" class="tab" onclick="openPage('chat');"><img src="{{ url_for('static', filename='img/home/chat.png') }}" class="icon"> <b id="newMessages" style="color: var(--light-red);"></b> Chat</div>
+    <div id="wawdTab" class="tab" onclick="openPage('wawd');"><img src="{{ url_for('static', filename='img/home/wawd.png') }}" class="icon"> What are we doing?</div>
+    <div id="gamesTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/home/games.png') }}" class="icon"> Games</div>
     <div id="gamesMenu" class="menu hidden" tabindex="-1">
-      <div id="2048Tab" class="tab" title="/2048" onclick="openPage('2048');">2048</div>
-      <div id="flappybirdTab" class="tab" title="/flappybird" onclick="openPage('flappybird');">Flappy Bird</div>
-      <div id="hangmanTab" class="tab" title="/hangman" onclick="openPage('hangman');">Hangman</div>
-      <div id="mnswTab" class="tab" title="/mnswbird" onclick="openPage('mnswbird');">Minesweeper</div>
-      <div id="tttTab" class="tab" title="/ttt" onclick="openPage('ttt');">Tic-tac-toe</div>
-      <div id="fighterTab" class="tab" title="/fighter" onclick="openPage('fighter');">Turn-Based Fighter</div>
+      <div id="2048Tab" class="tab" onclick="openPage('2048');">2048</div>
+      <div id="flappybirdTab" class="tab" onclick="openPage('flappybird');">Flappy Bird</div>
+      <div id="hangmanTab" class="tab" onclick="openPage('hangman');">Hangman</div>
+      <div id="mnswTab" class="tab" onclick="openPage('mnsw');">Minesweeper</div>
+      <div id="tttTab" class="tab" onclick="openPage('ttt');">Tic-tac-toe</div>
+      <div id="fighterTab" class="tab" onclick="openPage('fighter');">Turn-Based Fighter</div>
     </div>
-    <div id="teacherTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/expert/teacher.png') }}" class="icon"> Teacher</div>
+    <div id="teacherTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/home/teacher.png') }}" class="icon"> Teacher</div>
     <div id="teacherMenu" class="menu hidden" tabindex="-1">
-      <div id="needshelpTab" class="tab" title="/needshelp" onclick="openPage('needshelp');">Help tickets</div>
-      <div id="lessonTab" class="tab" title="/lesson" onclick="openPage('lesson');">Lesson</div>
-      <div id="settingsTab" class="tab" title="/settings" onclick="openPage('settings');">Settings</div>
-      <div id="usersTab" class="tab" title="/users" onclick="openPage('users');">User list</div>
+      <div id="needshelpTab" class="tab" onclick="openPage('needshelp');">Help tickets</div>
+      <div id="lessonTab" class="tab" onclick="openPage('lesson');">Lesson</div>
+      <div id="settingsTab" class="tab" onclick="openPage('settings');">Settings</div>
+      <div id="usersTab" class="tab" onclick="openPage('users');">User list</div>
     </div>
-    <div id="urlTab" class="tab" onclick="inputURL();">
-      <img src="{{ url_for('static', filename='img/expert/search.png') }}" class="icon">
-      <span id="url" class="hidden">
-        <label for="urlInput" id="urlLabel">192.168.10.82/</label><input type="text" id="urlInput"></input>
-      </span>
-    </div>
-    <div id="reload" class="tab" style="margin-left: auto;" title="Reload" onclick="document.getElementById('mainPage').contentWindow.location.reload();"><img src="{{ url_for('static', filename='img/expert/reload.png') }}" class="icon"></div>
+    <div id="debugTab" class="tab" onclick="openPage('debug');"><img src="{{ url_for('static', filename='img/home/debug.png') }}" class="icon"> API debugging</div>
+    <div id="reload" class="tab" style="margin-left: auto;" title="Reload" onclick="document.getElementById('innerPage').contentWindow.location.reload();"><img src="{{ url_for('static', filename='img/home/reload.png') }}" class="icon"></div>
   </div>
 
   <div>
-    <iframe src="/chat" id="mainPage" onload="pageOpened(this.contentWindow.location.pathname);"></iframe>
+    <iframe src="/chat" id="innerPage" onload="pageOpened(this.contentWindow.location.pathname);"></iframe>
   </div>
 </div>
 
 <script>
   let request = new XMLHttpRequest();
   let ws = new WebSocket("ws://192.168.10.82:9001");
-  let ep = localStorage.getItem("expertPreference");
   let thumbButtons = document.querySelectorAll(".thumbButton");
   let letterButtons = document.querySelectorAll(".letterButton");
   let bottom = document.getElementById("bottom");
   let menus = document.querySelectorAll(".menu");
-  let mainPage = document.getElementById("mainPage");
+  let innerPage = document.getElementById("innerPage");
   let chosenThumb = false;
   let chosenLetter = false;
   let segment;
@@ -490,9 +438,6 @@
     showUsername();
     showEnabled();
     bottomPosition();
-    quizName();
-    if (ep === null) ep = confirm("Do you want to use expert mode by default? " + "You will be redirected to this page automatically." + "\n" + "Choose \"Cancel\" to continue using the standard homepage.");
-    setDefault(ep);
     openPage("chat");
     setInterval(() => {
       mode();
@@ -500,7 +445,6 @@
       nowPlaying();
       showEnabled();
       bottomPosition();
-      quizName();
     }, 1000);
   };
 
@@ -512,6 +456,7 @@
     let currentMode = res.mode;
     document.getElementById("mode").innerText = currentMode;
 
+    ////needs update
     ["quiz", "tutd", "survey"].forEach(mode => {
       let el = document.getElementById(mode + "Div");
       if (mode == currentMode) el.classList.remove("hidden");
@@ -524,7 +469,6 @@
     let musicDiv = document.getElementById("musicDiv");
     let textDiv = document.getElementById("textDiv");
     let colorDiv = document.getElementById("colorDiv");
-    let percentDiv = document.getElementById("percentDiv");
 
     request.open("GET", '/getme', false);
     request.send(null);
@@ -542,11 +486,13 @@
     else soundDiv.classList.add("hidden");
     if (myPerms <= bgmPerm) musicDiv.classList.remove("hidden");
     else musicDiv.classList.add("hidden");
-    [textDiv, colorDiv, percentDiv].forEach(div => {
-      if (myPerms <= ledPerm) div.classList.remove("hidden");
-      else div.classList.add("hidden");
-    });
-
+    if (myPerms <= ledPerm) {
+      textDiv.classList.remove("hidden");
+      colorDiv.classList.remove("hidden");
+    } else {
+      textDiv.classList.add("hidden");
+      colorDiv.classList.add("hidden");
+    }
   }
 
   function bottomPosition() {
@@ -581,12 +527,6 @@
     while (container.clientHeight > maxHeight) text.innerText = text.innerText.substring(0, text.innerText.length - 2) + "…";
     text.title = original;
     text.style.cursor = "help";
-  }
-
-  function setDefault(value) {
-    if (value) localStorage.setItem("expertPreference", "true");
-    else localStorage.setItem("expertPreference", "");
-    document.getElementById("defaultCheckbox").checked = value;
   }
 
   Array.from(thumbButtons).forEach((button, i) => {
@@ -676,14 +616,14 @@
 
   function highlight(image) {
     let button = document.getElementById(image);
-    button.src = "/static/img/expert/" + image + "-highlight.png";
+    button.src = "/static/img/home/" + image + "-highlight.png";
     button.classList.add("highlight");
     button.title = "Cancel";
   }
 
   function removeHighlight(image) {
     let button = document.getElementById(image);
-    button.src = "/static/img/expert/" + image + ".png"
+    button.src = "/static/img/home/" + image + ".png"
     button.classList.remove("highlight");
     if (image == "thumbButton0") button.title = "Up";
     if (image == "thumbButton1") button.title = "Wiggle";
@@ -839,55 +779,16 @@
     if (event.code == "Enter") sendPercent();
   });
 
-  function quizName() {
-    request.open("GET", '/getquizname', false);
-    request.send(null);
-    let res = JSON.parse(request.responseText);
-    let quizName = res.quizname;
-
-    if (quizName) document.getElementById("quizName").innerText = quizName;
-  }
-
-  function inputURL() {
-    if (!urlOpen) {
-      urlOpen = true;
-      document.getElementById("url").classList.remove("hidden");
-      document.getElementById("urlInput").focus();
-    } else {
-      urlOpen = false;
-      document.getElementById("url").classList.add("hidden");
-    }
-  }
-
-  document.getElementById("urlInput").addEventListener("click", event => event.stopPropagation()); //Don't hide input when clicked
-  document.getElementById("urlInput").addEventListener("keydown", function(event) {
-    if (event.code == "Enter") openPage(this.value);
-  });
-
   function openPage(page) {
-    mainPage.contentWindow.location = "/" + page;
+    innerPage.contentWindow.location = "/" + page;
     Array.from(menus).forEach(menu => menu.classList.add("hidden"));
   }
 
   function pageOpened(path) {
-    let content = mainPage.contentWindow.document.getElementById("content");
-
-    if (path == "/expert") openPage("chat");
-    else if (!content) {
-      //Put error message in alert and go back
-      let message = mainPage.contentWindow.document.body.innerText;
-      mainPage.contentWindow.history.back();
-      //alert(message);
-      setTimeout(() => alert(message), 40); //Add a brief delay so page doesn't change
-    } else if (content.innerHTML.includes("Go Back")) { //Detects if the page has an error message (Is there a better way to do this?)
-      let message = content.innerText.slice(0, -9);
-      mainPage.contentWindow.history.back();
-      //alert(message);
-      setTimeout(() => alert(message), 40);
-    }
-
+    let content = innerPage.contentWindow.document.getElementById("content");
     let tabs = document.querySelectorAll(".tab");
     let tabEl = document.getElementById(path.substring(1) + "Tab");
+    if (!content) openPage("chat?message='Page does not exist.'");
     Array.from(tabs).forEach(tab => tab.classList.remove("open"));
     if (["/2048", "/flappybird", "/hangman", "mnsw", "/ttt", "/fighter"].includes(path)) document.getElementById("gamesTab").classList.add("open");
     else if (["/needshelp", "/lesson", "/settings", "/users"].includes(path)) document.getElementById("teacherTab").classList.add("open");
@@ -896,8 +797,9 @@
       newMessages = 0;
       document.getElementById("newMessages").innerText = null;
       setMenuWidths();
-      document.title = "Expert Homepage";
+      document.title = "Formbar";
     }
+    /*Change page title here*/
   }
 
   function showMenu(name) {
@@ -934,10 +836,10 @@
   ws.onmessage = message => {
     let data = JSON.parse(message.data);
     if (data.type == 'message' || data.type == 'alert') {
-      if (document.hidden || !mainPage.contentWindow.location.pathname == "/chat") {
+      if (document.hidden || !innerPage.contentWindow.location.pathname == "/chat") {
         newMessages++;
-        document.title = `(${newMessages}) Expert Homepage`;
-        if (mainPage.contentWindow.location.pathname != "chat") {
+        document.title = `(${newMessages}) Formbar`;
+        if (innerPage.contentWindow.location.pathname != "chat") {
           document.getElementById("newMessages").innerText = "(" + newMessages + ")";
           setMenuWidths();
         }
@@ -945,6 +847,6 @@
     }
   }
 
-  document.addEventListener("visibilitychange", () => {if (!document.hidden && mainPage.contentWindow.location.pathname == "chat") document.title = "Expert Homepage"}); //When user goes to this page, if chat is open, remove number of new messages from title
+  document.addEventListener("visibilitychange", () => {if (!document.hidden && innerPage.contentWindow.location.pathname == "chat") document.title = "Formbar"}); //When user goes to this page, if chat is open, remove number of new messages from title
 </script>
 {% endblock %}

@@ -1193,10 +1193,10 @@
         from: "server",
         content: content
       };
-      //ws.send(JSON.stringify(messageObj));
+      ////ws.send(JSON.stringify(messageObj));
       if (!recipient != "all") { //If message is private, send to sender in addition to recipient
         messageObj.to = me.name;
-        //ws.send(JSON.stringify(messageObj));
+        ////ws.send(JSON.stringify(messageObj));
       }
     }
 

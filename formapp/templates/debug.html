@@ -125,11 +125,7 @@
     <span id="pixBox"></span>
   </div>
 
-  <div id="buttonContainer">
-    <button id="/getpix" onclick="request('/getpix')">/getpix</button>
-    <button id="/getme" onclick="request('/getme')">/getme</button>
-    <button id="/getpermissions" onclick="request('/getpermissions')">/getpermissions</button>
-  </div>
+  <div id="buttonContainer"></div>
 
   <div id="data"></div>
 
@@ -138,9 +134,23 @@
 
   <script>
     let xhr = new XMLHttpRequest();
-    let urls = ["/getpix", "/getme", "/getpermissions"];
+    let urls = [
+      "/getbgm",
+      "/getfightermatches",
+      "/getme",
+      "/getmode",
+      "/getpermissions",
+      "/getphrase",
+      "/getpix",
+      "/getquizname",
+      "/getstudents",
+      "/getword"
+    ];
     let timeLeft = 3;
     let dataURL = "/getpix";
+
+    urls.forEach(url => document.getElementById("buttonContainer").innerHTML += `<button id="${url}" onclick="request('${url}')">${url}</button>`);
+
 
     function updateBar() {
       xhr.open("GET", '/getphrase', false);

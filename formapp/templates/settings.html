@@ -115,13 +115,21 @@
         xhr.send();
     }
 
+    function banip(name) {
+      if (confirm("Are you sure you want to ban this user's DEVICE?")) {
+        window.location.href = "/users?name=" + name + "&action=ban";
+      }
+    }
+
     setInterval(function() {
         checkUpdates('/getstudents');
-        if (studentData != oldStudentData) {
+        let studentBox = document.getElementById('tabcontainer');
+        if (studentData == undefined) {
+          studentBox.innerHTML = 'Cannot get students. Are you logged in and connected?';
+        } else if (studentData != oldStudentData) {
+            studentBox.innerHTML = '';
             oldStudentData = studentData;
             let studentList = JSON.parse(studentData);
-            let studentBox = document.getElementById('tabcontainer');
-            studentBox.innerHTML = '';
             console.log(studentList);
             //Loop through each student in the list
             for (student in studentList) {
@@ -207,7 +215,7 @@
                 newDetails.innerHTML += "	&nbsp; ";
                 newDetails.innerHTML += `<a href="users?name=${studentList[student]['name']}&action=kick">Remove</a>`;
                 newDetails.innerHTML += "	&nbsp; ";
-                newDetails.innerHTML += `<a href="users?name=${studentList[student]['name']}&action=ban">Ban</a>`;
+                newDetails.innerHTML += `<a href="#" onclick="banip('${studentList[student]['name']}')">Ban Device</a>`;
                 if (studentList[student]['help'] == true) {
                   newStudent.classList.add('help')
                   newDetails.innerHTML += "	&nbsp; ";

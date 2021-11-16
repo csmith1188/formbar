@@ -512,7 +512,7 @@ def surveyBar():
 
     if sD.settings['captions']:
         clearString()
-        showString("SRVY " + str(complete) + "/" + str(sD.settings['numStudents']))
+        showString("ABCD " + str(complete) + "/" + str(sD.settings['numStudents']))
     if ONRPi:
         pixels.show()
 
@@ -691,8 +691,19 @@ def updateStep():
     Homepage (root)
 '''
 @app.route('/')
-def endpoint_home():
-    return render_template('index.html')
+def endpoint_expert():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    else:
+        username = sD.studentDict[request.remote_addr]['name']
+        sfx.updateFiles()
+        sounds = []
+        music = []
+        for key, value in sfx.sound.items():
+            sounds.append(key)
+        for key, value in bgm.bgm.items():
+            music.append(key)
+        return render_template('index.html', username = username, serverIp = ip, sfx = sounds, bgm = music)
 
 @app.route('/2048')
 def endpoint_2048():
@@ -885,26 +896,6 @@ def endpoint_emptyblocks():
         pixels.show()
     return "Emptied blocks"
 '''
-
-'''
-    /expert
-    Default formbar in advanced expert mode
-'''
-#Default formbar in advanced expert mode
-@app.route('/expert')
-def endpoint_expert():
-    if not request.remote_addr in sD.studentDict:
-        return redirect('/login?forward=' + request.path)
-    else:
-        username = sD.studentDict[request.remote_addr]['name']
-        sfx.updateFiles()
-        sounds = []
-        music = []
-        for key, value in sfx.sound.items():
-            sounds.append(key)
-        for key, value in bgm.bgm.items():
-            music.append(key)
-        return render_template('expert.html', username = username, serverIp = ip, sfx = sounds, bgm = music)
 
 # ███████
 # ██

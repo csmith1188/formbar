@@ -12,15 +12,13 @@
   <body class="{% block color %}{% endblock %}">
     {% block main %}{% endblock %}
   </body>
-  
+
   <script>
     let request = new XMLHttpRequest();
     let ws = new WebSocket("ws://{{ serverIp }}:9001");
 
-    //If URL param "message" is present, display as alert
-    let urlParams = new URLSearchParams(window.location.search);
-    let message = urlParams.get("message");
-    if (message) alert(message);
+    //If message is present, display as alert
+    if ("{{ message }}") alert("{{ message }}");
   </script>
   {% block script %}{% endblock %}
 </html>

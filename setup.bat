@@ -3,9 +3,9 @@ REM install packages
 REM apt update
 REM apt upgrade -y
 REM apt-get -y install python3-pip
-cd installers
-python_39_64.exe
-cd ../
+REM cd installers
+REM python_39_64.exe
+REM cd ../
 REM apt-get -y install libatlas-base-dev
 REM apt-get -y install libsdl-ttf2.0-0
 REM apt-get -y install python3-sdl2

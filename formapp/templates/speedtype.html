@@ -1,10 +1,12 @@
-<!-- Original Site -->
-<!-- https://www.geeksforgeeks.org/design-a-typing-speed-test-game-using-javascript/ -->
+{% extends 'header.html' %}
+<!-- ^^ This means add this file to the end of the contents of header.html -->
+<!-- This is where the title, top buttons, and stylesheet is located -->
 
-<html lang="en">
+<!-- Change title here -->
+{% block title %}Simple Speed Typer{% endblock %}
 
-<head>
-  <title>Simple Speed Typer</title>
+<!-- Extra style declarations here -->
+{% block style %}
   <style media="screen">
     body {
       background-color: #fe9801;
@@ -100,9 +102,13 @@
       color: darkgreen;
     }
   </style>
-</head>
+{% endblock %}
 
-<body>
+<!-- Change theme color here -->
+{% block color %}green{% endblock %}
+
+<!-- Main content here -->
+{% block main %}
   <div class="container">
     <div class="heading">
       Simple Speed Typing
@@ -134,12 +140,15 @@
       Click on the area below to start the game.
     </div>
     <textarea class="input_area" placeholder="start typing here..." oninput="processCurrentText()" onfocus="startGame()">
-	</textarea>
+  </textarea>
     <button class="restart_btn" onclick="resetValues()">
       Restart
     </button>
   </div>
+{% endblock %}
 
+<!-- Extra JavaScript here -->
+{% block script %}
   <script>
     // define the time limit
     let TIME_LIMIT = 60;
@@ -326,6 +335,4 @@
       wpm_group.style.display = "block";
     }
   </script>
-</body>
-
-</html>
+{% endblock %}

@@ -783,8 +783,6 @@
   </div>
 
   <script>
-    let ws = new WebSocket("ws://{{ serverIp }}:9001");
-
     let red = {
       color: "red",
       effective: "yellow",
@@ -1130,7 +1128,6 @@
     let damageProperties = ["damage", "minDamage", "maxDamage", "critDamage", "secondaryDamage", "combinedDamage", "teamDamage"];
 
 
-    let request = new XMLHttpRequest();
     let match;
     let matchCode;
     let itemsArr = [];

@@ -133,7 +133,6 @@
 
 
   <script>
-    let xhr = new XMLHttpRequest();
     let urls = [
       "/getbgm",
       "/getfightermatches",
@@ -149,21 +148,21 @@
     let timeLeft = 3;
     let dataURL = "/getpix";
 
-    urls.forEach(url => document.getElementById("buttonContainer").innerHTML += `<button id="${url}" onclick="request('${url}')">${url}</button>`);
+    urls.forEach(url => document.getElementById("buttonContainer").innerHTML += `<button id="${url}" onclick="getData('${url}')">${url}</button>`);
 
 
     function updateBar() {
-      xhr.open("GET", '/getphrase', false);
-      xhr.send(null);
-      let phraseRes = JSON.parse(xhr.responseText);
+      request.open("GET", '/getphrase', false);
+      request.send(null);
+      let phraseRes = JSON.parse(request.responseText);
       let phrase = phraseRes.phrase;
       let vbText = document.getElementById("vbText");
       vbText.innerText = phrase;
       //To do: update color
 
-      xhr.open("GET", '/getpix', false);
-      xhr.send(null);
-      let pixRes = JSON.parse(xhr.responseText);
+      request.open("GET", '/getpix', false);
+      request.send(null);
+      let pixRes = JSON.parse(request.responseText);
       let pix = eval(pixRes.pixels);
       let pixBox = document.getElementById("pixBox");
       pixBox.innerHTML = '';
@@ -188,11 +187,11 @@
     updateBar();
     countdown();
 
-    function request(newURL) {
+    function getData(newURL) {
       dataURL = newURL;
-      xhr.open('GET', newURL);
-      xhr.onload = function() {
-          data = xhr.response;
+      request.open('GET', newURL);
+      request.onload = function() {
+          data = request.response;
           if (newURL) {
             urls.forEach(url => {
               let el = document.getElementById(url);
@@ -202,10 +201,10 @@
             document.getElementById("data").innerText = data;
           }
       };
-      xhr.send();
+      request.send();
     }
 
-    request(dataURL);
-    setInterval(() => request(dataURL), 3000);
+    getData(dataURL);
+    setInterval(() => getData(dataURL), 3000);
   </script>
 {% endblock %}

@@ -250,9 +250,6 @@
     <div id="commands" style="font-size: 14px; margin-top: 5px;">Commands: <button onclick="enterCommand('!#help')">!#help</button></div>
 </div>
 <script type="text/javascript">
-    // Connect to Web Socket
-    ws = new WebSocket("ws://{{ serverIp }}:9001");
-    let request = new XMLHttpRequest();
     var username = "{{ username }}";
     var receiver = 'all';
 

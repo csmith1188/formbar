@@ -817,10 +817,7 @@ def endpoint_bgmstop():
 def endpoint_chat():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
-    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['say']:
-        return render_template("message.html", forward=request.path, message = "You do not have high enough permissions to do this right now. " )
-    else:
-        return render_template("chat.html", username = sD.studentDict[request.remote_addr]['name'], serverIp = ip)
+    return render_template("chat.html", username = sD.studentDict[request.remote_addr]['name'], serverIp = ip)
 
 '''
     /color

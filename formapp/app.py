@@ -842,12 +842,12 @@ def endpoint_color():
             g = ''
             b = ''
         hex = request.args.get('hex')
-        if hex2dec(hex):
+        if hex and hex2dec(hex):
             fillBar(hex2dec(hex))
-        elif r and b and g:
+        elif not r == '' and not b == '' and not g == '':
             fillBar((r, g, b))
         else:
-            return "Bad ArgumentsTry <b>/color?hex=#FF00FF</b> or <b>/color?r=255&g=0&b=255</b>"
+            return "Bad ArgumentsTry <b>/color?hex=FF00FF</b> or <b>/color?r=255&g=0&b=255</b>"
         if ONRPi:
             pixels.show()
         return render_template("message.html", message = "Color sent!" )

@@ -238,12 +238,16 @@
     background: var(--color-cyan);
   }
 
+  #help.open {
+    background: var(--color-yellow);
+  }
+
   #wawdTab.open {
     background: var(--color-purple);
   }
 
-  #debugTab.open {
-    background: var(--color-red);
+  #quizTab.open {
+    background: var(--color-brown);
   }
 
   #gamesTab.open, #gamesMenu > .open {
@@ -252,6 +256,10 @@
 
   #teacherTab.open, #teacherMenu > .open {
     background: var(--color-orange);
+  }
+
+  #debugTab.open {
+    background: var(--color-red);
   }
 
   #urlLabel {
@@ -388,13 +396,16 @@
 <div id="rightSide">
   <div id="tabs">
     <div id="chatTab" class="tab" onclick="openPage('chat');"><img src="{{ url_for('static', filename='img/home/chat.png') }}" class="icon"> <b id="newMessages" style="color: var(--light-red);"></b> Chat</div>
+    <div id="helpTab" class="tab" onclick="openPage('help');"><img src="{{ url_for('static', filename='img/home/help.png') }}" class="icon"> Help!</div>
     <div id="wawdTab" class="tab" onclick="openPage('wawd');"><img src="{{ url_for('static', filename='img/home/wawd.png') }}" class="icon"> What are we doing?</div>
+    <div id="quizTab" class="tab" onclick="openPage('quiz');"><img src="{{ url_for('static', filename='img/home/quiz.png') }}" class="icon"> Quiz</div>
     <div id="gamesTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/home/games.png') }}" class="icon"> Games</div>
     <div id="gamesMenu" class="menu hidden" tabindex="-1">
       <div id="2048Tab" class="tab" onclick="openPage('2048');">2048</div>
       <div id="flappybirdTab" class="tab" onclick="openPage('flappybird');">Flappy Bird</div>
       <div id="hangmanTab" class="tab" onclick="openPage('hangman');">Hangman</div>
       <div id="mnswTab" class="tab" onclick="openPage('mnsw');">Minesweeper</div>
+      <div id="speedtypeTab" class="tab" onclick="openPage('speedtype');">Speed Typer</div>
       <div id="tttTab" class="tab" onclick="openPage('ttt');">Tic-tac-toe</div>
       <div id="fighterTab" class="tab" onclick="openPage('fighter');">Turn-Based Fighter</div>
     </div>
@@ -788,7 +799,7 @@
     let tabEl = document.getElementById(path.substring(1) + "Tab");
     if (!content) openPage("chat?message='Page does not exist.'");
     Array.from(tabs).forEach(tab => tab.classList.remove("open"));
-    if (["/2048", "/flappybird", "/hangman", "mnsw", "/ttt", "/fighter"].includes(path)) document.getElementById("gamesTab").classList.add("open");
+    if (["/2048", "/flappybird", "/hangman", "mnsw", "/speedtype", "/ttt", "/fighter"].includes(path)) document.getElementById("gamesTab").classList.add("open");
     else if (["/needshelp", "/lesson", "/settings", "/users"].includes(path)) document.getElementById("teacherTab").classList.add("open");
     if (tabEl) tabEl.classList.add("open");
     if (path == "/chat") {

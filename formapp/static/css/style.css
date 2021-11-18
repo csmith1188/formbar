@@ -45,7 +45,7 @@
 }
 
 /*Dark mode is default*/
-.dark, body:not(.light):not(body) {
+.dark, body:not(.light) {
   --bg-color: var(--bg-dark);
   --main-color: white;
   --emphasis-color: var(--bg-darker);

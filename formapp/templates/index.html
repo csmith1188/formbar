@@ -794,7 +794,7 @@
   }
 
   function pageOpened(path) {
-    let content = innerPage.contentWindow.document.getElementById("content");
+    let content = innerPage.contentWindow.document.body.innerHTML;
     let tabs = document.querySelectorAll(".tab");
     let tabEl = document.getElementById(path.substring(1) + "Tab");
     if (!content) openPage("chat?message='Page does not exist.'");

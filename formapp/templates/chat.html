@@ -419,6 +419,22 @@
         ws.close();
     }
 
+    function getDate() {
+      let date = new Date();
+      let month = date.getMonth() + 1;
+      let day = date.getDate();
+      let year = date.getFullYear().toString().slice(2);
+      let hour = date.getHours();
+      if (hour > 12) {
+        hour -= 12;
+        ampm = "PM";
+      } else {
+        if (hour == 0) hour = 12;
+        ampm = "AM";
+      }
+      return `${month}/${day}/${year} ${hour}:${minute} ${ampm}`;
+    }
+
     function output(message) {
         let lockBottom = false;
         if (atBottom(boxes.outputBox)) lockBottom = true;
@@ -436,24 +452,12 @@
           var usernameTitle = "Send a private message";
         }
 
-        let date = new Date();
-        let month = date.getMonth() + 1;
-        let day = date.getDate();
-        let year = date.getFullYear().toString().slice(2);
-        let hour = date.getHours();
-        if (hour > 12) {
-          hour -= 12;
-          ampm = "PM";
-        } else {
-          if (hour == 0) hour = 12;
-          ampm = "AM";
-        }
         let minute = date.getMinutes().toString();
         if (minute.length == 1) minute = "0" + minute;
         //Use this if you want to allow HTML
         newMSG.innerHTML = `
           <b class="username" onclick="${usernameOnclick}" title="${usernameTitle}">${message.from}</b>
-          <span style="color: var(--light-blue);">${month}/${day}/${year} ${hour}:${minute} ${ampm} ${message.to != "all" ? "· Private message" : ""}</span>
+          <span style="color: var(--light-blue);">${getDate()} ${message.to != "all" ? "· Private message" : ""}</span>
           <div class="content">${message.content}</div>
         `;
         //Use this if you want to convert HTML into text

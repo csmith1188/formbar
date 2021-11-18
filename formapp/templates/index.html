@@ -295,9 +295,6 @@
 </style>
 {% endblock %}
 
-<!-- Extra javascript here -->
-{% block script %}{% endblock %}
-
 <!-- Main content here -->
 {% block main %}
 <div id="sidebar" class="light">
@@ -424,7 +421,10 @@
     <iframe src="/chat" id="innerPage" onload="pageOpened(this.contentWindow.location.pathname);"></iframe>
   </div>
 </div>
+{% endblock %}
 
+<!-- Extra javascript here -->
+{% block script %}
 <script>
   let thumbButtons = document.querySelectorAll(".thumbButton");
   let letterButtons = document.querySelectorAll(".letterButton");
@@ -458,19 +458,12 @@
   };
 
   function mode() {
-    //Get current mode from server
-    request.open("GET", '/getmode', false);
-    request.send(null);
-    let res = JSON.parse(request.responseText);
-    let currentMode = res.mode;
-    document.getElementById("mode").innerText = currentMode;
-
     ////needs update
-    ["quiz", "tutd", "survey"].forEach(mode => {
+    /*["quiz", "tutd", "survey"].forEach(mode => {
       let el = document.getElementById(mode + "Div");
       if (mode == currentMode) el.classList.remove("hidden");
       else el.classList.add("hidden");
-    });
+    });*/
   }
 
   function showEnabled() {

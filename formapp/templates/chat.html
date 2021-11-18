@@ -229,10 +229,6 @@
 </style>
 {% endblock %}
 
-<!-- Extra javascript here -->
-{% block script %}
-{% endblock %}
-
 <!-- Main content here -->
 {% block main %}
 <div id="container-full-width">
@@ -249,6 +245,10 @@
     </form>
     <div id="commands" style="font-size: 14px; margin-top: 5px;">Commands: <button onclick="enterCommand('!#help')">!#help</button></div>
 </div>
+{% endblock %}
+
+<!-- Extra javascript here -->
+{% block script %}
 <script type="text/javascript">
     var username = "{{ username }}";
     var receiver = 'all';
@@ -263,10 +263,10 @@
     request.open("GET", '/getpermissions', false);
     request.send(null);
     let permsRes = JSON.parse(request.responseText);
-    let say = permsRes.say;
+    let sayPerms = permsRes.say;
 
     //If user doesn't have chat permissions, remove input section
-    if (true) {
+    if (myPerms > sayPerms) {
       let cc = document.getElementById("controlChat");
       cc.innerText = "You don't have high enough permissions to send chat messages.";
       cc.style.textAlign = "center";

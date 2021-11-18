@@ -959,10 +959,10 @@ def endpoint_getmode():
 def endpoint_getpermissions():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
-        if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
-            return render_template("chat.html", forward=request.path, message = "You do not have high enough permissions to do this right now. " )
-        else:
-            return json.dumps(sD.settings['perms'])
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
+        return render_template("chat.html", forward=request.path, message = "You do not have high enough permissions to do this right now. " )
+    else:
+        return json.dumps(sD.settings['perms'])
 
 @app.route('/getphrase')
 def endpoint_getphrase():

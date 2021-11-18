@@ -16,9 +16,9 @@
   <script>
     let request = new XMLHttpRequest();
     let ws = new WebSocket("ws://{{ serverIp }}:9001");
+    let urlParams = new URLSearchParams(window.location.search);
 
     //If URL param "message" is present, display as alert
-    let urlParams = new URLSearchParams(window.location.search);
     let message = urlParams.get("message");
     if (message) alert(message);
   </script>

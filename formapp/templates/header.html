@@ -19,8 +19,7 @@
     let urlParams = new URLSearchParams(window.location.search);
 
     //If URL param "message" is present, display as alert
-    let message = urlParams.get("message");
-    if (message) alert(message);
+    if (urlParams.get("message")) alert(urlParams.get("message"));
   </script>
   {% block script %}{% endblock %}
 </html>

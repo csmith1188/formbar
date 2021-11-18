@@ -394,6 +394,8 @@
       let day = date.getDate();
       let year = date.getFullYear().toString().slice(2);
       let hour = date.getHours();
+      let minute = date.getMinutes().toString();
+      if (minute.length == 1) minute = "0" + minute;
       if (hour > 12) {
         hour -= 12;
         ampm = "PM";
@@ -421,8 +423,6 @@
           var usernameTitle = "Send a private message";
         }
 
-        let minute = date.getMinutes().toString();
-        if (minute.length == 1) minute = "0" + minute;
         //Use this if you want to allow HTML
         newMSG.innerHTML = `
           <b class="username" onclick="${usernameOnclick}" title="${usernameTitle}">${message.from}</b>

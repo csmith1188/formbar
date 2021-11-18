@@ -386,7 +386,7 @@
   <div id="bottom">
     Name: <span id="name"></span> <button id="logOut" class="inline popOut" onclick="window.location = '/logout'">Log out</button>
     <br>
-    <button class="inline popOut" style="margin-top: 4px;" onclick="openPage('feedback');">Send feedback ▶</button>
+    <button class="inline popOut" style="margin-top: 4px;" onclick="feedback();">Send feedback ▶</button>
   </div>
 </div>
 
@@ -770,16 +770,10 @@
     document.getElementById("segmentEnd").value = 240;
   }
 
-  function sendPercent() {
-    let percent = document.getElementById("percent").value;
-    request.open("GET", "/perc?amount=" + percent);
-    request.send();
-    document.getElementById("percent").value = 0;
+  function feedback() {
+    let addresses = "csmith@ytech.edu,john2022026@live.ytech.edu,chris2023608@live.ytech.edu,john2023219@live.ytech.edu,jaysi2023227@live.ytech.edu";
+    window.open(`mailto:${addresses}?subject=Formbar%20Feedback`);
   }
-
-  document.getElementById("percent").addEventListener("keydown", event => {
-    if (event.code == "Enter") sendPercent();
-  });
 
   function openPage(page) {
     innerPage.contentWindow.location = "/" + page;

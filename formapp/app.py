@@ -703,7 +703,7 @@ def endpoint_expert():
             sounds.append(key)
         for key, value in bgm.bgm.items():
             music.append(key)
-        return render_template('index.html', username = username, serverIp = ip, sfx = sounds, bgm = music)
+        return render_template('index.html', username = username, sfx = sounds, bgm = music)
 
 @app.route('/2048')
 def endpoint_2048():
@@ -817,7 +817,7 @@ def endpoint_bgmstop():
 def endpoint_chat():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
-    return render_template("chat.html", username = sD.studentDict[request.remote_addr]['name'], serverIp = ip)
+    return render_template("chat.html", username = sD.studentDict[request.remote_addr]['name'])
 
 '''
     /color
@@ -911,7 +911,7 @@ def endpoint_fighter():
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
         return redirect("/chat?message=You do not have high enough permissions to do this right now.")
     else:
-        #return render_template('fighter.html', username = sD.studentDict[request.remote_addr]['name'], serverIp = ip)
+        #return render_template('fighter.html', username = sD.studentDict[request.remote_addr]['name'])
         return redirect("/chat?message=Fighter will be ready to play soon.")
 
 '''
@@ -942,6 +942,10 @@ def endpoint_getbgm():
 @app.route('/getfightermatches')
 def endpoint_getfightermatches():
     return json.dumps(sD.fighter)
+
+@app.route('/getip')
+def endpoint_getip():
+    return ip
 
 #Sends back your student information
 @app.route('/getme')
@@ -1831,7 +1835,7 @@ def endpoint_users():
 #This endpoint allows you to see the formbars IP with style and shows different colors.
 @app.route('/virtualbar')
 def endpoint_virtualbar():
-    return render_template("virtualbar.html", serverIp = sD.ip)
+    return render_template("virtualbar.html")
 
 # ██     ██
 # ██     ██

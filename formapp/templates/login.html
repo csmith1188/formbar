@@ -6,29 +6,42 @@
 {% block title %}Formbar Login{% endblock %}
 
 <!-- Extra style declarations here -->
-{% block style %}{% endblock %}
+{% block style %}
+<style>
+  body {
+    text-align: center;
+  }
 
-<!-- Extra javascript here -->
-{% block script %}{% endblock %}
+  form {
+    margin-top: 16px;
+  }
+
+  input {
+    font-size: 20px !important;
+    width: 256px;
+    margin-bottom: 16px;
+  }
+</style>
+{% endblock %}
 
 <!-- Main content here -->
 {% block main %}
-
-<h1 style="color: blue">Login</h1>
+<h1>Log in</h1>
 <form action="login" method="post">
     <p>Leave the password blank to sign in as a <b>Guest</b></p>
-    <input type="text" id="usernameBox" name="username" class="box" placeholder="Username" value="">
-    <input type="password" id="passwordBox" name="password" class="box" placeholder="Password" value="">
+    <input type="text" id="usernameBox" name="username" class="box" placeholder="Username" value=""><br>
+    <input type="password" id="passwordBox" name="password" class="box" placeholder="Password" value=""><br>
     <input type="hidden" id="forwardBox" name="forward">
     <input type="hidden" id="botBox" name="bot" value="False">
     <input type="submit" class="button" value="Log In">
 </form>
+{% endblock %}
 
+<!-- Extra javascript here -->
+{% block script %}
 <script type="text/javascript">
-    const urlParams = new URLSearchParams(window.location.search);
     const forward = urlParams.get('forward');
     if (forward) document.getElementById('forwardBox').value = forward;
     else document.getElementById('forwardBox').value = null;
 </script>
-
 {% endblock %}

@@ -15,7 +15,10 @@
 
   <script>
     let request = new XMLHttpRequest();
-    let ws = new WebSocket("ws://{{ serverIp }}:9001");
+    request.open("GET", '/getip', false);
+    request.send(null);
+    let serverIp = request.responseText;
+    let ws = new WebSocket(`ws://${serverIp}:9001`);
     let urlParams = new URLSearchParams(window.location.search);
 
     //If URL param "message" is present, display as alert

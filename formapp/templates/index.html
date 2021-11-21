@@ -401,7 +401,7 @@
       <div id="2048Tab" class="tab" onclick="openPage('2048');">2048</div>
       <div id="flappybirdTab" class="tab" onclick="openPage('flappybird');">Flappy Bird</div>
       <div id="hangmanTab" class="tab" onclick="openPage('hangman');">Hangman</div>
-      <div id="mnswTab" class="tab" onclick="openPage('mnsw');">Minesweeper</div>
+      <div id="minesweeperTab" class="tab" onclick="openPage('minesweeper');">Minesweeper</div>
       <div id="speedtypeTab" class="tab" onclick="openPage('speedtype');">Speed Typer</div>
       <div id="tttTab" class="tab" onclick="openPage('ttt');">Tic-tac-toe</div>
       <div id="fighterTab" class="tab" onclick="openPage('fighter');">Turn-Based Fighter</div>
@@ -772,7 +772,7 @@
 
   function feedback() {
     let addresses = "csmith@ytech.edu,john2022026@live.ytech.edu,chris2023608@live.ytech.edu,john2023219@live.ytech.edu,jaysi2023227@live.ytech.edu";
-    window.open(`mailto:${addresses}?subject=Formbar%20Feedback`);
+    window.open(`mailto:${addresses}?subject=Formbar Feedback`);
   }
 
   function openPage(page) {
@@ -786,7 +786,7 @@
     let tabEl = document.getElementById(path.substring(1) + "Tab");
     if (!content) openPage("chat?message='Page does not exist.'");
     Array.from(tabs).forEach(tab => tab.classList.remove("open"));
-    if (["/2048", "/flappybird", "/hangman", "mnsw", "/speedtype", "/ttt", "/fighter"].includes(path)) document.getElementById("gamesTab").classList.add("open");
+    if (["/2048", "/flappybird", "/hangman", "/minesweeper", "/speedtype", "/ttt", "/fighter"].includes(path)) document.getElementById("gamesTab").classList.add("open");
     else if (["/needshelp", "/lesson", "/settings", "/users"].includes(path)) document.getElementById("teacherTab").classList.add("open");
     if (tabEl) tabEl.classList.add("open");
     if (path == "/") openPage("chat");

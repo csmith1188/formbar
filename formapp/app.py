@@ -1266,7 +1266,7 @@ def endpoint_logout():
     /minesweeper
 '''
 @app.route('/minesweeper')
-def endpoint_mnsw():
+def endpoint_minesweeper():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:

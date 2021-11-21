@@ -15,8 +15,8 @@
 
   --light-red: #ff6860;
   --light-brown: #bf6040;
-  --light-orange: #ff8f60;
-  --light-yellow: #ffdf80;
+  --light-orange: #ff8f40;
+  --light-yellow: #ffdf40;
   --light-green: #80ff80;
   --light-cyan: #80ffff;
   --light-blue: #8f9bbf;
@@ -159,21 +159,22 @@ input, button, textarea, select {
   outline: none;
 }
 
-.box {
+textarea, .box {
   background: var(--emphasis-color);
   color: var(--main-color);
   border: 1px solid;
 }
 
-.box:focus {
-  outline: 1px solid;
+textarea:focus, .box:focus {
+  border: 1px solid var(--theme-color);
+  outline: 1px solid var(--theme-color);
 }
 
 /*Use class "button" for button-like inputs, such as submit and file*/
 
 button:not(.inline), .button:not(.inline) {
   padding: 3px 9px;
-  border-radius: 16px;
+  border-radius: 9999px;
   background: var(--emphasis-color);
   color: var(--theme-color);
   border: 1px solid;

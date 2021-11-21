@@ -937,54 +937,91 @@ def endpoint_flush():
 
 @app.route('/getbgm')
 def endpoint_getbgm():
-    return '{"bgm": "'+ str(sD.bgm['nowplaying']) +'"}'
+    if not request.remote_addr in sD.studentDict:
+        return '{"error": "You are not logged in."}'
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
+        return '{"error": "Insufficient permissions."}'
+    else:
+        return '{"bgm": "'+ str(sD.bgm['nowplaying']) +'"}'
 
 @app.route('/getfightermatches')
 def endpoint_getfightermatches():
-    return json.dumps(sD.fighter)
+    if not request.remote_addr in sD.studentDict:
+        return '{"error": "You are not logged in."}'
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
+        return '{"error": "Insufficient permissions."}'
+    else:
+        return json.dumps(sD.fighter)
 
 @app.route('/getip')
 def endpoint_getip():
-    return ip
+    if not request.remote_addr in sD.studentDict:
+        return '{"error": "You are not logged in."}'
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
+        return '{"error": "Insufficient permissions."}'
+    else:
+        return '{"ip": "'+ ip +'"}'
 
 #Sends back your student information
 @app.route('/getme')
 def endpoint_getme():
     if not request.remote_addr in sD.studentDict:
         return '{"error": "You are not logged in."}'
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
+        return '{"error": "Insufficient permissions."}'
     else:
         return json.dumps(sD.studentDict[request.remote_addr])
 
 @app.route('/getmode')
 def endpoint_getmode():
-    return '{"mode": "'+ str(sD.settings['barmode']) +'"}'
+    if not request.remote_addr in sD.studentDict:
+        return '{"error": "You are not logged in."}'
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
+        return '{"error": "Insufficient permissions."}'
+    else:
+        return '{"mode": "'+ str(sD.settings['barmode']) +'"}'
 
 @app.route('/getpermissions')
 def endpoint_getpermissions():
     if not request.remote_addr in sD.studentDict:
-        return redirect('/login?forward=' + request.path)
+        return '{"error": "You are not logged in."}'
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
-        return redirect("/chat?message=You do not have high enough permissions to do this right now.")
+        return '{"error": "Insufficient permissions."}'
     else:
         return json.dumps(sD.settings['perms'])
 
 @app.route('/getphrase')
 def endpoint_getphrase():
-    return '{"phrase": "'+ str(sD.activePhrase) +'"}'
+    if not request.remote_addr in sD.studentDict:
+        return '{"error": "You are not logged in."}'
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
+        return '{"error": "Insufficient permissions."}'
+    else:
+        return '{"phrase": "'+ str(sD.activePhrase) +'"}'
 
 #Shows the different colors the pixels take in the virtualbar.
 @app.route('/getpix')
 def endpoint_getpix():
-    if not ONRPi:
-        global pixels
-    return '{"pixels": "'+ str(pixels[:BARPIX]) +'"}'
+    if not request.remote_addr in sD.studentDict:
+        return '{"error": "You are not logged in."}'
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
+        return '{"error": "Insufficient permissions."}'
+    else:
+        if not ONRPi:
+            global pixels
+        return '{"pixels": "'+ str(pixels[:BARPIX]) +'"}'
 
 @app.route('/getquizname')
 def endpoint_getquizname():
-    if sD.activeQuiz:
-        return '{"quizname": "'+ str(sD.activeQuiz['name']) +'"}'
+    if not request.remote_addr in sD.studentDict:
+        return '{"error": "You are not logged in."}'
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
+        return '{"error": "Insufficient permissions."}'
     else:
-        return '{"quizname": "''"}'
+        if sD.activeQuiz:
+            return '{"quizname": "'+ str(sD.activeQuiz['name']) +'"}'
+        else:
+            return '{"quizname": "''"}'
 
 #This endpoints shows the actions the students did EX:TUTD up
 @app.route('/getstudents')

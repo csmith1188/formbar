@@ -111,6 +111,12 @@ body, .light, .dark {
   cursor: not-allowed;
 }
 
+.pressed {
+  background: var(--theme-color);
+  color: var(--bg-dark);
+  cursor: default;
+}
+
 ::selection {
   background: var(--theme-color);
   color: var(--bg-color);
@@ -180,10 +186,11 @@ button:not(.inline), .button:not(.inline) {
   border: 1px solid;
   font-size: 18px;
   cursor: pointer;
+  user-select: none;
 }
 
-button:not(.popOut):not(.unselectable):not(.on):hover,
-.button:not(.popOut):not(.unselectable):not(.on):hover {
+button:not(.popOut):not(.unselectable):not(.pressed):hover,
+.button:not(.popOut):not(.unselectable):not(.pressed):hover {
   background: var(--highlight-color);
 }
 
@@ -196,6 +203,7 @@ button.inline, .button.inline {
   color: var(--theme-color);
   font-weight: bold;
   cursor: pointer;
+  user-select: none;
 }
 
 .popOut {

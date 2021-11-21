@@ -99,23 +99,23 @@
     background: var(--light-gray);
   }
 
-  .red {
+  .redColor {
     color: var(--color-red);
   }
 
-  .yellow {
+  .yellowColor {
     color: var(--color-yellow);
   }
 
-  .green {
+  .greenColor {
     color: var(--color-green);
   }
 
-  .cyan {
+  .cyanColor {
     color: var(--color-cyan);
   }
 
-  .blue {
+  .blueColor {
     color: var(--color-blue);
   }
 
@@ -280,18 +280,6 @@
     height: calc(100% - 32px);
     border: none;
   }
-
-  .hidden {
-    display: none;
-  }
-
-  #content {
-    font: 16px "Segoe UI", sans-serif;
-  }
-
-  #quickmenu {
-    display: none;
-  }
 </style>
 {% endblock %}
 
@@ -303,23 +291,23 @@
     <div style="text-align: center;">Features will appear when the teacher makes them available.</div>
     <div id="tutdDiv" class="hidden">
       <h2>Thumbs</h2>
-      <img src="{{ url_for('static', filename='img/home/thumbButton0.png') }}" id="thumbButton0" class="thumbButton green" title="Up" onclick="thumbsVote(0);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/home/thumbButton0.png') }}" id="thumbButton0" class="thumbButton greenColor" title="Up" onclick="thumbsVote(0);" tabindex="0">
       <br>
-      <img src="{{ url_for('static', filename='img/home/thumbButton1.png') }}" id="thumbButton1" class="thumbButton cyan" title="Wiggle" onclick="thumbsVote(1);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/home/thumbButton1.png') }}" id="thumbButton1" class="thumbButton cyanColor" title="Wiggle" onclick="thumbsVote(1);" tabindex="0">
       <br>
-      <img src="{{ url_for('static', filename='img/home/thumbButton2.png') }}" id="thumbButton2" class="thumbButton red" title="Down" onclick="thumbsVote(2);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/home/thumbButton2.png') }}" id="thumbButton2" class="thumbButton redColor" title="Down" onclick="thumbsVote(2);" tabindex="0">
       <br><br><br>
     </div>
 
     <div id="surveyDiv" class="hidden">
       <h2>Survey</h2>
-      <img src="{{ url_for('static', filename='img/home/letterButton0.png') }}" id="letterButton0" class="letterButton red" title="Vote A" onclick="letterVote(0);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/home/letterButton0.png') }}" id="letterButton0" class="letterButton redColor" title="Vote A" onclick="letterVote(0);" tabindex="0">
       <br>
-      <img src="{{ url_for('static', filename='img/home/letterButton1.png') }}" id="letterButton1" class="letterButton blue" title="Vote B" onclick="letterVote(1);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/home/letterButton1.png') }}" id="letterButton1" class="letterButton blueColor" title="Vote B" onclick="letterVote(1);" tabindex="0">
       <br>
-      <img src="{{ url_for('static', filename='img/home/letterButton2.png') }}" id="letterButton2" class="letterButton yellow" title="Vote C" onclick="letterVote(2);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/home/letterButton2.png') }}" id="letterButton2" class="letterButton yellowColor" title="Vote C" onclick="letterVote(2);" tabindex="0">
       <br>
-      <img src="{{ url_for('static', filename='img/home/letterButton3.png') }}" id="letterButton3" class="letterButton green" title="Vote D" onclick="letterVote(3);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/home/letterButton3.png') }}" id="letterButton3" class="letterButton greenColor" title="Vote D" onclick="letterVote(3);" tabindex="0">
       <br><br><br>
     </div>
 
@@ -339,7 +327,7 @@
       <img src="{{ url_for('static', filename='img/home/random.png') }}" id="randomMusic" class="smallImg" title="Random" onclick="randomBGM()"><input type="text" id="music" placeholder="Filename" list="bgmFiles">
       <datalist id="bgmFiles"></datalist>
       <img src="{{ url_for('static', filename='img/home/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendMusic();"><br>
-      <div id="nowPlaying" class="hidden">Now playing: <b id="nowPlayingTitle" title="Song">Song</b></div>
+      <div id="nowPlaying" class="hidden">Now playing: <b id="nowPlayingTitle" title="Song"></b></div>
       <button id="stopMusicButton" class="inline popOut" style="margin-top: 12px;" onclick="stopMusic();">Stop music</button>
       <br><br><br>
     </div>
@@ -399,7 +387,6 @@
     <div id="gamesTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/home/games.png') }}" class="icon"> Games</div>
     <div id="gamesMenu" class="menu hidden" tabindex="-1">
       <div id="2048Tab" class="tab" onclick="openPage('2048');">2048</div>
-      <div id="flappybirdTab" class="tab" onclick="openPage('flappybird');">Flappy Bird</div>
       <div id="hangmanTab" class="tab" onclick="openPage('hangman');">Hangman</div>
       <div id="minesweeperTab" class="tab" onclick="openPage('minesweeper');">Minesweeper</div>
       <div id="speedtypeTab" class="tab" onclick="openPage('speedtype');">Speed Typer</div>
@@ -439,23 +426,21 @@
   let newMessages = 0;
   let username = "{{ username }}";
 
-  window.onload = () => {
+  mode();
+  setMenuWidths();
+  updateVotes();
+  nowPlaying();
+  showUsername();
+  showEnabled();
+  bottomPosition();
+  openPage("chat");
+  /*setInterval(() => {
     mode();
-    setMenuWidths();
     updateVotes();
     nowPlaying();
-    showUsername();
     showEnabled();
     bottomPosition();
-    openPage("chat");
-    /*setInterval(() => {
-      mode();
-      updateVotes();
-      nowPlaying();
-      showEnabled();
-      bottomPosition();
-    }, 1000);*/
-  };
+  }, 1000);*/
 
   function mode() {
     ////needs update
@@ -786,7 +771,7 @@
     let tabEl = document.getElementById(path.substring(1) + "Tab");
     if (!content) openPage("chat?message='Page does not exist.'");
     Array.from(tabs).forEach(tab => tab.classList.remove("open"));
-    if (["/2048", "/flappybird", "/hangman", "/minesweeper", "/speedtype", "/ttt", "/fighter"].includes(path)) document.getElementById("gamesTab").classList.add("open");
+    if (["/2048", "/hangman", "/minesweeper", "/speedtype", "/ttt", "/fighter"].includes(path)) document.getElementById("gamesTab").classList.add("open");
     else if (["/needshelp", "/lesson", "/settings", "/users"].includes(path)) document.getElementById("teacherTab").classList.add("open");
     if (tabEl) tabEl.classList.add("open");
     if (path == "/") openPage("chat");

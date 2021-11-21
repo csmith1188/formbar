@@ -25,7 +25,7 @@
   }
 
   .them .username {
-    color: var(--ice-blue);
+    color: var(--theme-color);
     cursor: pointer;
   }
 
@@ -38,13 +38,13 @@
   }
 
   .date {
-    color: var(--theme-color);
+    color: var(--light-gray);
     margin-right: 5px;
   }
 
   .alert .content {
     font-style: italic;
-    color: var(--ice-blue);
+    color: var(--theme-color);
   }
 
   #userlist {
@@ -73,13 +73,13 @@
   }
 
   .ulName.them:hover {
-    background-color: var(--ice-blue);
-    color: var(--bg-dark);
+    background-color: var(--theme-color);
+    color: var(--bg-color);
   }
 
   #controlChat {
-    background-color: var(--bg-dark);
-    border-top: 1px solid var(--ice-blue);
+    background-color: var(--bg-color);
+    border-top: 1px solid var(--theme-color);
     position: fixed;
     width: 100%;
     height: 90px;
@@ -104,49 +104,34 @@
     height: 32px;
     box-sizing: border-box;
     background-color: var(--bg-darker);
-    border: 1px solid var(--ice-blue);
-    font-family: "Segoe UI", sans-serif;
-    font-size: 16px;
+    border: 1px solid var(--theme-color);
   }
 
   #input:focus {
-    outline: 1px solid var(--ice-blue);
-  }
-
-  #sendButton, button {
-    box-sizing: border-box;
-    background-color: var(--bg-dark);
-    color: var(--ice-blue);
-    border: 1px solid var(--ice-blue);
-    cursor: pointer;
+    outline: 1px solid var(--theme-color);
   }
 
   #sendButton {
     width: 64px;
     height: 32px;
+    box-sizing: border-box;
     border-radius: 8px;
     margin: 0 0 0 5px;
-    font: 20px "Segoe UI", sans-serif;
+    font-size: 20px;
     vertical-align: top;
     transition-duration: 0.2s;
   }
 
-  button {
-    margin-top: 5px;
-    border-radius: 5.5px;
-    font: 14px "Segoe UI", sans-serif;
-  }
-
   #sendButton:hover, #sendButton:focus, button:hover, button:focus {
-    background-color: var(--ice-blue);
-    color: var(--bg-dark);
+    background-color: var(--theme-color);
+    color: var(--bg-color);
     outline: none;
   }
 
   #sendButton:active, button:active {
     background-color: white;
     border-color: white;
-    color: var(--bg-dark);
+    color: var(--bg-color);
   }
 
   #sendButton:active {
@@ -160,17 +145,17 @@
 
   #sendButton.rec:hover, #sendButton.rec:focus {
     background-color: var(--light-purple);
-    color: var(--bg-dark);
+    color: var(--bg-color);
   }
 
   #sendButton.rec:active {
     background-color: white;
     border-color: white;
-    color: var(--bg-dark);
+    color: var(--bg-color);
   }
 
   a {
-    color: var(--ice-blue);
+    color: var(--theme-color);
   }
 
   a:visited {
@@ -183,13 +168,13 @@
 
   h1 {
     margin: 0;
-    color: var(--ice-blue);
+    color: var(--theme-color);
     font-size: 24px;
   }
 
   h2 {
     margin: 0;
-    color: var(--ice-blue);
+    color: var(--theme-color);
     font-size: 20px;
   }
 
@@ -348,7 +333,7 @@
         receiver = 'all';
         boxes.recBox.innerHTML = "all";
         boxes.recBox.style.color = "white";
-        boxes.sendButton.style.color = "var(--ice-blue)";
+        boxes.sendButton.style.color = "var(--theme-color)";
         //sendButton.value = "Send";
         //el.classList.remove('whisper');
         document.getElementById("removeRec").style.display = "none";
@@ -426,7 +411,7 @@
         //Use this if you want to allow HTML
         newMSG.innerHTML = `
           <b class="username" onclick="${usernameOnclick}" title="${usernameTitle}">${message.from}</b>
-          <span style="color: var(--light-blue);">${getDate()} ${message.to != "all" ? "· Private message" : ""}</span>
+          <span style="color: var(--theme-color);">${getDate()} ${message.to != "all" ? "· Private message" : ""}</span>
           <div class="content">${message.content}</div>
         `;
         //Use this if you want to convert HTML into text

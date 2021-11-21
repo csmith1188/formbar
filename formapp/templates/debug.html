@@ -3,12 +3,6 @@
 {% block title %}Debugging{% endblock %}
 {% block style %}
 <style>
-  body {
-    background: var(--bg-dark);
-    color: white;
-    font: 16px "Segoe UI", sans-serif;
-  }
-
   #virtualBar {
     position: absolute;
     top: 0;
@@ -48,30 +42,11 @@
     height: 60px;
     box-sizing: border-box;
     padding: 10px;
-    background: var(--bg-dark-highlight);
+    background: var(--bg-darker);
   }
 
   button {
-    box-sizing: border-box;
-    border-radius: 15px;
     margin: 5px;
-    padding: 2px 8px;
-    background: transparent;
-    color: var(--light-red);
-    border: 1px var(--light-red) solid;
-    font: 18px "Segoe UI", sans-serif;
-    cursor: pointer;
-  }
-
-  button:not(.open):hover {
-    background: var(--light-red);
-    color: var(--bg-dark);
-  }
-
-  button.open {
-    background: white;
-    border-color: white;
-    color: var(--bg-dark);
   }
 
   #data {
@@ -92,7 +67,7 @@
     height: 28px;
     padding: 7px 14px;
     box-sizing: border-box;
-    background: linear-gradient(to right, var(--light-red), var(--light-red) 50%, var(--bg-dark-highlight) 50%);
+    background: linear-gradient(to right, var(--theme-color), var(--theme-color) 50%, var(--bg-dark-highlight) 50%);
     font-size: 14px;
     line-height: 14px;
     text-align: right;
@@ -136,6 +111,7 @@
     let urls = [
       "/getbgm",
       "/getfightermatches",
+      "/getip",
       "/getme",
       "/getmode",
       "/getpermissions",
@@ -195,8 +171,8 @@
           if (newURL) {
             urls.forEach(url => {
               let el = document.getElementById(url);
-              if (url == newURL) el.classList.add("open");
-              else el.classList.remove("open");
+              if (url == newURL) el.classList.add("pressed");
+              else el.classList.remove("pressed");
             });
             document.getElementById("data").innerText = data;
           }

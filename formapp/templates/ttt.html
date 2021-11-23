@@ -219,9 +219,6 @@
       turn: player.shape
     })));
 
-    //MAKE THE THINGIE, DECLARE IT KID
-    ws = new WebSocket("ws://{{ serverIp }}:9001");
-
     //YOUR USERNAME BE LIKE:
     var username = "{{ username }}";
 
@@ -244,12 +241,12 @@
 
         //IF THE SENDER IS THE PERSON YOU ARE IN A LOBBY WITH
         if (messageSender == "yaboi69") {
-          recieveTurn(data.content);
+          receiveTurn(data.content);
         }
       }
     };
 
-    function recieveTurn(move) {
+    function receiveTurn(move) {
       //CHECK IF ITS THEIR TURN
       if (player2.turn) {
         //ALTER YOUR BOARD

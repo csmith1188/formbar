@@ -285,3 +285,8 @@ select:focus {
 a {
   color: var(--theme-color);
 }
+
+table, th, td {
+  border: 1px solid;
+  border-collapse: collapse;
+}

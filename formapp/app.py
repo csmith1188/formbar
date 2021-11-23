@@ -1737,7 +1737,7 @@ def endpoint_ttt():
                 return render_template("ttt.html", game = json.dumps(sD.ttt[-1].__dict__))
 
 
-        #Ifthere is no game with these players
+        #If there is no game with these players
         return redirect("/chat", message="No game found")
 
 '''

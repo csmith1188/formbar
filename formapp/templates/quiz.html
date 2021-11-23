@@ -3,7 +3,7 @@
 <!-- This is where the title, top buttons, and stylesheet is located -->
 
 <!-- Change title here -->
-{% block title %}Quiz{% endblock %}
+{% block title %}{% endblock %}
 
 <!-- Extra style declarations here -->
 {% block style %}{% endblock %}
@@ -33,5 +33,6 @@
     listString.innerHTML += '<input type="submit" value="Submit">'
     document.getElementById('quizList').appendChild(listString)
     document.getElementById('quizName').innerHTML = "Quiz: " + quiz.name
+    document.title = "Quiz: " + quiz.name
 </script>
 {% endblock %}

@@ -401,7 +401,7 @@
       <div id="usersTab" class="tab" onclick="openPage('users');">User list</div>
     </div>
     <div id="debugTab" class="tab" onclick="openPage('debug');"><img src="{{ url_for('static', filename='img/home/debug.png') }}" class="icon"> API debugging</div>
-    <div id="reload" class="tab" style="margin-left: auto;" title="Reload" onclick="document.getElementById('innerPage').contentWindow.location.reload();"><img src="{{ url_for('static', filename='img/home/reload.png') }}" class="icon"></div>
+    <div id="reload" class="tab" style="margin-left: auto;" onclick="document.getElementById('innerPage').contentWindow.location.reload();"><img src="{{ url_for('static', filename='img/home/reload.png') }}" class="icon"> Reload inner page</div>
   </div>
 
   <div>

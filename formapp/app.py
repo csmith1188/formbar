@@ -691,7 +691,7 @@ def updateStep():
     Homepage (root)
 '''
 @app.route('/')
-def endpoint_expert():
+def endpoint_home():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     else:

@@ -1021,7 +1021,7 @@ def endpoint_getquizname():
         if sD.activeQuiz:
             return '{"quizname": "'+ str(sD.activeQuiz['name']) +'"}'
         else:
-            return '{"quizname": "''"}'
+            return '{"error": "No quiz is currently loaded."}'
 
 #This endpoints shows the actions the students did EX:TUTD up
 @app.route('/getstudents')

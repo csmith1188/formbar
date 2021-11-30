@@ -442,6 +442,14 @@
     bottomPosition();
   }, 1000);*/
 
+  function parseResponse(string) {
+    try {
+      return JSON.parse(string);
+    } catch {
+      return {};
+    }
+  }
+
   function mode() {
     ////needs update
     /*["quiz", "tutd", "survey"].forEach(mode => {
@@ -459,12 +467,12 @@
 
     request.open("GET", '/getme', false);
     request.send(null);
-    let meRes = JSON.parse(request.responseText);
+    let meRes = parseResponse(request.responseText);
     let myPerms = meRes.perms;
 
     request.open("GET", '/getpermissions', false);
     request.send(null);
-    let permsRes = JSON.parse(request.responseText);
+    let permsRes = parseResponse(request.responseText);
     let sfxPerm = permsRes.sfx;
     let bgmPerm = permsRes.bgm;
     let ledPerm = permsRes.bar;
@@ -583,7 +591,7 @@
   function updateVotes() { //Make sure displayed vote matches actual vote, for example if new poll is started or user reloads
     request.open("GET", '/getme', false);
     request.send(null);
-    let res = JSON.parse(request.responseText);
+    let res = parseResponse(request.responseText);
     let thumb;
     if (res.thumb == "up") thumb = 0;
     else if (res.thumb == "wiggle") thumb = 1;
@@ -671,7 +679,7 @@
     //Get current song from server
     request.open("GET", '/getbgm', false);
     request.send(null);
-    let res = JSON.parse(request.responseText);
+    let res = parseResponse(request.responseText);
     let songName = res.bgm;
 
     let np = document.getElementById("nowPlaying");
@@ -816,7 +824,7 @@
   });
 
   ws.onmessage = message => {
-    let data = JSON.parse(message.data);
+    let data = parseResponse(message.data);
     if (data.type == 'message' || data.type == 'alert') {
       if (document.hidden || !innerPage.contentWindow.location.pathname == "/chat") {
         newMessages++;

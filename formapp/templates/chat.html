@@ -74,11 +74,19 @@
 
   .ulName.them:hover {
     background-color: var(--theme-color);
+<<<<<<< Updated upstream
     color: var(--bg-color);
   }
 
   #controlChat {
     background-color: var(--bg-color);
+=======
+    color: var(--bg-dark);
+  }
+
+  #controlChat {
+    background-color: var(--bg-dark);
+>>>>>>> Stashed changes
     border-top: 1px solid var(--theme-color);
     position: fixed;
     width: 100%;
@@ -103,12 +111,16 @@
     width: 75%;
     height: 32px;
     box-sizing: border-box;
+<<<<<<< Updated upstream
     background-color: var(--bg-darker);
     border: 1px solid var(--theme-color);
   }
 
   #input:focus {
     outline: 1px solid var(--theme-color);
+=======
+    border-color: var(--theme-color);
+>>>>>>> Stashed changes
   }
 
   #sendButton {
@@ -122,6 +134,7 @@
     transition-duration: 0.2s;
   }
 
+<<<<<<< Updated upstream
   #sendButton:hover, #sendButton:focus, button:hover, button:focus {
     background-color: var(--theme-color);
     color: var(--bg-color);
@@ -132,6 +145,12 @@
     background-color: white;
     border-color: white;
     color: var(--bg-color);
+=======
+  button {
+    margin-top: 5px;
+    border-radius: 5.5px;
+    font: 14px "Segoe UI", sans-serif;
+>>>>>>> Stashed changes
   }
 
   #sendButton:active {
@@ -174,7 +193,10 @@
 
   h2 {
     margin: 0;
+<<<<<<< Updated upstream
     color: var(--theme-color);
+=======
+>>>>>>> Stashed changes
     font-size: 20px;
   }
 
@@ -187,7 +209,7 @@
     background-color: initial;
   }
 
-  .game #userlist, .game #recContainer, .game #commands {
+  .game #userlist, .game #recContainer {
     display: none;
   }
 
@@ -214,6 +236,9 @@
 </style>
 {% endblock %}
 
+<!-- Change theme color here -->
+{% block color %}blue{% endblock %}
+
 <!-- Main content here -->
 {% block main %}
 <div id="container-full-width">
@@ -225,10 +250,9 @@
 <div id="controlChat">
     <div id="recContainer" style="font-size: 14px; margin-bottom: 5px;">To <span id="recipient">all</span><span id="removeRec" onclick="removeRec()" title="Reset recipients to all">✕</span></div>
     <form onsubmit="event.preventDefault(); onSubmit(); return false;" style="margin: 0;">
-        <input id="input" placeholder="Enter a message" autocomplete="off">
-        <input type="submit" value="Send" id="sendButton">
+        <input id="input" class="box" placeholder="Enter a message" autocomplete="off">
+        <input type="submit" value="Send" id="sendButton" class="button">
     </form>
-    <div id="commands" style="font-size: 14px; margin-top: 5px;">Commands: <button onclick="enterCommand('!#help')">!#help</button></div>
 </div>
 {% endblock %}
 

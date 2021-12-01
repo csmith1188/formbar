@@ -19,7 +19,7 @@
   --light-yellow: #ffdf40;
   --light-green: #80ff80;
   --light-cyan: #80ffff;
-  --light-blue: #8f9bbf;
+  --light-blue: #bfcfff;
   --light-purple: #df80ff;
   --light-pink: #ff80bfff;
   --light-gray: #ccc;
@@ -54,6 +54,18 @@
 
 .red {
   --theme-color: var(--light-red);
+}
+
+.brown {
+  --theme-color: var(--light-brown);
+}
+
+.orange {
+  --theme-color: var(--light-orange);
+}
+
+.yellow {
+  --theme-color: var(--light-yellow);
 }
 
 .green {

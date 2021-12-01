@@ -37,11 +37,6 @@
     background-color: var(--bg-dark-highlight);
   }
 
-  .date {
-    color: var(--light-gray);
-    margin-right: 5px;
-  }
-
   .alert .content {
     font-style: italic;
     color: var(--theme-color);
@@ -435,7 +430,7 @@
         //Use this if you want to allow HTML
         newMSG.innerHTML = `
           <b class="username" onclick="${usernameOnclick}" title="${usernameTitle}">${message.from}</b>
-          <span style="color: var(--theme-color);">${getDate()} ${message.to != "all" ? "· Private message" : ""}</span>
+          <span style="color: var(--light-gray);">${getDate()} ${message.to != "all" ? "· Private message" : ""}</span>
           <div class="content">${message.content}</div>
         `;
         //Use this if you want to convert HTML into text

@@ -693,7 +693,7 @@ def updateStep():
 @app.route('/')
 def endpoint_home():
     if not request.remote_addr in sD.studentDict:
-        return redirect('/login?forward=' + request.path)
+        return redirect('/login')
     else:
         username = sD.studentDict[request.remote_addr]['name']
         sfx.updateFiles()

@@ -49,6 +49,11 @@
       height: 40px;
     }
 
+    .backButton {
+      left: 16px;
+      top: 16px;
+    }
+
     #randomButton {
       position: relative;
       margin-top: 8px;
@@ -559,9 +564,11 @@
   </div>
 
   <div id="chooseFighters" class="fullScreen hidden">
+    <button class="backButton" onclick="backToHome();">🡨 Back</button>
+
     <div class="large hCentered" style="top: 16px;">
       Choose two fighters to take into the match.<br>
-      <button id="randomButton" onclick="randomFighters()"><img src="{{ url_for('static', filename='img/fighter/random.png') }}" class="randomIcon"> Random</button>
+      <button id="randomButton" onclick="randomFighters();"><img src="{{ url_for('static', filename='img/fighter/random.png') }}" class="randomIcon"> Random</button>
     </div>
     <div id="fighterOptions" class="vCentered">
       <div id="redFighter"></div>
@@ -577,6 +584,8 @@
   </div>
 
   <div id="chooseItems" class="fullScreen hidden">
+    <button class="backButton" onclick="backToFighters();">🡨 Back</button>
+
     <div class="large hCentered" style="top: 192px; width: 100%;">Choose up to three items to take into the match. You can pick the same item more than once.</div>
     <div id="chooseItemsCenter" class="vCentered">
       <div id="itemOptions"></div><br>
@@ -1232,9 +1241,16 @@
         let el = document.getElementById(color.color + "Fighter");
         color.hp = 100;
         createFighter(color, el);
+        unchooseFighter(color);
         el.classList.add("targetOption");
         el.onclick = () => {chooseFighter(color);};
       });
+
+    }
+
+    function backToHome() {
+      document.getElementById("chooseFighters").classList.add("hidden");
+      document.getElementById("home").classList.remove("hidden");
     }
 
     function createFighter(fighter, fighterEl) {
@@ -1348,21 +1364,33 @@
       document.getElementById("chooseItems").classList.remove("hidden");
       document.getElementById("itemsDone").onclick = () => itemsDone();
 
+      removeItem(2);
+      removeItem(1);
+      removeItem(0);
+
       for (let item in items) itemsArr.push(item);
-      itemsArr.forEach(item => {
-        let itemObj = items[item];
-        document.getElementById("itemOptions").innerHTML +=
-        `<div class="itemNameAndImage">
-          <h3>${capitalize(itemObj.name)}</h3><br>
-          <img id="${item}" class="item targetOption" src="/static/img/fighter/${item}.png" draggable="false">
-        </div>`;
-      });
-      itemsArr.forEach(item => {
-        let el = document.getElementById(item);
-        el.onmouseover = () => document.getElementById("itemDesc").innerText = items[item].description;
-        el.onmouseout = () => document.getElementById("itemDesc").innerText = null;
-        el.onclick = () => chooseItem(item);
-      });
+      //Add items unless they are already there
+      if (!document.getElementById("itemOptions").innerHTML) {
+        itemsArr.forEach(item => {
+          let itemObj = items[item];
+          document.getElementById("itemOptions").innerHTML +=
+          `<div class="itemNameAndImage">
+            <h3>${capitalize(itemObj.name)}</h3><br>
+            <img id="${item}" class="item targetOption" src="/static/img/fighter/${item}.png" draggable="false">
+          </div>`;
+        });
+        itemsArr.forEach(item => {
+          let el = document.getElementById(item);
+          el.onmouseover = () => document.getElementById("itemDesc").innerText = items[item].description;
+          el.onmouseout = () => document.getElementById("itemDesc").innerText = null;
+          el.onclick = () => chooseItem(item);
+        });
+      }
+    }
+
+    function backToFighters() {
+      document.getElementById("chooseItems").classList.add("hidden");
+      document.getElementById("chooseFighters").classList.remove("hidden");
     }
 
     function chooseItem(item) {

@@ -34,17 +34,24 @@
       margin: 5px;
       font-size: 75px;
       font-weight: 600;
-      line-height: 125px;
-      width: 100px;
-      height: 125px;
+      line-height: 120px;
+      width: 95px;
+      height: 120px;
       text-align: center;
+      user-select: none;
+    }
+
+    .key:not(.unselectable) {
       background-color: #FFFFFF;
       cursor: pointer;
-      user-select: none;
     }
 
     .key:not(.unselectable):hover {
       background-color: var(--light-gray);
+    }
+
+    .key.unselectable {
+      opacity: 75%;
     }
 
     #keys {
@@ -336,7 +343,7 @@
 
       if (displayWord.slice(0, -1) == word.split('').join(' ')) {
         //they solved the word
-        lastword = word
+        let lastword = word;
         document.getElementById("last").innerHTML = lastword;
         score += lives;
         if (score > highscore) {
@@ -363,6 +370,7 @@
           score = 0;
           randomize();
           resetLetters();
+          let lastword = word;
           document.getElementById("last").innerHTML = lastword;
         }
       }

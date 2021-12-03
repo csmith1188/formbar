@@ -1085,12 +1085,12 @@ def endpoint_help():
         name = sD.studentDict[request.remote_addr]['name']
         name = name.strip()
         if name in helpList:
-            return render_template("help.html", message = "You already have a help ticket in. If your problem is time-sensitive, or your last ticket was not cleared, please get the teacher's attention manually." )
+            return render_template("chat.html", message = "You already have a help ticket in. If your problem is time-sensitive, or your last ticket was not cleared, please get the teacher's attention manually." )
         else:
-            helpList[name] = "Help ticket"
+            helpList[name] = request.form['message'] or "Help ticket"
             sD.studentDict[request.remote_addr]['help'] = True
             playSFX("sfx_up04")
-            return render_template("help.html", message = "Your ticket was sent. Keep working on the problem the best you can while you wait." )
+            return render_template("chat.html", message = "Your ticket was sent. Keep working on the problem the best you can while you wait." )
     else:
         return render_template("help.html")
 

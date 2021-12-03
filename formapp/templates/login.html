@@ -15,8 +15,8 @@
     text-align: center;
   }
 
-  form {
-    margin-top: 32px;
+  button {
+    margin: 16px 0;
   }
 
   input {
@@ -24,21 +24,20 @@
     width: 256px;
     height: 36px !important;
     box-sizing: border-box;
-    margin-bottom: 16px;
+    margin-top: 16px;
   }
 </style>
 {% endblock %}
 
 <!-- Main content here -->
 {% block main %}
-<h1>Log in</h1>
-<button id="logInButton" class="on" onclick="changeForm(this);">Log in</button>
+<button id="logInButton" class="pressed" onclick="changeForm(this);">Log in</button>
 <button id="newAccountButton" onclick="changeForm(this);">New account</button>
 <button id="guestButton" onclick="changeForm(this);">Use as guest</button>
 <form action="login" method="post">
     <input type="text" id="usernameBox" name="username" class="box" placeholder="Name" value=""><br>
     <input type="password" id="passwordBox" name="password" class="box" placeholder="Password" value=""><br>
-    <input type="hidden" id="userTypeBox" name="userType" value="log in">
+    <input type="hidden" id="userTypeBox" name="userType" value="login">
     <input type="hidden" id="forwardBox" name="forward">
     <input type="hidden" id="botBox" name="bot" value="False">
     <input type="submit" id="submitButton" class="button unselectable" value="Log In" onsubmit="return false;">
@@ -56,13 +55,15 @@
       let liButton = document.getElementById("logInButton");
       let naButton = document.getElementById("newAccountButton");
       let gButton = document.getElementById("guestButton");
-      let utBox = document.getElementById("userType");
+      let passwordBox = document.getElementById("passwordBox");
+      let utBox = document.getElementById("userTypeBox");
 
-      [liButton, naButton, gButton].forEach(button => button == el ? button.classList.add("on") : button.classList.remove("on"));
+      [liButton, naButton, gButton].forEach(button => button == el ? button.classList.add("pressed") : button.classList.remove("pressed"));
       if (el == gButton) {
-        let passwordBox = document.getElementById("passwordBox");
         passwordBox.value = null;
         passwordBox.classList.add("hidden");
+      } else {
+        passwordBox.classList.remove("hidden");
       }
 
       if (el == liButton) utBox.value = "login";

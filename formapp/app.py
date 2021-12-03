@@ -1259,11 +1259,11 @@ def endpoint_login():
                                     if bot:
                                         return json.dumps({'status': 'failed', 'reason': 'credentials'})
                                     else:
-                                        return render_template("login.html?message=Your password is incorrect.")
+                                        return redirect("/login?message=Your password is incorrect.")
                     else:
-                        return render_template("login.html?message=No users found with that username.")
+                        return redirect("/login?message=No users found with that username.")
                 else:
-                    return render_template("login.html?message=You need to enter a username and password.")
+                    return redirect("/login?message=You need to enter a username and password.")
 
             elif userType == "new":
                 if True:
@@ -1279,7 +1279,7 @@ def endpoint_login():
                     else:
                         return redirect('/', code=302)
                 else:
-                    return render_template("login.html?message=There is already a user with that name.")
+                    return redirect("/login?message=There is already a user with that name.")
 
             elif userType == "guest":
                 if True:
@@ -1289,7 +1289,7 @@ def endpoint_login():
                     else:
                         return redirect('/', code=302)
                 else:
-                    return render_template("login.html?message=There is already a user with that name.")
+                    return redirect("/login?message=There is already a user with that name.")
 
         elif request.args.get('name'):
             newStudent(remote, request.args.get('name'))

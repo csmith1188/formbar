@@ -184,7 +184,7 @@ textarea, .box {
 }
 
 textarea:focus, .box:focus {
-  border: 1px solid var(--theme-color);
+  border: 1px solid;
   outline: 1px solid;
 }
 

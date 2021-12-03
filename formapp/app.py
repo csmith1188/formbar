@@ -171,12 +171,12 @@ def newStudent(remote, username, bot=False):
             'bot': bot
         }
         #Track if this is the first human login or not
-        firstlog = True
+        humanUsers = 0
 
         #Check each student so far to make sure that none of them are bots
         for user in sD.studentDict:
             if not sD.studentDict[user]['bot']:
-                firstlog = False
+                humanUsers += 1
 
         #Login bots as guest
         if bot:
@@ -184,7 +184,7 @@ def newStudent(remote, username, bot=False):
             sD.studentDict[remote]['perms'] = sD.settings['perms']['anyone']
 
         #Login first user as teacher
-        elif firstlog:
+        elif humanUsers == 1:
             print("[info] " +username + " logged in. Made them the teacher...")
             sD.studentDict[remote]['perms'] = sD.settings['perms']['admin']
 
@@ -201,7 +201,7 @@ def newStudent(remote, username, bot=False):
         db.close()
         for user in userFound:
             if username in user:
-                if firstlog:
+                if humanUsers == 1:
                     sD.studentDict[remote]['perms'] = sD.settings['perms']['admin']
                 else:
                     sD.studentDict[remote]['perms'] = int(user[3])

@@ -26,6 +26,10 @@
     color: var(--color-blue);
   }
 
+  button, .button {
+    margin-top: 8px;
+  }
+
   input[type="text"],
   input[type="number"] {
     background: transparent;
@@ -334,11 +338,11 @@
       <br>
       <div style="display: inline-block;">
         <h3 id="color1Heading" class="hidden">Color 1</h3>
-        <input type="color" id="color1">
+        <input type="color" id="color1" class="button inline popOut">
       </div>
       <div id="color2Div" class="hidden" style="margin-left: 8px;">
         <h3>Color 2</h3>
-        <input type="color" id="color2">
+        <input type="color" id="color2" class="button inline popOut">
       </div>
       <img src="{{ url_for('static', filename='img/home/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendColor();">
       <br><br><br>
@@ -354,9 +358,9 @@
 
   <div id="bottom">
     Name: <span id="name"></span> <span id="guest"></span><br>
-    <button id="logOut" class="inline popOut" style="margin-top: 8px;" onclick="window.location = '/logout'">Log out</button>
+    <button id="logOut" class="inline popOut" onclick="window.location = '/logout'">Log out</button>
     <br>
-    <button class="inline popOut" style="margin-top: 8px;" onclick="feedback();">Send feedback</button>
+    <button class="inline popOut" onclick="feedback();">Send feedback</button>
   </div>
 </div>
 

@@ -372,7 +372,7 @@
   </div>
 
   <div id="bottom">
-    Name: <span id="name"></span> <button id="logOut" class="inline popOut" onclick="window.location = '/logout'">Log out</button>
+    Name: <span id="name"></span><span id="guest"></span> <button id="logOut" class="inline popOut" onclick="window.location = '/logout'">Log out</button>
     <br>
     <button class="inline popOut" style="margin-top: 4px;" onclick="feedback();">Send feedback</button>
   </div>
@@ -430,7 +430,7 @@
   setMenuWidths();
   updateVotes();
   nowPlaying();
-  showUsername();
+  getUsername();
   showEnabled();
   bottomPosition();
   openPage("chat");
@@ -506,10 +506,14 @@
     ["games", "teacher"].forEach(group => document.getElementById(group + "Menu").style.left = document.getElementById(group + "Tab").getBoundingClientRect().left + "px"); //Give menu same X position as tab
   }
 
-  function showUsername() {
+  function getUsername() {
     let nameBox = document.getElementById("name");
     let oldHeight = bottom.clientHeight;
     nameBox.innerText = username;
+    let meRes = getResponse("/getme");
+    let myPerms = meRes.perms;
+    let guestBox = document.getElementById("guest");
+    myPerms == 3 ? guestBox.innerText = "(guest)" : guestBox.innerText = null;
     if (bottom.clientHeight > oldHeight) shorten(bottom, oldHeight, nameBox);
     else nameBox.removeAttribute("title");
   }

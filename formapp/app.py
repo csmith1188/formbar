@@ -1387,20 +1387,18 @@ def endpoint_needshelp():
                         sD.studentDict[student]['help'] = False
                         break
                 del helpList[remove]
-                return render_template("message.html", forward=request.referrer, message = "Removed ticket for: " + remove +"" )
+                return redirect("/needshelp")
             else:
                 return render_template("message.html", forward=request.referrer, message = "Couldn't find ticket for: " + remove +"" )
         else:
             resString = '<meta http-equiv="refresh" content="5">'
             if not helpList:
-                resString += "No tickets yet. <button onclick='location.reload();'>Try Again</button>"
-                return render_template("needshelp.html", table = resString)
+                resString += "No tickets yet. <button class='inline popOut' onclick='location.reload();'>Try Again</button>"
             else:
-                resString += "<table border=1>"
                 for ticket in helpList:
-                    resString += "<tr><td><a href=\'/needshelp?remove=" + ticket +"\'>" + ticket + "</a></td><td>" + helpList[ticket] + "</td></tr>"
-                resString += "</table>"
-                return render_template("needshelp.html", table = resString)
+                    resString += "<span class='ticket'><b>" + ticket + ":</b> " + helpList[ticket] + " <button class='inline popOut' onclick='window.location = \"/needshelp?remove=" + ticket + "\"'>Remove</button></span><br>"
+                    resString += "<span class='ticket'><b>" + ticket + ":</b> " + helpList[ticket] + " <button class='inline popOut' onclick='window.location = \"/needshelp?remove=" + ticket + "\"'>Remove</button></span>"
+            return render_template("needshelp.html", list = resString)
 
 # ██████
 # ██   ██

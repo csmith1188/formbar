@@ -12,23 +12,27 @@
   body {
     text-align: center;
   }
+
+  button {
+    margin-left: 4px;
+  }
+
+  .ticket {
+    display: block;
+    margin: -4px auto;
+  }
 </style>
 {% endblock %}
 
 <!-- Change theme color here -->
 {% block color %}orange{% endblock %}
-<<<<<<< Updated upstream
-=======
-
-<!-- Extra javascript here -->
-{% block script %}{% endblock %}
->>>>>>> Stashed changes
 
 <!-- Main content here -->
 {% block main %}
-<h1>Ask For Help</h1>
-{{ table|safe }}
-
+  <h1>Help tickets</h1>
+  <div id="list">
+    {{ list|safe }}
+  </div>
 {% endblock %}
 
 <!-- Extra javascript here -->

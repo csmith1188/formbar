@@ -1266,20 +1266,24 @@ def endpoint_login():
                     return redirect("/login?message=You need to enter a username and password.")
 
             elif userType == "new":
-                if True:
-                    #Add user to database
-                    db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
-                    dbcmd = db.cursor()
-                    userFound = dbcmd.execute("INSERT INTO users (username, password, permissions, bot) VALUES (?, ?, ?, ?)", (username, passwordCrypt, sD.settings['perms']['anyone'], str(bot)))
-                    db.commit()
-                    db.close()
-                    newStudent(remote, username, bot=bot)
-                    if forward:
-                        return redirect(forward, code=302)
-                    else:
-                        return redirect('/', code=302)
-                else:
+                #Open and connect to database
+                db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+                dbcmd = db.cursor()
+                userFound = dbcmd.execute("SELECT * FROM users WHERE username=:uname", {"uname": username}).fetchall()
+                db.close()
+                if userFound:
                     return redirect("/login?message=There is already a user with that name.")
+                else:
+                    if True:
+                        #Add user to database
+                        userFound = dbcmd.execute("INSERT INTO users (username, password, permissions, bot) VALUES (?, ?, ?, ?)", (username, passwordCrypt, sD.settings['perms']['anyone'], str(bot)))
+                        db.commit()
+                        db.close()
+                        newStudent(remote, username, bot=bot)
+                        if forward:
+                            return redirect(forward, code=302)
+                        else:
+                            return redirect('/', code=302)
 
             elif userType == "guest":
                 if True:

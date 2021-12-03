@@ -118,17 +118,6 @@ body, .light, .dark {
   transform: translate(-50%, -50%);
 }
 
-.unselectable {
-  opacity: 50%;
-  cursor: not-allowed;
-}
-
-.pressed {
-  background: var(--theme-color);
-  color: var(--bg-dark);
-  cursor: default;
-}
-
 ::selection {
   background: var(--theme-color);
   color: var(--bg-color);
@@ -231,6 +220,17 @@ button.inline, .button.inline {
   transform: initial;
   box-shadow: initial;
   background: var(--highlight-color);
+}
+
+button.unselectable, .button.unselectable {
+  opacity: 50%;
+  cursor: not-allowed;
+}
+
+button.pressed, .button.pressed {
+  background: var(--theme-color);
+  color: var(--bg-dark);
+  cursor: default;
 }
 
 input[type="number"] {

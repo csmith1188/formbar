@@ -16,10 +16,12 @@
   }
 
   button {
-    margin: 16px 0;
+    margin: 16px 2px;
   }
 
   input {
+    display: block;
+    margin: auto;
     font-size: 20px !important;
     width: 256px;
     height: 36px !important;
@@ -31,12 +33,12 @@
 
 <!-- Main content here -->
 {% block main %}
-<button id="logInButton" class="pressed" onclick="changeForm(this);">Log in</button>
-<button id="newAccountButton" onclick="changeForm(this);">New account</button>
-<button id="guestButton" onclick="changeForm(this);">Use as guest</button>
+<button id="logInButton" class="pressed" onclick="changeUserType(this);">Log in</button>
+<button id="newAccountButton" onclick="changeUserType(this);">New account</button>
+<button id="guestButton" onclick="changeUserType(this);">Use as guest</button>
 <form action="login" method="post">
-    <input type="text" id="usernameBox" name="username" class="box" placeholder="Name" value=""><br>
-    <input type="password" id="passwordBox" name="password" class="box" placeholder="Password" value=""><br>
+    <input type="text" id="usernameBox" name="username" class="box" placeholder="Name" value="" required>
+    <input type="password" id="passwordBox" name="password" class="box" placeholder="Password" value="" required>
     <input type="hidden" id="userTypeBox" name="userType" value="login">
     <input type="hidden" id="forwardBox" name="forward">
     <input type="hidden" id="botBox" name="bot" value="False">
@@ -51,40 +53,45 @@
     if (forward) document.getElementById('forwardBox').value = forward;
     else document.getElementById('forwardBox').value = null;
 
-    function changeForm(el) {
-      let liButton = document.getElementById("logInButton");
-      let naButton = document.getElementById("newAccountButton");
-      let gButton = document.getElementById("guestButton");
-      let passwordBox = document.getElementById("passwordBox");
-      let utBox = document.getElementById("userTypeBox");
-
-      [liButton, naButton, gButton].forEach(button => button == el ? button.classList.add("pressed") : button.classList.remove("pressed"));
-      if (el == gButton) {
-        passwordBox.value = null;
-        passwordBox.classList.add("hidden");
-      } else {
-        passwordBox.classList.remove("hidden");
-      }
-
-      if (el == liButton) utBox.value = "login";
-      else if (el == naButton) utBox.value = "new";
-      else if (el == gButton) utBox.value = "guest";
-    }
-
     //Prevent submission if a field is blank
     let ub = document.getElementById("usernameBox");
     let pb = document.getElementById("passwordBox");
+    let ut = document.getElementById("userTypeBox");
     let sb = document.getElementById("submitButton");
-    [ub, pb].forEach(el => {
-      el.oninput = () => {
-        if (ub.value && pb.value) {
-          sb.classList.remove("unselectable");
-          sb.onsubmit = () => true;
-        } else {
-          sb.classList.add("unselectable");
-          sb.onsubmit = () => false;
-        }
+
+    function changeUserType(el) {
+      let liButton = document.getElementById("logInButton");
+      let naButton = document.getElementById("newAccountButton");
+      let gButton = document.getElementById("guestButton");
+
+      [liButton, naButton, gButton].forEach(button => button == el ? button.classList.add("pressed") : button.classList.remove("pressed"));
+      if (el == gButton) {
+        pb.value = null;
+        pb.classList.add("hidden");
+        pb.required = false;
+      } else {
+        pb.classList.remove("hidden");
+        pb.required = true;
       }
-    });
+
+      if (el == liButton) ut.value = "login";
+      else if (el == naButton) ut.value = "new";
+      else if (el == gButton) ut.value = "guest";
+
+      checkIfBlank();
+    }
+
+    function checkIfBlank() {
+      if (ub.value && (pb.value || ut.value == "guest")) {
+        sb.classList.remove("unselectable");
+        sb.onsubmit = () => true;
+      } else {
+        sb.classList.add("unselectable");
+        sb.onsubmit = () => false;
+      }
+    }
+
+    ub.oninput = checkIfBlank;
+    pb.oninput = checkIfBlank;
 </script>
 {% endblock %}

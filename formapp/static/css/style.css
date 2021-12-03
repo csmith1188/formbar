@@ -185,7 +185,7 @@ textarea, .box {
 
 textarea:focus, .box:focus {
   border: 1px solid var(--theme-color);
-  outline: 1px solid var(--theme-color);
+  outline: 1px solid;
 }
 
 /*Use class "button" for button-like inputs, such as submit and file*/
@@ -291,7 +291,7 @@ select {
 }
 
 select:focus {
-  outline: 1px solid var(--theme-color);
+  outline: 1px solid;
 }
 
 a {

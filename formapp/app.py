@@ -1230,32 +1230,44 @@ def endpoint_login():
             username = username.strip()
             password = request.form['password']
             passwordCrypt = cipher.encrypt(password.encode()) #Required to be bytes?
+            userType = request.form['userType']
             forward = request.form['forward']
             bot = request.form['bot']
             bot = bot.lower() == "true"
-            if username and password:
-                #Open and connect to database
-                db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
-                dbcmd = db.cursor()
-                userFound = dbcmd.execute("SELECT * FROM users WHERE username=:uname", {"uname": username}).fetchall()
-                db.close()
-                if userFound:
-                    for user in userFound:
-                        if username in user:
-                            if password == cipher.decrypt(user[2]).decode():
-                                newStudent(remote, username, bot=bot)
-                                if bot:
-                                    return json.dumps({'status': 'success'})
-                                if forward:
-                                    return redirect(forward, code=302)
+
+
+            if userType == "login":
+                if username and password:
+                    #Open and connect to database
+                    db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+                    dbcmd = db.cursor()
+                    userFound = dbcmd.execute("SELECT * FROM users WHERE username=:uname", {"uname": username}).fetchall()
+                    db.close()
+                    if userFound:
+                        for user in userFound:
+                            if username in user:
+                                #Check if the password is correct
+                                if password == cipher.decrypt(user[2]).decode():
+                                    newStudent(remote, username, bot=bot)
+                                    if bot:
+                                        return json.dumps({'status': 'success'})
+                                    if forward:
+                                        return redirect(forward, code=302)
+                                    else:
+                                        return redirect('/', code=302)
                                 else:
-                                    return redirect('/', code=302)
-                            else:
-                                if bot:
-                                    return json.dumps({'status': 'failed', 'reason': 'credentials'})
-                                else:
-                                    return render_template("message.html", forward=forward, message="No users found with that username and/or password. If your password was blank, there is already a user with that name.")
+                                    if bot:
+                                        return json.dumps({'status': 'failed', 'reason': 'credentials'})
+                                    else:
+                                        return render_template("login.html?message=Your password is incorrect.")
+                    else:
+                        return render_template("login.html?message=No users found with that username.")
                 else:
+                    return render_template("login.html?message=You need to enter a username and password.")
+
+            elif userType == "new":
+                if True:
+                    #Add user to database
                     db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
                     dbcmd = db.cursor()
                     userFound = dbcmd.execute("INSERT INTO users (username, password, permissions, bot) VALUES (?, ?, ?, ?)", (username, passwordCrypt, sD.settings['perms']['anyone'], str(bot)))
@@ -1266,14 +1278,19 @@ def endpoint_login():
                         return redirect(forward, code=302)
                     else:
                         return redirect('/', code=302)
-            elif username:
-                newStudent(remote, username)
-                if forward:
-                    return redirect(forward, code=302)
                 else:
-                    return redirect('/', code=302)
-            else:
-                return render_template("message.html", forward=forward, message="You cannot have a blank name.")
+                    return render_template("login.html?message=There is already a user with that name.")
+
+            elif userType == "guest":
+                if True:
+                    newStudent(remote, username)
+                    if forward:
+                        return redirect(forward, code=302)
+                    else:
+                        return redirect('/', code=302)
+                else:
+                    return render_template("login.html?message=There is already a user with that name.")
+
         elif request.args.get('name'):
             newStudent(remote, request.args.get('name'))
             return redirect('/', code=302)

@@ -1603,57 +1603,53 @@ def endpoint_settings():
     elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['admin']:
         return redirect("/chat?message=You do not have high enough permissions to do this right now.")
     else:
-        if request.method == 'POST':
-            repeatMode()
-            return redirect('/settings')
-        else:
-            resString = ''
-            #Loop through every arg that was sent as a query parameter
-            for arg in request.args:
-                #See if you save the
-                argVal = str2bool(request.args.get(arg))
-                #if the argVal resolved to a boolean value
-                if isinstance(argVal, bool):
-                    if arg in sD.settings:
-                        sD.settings[arg] = argVal
-                        resString += 'Set <i>' + arg + '</i> to: <i>' + str(argVal) + "</i>"
-                    else:
-                        resString += 'There is no setting that takes \'true\' or \'false\' named: <i>' + arg + "</i>"
+        resString = ''
+        #Loop through every arg that was sent as a query parameter
+        for arg in request.args:
+            #See if you save the
+            argVal = str2bool(request.args.get(arg))
+            #if the argVal resolved to a boolean value
+            if isinstance(argVal, bool):
+                if arg in sD.settings:
+                    sD.settings[arg] = argVal
+                    resString += 'Set <i>' + arg + '</i> to: <i>' + str(argVal) + "</i>"
                 else:
-                    try:
-                        argInt = int(request.args.get(arg))
-                        if arg in sD.settings['perms']:
-                            if argInt > 4 or argInt < 0:
-                                resString += "Permission value out of range! "
-                            else:
-                                sD.settings['perms'][arg] = argInt
-                    except:
-                        pass
-
-            ###
-            ### Everything past this point uses the old method of changing settings. Needs updated
-            ###
-
-            if request.args.get('students'):
-                sD.settings['numStudents'] = int(request.args.get('students'))
-                if sD.settings['numStudents'] == 0:
-                    sD.settings['autocount'] = True
-                    autoStudentCount()
-                else:
-                    sD.settings['autocount'] = False
-                    resString += 'Set <i>numStudents</i> to: ' + str(sD.settings['numStudents'])
-            if request.args.get('barmode'):
-                if request.args.get('barmode') in sD.settings['modes']:
-                    sD.settings['barmode'] = request.args.get('barmode')
-                    resString += 'Set <i>mode</i> to: ' + sD.settings['barmode']
-                else:
-                    resString += 'No setting called ' + sD.settings['barmode']
-            if resString == '':
-                return render_template("settings.html")
+                    resString += 'There is no setting that takes \'true\' or \'false\' named: <i>' + arg + "</i>"
             else:
-                playSFX("sfx_pickup01")
-                resString += ""
-                return resString
+                try:
+                    argInt = int(request.args.get(arg))
+                    if arg in sD.settings['perms']:
+                        if argInt > 4 or argInt < 0:
+                            resString += "Permission value out of range! "
+                        else:
+                            sD.settings['perms'][arg] = argInt
+                except:
+                    pass
+
+        ###
+        ### Everything past this point uses the old method of changing settings. Needs updated
+        ###
+
+        if request.args.get('students'):
+            sD.settings['numStudents'] = int(request.args.get('students'))
+            if sD.settings['numStudents'] == 0:
+                sD.settings['autocount'] = True
+                autoStudentCount()
+            else:
+                sD.settings['autocount'] = False
+                resString += 'Set <i>numStudents</i> to: ' + str(sD.settings['numStudents'])
+        if request.args.get('barmode'):
+            if request.args.get('barmode') in sD.settings['modes']:
+                sD.settings['barmode'] = request.args.get('barmode')
+                resString += 'Set <i>mode</i> to: ' + sD.settings['barmode']
+            else:
+                resString += 'No setting called ' + sD.settings['barmode']
+        if resString == '':
+            return render_template("settings.html")
+        else:
+            playSFX("sfx_pickup01")
+            resString += ""
+            return resString
 
 #This endpoint leads to the Sound Effect page
 @app.route('/sfx')
@@ -1686,6 +1682,20 @@ def endpoint_speedtype():
         return redirect("/chat?message=You do not have high enough permissions to do this right now.")
     else:
         return render_template("speedtype.html")
+
+#Start a letter survey
+@app.route('/startsurvey')
+def endpoint_startsurvey():
+    changeMode('survey')
+    repeatMode()
+    return redirect('/settings')
+
+#Start a thumbs survey
+@app.route('/starttutd')
+def endpoint_starttutd():
+    changeMode('tutd')
+    repeatMode()
+    return redirect('/settings')
 
 '''
     /survey

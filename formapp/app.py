@@ -1718,24 +1718,27 @@ def endpoint_survey():
         ip = request.remote_addr
         vote = request.args.get('vote')
         if vote:
-            if vote in ["a", "b", "c", "d"]:
-                if sD.studentDict[request.remote_addr]['survey'] != vote:
-                    sD.studentDict[request.remote_addr]['survey'] = vote
-                    playSFX("sfx_blip01")
-                    surveyBar()
-                    return render_template("message.html", forward=request.path, message = "Thank you for your tasty bytes... (" + vote + ")" )
+            if sD.settings['barmode'] == 'tutd':
+                if vote in ["a", "b", "c", "d"]:
+                    if sD.studentDict[request.remote_addr]['survey'] != vote:
+                        sD.studentDict[request.remote_addr]['survey'] = vote
+                        playSFX("sfx_blip01")
+                        surveyBar()
+                        return render_template("message.html", forward=request.path, message = "Thank you for your tasty bytes... (" + vote + ")" )
+                    else:
+                        return render_template("message.html", forward=request.path, message = "You've already sunmitted an answer... (" + sD.studentDict[request.remote_addr]['survey'] + ")" )
+                elif vote == 'oops':
+                    if sD.studentDict[request.remote_addr]['survey']:
+                        sD.studentDict[request.remote_addr]['survey'] = ''
+                        playSFX("sfx_hit01")
+                        surveyBar()
+                        return render_template("message.html", forward=request.path, message = "I won\'t mention it if you don\'t" )
+                    else:
+                        return render_template("message.html", forward=request.path, message = "You don't have an answer to erase." )
                 else:
-                    return render_template("message.html", forward=request.path, message = "You've already sunmitted an answer... (" + sD.studentDict[request.remote_addr]['survey'] + ")" )
-            elif vote == 'oops':
-                if sD.studentDict[request.remote_addr]['survey']:
-                    sD.studentDict[request.remote_addr]['survey'] = ''
-                    playSFX("sfx_hit01")
-                    surveyBar()
-                    return render_template("message.html", forward=request.path, message = "I won\'t mention it if you don\'t" )
-                else:
-                    return render_template("message.html", forward=request.path, message = "You don't have an answer to erase." )
+                    return render_template("message.html", forward=request.path, message = "Bad arguments..." )
             else:
-                return render_template("message.html", forward=request.path, message = "Bad arguments..." )
+                return render_template("message.html", forward=request.path, message = "Not in survey mode." )
         else:
             return render_template("thumbsrental.html")
 
@@ -1787,24 +1790,27 @@ def endpoint_tutd():
         ip = request.remote_addr
         thumb = request.args.get('thumb')
         if thumb:
-            # print("[info] " + "Recieved " + thumb + " from " + name + " at ip: " + ip)
-            if thumb in ['up', 'down', 'wiggle']:
-                if sD.studentDict[request.remote_addr]['thumb'] != thumb:
-                    sD.studentDict[request.remote_addr]['thumb'] = thumb
-                    tutdBar()
-                    return render_template("message.html", forward=request.path, message = "Thank you for your tasty bytes... (" + thumb + ")" )
+            if sD.settings['barmode'] == 'tutd':
+                # print("[info] " + "Recieved " + thumb + " from " + name + " at ip: " + ip)
+                if thumb in ['up', 'down', 'wiggle']:
+                    if sD.studentDict[request.remote_addr]['thumb'] != thumb:
+                        sD.studentDict[request.remote_addr]['thumb'] = thumb
+                        tutdBar()
+                        return render_template("message.html", forward=request.path, message = "Thank you for your tasty bytes... (" + thumb + ")" )
+                    else:
+                        return render_template("message.html", forward=request.path, message = "You've already sunmitted this answer... (" + thumb + ")" )
+                elif thumb == 'oops':
+                    if sD.studentDict[request.remote_addr]['thumb']:
+                        sD.studentDict[request.remote_addr]['thumb'] = ''
+                        playSFX("sfx_hit01")
+                        tutdBar()
+                        return render_template("message.html", forward=request.path, message = "I won\'t mention it if you don\'t" )
+                    else:
+                        return render_template("message.html", forward=request.path, message = "You don't have an answer to erase." )
                 else:
-                    return render_template("message.html", forward=request.path, message = "You've already sunmitted this answer... (" + thumb + ")" )
-            elif thumb == 'oops':
-                if sD.studentDict[request.remote_addr]['thumb']:
-                    sD.studentDict[request.remote_addr]['thumb'] = ''
-                    playSFX("sfx_hit01")
-                    tutdBar()
-                    return render_template("message.html", forward=request.path, message = "I won\'t mention it if you don\'t" )
-                else:
-                    return render_template("message.html", forward=request.path, message = "You don't have an answer to erase." )
+                    return render_template("message.html", forward=request.path, message = "Bad ArgumentsTry <b>/tutd?thumb=wiggle</b>You can also try <b>down</b> and <b>up</b> instead of <b>wiggle</b>")
             else:
-                return render_template("message.html", forward=request.path, message = "Bad ArgumentsTry <b>/tutd?thumb=wiggle</b>You can also try <b>down</b> and <b>up</b> instead of <b>wiggle</b>")
+                return render_template("message.html", forward=request.path, message = "Not in TUTD mode.")
         else:
             if sD.activePrompt:
                 prompt = '<h2>'

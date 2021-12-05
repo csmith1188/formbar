@@ -428,17 +428,6 @@
     bottomPosition();
   }, 1000);*/
 
-  function getResponse(endpoint) {
-    request.open("GET", endpoint, false);
-    request.send(null);
-    try {
-      return JSON.parse(request.responseText);
-    } catch {
-      return {};
-      console.error("Could not get data.");
-    }
-  }
-
   function mode() {
     ////needs update
     /*["quiz", "tutd", "survey"].forEach(mode => {

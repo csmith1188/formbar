@@ -852,6 +852,11 @@ def endpoint_color():
             pixels.show()
         return render_template("message.html", message = "Color sent!" )
 
+
+@app.route('/countdown')
+def endpoint_countdown():
+    return render_template('message.html', message='This feature is not available yet.')
+
 @app.route('/createfightermatch')
 def endpoint_createfightermatch():
     code = request.args.get('code')
@@ -1087,7 +1092,7 @@ def endpoint_help():
         if name in helpList:
             return render_template("chat.html", message = "You already have a help ticket in. If your problem is time-sensitive, or your last ticket was not cleared, please get the teacher's attention manually." )
         else:
-            helpList[name] = request.form['message'] or "Help ticket"
+            helpList[name] = request.form['message'] or ''
             sD.studentDict[request.remote_addr]['help'] = True
             playSFX("sfx_up04")
             return render_template("chat.html", message = "Your ticket was sent. Keep working on the problem the best you can while you wait." )

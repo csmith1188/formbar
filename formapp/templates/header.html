@@ -21,6 +21,17 @@
     //let ws = new WebSocket(`ws://${serverIp}:9001`);
     let urlParams = new URLSearchParams(window.location.search);
 
+    function getResponse(endpoint) {
+      request.open("GET", endpoint, false);
+      request.send(null);
+      try {
+        return JSON.parse(request.responseText);
+      } catch {
+        return {};
+        console.error("Could not get data.");
+      }
+    }
+
     //If URL param "message" is present, display as alert
     if (urlParams.get("message")) {
       alert(urlParams.get("message"));

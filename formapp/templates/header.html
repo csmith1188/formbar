@@ -22,7 +22,10 @@
     let urlParams = new URLSearchParams(window.location.search);
 
     //If URL param "message" is present, display as alert
-    if (urlParams.get("message")) alert(urlParams.get("message"));
+    if (urlParams.get("message")) {
+      alert(urlParams.get("message"));
+      window.location = window.location.pathname; //Remove message so it doesn't appear again if page is reloaded
+    }
   </script>
   {% block script %}{% endblock %}
 </html>

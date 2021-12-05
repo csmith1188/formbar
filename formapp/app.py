@@ -1718,7 +1718,7 @@ def endpoint_survey():
         ip = request.remote_addr
         vote = request.args.get('vote')
         if vote:
-            if sD.settings['barmode'] == 'tutd':
+            if sD.settings['barmode'] == 'survey':
                 if vote in ["a", "b", "c", "d"]:
                     if sD.studentDict[request.remote_addr]['survey'] != vote:
                         sD.studentDict[request.remote_addr]['survey'] = vote

@@ -412,30 +412,20 @@
   let newMessages = 0;
   let username = "{{ username }}";
 
-  mode();
-  setMenuWidths();
+  menuPositions();
   updateVotes();
   nowPlaying();
   getUsername();
   showEnabled();
   bottomPosition();
   openPage("chat");
-  /*setInterval(() => {
-    mode();
+  setInterval(() => {
+    checkIfRemoved();
     updateVotes();
     nowPlaying();
     showEnabled();
     bottomPosition();
-  }, 1000);*/
-
-  function mode() {
-    ////needs update
-    /*["quiz", "tutd", "survey"].forEach(mode => {
-      let el = document.getElementById(mode + "Div");
-      if (mode == currentMode) el.classList.remove("hidden");
-      else el.classList.add("hidden");
-    });*/
-  }
+  }, 1000);
 
   function showEnabled() {
     let soundDiv = document.getElementById("soundDiv");
@@ -477,7 +467,7 @@
 
   window.addEventListener("resize", bottomPosition);
 
-  function setMenuWidths() {
+  function menuPositions() {
     ["games", "teacher"].forEach(group => document.getElementById(group + "Menu").style.left = document.getElementById(group + "Tab").getBoundingClientRect().left + "px"); //Give menu same X position as tab
   }
 
@@ -491,6 +481,12 @@
     myPerms == 3 ? guestBox.innerText = "(guest)" : guestBox.innerText = null;
     if (bottom.clientHeight > oldHeight) shorten(bottom, oldHeight, nameBox);
     else nameBox.removeAttribute("title");
+  }
+
+  function checkIfRemoved() {
+    //If the user is removed by the teacher, send them back to the login page
+    let res = getResponse("/getme");
+    if (res.error == "Insufficient permissions.") window.location = "/login?message=You have been logged out.";
   }
 
   function shorten(container, maxHeight, text) {
@@ -760,7 +756,7 @@
     if (path == "/chat") {
       newMessages = 0;
       document.getElementById("newMessages").innerText = null;
-      setMenuWidths();
+      menuPositions();
       document.title = "Formbar";
     }
     /*Change page title here*/
@@ -805,7 +801,7 @@
         document.title = `(${newMessages}) Formbar`;
         if (innerPage.contentWindow.location.pathname != "chat") {
           document.getElementById("newMessages").innerText = "(" + newMessages + ")";
-          setMenuWidths();
+          menuPositions();
         }
       }
     }

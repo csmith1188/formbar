@@ -1092,7 +1092,7 @@ def endpoint_help():
         if name in helpList:
             return render_template("chat.html", message = "You already have a help ticket in. If your problem is time-sensitive, or your last ticket was not cleared, please get the teacher's attention manually." )
         else:
-            helpList[name] = request.form['message'] or ''
+            helpList[name] = request.form['message'] or '<i>No message</i>'
             sD.studentDict[request.remote_addr]['help'] = True
             playSFX("sfx_up04")
             return render_template("chat.html", message = "Your ticket was sent. Keep working on the problem the best you can while you wait." )
@@ -1401,7 +1401,6 @@ def endpoint_needshelp():
                 resString += "No tickets yet. <button class='inline popOut' onclick='location.reload();'>Try Again</button>"
             else:
                 for ticket in helpList:
-                    resString += "<span class='ticket'><b>" + ticket + ":</b> " + helpList[ticket] + " <button class='inline popOut' onclick='window.location = \"/needshelp?remove=" + ticket + "\"'>Remove</button></span><br>"
                     resString += "<span class='ticket'><b>" + ticket + ":</b> " + helpList[ticket] + " <button class='inline popOut' onclick='window.location = \"/needshelp?remove=" + ticket + "\"'>Remove</button></span>"
             return render_template("needshelp.html", list = resString)
 

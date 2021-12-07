@@ -129,7 +129,6 @@
 
   urls.forEach(url => document.getElementById("buttonContainer").innerHTML += `<button id="${url}" onclick="getData('${url}')">${url}</button>`);
 
-
   function updateBar() {
     request.open("GET", '/getphrase', false);
     request.send(null);

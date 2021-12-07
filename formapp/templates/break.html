@@ -1,0 +1,38 @@
+{% extends 'header.html' %}
+<!-- ^^ This means add this file to the end of the contents of header.html -->
+<!-- This is where the title, top buttons, and stylesheet is located -->
+
+<!-- Change title here -->
+{% block title %}Help{% endblock %}
+
+<!-- Extra style declarations here -->
+{% block style %}
+  <meta http-equiv="refresh" content="5">
+  <style>
+    body {
+      text-align: center;
+    }
+  </style>
+{% endblock %}
+
+<!-- Change theme color here -->
+{% block color %}yellow{% endblock %}
+
+<!-- Main content here -->
+{% block main %}
+  <h1>Take a break</h1>
+  <div id="info">You will be excluded until your break is ended. While taking a break, you won't be able to participate in surveys or use other features.</div>
+  <form method="post">
+    <input type="submit" id="submitButton" class="button" value="Take break">
+  </form>
+{% endblock %}
+
+<!-- Extra javascript here -->
+{% block script %}
+  <script>
+    if ("{{ excluded }}") {
+      document.getElementById("info").innerText = "End your break to participate again.";
+      document.getElementById("info").value = "End break";
+    }
+  </script>
+{% endblock %}

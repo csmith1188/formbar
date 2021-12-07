@@ -161,7 +161,7 @@ def newStudent(remote, username, bot=False):
         sD.studentDict[remote] = {
             'name': username,
             'thumb': '',
-            'survey': '',
+            'letter': '',
             'perms': 3,
             'progress': [],
             'complete': False,
@@ -229,7 +229,7 @@ def refreshUsers(selectedStudent='', category=''):
                 return False
         else:
             sD.studentDict[student]['thumb'] = '',
-            sD.studentDict[student]['survey'] = '',
+            sD.studentDict[student]['letter'] = '',
             sD.studentDict[student]['progress'] = [],
             sD.studentDict[student]['complete'] = False,
             sD.studentDict[student]['quizRes'] = [],
@@ -255,8 +255,8 @@ def changeMode(newMode='', direction='next'):
         sD.settings['barmode'] = sD.settings['modes'][index]
     if sD.settings['barmode'] == 'tutd':
         tutdBar()
-    elif sD.settings['barmode'] == 'survey':
-        surveyBar()
+    elif sD.settings['barmode'] == 'abcd':
+        abcdBar()
     elif sD.settings['barmode'] == 'essay' or sD.settings['barmode'] == 'quiz':
         completeBar()
     elif sD.settings['barmode'] == 'progress':
@@ -398,11 +398,11 @@ def repeatMode():
         for student in sD.studentDict:
             sD.studentDict[student]['thumb'] = ''
         tutdBar()
-    elif sD.settings['barmode'] == 'survey':
+    elif sD.settings['barmode'] == 'abcd':
         # Clear thumbs
         for student in sD.studentDict:
-            sD.studentDict[student]['survey'] = ''
-        surveyBar()
+            sD.studentDict[student]['letter'] = ''
+        abcdBar()
     elif sD.settings['barmode'] == 'essay' or sD.settings['barmode'] == 'quiz' :
         # Clear thumbs
         for student in sD.studentDict:
@@ -467,8 +467,8 @@ def printLetter(letter, startLocation, fg=colors['fg'], bg=colors['bg']):
     else:
         print("[warning] " + "Warning! Not enough space for this letter!")
 
-#Shows results of test when done with surveyBar
-def surveyBar():
+#Shows results of test when done with abcdBar
+def abcdBar():
     if not ONRPi:
         global pixels
     results = [] # Create empty results list
@@ -476,9 +476,9 @@ def surveyBar():
     #Go through IP list and see what each IP sent as a response
     for student in sD.studentDict:
         #if the survey answer is a valid a, b, c, or d:
-        if sD.studentDict[student]['survey'] in ['a', 'b', 'c', 'd']:
+        if sD.studentDict[student]['letter'] in ['a', 'b', 'c', 'd']:
             #add this result to the results list
-            results.append(sD.studentDict[student]['survey'])
+            results.append(sD.studentDict[student]['letter'])
     #The number of results is how many have complete the survey
     complete = len(results)
     #calculate the chunk length for each student
@@ -658,12 +658,12 @@ def updateStep():
         sD.settings['barmode'] = 'essay'
         sD.activePrompt = step['Prompt']
         sD.wawdLink = '/essay'
-    elif step['Type'] == 'Survey':
-        sD.settings['barmode'] = 'survey'
+    elif step['Type'] == 'ABCD':
+        sD.settings['barmode'] = 'abcd'
         sD.activeQuiz = sD.lesson.quizList[step['Prompt']]
-        surveyIndex = int(sD.activeQuiz['name'].split(' ', 1))
-        sD.activePrompt = sD.activeQuiz['questions'][surveyIndex]
-        sD.wawdLink = '/survey'
+        abcdIndex = int(sD.activeQuiz['name'].split(' ', 1))
+        sD.activePrompt = sD.activeQuiz['questions'][abcdIndex]
+        sD.wawdLink = '/abcd'
     elif step['Type'] == 'Quiz':
         sD.activeQuiz = sD.lesson.quizList[step['Prompt']]
         sD.settings['barmode'] = 'quiz'
@@ -720,6 +720,43 @@ def endpoint_2048():
 # ██   ██
 # ██   ██
 
+
+'''
+/abcd
+'''
+@app.route('/abcd')
+def endpoint_abcd():
+if not request.remote_addr in sD.studentDict:
+    return redirect('/login?forward=' + request.path)
+if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['student']:
+    return redirect("/chat?message=You do not have high enough permissions to do this right now.")
+else:
+    ip = request.remote_addr
+    vote = request.args.get('vote')
+    if vote:
+        if sD.settings['barmode'] == 'abcd':
+            if vote in ["a", "b", "c", "d"]:
+                if sD.studentDict[request.remote_addr]['letter'] != vote:
+                    sD.studentDict[request.remote_addr]['letter'] = vote
+                    playSFX("sfx_blip01")
+                    abcdBar()
+                    return render_template("message.html", forward=request.path, message = "Thank you for your tasty bytes... (" + vote + ")" )
+                else:
+                    return render_template("message.html", forward=request.path, message = "You've already sunmitted an answer... (" + sD.studentDict[request.remote_addr]['letter'] + ")" )
+            elif vote == 'oops':
+                if sD.studentDict[request.remote_addr]['letter']:
+                    sD.studentDict[request.remote_addr]['letter'] = ''
+                    playSFX("sfx_hit01")
+                    abcdBar()
+                    return render_template("message.html", forward=request.path, message = "I won\'t mention it if you don\'t" )
+                else:
+                    return render_template("message.html", forward=request.path, message = "You don't have an answer to erase." )
+            else:
+                return render_template("message.html", forward=request.path, message = "Bad arguments..." )
+        else:
+            return render_template("message.html", forward=request.path, message = "Not in ABCD mode." )
+    else:
+        return render_template("thumbsrental.html")
 
 '''
     /addfighteropponent
@@ -801,6 +838,27 @@ def endpoint_bgmstop():
     sD.bgm['paused'] = False
     stopBGM()
     return render_template("message.html", message = 'Stopped music...' )
+
+'''
+    /break
+    For when a student is temporarily unable to participate
+'''
+@app.route('/break', methods = ['POST', 'GET'])
+def endpoint_break():
+if not request.remote_addr in sD.studentDict:
+    return redirect('/login?forward=' + request.path)
+if request.method == 'POST':
+    if sD.studentDict[request.remote_addr]['excluded']:
+        sD.studentDict[request.remote_addr]['excluded'] = False
+        sD.studentDict[remote]['oldperms'] = sD.settings[remote]['perms']
+        sD.studentDict[remote]['perms'] = sD.settings['perms']['banned']
+    else:
+        sD.studentDict[request.remote_addr]['excluded'] = True
+        sD.studentDict[remote]['perms'] = sD.studentDict[remote]['oldperms']
+        playSFX("sfx_pickup02")
+    return redirect('/break')
+else:
+    return render_template("break.html", break = sD.studentDict[request.remote_addr]['excluded'])
 
 #  ██████
 # ██
@@ -1090,12 +1148,12 @@ def endpoint_help():
         name = sD.studentDict[request.remote_addr]['name']
         name = name.strip()
         if name in helpList:
-            return render_template("chat.html", message = "You already have a help ticket in. If your problem is time-sensitive, or your last ticket was not cleared, please get the teacher's attention manually." )
+            return redirect("/chat?message=You already have a help ticket in. If your problem is time-sensitive, or your last ticket was not cleared, please get the teacher's attention manually." )
         else:
             helpList[name] = request.form['message'] or '<i>No message</i>'
             sD.studentDict[request.remote_addr]['help'] = True
             playSFX("sfx_up04")
-            return render_template("chat.html", message = "Your ticket was sent. Keep working on the problem the best you can while you wait." )
+            return redirect("/chat?message=Your ticket was sent. Keep working on the problem the best you can while you wait." )
     else:
         return render_template("help.html")
 
@@ -1695,10 +1753,10 @@ def endpoint_speedtype():
     else:
         return render_template("speedtype.html")
 
-#Start a letter survey
-@app.route('/startsurvey')
-def endpoint_startsurvey():
-    changeMode('survey')
+#Start a letter abcd
+@app.route('/startabcd')
+def endpoint_startabcd():
+    changeMode('abcd')
     repeatMode()
     return redirect('/settings')
 
@@ -1708,43 +1766,6 @@ def endpoint_starttutd():
     changeMode('tutd')
     repeatMode()
     return redirect('/settings')
-
-'''
-    /survey
-'''
-@app.route('/survey')
-def endpoint_survey():
-    if not request.remote_addr in sD.studentDict:
-        return redirect('/login?forward=' + request.path)
-    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['student']:
-        return redirect("/chat?message=You do not have high enough permissions to do this right now.")
-    else:
-        ip = request.remote_addr
-        vote = request.args.get('vote')
-        if vote:
-            if sD.settings['barmode'] == 'survey':
-                if vote in ["a", "b", "c", "d"]:
-                    if sD.studentDict[request.remote_addr]['survey'] != vote:
-                        sD.studentDict[request.remote_addr]['survey'] = vote
-                        playSFX("sfx_blip01")
-                        surveyBar()
-                        return render_template("message.html", forward=request.path, message = "Thank you for your tasty bytes... (" + vote + ")" )
-                    else:
-                        return render_template("message.html", forward=request.path, message = "You've already sunmitted an answer... (" + sD.studentDict[request.remote_addr]['survey'] + ")" )
-                elif vote == 'oops':
-                    if sD.studentDict[request.remote_addr]['survey']:
-                        sD.studentDict[request.remote_addr]['survey'] = ''
-                        playSFX("sfx_hit01")
-                        surveyBar()
-                        return render_template("message.html", forward=request.path, message = "I won\'t mention it if you don\'t" )
-                    else:
-                        return render_template("message.html", forward=request.path, message = "You don't have an answer to erase." )
-                else:
-                    return render_template("message.html", forward=request.path, message = "Bad arguments..." )
-            else:
-                return render_template("message.html", forward=request.path, message = "Not in survey mode." )
-        else:
-            return render_template("thumbsrental.html")
 
 # ████████
 #    ██

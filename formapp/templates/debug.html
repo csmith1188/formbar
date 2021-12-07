@@ -123,7 +123,6 @@
     "/getpix",
     "/getquizname",
     "/getstudents",
-    "/getword"
   ];
   let timeLeft = 3;
   let dataURL = "/getpix";
@@ -175,8 +174,8 @@
         if (newURL) {
           urls.forEach(url => {
             let el = document.getElementById(url);
-            if (url == newURL) el.classList.add("open");
-            else el.classList.remove("open");
+            if (url == newURL) el.classList.add("pressed");
+            else el.classList.remove("pressed");
           });
           document.getElementById("data").innerText = data;
         }

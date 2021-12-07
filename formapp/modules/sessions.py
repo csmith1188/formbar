@@ -65,7 +65,6 @@ class Student():
     def __init__(self, username):
         self.name = username
         self.help = False
-        self.excluded = False
         self.thumb = ''
         self.letter = ''
         self.progress = []

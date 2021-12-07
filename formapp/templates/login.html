@@ -37,7 +37,7 @@
 <button id="newAccountButton" onclick="changeUserType(this);">New account</button>
 <button id="guestButton" onclick="changeUserType(this);">Use as guest</button>
 <form action="login" method="post">
-    <input type="text" id="usernameBox" name="username" class="box" placeholder="Name" value="" required>
+    <input type="text" id="usernameBox" name="username" class="box" placeholder="Name" value="" autocomplete="off" required>
     <input type="password" id="passwordBox" name="password" class="box" placeholder="Password" value="" required>
     <input type="hidden" id="userTypeBox" name="userType" value="login">
     <input type="hidden" id="forwardBox" name="forward">
@@ -66,6 +66,7 @@
 
       [liButton, naButton, gButton].forEach(button => button == el ? button.classList.add("pressed") : button.classList.remove("pressed"));
       if (el == gButton) {
+        ub.value = null;
         pb.value = null;
         pb.classList.add("hidden");
         pb.required = false;
@@ -74,7 +75,11 @@
         pb.classList.remove("hidden");
         pb.required = true;
         if (el == liButton) sb.value = "Log in";
-        else if (el == naButton) sb.value = "Create account";
+        else if (el == naButton) {
+          ub.value = null;
+          pb.value = null;
+          sb.value = "Create account";
+        }
       }
 
       if (el == liButton) ut.value = "login";

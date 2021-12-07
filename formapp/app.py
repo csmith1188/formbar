@@ -163,12 +163,14 @@ def newStudent(remote, username, bot=False):
             'thumb': '',
             'letter': '',
             'perms': 3,
+            'oldPerms': 3,
             'progress': [],
             'complete': False,
             'tttGames': [],
             'quizRes': [],
             'essayRes': '',
-            'bot': bot
+            'bot': bot,
+            'excluded': False
         }
         #Track if this is the first human login or not
         humanUsers = 0
@@ -658,11 +660,11 @@ def updateStep():
         sD.settings['barmode'] = 'essay'
         sD.activePrompt = step['Prompt']
         sD.wawdLink = '/essay'
-    elif step['Type'] == 'ABCD':
-        sD.settings['barmode'] = 'abcd'
+    elif step['Type'] == 'survey':
+        sD.settings['barmode'] = 'survey'
         sD.activeQuiz = sD.lesson.quizList[step['Prompt']]
-        abcdIndex = int(sD.activeQuiz['name'].split(' ', 1))
-        sD.activePrompt = sD.activeQuiz['questions'][abcdIndex]
+        surveyIndex = int(sD.activeQuiz['name'].split(' ', 1))
+        sD.activePrompt = sD.activeQuiz['questions'][surveyIndex]
         sD.wawdLink = '/abcd'
     elif step['Type'] == 'Quiz':
         sD.activeQuiz = sD.lesson.quizList[step['Prompt']]
@@ -710,7 +712,7 @@ def endpoint_2048():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
-        return redirect("/chat?message=You do not have high enough permissions to do this right now.")
+        return redirect("/chat?alert=You do not have high enough permissions to do this right now.")
     else:
         return render_template('2048.html')
 
@@ -726,37 +728,37 @@ def endpoint_2048():
 '''
 @app.route('/abcd')
 def endpoint_abcd():
-if not request.remote_addr in sD.studentDict:
-    return redirect('/login?forward=' + request.path)
-if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['student']:
-    return redirect("/chat?message=You do not have high enough permissions to do this right now.")
-else:
-    ip = request.remote_addr
-    vote = request.args.get('vote')
-    if vote:
-        if sD.settings['barmode'] == 'abcd':
-            if vote in ["a", "b", "c", "d"]:
-                if sD.studentDict[request.remote_addr]['letter'] != vote:
-                    sD.studentDict[request.remote_addr]['letter'] = vote
-                    playSFX("sfx_blip01")
-                    abcdBar()
-                    return render_template("message.html", forward=request.path, message = "Thank you for your tasty bytes... (" + vote + ")" )
-                else:
-                    return render_template("message.html", forward=request.path, message = "You've already sunmitted an answer... (" + sD.studentDict[request.remote_addr]['letter'] + ")" )
-            elif vote == 'oops':
-                if sD.studentDict[request.remote_addr]['letter']:
-                    sD.studentDict[request.remote_addr]['letter'] = ''
-                    playSFX("sfx_hit01")
-                    abcdBar()
-                    return render_template("message.html", forward=request.path, message = "I won\'t mention it if you don\'t" )
-                else:
-                    return render_template("message.html", forward=request.path, message = "You don't have an answer to erase." )
-            else:
-                return render_template("message.html", forward=request.path, message = "Bad arguments..." )
-        else:
-            return render_template("message.html", forward=request.path, message = "Not in ABCD mode." )
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['student']:
+        return redirect("/chat?alert=You do not have high enough permissions to do this right now.")
     else:
-        return render_template("thumbsrental.html")
+        ip = request.remote_addr
+        vote = request.args.get('vote')
+        if vote:
+            if sD.settings['barmode'] == 'abcd':
+                if vote in ["a", "b", "c", "d"]:
+                    if sD.studentDict[request.remote_addr]['letter'] != vote:
+                        sD.studentDict[request.remote_addr]['letter'] = vote
+                        playSFX("sfx_blip01")
+                        abcdBar()
+                        return render_template("message.html", forward=request.path, message = "Thank you for your tasty bytes... (" + vote + ")" )
+                    else:
+                        return render_template("message.html", forward=request.path, message = "You've already sunmitted an answer... (" + sD.studentDict[request.remote_addr]['letter'] + ")" )
+                elif vote == 'oops':
+                    if sD.studentDict[request.remote_addr]['letter']:
+                        sD.studentDict[request.remote_addr]['letter'] = ''
+                        playSFX("sfx_hit01")
+                        abcdBar()
+                        return render_template("message.html", forward=request.path, message = "I won\'t mention it if you don\'t" )
+                    else:
+                        return render_template("message.html", forward=request.path, message = "You don't have an answer to erase." )
+                else:
+                    return render_template("message.html", forward=request.path, message = "Bad arguments..." )
+            else:
+                return render_template("message.html", forward=request.path, message = "Not in ABCD mode." )
+        else:
+            return render_template("thumbsrental.html")
 
 '''
     /addfighteropponent
@@ -783,7 +785,7 @@ def endpoint_bgm():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['bgm']:
-        return redirect("/chat?message=You do not have high enough permissions to do this right now.")
+        return redirect("/chat?alert=You do not have high enough permissions to do this right now.")
     else:
         bgm.updateFiles()
         bgm_file = request.args.get('file')
@@ -845,20 +847,20 @@ def endpoint_bgmstop():
 '''
 @app.route('/break', methods = ['POST', 'GET'])
 def endpoint_break():
-if not request.remote_addr in sD.studentDict:
-    return redirect('/login?forward=' + request.path)
-if request.method == 'POST':
-    if sD.studentDict[request.remote_addr]['excluded']:
-        sD.studentDict[request.remote_addr]['excluded'] = False
-        sD.studentDict[remote]['oldperms'] = sD.settings[remote]['perms']
-        sD.studentDict[remote]['perms'] = sD.settings['perms']['banned']
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    if request.method == 'POST':
+        if sD.studentDict[request.remote_addr]['excluded']:
+            sD.studentDict[request.remote_addr]['excluded'] = False
+            sD.studentDict[request.remote_addr]['oldPerms'] = sD.studentDict[request.remote_addr]['perms']
+            sD.studentDict[request.remote_addr]['perms'] = sD.settings['perms']['banned']
+        else:
+            sD.studentDict[request.remote_addr]['excluded'] = True
+            sD.studentDict[request.remote_addr]['perms'] = sD.studentDict[request.remote_addr]['oldPerms']
+            playSFX("sfx_pickup02")
+        return redirect('/break')
     else:
-        sD.studentDict[request.remote_addr]['excluded'] = True
-        sD.studentDict[remote]['perms'] = sD.studentDict[remote]['oldperms']
-        playSFX("sfx_pickup02")
-    return redirect('/break')
-else:
-    return render_template("break.html", break = sD.studentDict[request.remote_addr]['excluded'])
+        return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'])
 
 #  ██████
 # ██
@@ -889,7 +891,7 @@ def endpoint_color():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['bar']:
-        return redirect("/chat?message=You do not have high enough permissions to do this right now.")
+        return redirect("/chat?alert=You do not have high enough permissions to do this right now.")
     else:
         try:
             r = int(request.args.get('r'))
@@ -972,10 +974,10 @@ def endpoint_fighter():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
-        return redirect("/chat?message=You do not have high enough permissions to do this right now.")
+        return redirect("/chat?alert=You do not have high enough permissions to do this right now.")
     else:
         #return render_template('fighter.html', username = sD.studentDict[request.remote_addr]['name'])
-        return redirect("/chat?message=Fighter will be ready to play soon.")
+        return redirect("/chat?alert=Fighter will be ready to play soon.")
 
 '''
     /flush
@@ -985,7 +987,7 @@ def endpoint_flush():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['admin']:
-        return redirect("/chat?message=You do not have high enough permissions to do this right now.")
+        return redirect("/chat?alert=You do not have high enough permissions to do this right now.")
     else:
         flushUsers()
         sD.refresh()
@@ -1127,7 +1129,7 @@ def endpoint_hangman():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
-        return redirect("/chat?message=You do not have high enough permissions to do this right now.")
+        return redirect("/chat?alert=You do not have high enough permissions to do this right now.")
     else:
         if sD.lesson:
             if sD.lesson.vocab:
@@ -1148,12 +1150,12 @@ def endpoint_help():
         name = sD.studentDict[request.remote_addr]['name']
         name = name.strip()
         if name in helpList:
-            return redirect("/chat?message=You already have a help ticket in. If your problem is time-sensitive, or your last ticket was not cleared, please get the teacher's attention manually." )
+            return redirect("/chat?alert=You already have a help ticket in. If your problem is time-sensitive, or your last ticket was not cleared, please get the teacher's attention manually." )
         else:
             helpList[name] = request.form['message'] or '<i>No message</i>'
             sD.studentDict[request.remote_addr]['help'] = True
             playSFX("sfx_up04")
-            return redirect("/chat?message=Your ticket was sent. Keep working on the problem the best you can while you wait." )
+            return redirect("/chat?alert=Your ticket was sent. Keep working on the problem the best you can while you wait." )
     else:
         return render_template("help.html")
 
@@ -1177,7 +1179,7 @@ def endpoint_lesson():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['bar']:
-        return redirect("/chat?message=You do not have high enough permissions to do this right now.")
+        return redirect("/chat?alert=You do not have high enough permissions to do this right now.")
     else:
         if request.method == 'POST':
             if not request.files['file']:
@@ -1322,11 +1324,11 @@ def endpoint_login():
                                     if bot:
                                         return json.dumps({'status': 'failed', 'reason': 'credentials'})
                                     else:
-                                        return redirect("/login?message=Your password is incorrect.")
+                                        return redirect("/login?alert=Your password is incorrect.")
                     else:
-                        return redirect("/login?message=No users found with that username.")
+                        return redirect("/login?alert=No users found with that username.")
                 else:
-                    return redirect("/login?message=You need to enter a username and password.")
+                    return redirect("/login?alert=You need to enter a username and password.")
 
             elif userType == "new":
                 #Open and connect to database
@@ -1335,7 +1337,7 @@ def endpoint_login():
                 userFound = dbcmd.execute("SELECT * FROM users WHERE username=:uname", {"uname": username}).fetchall()
                 db.close()
                 if userFound:
-                    return redirect("/login?message=There is already a user with that name.")
+                    return redirect("/login?alert=There is already a user with that name.")
                 else:
                     db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
                     dbcmd = db.cursor()
@@ -1356,7 +1358,7 @@ def endpoint_login():
                 userFound = dbcmd.execute("SELECT * FROM users WHERE username=:uname", {"uname": username}).fetchall()
                 db.close()
                 if userFound:
-                    return redirect("/login?message=There is already a user with that name.")
+                    return redirect("/login?alert=There is already a user with that name.")
                 else:
                     newStudent(remote, username)
                     if forward:
@@ -1397,7 +1399,7 @@ def endpoint_minesweeper():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
-        return redirect("/chat?message=You do not have high enough permissions to do this right now.")
+        return redirect("/chat?alert=You do not have high enough permissions to do this right now.")
     else:
         cols = 20
         rows = 20
@@ -1423,7 +1425,7 @@ def endpoint_needshelp():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['admin']:
-        return redirect("/chat?message=You do not have high enough permissions to do this right now.")
+        return redirect("/chat?alert=You do not have high enough permissions to do this right now.")
     else:
         remove = request.args.get('remove')
         '''
@@ -1474,7 +1476,7 @@ def endpoint_perc():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['bar']:
-        return redirect("/chat?message=You do not have high enough permissions to do this right now.")
+        return redirect("/chat?alert=You do not have high enough permissions to do this right now.")
     else:
         percAmount = request.args.get('amount')
         try:
@@ -1492,7 +1494,7 @@ def endpoint_profile():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     elif sD.studentDict[request.remote_addr]['perms'] >= sD.settings['perms']['banned']:
-        return redirect("/chat?message=You do not have high enough permissions to do this right now.")
+        return redirect("/chat?alert=You do not have high enough permissions to do this right now.")
     else:
         if request.args.get('user'):
             return render_template("message.html", forward=request.path, message = "Looking up users by name is not yet supported." )
@@ -1508,7 +1510,7 @@ def endpoint_progress():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     #elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['bar']:
-    #     return redirect("/chat?message=You do not have high enough permissions to do this right now.")
+    #     return redirect("/chat?alert=You do not have high enough permissions to do this right now.")
     else:
         if request.args.get('check'):
             try:
@@ -1541,7 +1543,7 @@ def endpoint_quiz():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['student']:
-        return redirect("/chat?message=You do not have high enough permissions to do this right now.")
+        return redirect("/chat?alert=You do not have high enough permissions to do this right now.")
     else:
         if request.method == 'POST':
             resString = '<ul>'
@@ -1558,7 +1560,7 @@ def endpoint_quiz():
         elif sD.activeQuiz:
             return render_template('quiz.html', quiz=sD.activeQuiz)
         else:
-            return redirect("/chat?message=No quiz is currently loaded.")
+            return redirect("/chat?alert=No quiz is currently loaded.")
             return render_template('chat.html', message='No quiz is currently loaded.')
 
 # ███████
@@ -1573,7 +1575,7 @@ def endpoint_say():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['bar']:
-        return redirect("/chat?message=You do not have high enough permissions to do this right now.")
+        return redirect("/chat?alert=You do not have high enough permissions to do this right now.")
     else:
         sD.activePhrase = request.args.get('phrase')
         fgColor = request.args.get('fg')
@@ -1598,7 +1600,7 @@ def endpoint_segment():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['bar']:
-        return redirect("/chat?message=You do not have high enough permissions to do this right now.")
+        return redirect("/chat?alert=You do not have high enough permissions to do this right now.")
     else:
         type = request.args.get('type')
         hex = request.args.get('hex')
@@ -1671,7 +1673,7 @@ def endpoint_settings():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['admin']:
-        return redirect("/chat?message=You do not have high enough permissions to do this right now.")
+        return redirect("/chat?alert=You do not have high enough permissions to do this right now.")
     else:
         resString = ''
         #Loop through every arg that was sent as a query parameter
@@ -1727,7 +1729,7 @@ def endpoint_sfx():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['sfx']:
-        return redirect("/chat?message=You do not have high enough permissions to do this right now.")
+        return redirect("/chat?alert=You do not have high enough permissions to do this right now.")
     else:
         sfx.updateFiles()
         sfx_file = request.args.get('file')
@@ -1749,7 +1751,7 @@ def endpoint_speedtype():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
-        return redirect("/chat?message=You do not have high enough permissions to do this right now.")
+        return redirect("/chat?alert=You do not have high enough permissions to do this right now.")
     else:
         return render_template("speedtype.html")
 
@@ -1780,7 +1782,7 @@ def endpoint_ttt():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['student']:
-        return redirect("/chat?message=You do not have high enough permissions to do this right now.")
+        return redirect("/chat?alert=You do not have high enough permissions to do this right now.")
     else:
         opponent = request.args.get('opponent')
 
@@ -1859,7 +1861,7 @@ def endpoint_users():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['users']:
-        return redirect("/chat?message=You do not have high enough permissions to do this right now.")
+        return redirect("/chat?alert=You do not have high enough permissions to do this right now.")
     else:
         user = '';
         if request.args.get('name'):

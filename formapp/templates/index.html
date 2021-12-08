@@ -369,8 +369,8 @@
     <div id="chatTab" class="tab" onclick="openPage('chat');"><img src="{{ url_for('static', filename='img/home/chat.png') }}" class="icon"> <b id="newMessages" style="color: var(--light-red);"></b> Chat</div>
     <div id="studentsTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/home/students.png') }}" class="icon"> Students</div>
     <div id="studentsMenu" class="menu hidden" tabindex="-1">
-      <div id="breakTab" class="tab" onclick="openPage('break');">Request a bathroom break</div>
       <div id="helpTab" class="tab" onclick="openPage('help');">Help!</div>
+      <div id="breakTab" class="tab" onclick="openPage('break');">Request a bathroom break</div>
     </div>
     <div id="wawdTab" class="tab" onclick="openPage('wawd');"><img src="{{ url_for('static', filename='img/home/wawd.png') }}" class="icon"> What are we doing?</div>
     <div id="quizTab" class="tab" onclick="openPage('quiz');"><img src="{{ url_for('static', filename='img/home/quiz.png') }}" class="icon"> Quiz</div>
@@ -753,7 +753,7 @@
     let tabEl = document.getElementById(path.substring(1) + "Tab");
     if (!content) openPage("chat?message='Page does not exist.'");
     Array.from(tabs).forEach(tab => tab.classList.remove("open"));
-    if (["/break", "/help"].includes(path)) document.getElementById("studentsTab").classList.add("open");
+    if (["/help", "/break"].includes(path)) document.getElementById("studentsTab").classList.add("open");
     if (["/2048", "/hangman", "/minesweeper", "/speedtype", "/ttt", "/fighter"].includes(path)) document.getElementById("gamesTab").classList.add("open");
     else if (["/needshelp", "/lesson", "/settings", "/users"].includes(path)) document.getElementById("teacherTab").classList.add("open");
     if (tabEl) tabEl.classList.add("open");

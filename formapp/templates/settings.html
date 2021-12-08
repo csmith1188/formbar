@@ -25,7 +25,7 @@
   }
 
   h1::before {
-    
+
   }
 </style>
 {% endblock %}
@@ -94,10 +94,6 @@
             for (student in studentList) {
                 let newStudent = document.createElement('h3');
                 newStudent.innerHTML = studentList[student].name;
-                if (studentList[student].excluded) {
-                    let newStudent = document.createElement('div');
-                    newStudent.
-                }
                 let newDetails = document.createElement('span');
                 newDetails.classList.add('user');
                 if (studentList[student].excluded) {

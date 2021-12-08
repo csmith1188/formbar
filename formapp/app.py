@@ -1449,31 +1449,31 @@ def endpoint_needshelp():
         sD.studentDict[request.remote_addr]['oldPerms'] = sD.studentDict[request.remote_addr]['perms'] #Get the student's current permissions so they can be stored later
         sD.studentDict[request.remote_addr]['perms'] = sD.settings['perms']['banned']
     if remove:
-            if remove in helpList:
-                #Seacrch through each student
-                for student in sD.studentDict:
-                    #If the name with no whitespaces equals the name we want to remove
-                    if sD.studentDict[student]['name'].strip() == remove:
-                        #Remove the help flag from their user and break loop
-                        sD.studentDict[student]['help'] = False
-                        break
-                del helpList[remove]
-                return redirect("/needshelp")
-            else:
-                return render_template("message.html", forward=request.referrer, message = "Couldn't find ticket for: " + remove +"" )
+        if remove in helpList:
+            #Seacrch through each student
+            for student in sD.studentDict:
+                #If the name with no whitespaces equals the name we want to remove
+                if sD.studentDict[student]['name'].strip() == remove:
+                    #Remove the help flag from their user and break loop
+                    sD.studentDict[student]['help'] = False
+                    break
+            del helpList[remove]
+            return redirect("/needshelp")
         else:
-            resString = '<meta http-equiv="refresh" content="5">'
-            if not helpList:
-                resString += "No tickets yet. <button class='inline popOut' onclick='location.reload();'>Try Again</button>"
-            else:
-                for ticket in helpList:
-                    resString += "<span class='ticket'><b>" + ticket + ":</b> " + helpList[ticket]
-                    if helpList[ticket] == '<i>Requested a bathroom break</i>':
-                        resString += " <button class='inline popOut' onclick='window.location = \"/needshelp?remove=" + ticket + "&acceptBreak=true\"'>Accept</button> <button class='inline popOut' onclick='window.location = \"/needshelp?remove=" + ticket + "\"'>Reject</button>"
-                    else:
-                        resString += " <button class='inline popOut' onclick='window.location = \"/needshelp?remove=" + ticket + "\"'>Remove</button>"
-                    resString += "</span>"
-            return render_template("needshelp.html", list = resString)
+            return render_template("message.html", forward=request.referrer, message = "Couldn't find ticket for: " + remove +"" )
+    else:
+        resString = '<meta http-equiv="refresh" content="5">'
+        if not helpList:
+            resString += "No tickets yet. <button class='inline popOut' onclick='location.reload();'>Try Again</button>"
+        else:
+            for ticket in helpList:
+                resString += "<span class='ticket'><b>" + ticket + ":</b> " + helpList[ticket]
+                if helpList[ticket] == '<i>Requested a bathroom break</i>':
+                    resString += " <button class='inline popOut' onclick='window.location = \"/needshelp?remove=" + ticket + "&acceptBreak=true\"'>Accept</button> <button class='inline popOut' onclick='window.location = \"/needshelp?remove=" + ticket + "\"'>Reject</button>"
+                else:
+                    resString += " <button class='inline popOut' onclick='window.location = \"/needshelp?remove=" + ticket + "\"'>Remove</button>"
+                resString += "</span>"
+        return render_template("needshelp.html", list = resString)
 
 # ██████
 # ██   ██

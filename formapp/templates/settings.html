@@ -24,8 +24,48 @@
     left: 21px;
   }
 
-  h1::before {
+  .up::before,
+  .wiggle::before,
+  .down::before,
+  .a::before,
+  .b::before,
+  .c::before,
+  .d::before {
+    content: "";
+    background-size: 1em 1em;
+    width: 1em;
+    height: 1em;
+    display: inline-block;
+    vertical-align: text-bottom;
+    margin-right: 4px;
+  }
 
+  .up::before {
+    background-image: url("{{ url_for('static', filename='img/settings/up.png') }}");
+  }
+
+  .wiggle::before {
+    background-image: url("{{ url_for('static', filename='img/settings/wiggle.png') }}");
+  }
+
+  .down::before {
+    background-image: url("{{ url_for('static', filename='img/settings/down.png') }}");
+  }
+
+  .a::before {
+    background-image: url("{{ url_for('static', filename='img/settings/a.png') }}");
+  }
+
+  .b::before {
+    background-image: url("{{ url_for('static', filename='img/settings/b.png') }}");
+  }
+
+  .c::before {
+    background-image: url("{{ url_for('static', filename='img/settings/c.png') }}");
+  }
+
+  .d::before {
+    background-image: url("{{ url_for('static', filename='img/settings/d.png') }}");
   }
 </style>
 {% endblock %}
@@ -170,6 +210,17 @@
                     newDetails.classList.remove('up')
                     newDetails.classList.remove('wiggle')
                     newDetails.classList.remove('down')
+                }
+                //Change student letter according to survey response
+                if (studentList[student]['letter'] == 'a') newStudent.classList.add('a')
+                else if (studentList[student]['letter'] == 'b') newStudent.classList.add('b')
+                else if (studentList[student]['letter'] == 'c') newStudent.classList.add('c')
+                else if (studentList[student]['letter'] == 'c') newStudent.classList.add('d')
+                else {
+                    newDetails.classList.remove('a')
+                    newDetails.classList.remove('b')
+                    newDetails.classList.remove('c')
+                    newDetails.classList.remove('d')
                 }
                 studentBox.appendChild(newStudent)
                 studentBox.appendChild(newDetails)

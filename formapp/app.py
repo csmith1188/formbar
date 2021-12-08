@@ -845,22 +845,23 @@ def endpoint_bgmstop():
     /break
     For when a student is temporarily unable to participate
 '''
-@app.route('/break', methods = ['POST', 'GET'])
+
+@app.route('/break')
 def endpoint_break():
+    #Still need to validate name and end break from /settings
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
-    if request.method == 'POST':
+    if request.args.get('request'):
+        helpList[name] = '<i>Requested a bathroom break</i>'
+        sD.studentDict[request.remote_addr]['breakRequest'] = True
+        playSFX("sfx_pickup02")
+        return redirect("/break")
+    elif request.args.get('end'):
         if sD.studentDict[request.remote_addr]['excluded']:
             sD.studentDict[request.remote_addr]['excluded'] = False
-            sD.studentDict[request.remote_addr]['oldPerms'] = sD.studentDict[request.remote_addr]['perms']
-            sD.studentDict[request.remote_addr]['perms'] = sD.settings['perms']['banned']
-        else:
-            sD.studentDict[request.remote_addr]['excluded'] = True
             sD.studentDict[request.remote_addr]['perms'] = sD.studentDict[request.remote_addr]['oldPerms']
-            playSFX("sfx_pickup02")
-        return redirect('/break')
-    else:
-        return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'])
+    return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'])
+
 
 #  ██████
 # ██
@@ -1152,7 +1153,7 @@ def endpoint_help():
         if name in helpList:
             return redirect("/chat?alert=You already have a help ticket in. If your problem is time-sensitive, or your last ticket was not cleared, please get the teacher's attention manually." )
         else:
-            helpList[name] = request.form['message'] or '<i>No message</i>'
+            helpList[name] = request.form['message'] or '<i>Sent a help ticket</i>'
             sD.studentDict[request.remote_addr]['help'] = True
             playSFX("sfx_up04")
             return redirect("/chat?alert=Your ticket was sent. Keep working on the problem the best you can while you wait." )
@@ -1427,6 +1428,7 @@ def endpoint_needshelp():
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['admin']:
         return redirect("/chat?alert=You do not have high enough permissions to do this right now.")
     else:
+        acceptBreak = request.args.get('acceptBreak')
         remove = request.args.get('remove')
         '''
         if bool(helpList):
@@ -1442,7 +1444,11 @@ def endpoint_needshelp():
         if ONRPi:
             pixels.show()
         '''
-        if remove:
+    if acceptBreak:
+        sD.studentDict[request.remote_addr]['excluded'] = True
+        sD.studentDict[request.remote_addr]['oldPerms'] = sD.studentDict[request.remote_addr]['perms'] #Get the student's current permissions so they can be stored later
+        sD.studentDict[request.remote_addr]['perms'] = sD.settings['perms']['banned']
+    if remove:
             if remove in helpList:
                 #Seacrch through each student
                 for student in sD.studentDict:
@@ -1461,7 +1467,12 @@ def endpoint_needshelp():
                 resString += "No tickets yet. <button class='inline popOut' onclick='location.reload();'>Try Again</button>"
             else:
                 for ticket in helpList:
-                    resString += "<span class='ticket'><b>" + ticket + ":</b> " + helpList[ticket] + " <button class='inline popOut' onclick='window.location = \"/needshelp?remove=" + ticket + "\"'>Remove</button></span>"
+                    resString += "<span class='ticket'><b>" + ticket + ":</b> " + helpList[ticket]
+                    if helpList[ticket] == '<i>Requested a bathroom break</i>':
+                        resString += " <button class='inline popOut' onclick='window.location = \"/needshelp?remove=" + ticket + "&acceptBreak=true\"'>Accept</button> <button class='inline popOut' onclick='window.location = \"/needshelp?remove=" + ticket + "\"'>Reject</button>"
+                    else:
+                        resString += " <button class='inline popOut' onclick='window.location = \"/needshelp?remove=" + ticket + "\"'>Remove</button>"
+                    resString += "</span>"
             return render_template("needshelp.html", list = resString)
 
 # ██████

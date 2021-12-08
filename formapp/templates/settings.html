@@ -18,6 +18,15 @@
   h2 {
     margin: 40px 0 8px;
   }
+
+  .user {
+    position: relative;
+    left: 21px;
+  }
+
+  h1::before {
+    
+  }
 </style>
 {% endblock %}
 
@@ -85,8 +94,16 @@
             for (student in studentList) {
                 let newStudent = document.createElement('h3');
                 newStudent.innerHTML = studentList[student].name;
+                if (studentList[student].excluded) {
+                    let newStudent = document.createElement('div');
+                    newStudent.
+                }
                 let newDetails = document.createElement('span');
                 newDetails.classList.add('user');
+                if (studentList[student].excluded) {
+                    newStudent.style.background = "var(--highlight-color)";
+                    newDetails.HTML = "Taking a bathroom break <button class='inline popOut'>End break</button>";
+                }
                 newDetails.innerHTML += permNames[studentList[student]['perms']];
                 newDetails.innerHTML += "	&nbsp; ";
                 newDetails.innerHTML +=

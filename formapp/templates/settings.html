@@ -138,7 +138,7 @@
                 newDetails.classList.add('user');
                 if (studentList[student].excluded) {
                     newStudent.style.background = "var(--highlight-color)";
-                    newDetails.HTML = "Taking a bathroom break <button class='inline popOut'>End break</button>";
+                    newDetails.HTML = "Taking a bathroom break <button class='inline popOut' onclick='request.open(\"GET\", \"/break?action=end&name=" + studentList[student].name + "\");'>End break</button>";
                 }
                 newDetails.innerHTML += permNames[studentList[student]['perms']];
                 newDetails.innerHTML += "	&nbsp; ";

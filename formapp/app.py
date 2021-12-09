@@ -848,19 +848,34 @@ def endpoint_bgmstop():
 
 @app.route('/break')
 def endpoint_break():
-    #Still need to validate name and end break from /settings
+    #Still need to end break from /settings
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     if request.args.get('action') == 'request':
-        helpList[name] = '<i>Requested a bathroom break</i>'
-        sD.studentDict[request.remote_addr]['breakRequest'] = True
-        playSFX("sfx_pickup02")
-        return redirect("/break")
+        if sD.studentDict[request.remote_addr]['breakRequest']:
+            return redirect("/chat?alert=You've already sent a request for a bathroom break.")
+        else:
+            helpList[name] = '<i>Requested a bathroom break</i>'
+            sD.studentDict[request.remote_addr]['breakRequest'] = True
+            playSFX("sfx_pickup02")
+            return redirect("/chat?alert=Your request was sent. The teacher still needs to approve it.")
     elif request.args.get('action') == 'end':
-        if sD.studentDict[request.remote_addr]['excluded']:
-            sD.studentDict[request.remote_addr]['excluded'] = False
-            sD.studentDict[request.remote_addr]['perms'] = sD.studentDict[request.remote_addr]['oldPerms']
-    return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'], breakRequest = sD.studentDict[request.remote_addr]['breakRequest'])
+        if request.args.get('name'):
+            #Find the student whose username matches the "name" argument
+            for student in sD.studentDict:
+                if sD.studentDict[student]['name'].strip() == request.args.get('name'):
+                    if sD.studentDict[student]['excluded']:
+                        sD.studentDict[student]['excluded'] = False
+                        sD.studentDict[student]['perms'] = sD.studentDict[request.remote_addr]['oldPerms']
+                        server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', student, 'server', 'Your break was ended.')))
+                        return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'], breakRequest = sD.studentDict[request.remote_addr]['breakRequest'])
+                    else:
+                        return redirect("/chat?alert=This student is not currently taking a bathroom break.")
+            return render_template("message.html", message = 'Student not found.')
+        else:
+            return render_template("message.html", message = 'You need a "name" argument.')
+    else:
+        return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'], breakRequest = sD.studentDict[request.remote_addr]['breakRequest'])
 
 
 #  ██████
@@ -1443,14 +1458,6 @@ def endpoint_needshelp():
         if ONRPi:
             pixels.show()
         '''
-    sD.studentDict[]['breakRequest'] = False #Remove the student's bathroom break request if they have one
-    if request.args.get('acceptBreak'):
-        student = request.args.get('acceptBreak')
-        #Get student by username
-        sD.studentDict[]['excluded'] = True
-        sD.studentDict[]['oldPerms'] = sD.studentDict[request.remote_addr]['perms'] #Get the student's current permissions so they can be stored later
-        sD.studentDict[]['perms'] = sD.settings['perms']['banned']
-        server.send_message(sD.studentDict[], json.dumps(packMSG('alert', student, 'server', 'The teacher accepted your break request.')))
     if remove:
         if remove in helpList:
             #Seacrch through each student
@@ -1459,7 +1466,13 @@ def endpoint_needshelp():
                 if sD.studentDict[student]['name'].strip() == remove:
                     #Remove the help flag from their user and break loop
                     sD.studentDict[student]['help'] = False
-                    break
+                    sD.studentDict[student]['breakRequest'] = False #Remove the student's bathroom break request if they have one
+                    if request.args.get('acceptBreak'):
+                        sD.studentDict[student]['excluded'] = True
+                        sD.studentDict[student]['oldPerms'] = sD.studentDict[request.remote_addr]['perms'] #Get the student's current permissions so they can be stored later
+                        sD.studentDict[student]['perms'] = sD.settings['perms']['banned']
+                        server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', student, 'server', 'The teacher accepted your break request.')))
+                        break
             del helpList[remove]
             return redirect("/needshelp")
         else:

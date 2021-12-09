@@ -154,7 +154,7 @@ def dbug(message='Checkpoint Reached'):
     global DEBUG
     if DEBUG:
         print("[DEBUG] " + str(message))
-
+#Making the new student and checking if it's a bot or not
 def newStudent(remote, username, bot=False):
     global NEWACCOUNTPERMISSIONS
     if not remote in sD.studentDict:
@@ -207,7 +207,7 @@ def newStudent(remote, username, bot=False):
                     sD.studentDict[remote]['perms'] = int(user[3])
 
         playSFX("sfx_up02")
-
+#Flushes all the users without admin perms out of the formbar
 def flushUsers():
     for user in list(sD.studentDict):
         if not sD.studentDict[user]['perms'] == sD.settings['perms']['admin']:
@@ -235,7 +235,7 @@ def refreshUsers(selectedStudent='', category=''):
             sD.studentDict[student]['quizRes'] = [],
             sD.studentDict[student]['essayRes'] = ''
             return True
-
+#Changes the mode the bar is in. Survey, essay, tutd, etc.
 def changeMode(newMode='', direction='next'):
     playSFX("sfx_pickup01")
     index = sD.settings['modes'].index(sD.settings['barmode'])

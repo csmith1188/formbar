@@ -26,76 +26,68 @@
     body, #content {
       background-color: var(--bg-dark);
       color: white;
+      font-family: "Times New Roman", Times, serif;
     }
 
     .container {
-      position: fixed;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
+      margin: auto;
       width: 452px;
       height: 100%;
       overflow: hidden;
+      position: relative;
     }
 
     .logo {
-      position: absolute;
-      left: 0;
-      top: 20px;
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .logo > span {
-      position: static;
-      font-size: 100px;
-      background: white;
-      font-family: monospace;
-      font-weight: 600;
-    }
-
-    #logo2 {
-      color: var(--color-blue);
-    }
-
-    #logo0 {
-      color: var(--color-cyan);
-    }
-
-    #logo4 {
+      width: 40%;
+      font-size: 70px;
+      font-weight: bold;
       color: var(--color-green);
-    }
-
-    #logo8 {
-      color: var(--color-yellow);
+      float: left;
+      position: relative;
+      top: 10px;
     }
 
     .scoreBar {
-      position: absolute;
-      left: 0;
-      top: 140px;
-      width: 100%;
-      height: 108px;
-      display: flex;
-      justify-content: space-evenly;
+      width: 50%;
+      float: right;
+      background: #fff;
+      color: #111;
+
+      padding: 10px;
+      position: relative;
+      margin-top: 10px;
     }
 
-    .scoreContainer, .highScoreContainer {
-      width: 175px;
-      box-sizing: border-box;
-      background: var(--dark-gray);
-      padding: 10px;
-      text-align: center;
+    .scoreBar:before {
+      content: "";
+      display: block;
+      border-width: 20px;
+      border-color: transparent #fff transparent transparent;
+      border-style: solid;
+      position: absolute;
+      top: 50%;
+      left: -40px;
+      margin-top: -20px;
     }
 
     #score, #highScore {
       font-size: 30px;
+      color: #7f7e83;
+    }
+
+    #highScore {
+      position: absolute;
+      right: 10px;
+      top: 28px;
     }
 
     #addScore {
-      font-size: 20px;
-      color: var(--light-gray);
+      display: inline-block;
+      font-size: 30px;
+      color: #999;
+      opacity: .8;
+      top: 4px;
+      right: 0;
     }
 
     #addScore.show {
@@ -117,17 +109,12 @@
       -webkit-transition: all .5s ease;
     }
 
-    #newBest {
-      font-size: 20px;
-      color: var(--light-red);
-    }
-
     #gameOver {
       position: fixed;
       color: var(--light-red);
       left: 50%;
       transform: translateX(-50%);
-      top: 29%;
+      top: 27%;
       font-size: 32px;
       display: none;
     }
@@ -141,10 +128,10 @@
       position: absolute;
       width: 450px;
       height: 450px;
-      top: 57%;
+      top: 55%;
       left: 0;
       margin-top: -200px;
-      border: 1px solid var(--light-gray);
+      border: 1px solid #eee;
       z-index: 1;
     }
 
@@ -258,16 +245,10 @@
 
     }
 
-    .blank {
-      background: var(--bg-dark);
-    }
-
     .num2 {
-      color: var(--color-blue);
+      background: #FFFFFF;
+      color: #7f7e83;
       font-size: 100px;
-      background: white;
-      font-family: monospace;
-      font-weight: 600;
       transition: all .2s ease;
       -ms-transition: all .2s ease;
       -moz-transition: all .2s ease;
@@ -281,11 +262,9 @@
     }
 
     .num4 {
-      color: var(--color-cyan);
+      background: #FFFFFF;
+      color: #005744;
       font-size: 100px;
-      background: white;
-      font-family: monospace;
-      font-weight: 600;
       transition: all .2s ease;
       -ms-transition: all .2s ease;
       -moz-transition: all .2s ease;
@@ -295,210 +274,132 @@
       -moz-animation: myfirst .5s;
       /* Firefox */
       -webkit-animation: myfirst .5s;
-      /* Safari or Chrome or opera */
+      /* Safari or Chrome */
     }
 
     .num8 {
-      color: var(--color-green);
+      background: #FFFFFF;
+      color: #7f7e83;
       font-size: 100px;
-      background: white;
-      font-family: monospace;
-      font-weight: 600;
       transition: all .2s ease;
       -ms-transition: all .2s ease;
       -moz-transition: all .2s ease;
       -o-transition: all .2s ease;
       -webkit-transition: all .2s ease;
       animation: myfirst .5s;
-      -moz-animation: myfirst .5s;
-      /* Firefox */
-      -webkit-animation: myfirst .5s;
-      /* Safari or Chrome or opera */
     }
 
     .num16 {
-      color: var(--color-yellow);
-      font-size: 75px;
-      background: white;
-      font-family: monospace;
-      font-weight: 600;
+      background: #FFFFFF;
+      color: #005744;
+      font-size: 80px;
       transition: all .2s ease;
       -ms-transition: all .2s ease;
       -moz-transition: all .2s ease;
       -o-transition: all .2s ease;
       -webkit-transition: all .2s ease;
       animation: myfirst .5s;
-      -moz-animation: myfirst .5s;
-      /* Firefox */
-      -webkit-animation: myfirst .5s;
-      /* Safari or Chrome or opera */
     }
 
     .num32 {
-      color: var(--color-orange);
-      font-size: 75px;
-      background: white;
-      font-family: monospace;
-      font-weight: 600;
+      background: #FFFFFF;
+      color: #7f7e83;
+      font-size: 80px;
       transition: all .2s ease;
       -ms-transition: all .2s ease;
       -moz-transition: all .2s ease;
       -o-transition: all .2s ease;
       -webkit-transition: all .2s ease;
-      animation: myfirst .5s;
-      -moz-animation: myfirst .5s;
-      /* Firefox */
-      -webkit-animation: myfirst .5s;
-      /* Safari or Chrome or opera */
     }
 
     .num64 {
-      color: var(--color-red);
-      font-size: 75px;
-      background: white;
-      font-family: monospace;
-      font-weight: 600;
+      background: #FFFFFF;
+      color: #005744;
+      font-size: 80px;
       transition: all .2s ease;
       -ms-transition: all .2s ease;
       -moz-transition: all .2s ease;
       -o-transition: all .2s ease;
       -webkit-transition: all .2s ease;
-      animation: myfirst .5s;
-      -moz-animation: myfirst .5s;
-      /* Firefox */
-      -webkit-animation: myfirst .5s;
-      /* Safari or Chrome or opera */
     }
 
     .num128 {
-      box-shadow: inset 0 0 10px 3px var(--color-red);
-      color: var(--color-blue);
-      font-size: 50px;
-      background: white;
-      font-family: monospace;
-      font-weight: 600;
+      background: #FFFFFF;
+      color: #7f7e83;
+      font-size: 52px;
       transition: all .2s ease;
       -ms-transition: all .2s ease;
       -moz-transition: all .2s ease;
       -o-transition: all .2s ease;
       -webkit-transition: all .2s ease;
-      animation: myfirst .5s;
-      -moz-animation: myfirst .5s;
-      /* Firefox */
-      -webkit-animation: myfirst .5s;
-      /* Safari or Chrome or opera */
     }
 
     .num256 {
-      box-shadow: inset 0 0 10px 3px var(--color-red);
-      color: var(--color-cyan);
-      font-size: 50px;
-      background: white;
-      font-family: monospace;
-      font-weight: 600;
+      background: #FFFFFF;
+      color: #005744;
+      font-size: 52px;
       transition: all .2s ease;
       -ms-transition: all .2s ease;
       -moz-transition: all .2s ease;
       -o-transition: all .2s ease;
       -webkit-transition: all .2s ease;
-      animation: myfirst .5s;
-      -moz-animation: myfirst .5s;
-      /* Firefox */
-      -webkit-animation: myfirst .5s;
-      /* Safari or Chrome or opera */
     }
 
     .num512 {
-      box-shadow: inset 0 0 10px 3px var(--color-red);
-      color: var(--theme-color);
-      font-size: 50px;
-      background: white;
-      font-family: monospace;
-      font-weight: 600;
+      background: #FFFFFF;
+      color: #7f7e83;
+      font-size: 52px;
       transition: all .2s ease;
       -ms-transition: all .2s ease;
       -moz-transition: all .2s ease;
       -o-transition: all .2s ease;
       -webkit-transition: all .2s ease;
-      animation: myfirst .5s;
-      -moz-animation: myfirst .5s;
-      /* Firefox */
-      -webkit-animation: myfirst .5s;
-      /* Safari or Chrome or opera */
     }
 
     .num1024 {
-      box-shadow: inset 0 0 10px 3px var(--color-red);
-      color: var(--color-yellow);
-      font-size: 50px;
-      line-height: 50px;
-      background: white;
-      font-family: monospace;
-      font-weight: 600;
+      background: #FFFFFF;
+      color: #005744;
+      font-size: 52px;
       transition: all .2s ease;
       -ms-transition: all .2s ease;
       -moz-transition: all .2s ease;
       -o-transition: all .2s ease;
       -webkit-transition: all .2s ease;
-      animation: myfirst .5s;
-      -moz-animation: myfirst .5s;
-      /* Firefox */
-      -webkit-animation: myfirst .5s;
-      /* Safari or Chrome or opera */
     }
 
     .num2048 {
-      box-shadow: inset 0 0 10px 3px var(--color-red);
-      color: var(--color-orange);
-      font-size: 50px;
-      line-height: 50px;
-      background: white;
-      font-family: monospace;
-      font-weight: 600;
+      background: #FFFFFF;
+      color: #7f7e83;
+      font-size: 52px;
+
       transition: all .2s ease;
       -ms-transition: all .2s ease;
       -moz-transition: all .2s ease;
       -o-transition: all .2s ease;
       -webkit-transition: all .2s ease;
-      animation: myfirst .5s;
-      -moz-animation: myfirst .5s;
-      /* Firefox */
-      -webkit-animation: myfirst .5s;
-      /* Safari or Chrome or opera */
     }
 
     .num4096 {
-      box-shadow: inset 0 0 10px 3px var(--color-red);
-      color: black;
-      font-size: 50px;
-      line-height: 50px;
-      background: white;
-      font-family: monospace;
-      font-weight: 600;
+      background: #FFFFFF;
+      color: #005744;
+      font-size: 52px;
       transition: all .2s ease;
       -ms-transition: all .2s ease;
       -moz-transition: all .2s ease;
       -o-transition: all .2s ease;
       -webkit-transition: all .2s ease;
-      animation: myfirst .5s;
-      -moz-animation: myfirst .5s;
-      /* Firefox */
-      -webkit-animation: myfirst .5s;
-      /* Safari or Chrome or opera */
     }
 
     #newGameButton {
-      position: fixed;
+      position: absolute;
       left: 50%;
       transform: translateX(-50%);
-      top: 88%;
-      width: fit-content;
-      height: fit-content;
-      padding: 7px 14px;
-      font-size: 28px;
-      border-radius: 28px;
+      top: 87%;
+      padding: 8px 16px;
+      font: 30px "Times New Roman", Times, serif;
+      border-radius: 12px;
       background: var(--bg-darker);
-      color: var(--theme-color);
+      color: var(--color-green);
       border: 2px solid;
       cursor: pointer;
       z-index: 3;
@@ -600,387 +501,355 @@
   </style>
 {% endblock %}
 
-<!-- Change theme color here -->
-{% block color %}green{% endblock %}
+<!-- Extra javascript here -->
+{% block script %}{% endblock %}
 
 <!-- Main content here -->
 {% block main %}
   <div id="cover"></div>
   <div class="container">
-    <div class="logo">
-      <span id="logo2">2</span>
-      <span id="logo0">0</span>
-      <span id="logo4">4</span>
-      <span id="logo8">8</span>
-    </div>
+    <div class="logo">2048
+    SPARTANS</div>
     <div class="scoreBar">
-      <div class="scoreContainer">
-        <label>Score</label><br>
-        <label id="score">0</label>
-        <div id="addScore"></div>
-      </div>
-      <div class="highScoreContainer">
-        <label>High score</label><br>
-        <label id="highScore">0</label><br>
-        <div id="newBest"></div>
-      </div>
+      <label>Score</label><br>
+      <label id="score">0</label>
+      <div id="addScore"></div>
+
+      <label style="position: absolute; right: 10px; top: 10px;">High score</label><br>
+      <label id="highScore">0</label>
     </div>
     <div id="gameOver">GAME OVER!</div>
-    <div id="stage">
-      <span class="row0 cell0 blank"></span>
-      <span class="row0 cell1 blank"></span>
-      <span class="row0 cell2 blank"></span>
-      <span class="row0 cell3 blank"></span>
-      <span class="row1 cell0 blank"></span>
-      <span class="row1 cell1 blank"></span>
-      <span class="row1 cell2 blank"></span>
-      <span class="row1 cell3 blank"></span>
-      <span class="row2 cell0 blank"></span>
-      <span class="row2 cell1 blank"></span>
-      <span class="row2 cell2 blank"></span>
-      <span class="row2 cell3 blank"></span>
-      <span class="row3 cell0 blank"></span>
-      <span class="row3 cell1 blank"></span>
-      <span class="row3 cell2 blank"></span>
-      <span class="row3 cell3 blank"></span>
-    </div>
+    <div id="stage"></div>
     <!--<div id="gameOver hide">-->
     <!--<div class="overText">GameOver!</div>-->
     <!--</div>-->
+    <button id="newGameButton" onclick="window.location.reload();">New game</button>
   </div>
-  <button id="newGameButton" onclick="window.location.reload();">New game</button>
-{% endblock %}
+  <script>
+    if (localStorage.getItem("2048HighScore")) document.getElementById("highScore").innerHTML = localStorage.getItem("2048HighScore");
 
-<!-- Extra javascript here -->
-{% block script %}
-<script>
-  if (localStorage.getItem("2048HighScore")) document.getElementById("highScore").innerHTML = localStorage.getItem("2048HighScore");
-
-  var gameObj = {
-    points: {
-      score: 0,
-      history: [],
-      status: 1
-    },
-    stage: [],
-    intiStage: function() {
-      for (var cell = 0; cell < 4; cell++) {
-        this.stage[cell] = [];
-        for (var row = 0; row < 4; row++) {
-          this.stage[cell][row] = {
-            boxObj: null,
-            position: [cell, row]
-          };
-        }
-      }
-
-    },
-
-    empty: function() {
-      var emptyList = [];
-      for (var row = 0; row < 4; row++) {
+    var gameObj = {
+      points: {
+        score: 0,
+        history: [],
+        status: 1
+      },
+      stage: [],
+      intiStage: function() {
         for (var cell = 0; cell < 4; cell++) {
-          if (this.stage[cell][row].boxObj == null) {
-            emptyList.push(this.stage[cell][row]);
+          this.stage[cell] = [];
+          for (var row = 0; row < 4; row++) {
+            this.stage[cell][row] = {
+              boxObj: null,
+              position: [cell, row]
+            };
           }
         }
-      }
-      return emptyList;
-    },
-    newBox: function() {
-      var _this = this;
 
+      },
 
-      var box = function(obj) {
-        var num = Math.random() > 0.9 ? 4 : 2;
-        this.value = num;
-        this.parent = obj;
-        this.domObj = function() {
-          var domBox = document.createElement('span');
-          domBox.innerText = num;
-          domBox.textContent = num;
-          domBox.className = 'row' + obj.position[0] + ' ' + 'cell' + obj.position[1] + ' ' + 'num' + num;
-          var root = document.getElementById('stage');
-          root.appendChild(domBox);
-          return domBox;
-        }();
-        obj.boxObj = this;
-      }
-      var emptyList = this.empty();
-      if (emptyList.length) {
-        var randomIndex = Math.floor(Math.random() * emptyList.length);
-        new box(emptyList[randomIndex]);
-        return true;
-      }
-    },
-    isEnd: function() {
-      var emptyList = this.empty();
-      if (!emptyList.length) {
-        for (var i = 0; i < 4; i++) {
-          for (var j = 0; j < 4; j++) {
-            var obj = this.stage[i][j];
-            var objLeft = (j == 0) ? {
-              boxObj: {
-                value: 0
-              }
-            } : this.stage[i][j - 1];
-            var objRight = (j == 3) ? {
-              boxObj: {
-                value: 0
-              }
-            } : this.stage[i][j + 1];
-            var objUp = (i == 0) ? {
-              boxObj: {
-                value: 0
-              }
-            } : this.stage[i - 1][j];
-            var objDown = (i == 3) ? {
-              boxObj: {
-                value: 0
-              }
-            } : this.stage[i + 1][j];
-            if (obj.boxObj.value == objLeft.boxObj.value ||
-              obj.boxObj.value == objDown.boxObj.value ||
-              obj.boxObj.value == objRight.boxObj.value ||
-              obj.boxObj.value == objUp.boxObj.value) {
-              return false
+      empty: function() {
+        var emptyList = [];
+        for (var row = 0; row < 4; row++) {
+          for (var cell = 0; cell < 4; cell++) {
+            if (this.stage[cell][row].boxObj == null) {
+              emptyList.push(this.stage[cell][row]);
             }
           }
         }
-        return true;
-      }
-      return false;
-    },
-    gameOver: function() {
-      document.getElementById("gameOver").style.display = "block";
-      document.getElementById("cover").style.cursor = "not-allowed";
-      document.getElementById("newGameButton").classList.add("newButtonAnimation");
-    },
-    moveTo: function(obj1, obj2) {
-      obj2.boxObj = obj1.boxObj;
-      obj2.boxObj.domObj.className = 'row' + obj2.position[0] + ' ' + 'cell' + obj2.position[1] + ' ' + 'num' + obj2.boxObj.value;
-      //            obj1.boxObj.domObj.parentNode.removeChild(obj1.boxObj.domObj);
-      obj1.boxObj = null;
-    },
-    addTo: function(obj1, obj2) {
-      obj2.boxObj.domObj.parentNode.removeChild(obj2.boxObj.domObj);
-      obj2.boxObj = obj1.boxObj;
-      obj1.boxObj = null;
-      obj2.boxObj.value = obj2.boxObj.value * 2;
-      obj2.boxObj.domObj.className = 'row' + obj2.position[0] + ' ' + 'cell' + obj2.position[1] + ' ' + 'num' + obj2.boxObj.value;
-      obj2.boxObj.domObj.innerText = obj2.boxObj.value;
-      obj2.boxObj.domObj.textContent = obj2.boxObj.value;
-      this.points.score += obj2.boxObj.value;
-      var scoreBar = document.getElementById('score');
-      scoreBar.innerText = this.points.score;
-      scoreBar.textContent = this.points.score;
-      var highScoreBar = document.getElementById('highScore');
-      var newBest = document.getElementById('newBest');
-      var highScore = localStorage.getItem("2048HighScore");
-      if (this.points.score > highScore) {
-        highScoreBar.innerText = this.points.score;
-        highScoreBar.textContent = this.points.score;
-        highScoreBar.style.color = "var(--light-red)";
-        newBest.innerText = "New best!";
-        newBest.textContent = "New best!";
-        localStorage.setItem("2048HighScore", this.points.score);
-      }
-      return obj2.boxObj.value;
+        return emptyList;
+      },
+      newBox: function() {
+        var _this = this;
 
 
-    },
-    clear: function(x, y) {
-      var can = 0;
-      for (var i = 0; i < 4; i++) {
-        var fst = null;
-        var fstEmpty = null;
-        for (var j = 0; j < 4; j++) {
-          var objInThisWay = null;
-          switch ("" + x + y) {
-            case '00':
-              objInThisWay = this.stage[i][j];
-              break;
-            case '10':
-              objInThisWay = this.stage[j][i];
-              break;
-            case '11':
-              objInThisWay = this.stage[3 - j][i];
-              break;
-            case '01':
-              objInThisWay = this.stage[i][3 - j];
-              break;
+        var box = function(obj) {
+          var num = Math.random() > 0.9 ? 4 : 2;
+          this.value = num;
+          this.parent = obj;
+          this.domObj = function() {
+            var domBox = document.createElement('span');
+            domBox.innerText = num;
+            domBox.textContent = num;
+            domBox.className = 'row' + obj.position[0] + ' ' + 'cell' + obj.position[1] + ' ' + 'num' + num;
+            var root = document.getElementById('stage');
+            root.appendChild(domBox);
+            return domBox;
+          }();
+          obj.boxObj = this;
+        }
+        var emptyList = this.empty();
+        if (emptyList.length) {
+          var randomIndex = Math.floor(Math.random() * emptyList.length);
+          new box(emptyList[randomIndex]);
+          return true;
+        }
+      },
+      isEnd: function() {
+        var emptyList = this.empty();
+        if (!emptyList.length) {
+          for (var i = 0; i < 4; i++) {
+            for (var j = 0; j < 4; j++) {
+              var obj = this.stage[i][j];
+              var objLeft = (j == 0) ? {
+                boxObj: {
+                  value: 0
+                }
+              } : this.stage[i][j - 1];
+              var objRight = (j == 3) ? {
+                boxObj: {
+                  value: 0
+                }
+              } : this.stage[i][j + 1];
+              var objUp = (i == 0) ? {
+                boxObj: {
+                  value: 0
+                }
+              } : this.stage[i - 1][j];
+              var objDown = (i == 3) ? {
+                boxObj: {
+                  value: 0
+                }
+              } : this.stage[i + 1][j];
+              if (obj.boxObj.value == objLeft.boxObj.value ||
+                obj.boxObj.value == objDown.boxObj.value ||
+                obj.boxObj.value == objRight.boxObj.value ||
+                obj.boxObj.value == objUp.boxObj.value) {
+                return false
+              }
+            }
           }
-          if (objInThisWay.boxObj != null) {
-            if (fstEmpty) {
-              this.moveTo(objInThisWay, fstEmpty)
-              fstEmpty = null;
-              j = 0;
+          return true;
+        }
+        return false;
+      },
+      gameOver: function() {
+        document.getElementById("gameOver").style.display = "block";
+        document.getElementById("cover").style.cursor = "not-allowed";
+        document.getElementById("newGameButton").classList.add("newButtonAnimation");
+      },
+      moveTo: function(obj1, obj2) {
+        obj2.boxObj = obj1.boxObj;
+        obj2.boxObj.domObj.className = 'row' + obj2.position[0] + ' ' + 'cell' + obj2.position[1] + ' ' + 'num' + obj2.boxObj.value;
+        //            obj1.boxObj.domObj.parentNode.removeChild(obj1.boxObj.domObj);
+        obj1.boxObj = null;
+      },
+      addTo: function(obj1, obj2) {
+        obj2.boxObj.domObj.parentNode.removeChild(obj2.boxObj.domObj);
+        obj2.boxObj = obj1.boxObj;
+        obj1.boxObj = null;
+        obj2.boxObj.value = obj2.boxObj.value * 2;
+        obj2.boxObj.domObj.className = 'row' + obj2.position[0] + ' ' + 'cell' + obj2.position[1] + ' ' + 'num' + obj2.boxObj.value;
+        obj2.boxObj.domObj.innerText = obj2.boxObj.value;
+        obj2.boxObj.domObj.textContent = obj2.boxObj.value;
+        this.points.score += obj2.boxObj.value;
+        var scoreBar = document.getElementById('score');
+        scoreBar.innerText = this.points.score;
+        scoreBar.textContent = this.points.score;
+        var highScoreBar = document.getElementById('highScore');
+        var highScore = localStorage.getItem("2048HighScore");
+        if (this.points.score > highScore) {
+          highScoreBar.innerText = this.points.score;
+          highScoreBar.textContent = this.points.score;
+          highScoreBar.style.color = "#f04040"
+          localStorage.setItem("2048HighScore", this.points.score);
+        }
+        return obj2.boxObj.value;
+
+
+      },
+      clear: function(x, y) {
+        var can = 0;
+        for (var i = 0; i < 4; i++) {
+          var fst = null;
+          var fstEmpty = null;
+          for (var j = 0; j < 4; j++) {
+            var objInThisWay = null;
+            switch ("" + x + y) {
+              case '00':
+                objInThisWay = this.stage[i][j];
+                break;
+              case '10':
+                objInThisWay = this.stage[j][i];
+                break;
+              case '11':
+                objInThisWay = this.stage[3 - j][i];
+                break;
+              case '01':
+                objInThisWay = this.stage[i][3 - j];
+                break;
+            }
+            if (objInThisWay.boxObj != null) {
+              if (fstEmpty) {
+                this.moveTo(objInThisWay, fstEmpty)
+                fstEmpty = null;
+                j = 0;
+                can = 1;
+              }
+            } else if (!fstEmpty) {
+              fstEmpty = objInThisWay;
+            }
+          }
+        }
+        return can;
+      },
+
+      move: function(x, y) {
+        var can = 0;
+        can = this.clear(x, y) ? 1 : 0;
+        var add = 0;
+        for (var i = 0; i < 4; i++) {
+          for (var j = 0; j < 3; j++) {
+            var objInThisWay = null;
+            var objInThisWay2 = null;
+            switch ("" + x + y) {
+              case '00': {
+                objInThisWay = this.stage[i][j];
+                objInThisWay2 = this.stage[i][j + 1];
+                break;
+              }
+              case '10': {
+                objInThisWay = this.stage[j][i];
+                objInThisWay2 = this.stage[j + 1][i];
+                break;
+              }
+
+              case '11': {
+                objInThisWay = this.stage[3 - j][i];
+                objInThisWay2 = this.stage[2 - j][i];
+                break;
+              }
+              case '01': {
+                objInThisWay = this.stage[i][3 - j];
+                objInThisWay2 = this.stage[i][2 - j];
+                break;
+              }
+            }
+            if (objInThisWay2.boxObj && objInThisWay.boxObj.value == objInThisWay2.boxObj.value) {
+              add += this.addTo(objInThisWay2, objInThisWay);
+              this.clear(x, y);
+              //                    j++;
               can = 1;
             }
-          } else if (!fstEmpty) {
-            fstEmpty = objInThisWay;
+            //                console.log(this.stage);
           }
         }
-      }
-      return can;
-    },
-
-    move: function(x, y) {
-      var can = 0;
-      can = this.clear(x, y) ? 1 : 0;
-      var add = 0;
-      for (var i = 0; i < 4; i++) {
-        for (var j = 0; j < 3; j++) {
-          var objInThisWay = null;
-          var objInThisWay2 = null;
-          switch ("" + x + y) {
-            case '00': {
-              objInThisWay = this.stage[i][j];
-              objInThisWay2 = this.stage[i][j + 1];
-              break;
-            }
-            case '10': {
-              objInThisWay = this.stage[j][i];
-              objInThisWay2 = this.stage[j + 1][i];
-              break;
-            }
-
-            case '11': {
-              objInThisWay = this.stage[3 - j][i];
-              objInThisWay2 = this.stage[2 - j][i];
-              break;
-            }
-            case '01': {
-              objInThisWay = this.stage[i][3 - j];
-              objInThisWay2 = this.stage[i][2 - j];
-              break;
-            }
-          }
-          if (objInThisWay2.boxObj && objInThisWay.boxObj.value == objInThisWay2.boxObj.value) {
-            add += this.addTo(objInThisWay2, objInThisWay);
-            this.clear(x, y);
-            //                    j++;
-            can = 1;
-          }
-          //                console.log(this.stage);
+        if (add) {
+          var addscore = document.getElementById('addScore');
+          addscore.innerText = "+" + add;
+          addscore.textContent = "+" + add;
+          addscore.className = "show";
+          setTimeout(function() {
+            addscore.className = "hide";
+          }, 500);
         }
-      }
-      if (add) {
-        var addscore = document.getElementById('addScore');
-        addscore.innerText = "+" + add;
-        addscore.textContent = "+" + add;
-        addscore.className = "show";
-        setTimeout(function() {
-          addscore.className = "hide";
-        }, 500);
-      }
-      if (can) {
-        this.newBox();
-      }
-      if (this.isEnd()) {
-        this.gameOver();
-      }
-    },
+        if (can) {
+          this.newBox();
+        }
+        if (this.isEnd()) {
+          this.gameOver();
+        }
+      },
 
-    inti: null
-  }
-  var controller = function() {
-    var startX = 0;
-    var startY = 0;
-    var ready = 0;
-    this.start = function(x, y) {
-      ready = 1;
-      startX = x;
-      startY = y;
-    };
-    this.move = function(x, y) {
-      if (x - startX > 100 && ready) {
-        gameObj.move(0, 1);
-        ready = 0;
-      } else if (startX - x > 100 && ready) {
-        gameObj.move(0, 0);
-        ready = 0;
-      } else if (startY - y > 100 && ready) {
-        gameObj.move(1, 0);
-        ready = 0;
-      } else if (y - startY > 100 && ready) {
-        gameObj.move(1, 1);
-        ready = 0;
-      }
+      inti: null
     }
-    this.end = function(x, y) {
-      ready = 0;
-    }
-    return {
-      start: this.start,
-      move: this.move,
-      end: this.end
-    }
-  }();
-
-  function disableSelection(target) {
-    if (typeof target.onselectstart != "undefined") //IE route
-      target.onselectstart = function() {
-        return false
-      }
-    else if (typeof target.style.MozUserSelect != "undefined") //Firefox route
-      target.style.MozUserSelect = "none"
-    else //All other route (ie: Opera)
-      target.onmousedown = function() {
-        return false
-      }
-    target.style.cursor = "default"
-  }
-  window.onload = function() {
-    gameObj.intiStage();
-    gameObj.newBox();
-    //    gameObj.newBox();
-    var stage = document.getElementById('stage');
-    document.onmousedown = function(e) {
-      var event = e || window.event;
-      var obj = event.target || event.srcElement;
-      var x = event.clientX;
-      var y = event.clientY;
-      controller.start(x, y);
-    }
-    document.onmousemove = function(e) {
-      var event = e || window.event;
-      var obj = event.target || event.srcElement;
-      var x = event.clientX;
-      var y = event.clientY;
-      controller.move(x, y);
-    }
-    document.onmouseup = function(e) {
-      var event = e || window.event;
-      var obj = event.target || event.srcElement;
-      var x = event.clientX;
-      var y = event.clientY;
-      controller.end(x, y);
-    }
-
-    function keyDown(e) {
-      var currKey = 0,
-        e = e || event;
-      currKey = e.keyCode || e.which || e.charCode;
-      var keyName = String.fromCharCode(currKey);
-      switch (currKey) {
-        case 37:
-          gameObj.move(0, 0);
-          break;
-        case 38:
-          gameObj.move(1, 0);
-          break;
-        case 39:
+    var controller = function() {
+      var startX = 0;
+      var startY = 0;
+      var ready = 0;
+      this.start = function(x, y) {
+        ready = 1;
+        startX = x;
+        startY = y;
+      };
+      this.move = function(x, y) {
+        if (x - startX > 100 && ready) {
           gameObj.move(0, 1);
-          break;
-        case 40:
+          ready = 0;
+        } else if (startX - x > 100 && ready) {
+          gameObj.move(0, 0);
+          ready = 0;
+        } else if (startY - y > 100 && ready) {
+          gameObj.move(1, 0);
+          ready = 0;
+        } else if (y - startY > 100 && ready) {
           gameObj.move(1, 1);
-          break;
+          ready = 0;
+        }
       }
-      //        alert("key code: " + currKey + " Character: " + keyName);
+      this.end = function(x, y) {
+        ready = 0;
+      }
+      return {
+        start: this.start,
+        move: this.move,
+        end: this.end
+      }
+    }();
+
+    function disableSelection(target) {
+      if (typeof target.onselectstart != "undefined") //IE route
+        target.onselectstart = function() {
+          return false
+        }
+      else if (typeof target.style.MozUserSelect != "undefined") //Firefox route
+        target.style.MozUserSelect = "none"
+      else //All other route (ie: Opera)
+        target.onmousedown = function() {
+          return false
+        }
+      target.style.cursor = "default"
     }
-    document.onkeydown = keyDown;
-    //    disableSelection(document.body);
-  }
-</script>
+    window.onload = function() {
+      gameObj.intiStage();
+      gameObj.newBox();
+      //    gameObj.newBox();
+      var stage = document.getElementById('stage');
+      document.onmousedown = function(e) {
+        var event = e || window.event;
+        var obj = event.target || event.srcElement;
+        var x = event.clientX;
+        var y = event.clientY;
+        controller.start(x, y);
+      }
+      document.onmousemove = function(e) {
+        var event = e || window.event;
+        var obj = event.target || event.srcElement;
+        var x = event.clientX;
+        var y = event.clientY;
+        controller.move(x, y);
+      }
+      document.onmouseup = function(e) {
+        var event = e || window.event;
+        var obj = event.target || event.srcElement;
+        var x = event.clientX;
+        var y = event.clientY;
+        controller.end(x, y);
+      }
+
+      function keyDown(e) {
+        var currKey = 0,
+          e = e || event;
+        currKey = e.keyCode || e.which || e.charCode;
+        var keyName = String.fromCharCode(currKey);
+        switch (currKey) {
+          case 37:
+            gameObj.move(0, 0);
+            break;
+          case 38:
+            gameObj.move(1, 0);
+            break;
+          case 39:
+            gameObj.move(0, 1);
+            break;
+          case 40:
+            gameObj.move(1, 1);
+            break;
+        }
+        //        alert("key code: " + currKey + " Character: " + keyName);
+      }
+      document.onkeydown = keyDown;
+      //    disableSelection(document.body);
+    }
+  </script>
 {% endblock %}

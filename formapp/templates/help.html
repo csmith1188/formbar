@@ -3,29 +3,19 @@
 <!-- This is where the title, top buttons, and stylesheet is located -->
 
 <!-- Change title here -->
-{% block title %}Help{% endblock %}
+{% block title %}Formbar Help{% endblock %}
 
 <!-- Extra style declarations here -->
-{% block style %}
-<style>
-  body {
-    text-align: center;
-  }
-</style>
-{% endblock %}
-
-<!-- Change theme color here -->
-{% block color %}yellow{% endblock %}
+{% block style %}{% endblock %}
 
 <!-- Extra javascript here -->
 {% block script %}{% endblock %}
 
 <!-- Main content here -->
 {% block main %}
-<h1>Ask For Help</h1>
-<form action="help" method="post">
-    <textarea name="message" class="box" rows="4" cols="40" placeholder="Message (optional)"></textarea><br>
-    <br>
-    <input type="submit" class="button" value="Send ticket">
+<h1 style="color: blue">Ask For Help</h1>
+<form action="help" method="post" style="text-align: center;">
+    <input type="submit" value="Click to Send a Help Ticket">
 </form>
+
 {% endblock %}

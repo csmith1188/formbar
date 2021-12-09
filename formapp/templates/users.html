@@ -3,26 +3,10 @@
 <!-- This is where the title, top buttons, and stylesheet is located -->
 
 <!-- Change title here -->
-{% block title %}User List{% endblock %}
+{% block title %}Formbar User List{% endblock %}
 
 <!-- Extra style declarations here -->
-{% block style %}
-<style>
-  body {
-    text-align: center;
-  }
-</style>
-{% endblock %}
-
-<!-- Change theme color here -->
-{% block color %}orange{% endblock %}
-
-<!-- Main content here -->
-{% block main %}
-<h1>Users</h1>
-<div id="students">
-</div>
-{% endblock %}
+{% block style %}{% endblock %}
 
 <!-- Extra javascript here -->
 {% block script %}
@@ -77,4 +61,11 @@
         request.send();
     }
 </script>
+{% endblock %}
+
+<!-- Main content here -->
+{% block main %}
+<h1 style="color: blue">Users</h1>
+<div id="students">
+</div>
 {% endblock %}

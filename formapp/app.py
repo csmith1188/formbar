@@ -296,6 +296,7 @@ def rewindBGM():
     pygame.mixer.music.rewind()
     playSFX("sfx_pickup01")
 
+# Allows you to unpause the music. If there is music and it is paused, you can unpause it and it plays a sound effect.
 def playpauseBGM(state='none'):
     if pygame.mixer.music.get_busy():
         if type(state) is bool:
@@ -307,6 +308,7 @@ def playpauseBGM(state='none'):
             pygame.mixer.music.unpause()
     playSFX("sfx_pickup01")
 
+# Sets the volume for the background music. Lets you increase and decrease it in small intervals.
 def volBGM(direction):
     sD.bgm['volume'] = pygame.mixer.music.get_volume()
     if direction == 'up':
@@ -611,6 +613,7 @@ def completeBar():
     if ONRPi:
         pixels.show()
 
+# Number of students counted out for you.
 def autoStudentCount():
     sD.settings['numStudents'] = 0
     for user in sD.studentDict:
@@ -636,6 +639,7 @@ def stripUserData(perm='', sList={}):
         newList[student]['complete'] = sD.studentDict[student]['complete']
     return newList
 
+# Shows the users in the chat. If a user wants to join the chat, add them to a list.
 def chatUsers():
     newList = {}
     for student in sD.studentDict:
@@ -690,6 +694,7 @@ def updateStep():
     /
     Homepage (root)
 '''
+# Root directory.
 @app.route('/')
 def endpoint_home():
     if not request.remote_addr in sD.studentDict:
@@ -705,6 +710,7 @@ def endpoint_home():
             music.append(key)
         return render_template('index.html', username = username, sfx = sounds, bgm = music)
 
+# Endpoint for the 2048 game
 @app.route('/2048')
 def endpoint_2048():
     if not request.remote_addr in sD.studentDict:
@@ -724,6 +730,7 @@ def endpoint_2048():
 '''
     /addfighteropponent
 '''
+# Fighter game endpoint. Adds an opponent into the game.
 @app.route('/addfighteropponent')
 def endpoint_addfighteropponent():
     code = request.args.get('code')
@@ -741,6 +748,7 @@ def endpoint_addfighteropponent():
     /bgm
     This endpoint leads to the Background music page
 '''
+# Settig up the background music. Updates the files, change the volume of the music, randomize the choice, and can stop the music.
 @app.route('/bgm')
 def endpoint_bgm():
     if not request.remote_addr in sD.studentDict:
@@ -796,6 +804,7 @@ def endpoint_bgm():
     /bgmstop
     Stops the current background Music
 '''
+# Stops the background music
 @app.route('/bgmstop')
 def endpoint_bgmstop():
     sD.bgm['paused'] = False
@@ -813,6 +822,7 @@ def endpoint_bgmstop():
     /chat
     This endpoint allows students and teacher to chat realTime.
 '''
+# Chat endpoint
 @app.route('/chat')
 def endpoint_chat():
     if not request.remote_addr in sD.studentDict:
@@ -826,6 +836,7 @@ def endpoint_chat():
         hex = six hexadecimal digit rgb color (prioritizes over RGB)
         r, g, b = provide three color values between 0 and 255
 '''
+# Sets up the color values for the formbar and allows you to send a certain color to the formbar.
 @app.route('/color')
 def endpoint_color():
     if not request.remote_addr in sD.studentDict:
@@ -852,11 +863,13 @@ def endpoint_color():
             pixels.show()
         return render_template("message.html", message = "Color sent!" )
 
-
+# Starts a countdown
 @app.route('/countdown')
 def endpoint_countdown():
+    # Relays a message saying the feature is not available yet.
     return render_template('message.html', message='This feature is not available yet.')
 
+# Fighting game endpoint. This one is used to create the match.
 @app.route('/createfightermatch')
 def endpoint_createfightermatch():
     code = request.args.get('code')
@@ -875,6 +888,7 @@ def endpoint_createfightermatch():
 '''
     /DEBUG
 '''
+#Debug endpoint.
 @app.route('/debug')
 def endpoint_debug():
     return render_template('debug.html')
@@ -909,6 +923,7 @@ def endpoint_emptyblocks():
 '''
     /fighter
 '''
+# Sets up a temporary endpoint for the fighter.
 @app.route('/fighter')
 def endpoint_fighter():
     if not request.remote_addr in sD.studentDict:
@@ -917,11 +932,13 @@ def endpoint_fighter():
         return redirect("/chat?message=You do not have high enough permissions to do this right now.")
     else:
         #return render_template('fighter.html', username = sD.studentDict[request.remote_addr]['name'])
+        #Relays a message telling the user the game is not ready.
         return redirect("/chat?message=Fighter will be ready to play soon.")
 
 '''
     /flush
 '''
+# If the user is not an admin or teacher, flush them out of the system.
 @app.route('/flush')
 def endpoint_flush():
     if not request.remote_addr in sD.studentDict:
@@ -939,7 +956,7 @@ def endpoint_flush():
 # ██    ██
 #  ██████
 
-
+# Allows you to change the background music
 @app.route('/getbgm')
 def endpoint_getbgm():
     if not request.remote_addr in sD.studentDict:
@@ -949,6 +966,7 @@ def endpoint_getbgm():
     else:
         return '{"bgm": "'+ str(sD.bgm['nowplaying']) +'"}'
 
+#Takes you to the fighting game
 @app.route('/getfightermatches')
 def endpoint_getfightermatches():
     if not request.remote_addr in sD.studentDict:
@@ -958,6 +976,7 @@ def endpoint_getfightermatches():
     else:
         return json.dumps(sD.fighter)
 
+#Returns your IP address
 @app.route('/getip')
 def endpoint_getip():
     if not request.remote_addr in sD.studentDict:
@@ -1081,7 +1100,7 @@ def endpoint_hangman():
                 'words': 'here'
             }
         return render_template("hangman.html", wordObj=wordObj)
-
+# Help endpoint
 @app.route('/help', methods = ['POST', 'GET'])
 def endpoint_help():
     if not request.remote_addr in sD.studentDict:
@@ -1089,9 +1108,11 @@ def endpoint_help():
     if request.method == 'POST':
         name = sD.studentDict[request.remote_addr]['name']
         name = name.strip()
+        # Prevent help ticket spam
         if name in helpList:
             return render_template("chat.html", message = "You already have a help ticket in. If your problem is time-sensitive, or your last ticket was not cleared, please get the teacher's attention manually." )
         else:
+            #Sends the help ticket and plays a sound
             helpList[name] = request.form['message'] or '<i>No message</i>'
             sD.studentDict[request.remote_addr]['help'] = True
             playSFX("sfx_up04")
@@ -1114,6 +1135,7 @@ def endpoint_help():
     POST: Submit a lesson excel spreadsheet for upload.
             (This needs validation on upload!)
 '''
+# Lesson endpoint
 @app.route('/lesson', methods = ['POST', 'GET'])
 def endpoint_lesson():
     if not request.remote_addr in sD.studentDict:
@@ -1224,9 +1246,11 @@ def endpoint_lesson():
     /login
     Handles logging into the Formbar
 '''
+# Login endpoint for students
 @app.route('/login', methods = ['POST', 'GET'])
 def endpoint_login():
     remote = request.remote_addr
+    # If the IP was banned, don't allow them to log in
     if remote in banList:
         return "This IP is in the banlist."
     else:
@@ -1315,6 +1339,7 @@ def endpoint_login():
 '''
     /logout
 '''
+# Logout endpoint for students
 @app.route('/logout')
 def endpoint_logout():
     if not request.remote_addr in sD.studentDict:
@@ -1334,6 +1359,7 @@ def endpoint_logout():
 '''
     /minesweeper
 '''
+#Sets up a basic minesweeper game
 @app.route('/minesweeper')
 def endpoint_minesweeper():
     if not request.remote_addr in sD.studentDict:
@@ -1410,8 +1436,7 @@ def endpoint_needshelp():
 # ██
 # ██
 
-
-@app.route('/perc')
+# Change the percentage
 def endpoint_perc():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
@@ -1429,6 +1454,7 @@ def endpoint_perc():
 '''
     /profile
 '''
+# User profiles
 @app.route('/profile')
 def endpoint_profile():
     if not request.remote_addr in sD.studentDict:
@@ -1486,11 +1512,12 @@ def endpoint_quiz():
         return redirect("/chat?message=You do not have high enough permissions to do this right now.")
     else:
         if request.method == 'POST':
-            messageOut = packMSG('message', 'all', 'server', '<button onclick="window.location=\"/quiz\"">Quiz Link!</button>')
+            messageOut = packMSG('message', 'all', 'server', '<button onclick="window.location=\"/quiz\"">Quiz Link!</button>') #If a quiz was started, send a message into the chat with the link.
             server.send_message_to_all(json.dumps(messageOut))
             resString = '<ul>'
             for i, answer in enumerate(request.form):
                 resString += '<li>' + str(i) + ': '
+                #Checks if your answers were right or wrong
                 if sD.activeQuiz['keys'][i] == int(request.form[answer]):
                     sD.studentDict[request.remote_addr]['quizRes'].append(True)
                     resString += '<b>Correct!</b></li>'
@@ -1511,7 +1538,7 @@ def endpoint_quiz():
 #      ██
 # ███████
 
-
+# Allows a user to change the color on the bar?
 @app.route('/say')
 def endpoint_say():
     if not request.remote_addr in sD.studentDict:

@@ -110,54 +110,6 @@
   <div id="updateBar">Updating in <span id="timeLeft">3</span></div>
 {% endblock %}
 
-<<<<<<< Updated upstream
-
-  <script>
-    let urls = [
-      "/getbgm",
-      "/getfightermatches",
-      "/getip",
-      "/getme",
-      "/getmode",
-      "/getpermissions",
-      "/getphrase",
-      "/getpix",
-      "/getquizname",
-      "/getstudents",
-      "/getword"
-    ];
-    let timeLeft = 3;
-    let dataURL = "/getpix";
-
-    urls.forEach(url => document.getElementById("buttonContainer").innerHTML += `<button id="${url}" onclick="getData('${url}')">${url}</button>`);
-
-
-    function updateBar() {
-      request.open("GET", '/getphrase', false);
-      request.send(null);
-      let phraseRes = JSON.parse(request.responseText);
-      let phrase = phraseRes.phrase;
-      let vbText = document.getElementById("vbText");
-      vbText.innerText = phrase;
-      //To do: update color
-
-      request.open("GET", '/getpix', false);
-      request.send(null);
-      let pixRes = JSON.parse(request.responseText);
-      let pix = eval(pixRes.pixels);
-      let pixBox = document.getElementById("pixBox");
-      pixBox.innerHTML = '';
-      for (let i = pix.length - 1; i >= 0; i--) {
-          for (let color = 0; color < pix[i].length; color++) {
-              pix[i][color] = pix[i][color].toString(16);
-              if (pix[i][color].length < 2)
-                  pix[i][color] = "0" + pix[i][color];
-          }
-          pixBox.innerHTML += "<div style='display: inline; flex-grow: 1; overflow: hidden; background-color: #" + pix[i][0] + "" + pix[i][1] + "" + pix[i][2] + ";'>&nbsp;</div>";
-      }
-
-      timeLeft = 3;
-=======
 <!-- Extra JavaScript here -->
 {% block script %}
 <script>
@@ -171,13 +123,11 @@
     "/getpix",
     "/getquizname",
     "/getstudents",
-    "/getword"
   ];
   let timeLeft = 3;
   let dataURL = "/getpix";
 
   urls.forEach(url => document.getElementById("buttonContainer").innerHTML += `<button id="${url}" onclick="getData('${url}')">${url}</button>`);
-
 
   function updateBar() {
     request.open("GET", '/getphrase', false);
@@ -201,35 +151,11 @@
                 pix[i][color] = "0" + pix[i][color];
         }
         pixBox.innerHTML += "<div style='display: inline; flex-grow: 1; overflow: hidden; background-color: #" + pix[i][0] + "" + pix[i][1] + "" + pix[i][2] + ";'>&nbsp;</div>";
->>>>>>> Stashed changes
     }
 
     timeLeft = 3;
   }
 
-<<<<<<< Updated upstream
-    setInterval(updateBar, 3000);
-    setInterval(countdown, 1000);
-    updateBar();
-    countdown();
-
-    function getData(newURL) {
-      dataURL = newURL;
-      request.open('GET', newURL);
-      request.onload = function() {
-          data = request.response;
-          if (newURL) {
-            urls.forEach(url => {
-              let el = document.getElementById(url);
-              if (url == newURL) el.classList.add("pressed");
-              else el.classList.remove("pressed");
-            });
-            document.getElementById("data").innerText = data;
-          }
-      };
-      request.send();
-    }
-=======
   function countdown() {
     document.getElementById("timeLeft").innerHTML = timeLeft--;
   }
@@ -247,15 +173,14 @@
         if (newURL) {
           urls.forEach(url => {
             let el = document.getElementById(url);
-            if (url == newURL) el.classList.add("open");
-            else el.classList.remove("open");
+            if (url == newURL) el.classList.add("pressed");
+            else el.classList.remove("pressed");
           });
           document.getElementById("data").innerText = data;
         }
     };
     request.send();
   }
->>>>>>> Stashed changes
 
   getData(dataURL);
   setInterval(() => getData(dataURL), 3000);

@@ -1,0 +1,45 @@
+{% extends 'header.html' %}
+<!-- ^^ This means add this file to the end of the contents of header.html -->
+<!-- This is where the title, top buttons, and stylesheet is located -->
+
+<!-- Change title here -->
+{% block title %}Pee pee poo poo{% endblock %}
+
+<!-- Extra style declarations here -->
+{% block style %}
+  <meta http-equiv="refresh" content="5">
+  <style>
+    body {
+      text-align: center;
+      margin: 0 30%;
+    }
+  </style>
+{% endblock %}
+
+<!-- Change theme color here -->
+{% block color %}yellow{% endblock %}
+
+<!-- Main content here -->
+{% block main %}
+  <h1>Take a break</h1>
+  <div id="info">You will be excluded until your break is ended. While taking a break, you won't be able to participate in surveys or use other features.</div>
+  <br>
+  <form method="get">
+    <input type="hidden" id="action" name="action" value="request">
+    <input type="submit" id="submitButton" class="button" value="Request break">
+  </form>
+{% endblock %}
+
+<!-- Extra javascript here -->
+{% block script %}
+  <script>
+    if (eval("{{ excluded }}")) {
+      document.getElementById("info").innerText = "End your break to participate again.";
+      document.getElementById("action").value = "end";
+      document.getElementById("submitButton").value = "End break";
+    } else if (eval("{{ breakRequest }}")) {
+      document.getElementById("info").innerText = "Waiting for the teacher to accept your request…";
+      document.getElementById("submitButton").classList.add("hidden");
+    }
+  </script>
+{% endblock %}

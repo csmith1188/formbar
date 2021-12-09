@@ -851,16 +851,16 @@ def endpoint_break():
     #Still need to validate name and end break from /settings
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
-    if request.args.get('request'):
+    if request.args.get('action') == 'request':
         helpList[name] = '<i>Requested a bathroom break</i>'
         sD.studentDict[request.remote_addr]['breakRequest'] = True
         playSFX("sfx_pickup02")
         return redirect("/break")
-    elif request.args.get('end'):
+    elif request.args.get('action') == 'end':
         if sD.studentDict[request.remote_addr]['excluded']:
             sD.studentDict[request.remote_addr]['excluded'] = False
             sD.studentDict[request.remote_addr]['perms'] = sD.studentDict[request.remote_addr]['oldPerms']
-    return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'])
+    return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'], breakRequest = sD.studentDict[request.remote_addr]['breakRequest'])
 
 
 #  ██████
@@ -1428,7 +1428,6 @@ def endpoint_needshelp():
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['admin']:
         return redirect("/chat?alert=You do not have high enough permissions to do this right now.")
     else:
-        acceptBreak = request.args.get('acceptBreak')
         remove = request.args.get('remove')
         '''
         if bool(helpList):
@@ -1444,10 +1443,14 @@ def endpoint_needshelp():
         if ONRPi:
             pixels.show()
         '''
-    if acceptBreak:
-        sD.studentDict[request.remote_addr]['excluded'] = True
-        sD.studentDict[request.remote_addr]['oldPerms'] = sD.studentDict[request.remote_addr]['perms'] #Get the student's current permissions so they can be stored later
-        sD.studentDict[request.remote_addr]['perms'] = sD.settings['perms']['banned']
+    sD.studentDict[]['breakRequest'] = False #Remove the student's bathroom break request if they have one
+    if request.args.get('acceptBreak'):
+        student = request.args.get('acceptBreak')
+        #Get student by username
+        sD.studentDict[]['excluded'] = True
+        sD.studentDict[]['oldPerms'] = sD.studentDict[request.remote_addr]['perms'] #Get the student's current permissions so they can be stored later
+        sD.studentDict[]['perms'] = sD.settings['perms']['banned']
+        server.send_message(sD.studentDict[], json.dumps(packMSG('alert', student, 'server', 'The teacher accepted your break request.')))
     if remove:
         if remove in helpList:
             #Seacrch through each student

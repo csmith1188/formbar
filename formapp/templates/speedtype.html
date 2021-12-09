@@ -1,14 +1,17 @@
 <!-- Original Site -->
 <!-- https://www.geeksforgeeks.org/design-a-typing-speed-test-game-using-javascript/ -->
 
-<html lang="en">
+{% extends 'header.html' %}
+<!-- ^^ This means add this file to the end of the contents of header.html -->
+<!-- This is where the title, top buttons, and stylesheet is located -->
 
-<head>
-  <title>Simple Speed Typer</title>
+<!-- Change title here -->
+{% block title %}Simple Speed Typer{% endblock %}
+
+<!-- Extra style declarations here -->
+{% block style %}
   <style media="screen">
     body {
-      background-color: #fe9801;
-      color: black;
       text-align: center;
     }
 
@@ -21,7 +24,6 @@
     .heading {
       margin-bottom: 20px;
       font-size: 3rem;
-      color: black;
     }
 
     .header {
@@ -34,13 +36,12 @@
     .accuracy,
     .cpm,
     .wpm {
-      background-color: #ccda46;
+      background-color: var(--dark-gray);
       height: 60px;
-      width: 70px;
+      width: 135px;
+      min-width: 60px;
       margin: 8px;
       padding: 12px;
-      border-radius: 20%;
-      box-shadow: black 5px 8px 5px;
     }
 
     .cpm,
@@ -48,72 +49,65 @@
       display: none;
     }
 
-    .header_text {
-      text-transform: uppercase;
-      font-size: 0.6rem;
-      font-weight: 600;
-    }
-
     .curr_time,
     .curr_errors,
     .curr_accuracy,
     .curr_cpm,
     .curr_wpm {
-      font-size: 2.75rem;
+      font-size: 1.875rem;
     }
 
     .quote {
-      background-color: #ccda46;
       font-size: 1.5rem;
       margin: 10px;
       padding: 25px;
-      box-shadow: black 5px 8px 5px;
+      background: var(--bg-darker);
+      border: 1px solid var(--light-yellow);
     }
 
     .input_area {
-      background-color: #f5f5c6;
       height: 80px;
-      width: 40%;
+      width: fit-content;
+      min-width: 40%;
       font-size: 1.5rem;
       font-weight: 600;
       margin: 15px;
-      padding: 20px;
-      border: 0px;
-      box-shadow: black 5px 8px 5px;
+      padding: 23px;
     }
 
-    .restart_btn {
+    button.restart_btn {
       display: none;
-      background-color: #326765;
       font-size: 1.5rem;
-      padding: 10px;
-      border: 0px;
-      box-shadow: black 5px 8px 5px;
+      padding: 6px 18px;
     }
 
     .incorrect_char {
-      color: red;
+      color: var(--light-red);
       text-decoration: underline;
     }
 
     .correct_char {
-      color: darkgreen;
+      color: var(--light-green);
     }
   </style>
-</head>
+{% endblock %}
 
-<body>
+<!-- Change theme color here -->
+{% block color %}green{% endblock %}
+
+<!-- Main content here -->
+{% block main %}
   <div class="container">
-    <div class="heading">
+    <h1 class="heading">
       Simple Speed Typing
-    </div>
+    </h1>
     <div class="header">
       <div class="wpm">
-        <div class="header_text">WPM</div>
+        <div class="header_text">Words/minute</div>
         <div class="curr_wpm">100</div>
       </div>
       <div class="cpm">
-        <div class="header_text">CPM</div>
+        <div class="header_text">Characters/minute</div>
         <div class="curr_cpm">100</div>
       </div>
       <div class="errors">
@@ -125,21 +119,24 @@
         <div class="curr_time">60s</div>
       </div>
       <div class="accuracy">
-        <div class="header_text">% Accuracy</div>
-        <div class="curr_accuracy">100</div>
+        <div class="header_text">Accuracy</div>
+        <div class="curr_accuracy">100%</div>
       </div>
     </div>
 
     <div class="quote">
       Click on the area below to start the game.
     </div>
-    <textarea class="input_area" placeholder="start typing here..." oninput="processCurrentText()" onfocus="startGame()">
-	</textarea>
+    <textarea class="input_area" placeholder="start typing here..." oninput="processCurrentText()" onfocus="if (!activeGame) startGame()" onclick="this.selectionStart = this.value.length" onselect="this.selectionStart = this.value.length" onkeydown="return isValid(event)" onpaste="return false" ondrop="return false">
+  </textarea>
     <button class="restart_btn" onclick="resetValues()">
       Restart
     </button>
   </div>
+{% endblock %}
 
+<!-- Extra JavaScript here -->
+{% block script %}
   <script>
     // define the time limit
     let TIME_LIMIT = 60;
@@ -163,11 +160,13 @@
     let quote_text = document.querySelector(".quote");
     let input_area = document.querySelector(".input_area");
     let restart_btn = document.querySelector(".restart_btn");
+    let timer_group = document.querySelector(".timer");
     let cpm_group = document.querySelector(".cpm");
     let wpm_group = document.querySelector(".wpm");
     let error_group = document.querySelector(".errors");
     let accuracy_group = document.querySelector(".accuracy");
 
+    let activeGame = false;
     let timeLeft = TIME_LIMIT;
     let timeElapsed = 0;
     let total_errors = 0;
@@ -197,12 +196,18 @@
         quoteNo = 0;
     }
 
+    function isValid() {
+      if (event.key.length == 1) return true;
+      else return false;
+    }
 
     function processCurrentText() {
+      // scroll to bottom
+      input_area.scrollTop = input_area.scrollHeight;
 
       // get current input text and split it
-      curr_input = input_area.value;
-      curr_input_array = curr_input.split('');
+      let curr_input = input_area.value;
+      let curr_input_array = curr_input.split('');
 
       // increment total characters typed
       characterTyped++;
@@ -239,7 +244,7 @@
       // update accuracy text
       let correctCharacters = (characterTyped - (total_errors + errors));
       let accuracyVal = ((correctCharacters / characterTyped) * 100);
-      accuracy_text.textContent = Math.round(accuracyVal);
+      accuracy_text.textContent = Math.round(accuracyVal) + "%";
 
       // if current text is completely typed
       // irrespective of errors
@@ -259,6 +264,8 @@
       resetValues();
       updateQuote();
 
+      activeGame = true;
+
       // clear old and start a new timer
       clearInterval(timer);
       timer = setInterval(updateTimer, 1000);
@@ -273,15 +280,20 @@
       characterTyped = 0;
       quoteNo = 0;
       input_area.disabled = false;
+      input_area.classList.remove("unselectable");
 
       input_area.value = "";
       quote_text.textContent = 'Click on the area below to start the game.';
-      accuracy_text.textContent = 100;
+      accuracy_text.textContent = "100%";
       timer_text.textContent = timeLeft + 's';
       error_text.textContent = 0;
-      restart_btn.style.display = "none";
       cpm_group.style.display = "none";
       wpm_group.style.display = "none";
+      // display restart button
+      restart_btn.style.display = "block";
+      // stop the timer
+      clearInterval(timer);
+      activeGame = false;
     }
 
     function updateTimer() {
@@ -306,12 +318,10 @@
 
       // disable the input area
       input_area.disabled = true;
+      input_area.classList.add("unselectable");
 
       // show finishing text
       quote_text.textContent = "Click on restart to start a new game.";
-
-      // display restart button
-      restart_btn.style.display = "block";
 
       // calculate cpm and wpm
       cpm = Math.round(((characterTyped / timeElapsed) * 60));
@@ -324,8 +334,10 @@
       // display the cpm and wpm
       cpm_group.style.display = "block";
       wpm_group.style.display = "block";
+      // hide the timer
+      timer_group.style.display = "none";
+
+      activeGame = false;
     }
   </script>
-</body>
-
-</html>
+{% endblock %}

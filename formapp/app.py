@@ -1573,6 +1573,8 @@ def endpoint_quiz():
         return redirect("/chat?alert=You do not have high enough permissions to do this right now.")
     else:
         if request.method == 'POST':
+            messageOut = packMSG('alert', 'all', 'server', 'The teacher started a quiz.<br><button onclick="window.location=\"/quiz\"">Open quiz</button>')
+            server.send_message_to_all(json.dumps(messageOut))
             resString = '<ul>'
             for i, answer in enumerate(request.form):
                 resString += '<li>' + str(i) + ': '

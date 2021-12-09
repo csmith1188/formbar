@@ -7,7 +7,6 @@
 
 <!-- Extra style declarations here -->
 {% block style %}
-  <meta http-equiv="refresh" content="5">
   <style>
     body {
       text-align: center;
@@ -21,7 +20,7 @@
 
 <!-- Main content here -->
 {% block main %}
-  <h1>Take a break</h1>
+  <h1>Take a bathroom break</h1>
   <div id="info">You will be excluded until your break is ended. While taking a break, you won't be able to participate in surveys or use other features.</div>
   <br>
   <form method="get">
@@ -33,13 +32,18 @@
 <!-- Extra javascript here -->
 {% block script %}
   <script>
-    if (eval("{{ excluded }}")) {
+    if (eval("{{ excluded }}".toLowerCase())) {
       document.getElementById("info").innerText = "End your break to participate again.";
       document.getElementById("action").value = "end";
       document.getElementById("submitButton").value = "End break";
-    } else if (eval("{{ breakRequest }}")) {
+    } else if ("{{ ticket }}" == "&lt;i&gt;Requested a bathroom break&lt;/i&gt;") {
       document.getElementById("info").innerText = "Waiting for the teacher to accept your request…";
       document.getElementById("submitButton").classList.add("hidden");
+    } else if  ("{{ ticket }}") {
+      document.getElementById("info").innerText = "You can't request a bathroom break while you have a help ticket in.";
+      document.getElementById("submitButton").classList.add("hidden");
     }
+
+    setInterval(() => window.location = "/break", 5000); //Go to /break without arguments every 5 seconds
   </script>
 {% endblock %}

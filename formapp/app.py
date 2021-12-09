@@ -848,34 +848,38 @@ def endpoint_bgmstop():
 
 @app.route('/break')
 def endpoint_break():
-    #Still need to end break from /settings
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
+    if request.args.get('name'):
+        name = request.args.get('name')
+    else:
+        name = sD.studentDict[request.remote_addr]['name'].strip()
+    if name in helpList:
+        ticket = helpList[name]
+    else:
+        ticket = ''
     if request.args.get('action') == 'request':
-        if sD.studentDict[request.remote_addr]['breakRequest']:
-            return redirect("/chat?alert=You've already sent a request for a bathroom break.")
+        if name in helpList:
+            return redirect("/chat?alert=You already have a help ticket or break request in." )
         else:
             helpList[name] = '<i>Requested a bathroom break</i>'
-            sD.studentDict[request.remote_addr]['breakRequest'] = True
             playSFX("sfx_pickup02")
             return redirect("/chat?alert=Your request was sent. The teacher still needs to approve it.")
     elif request.args.get('action') == 'end':
-        if request.args.get('name'):
-            #Find the student whose username matches the "name" argument
-            for student in sD.studentDict:
-                if sD.studentDict[student]['name'].strip() == request.args.get('name'):
-                    if sD.studentDict[student]['excluded']:
-                        sD.studentDict[student]['excluded'] = False
-                        sD.studentDict[student]['perms'] = sD.studentDict[request.remote_addr]['oldPerms']
-                        server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', student, 'server', 'Your break was ended.')))
-                        return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'], breakRequest = sD.studentDict[request.remote_addr]['breakRequest'])
-                    else:
-                        return redirect("/chat?alert=This student is not currently taking a bathroom break.")
-            return render_template("message.html", message = 'Student not found.')
-        else:
-            return render_template("message.html", message = 'You need a "name" argument.')
+        #Find the student whose username matches the "name" argument
+        for student in sD.studentDict:
+            if sD.studentDict[student]['name'].strip() == name:
+                if sD.studentDict[student]['excluded']:
+                    sD.studentDict[student]['excluded'] = False
+                    sD.studentDict[student]['perms'] = sD.studentDict[request.remote_addr]['oldPerms']
+                    #Commented out because WebSocket server isn't working
+                    #server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', student, 'server', 'Your break was ended.')))
+                    return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'], ticket = ticket)
+                else:
+                    return redirect("/chat?alert=This student is not currently taking a bathroom break.")
+        return render_template("message.html", message = 'Student not found.')
     else:
-        return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'], breakRequest = sD.studentDict[request.remote_addr]['breakRequest'])
+        return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'], ticket = ticket)
 
 
 #  ██████
@@ -1166,7 +1170,7 @@ def endpoint_help():
         name = sD.studentDict[request.remote_addr]['name']
         name = name.strip()
         if name in helpList:
-            return redirect("/chat?alert=You already have a help ticket in. If your problem is time-sensitive, or your last ticket was not cleared, please get the teacher's attention manually." )
+            return redirect("/chat?alert=You already have a help ticket or break request in. If your problem is time-sensitive, or your last ticket was not cleared, please get the teacher's attention manually." )
         else:
             helpList[name] = request.form['message'] or '<i>Sent a help ticket</i>'
             sD.studentDict[request.remote_addr]['help'] = True
@@ -1463,16 +1467,18 @@ def endpoint_needshelp():
             #Seacrch through each student
             for student in sD.studentDict:
                 #If the name with no whitespaces equals the name we want to remove
-                if sD.studentDict[student]['name'].strip() == remove:
+                name = sD.studentDict[student]['name'].strip()
+                if name == remove:
                     #Remove the help flag from their user and break loop
                     sD.studentDict[student]['help'] = False
-                    sD.studentDict[student]['breakRequest'] = False #Remove the student's bathroom break request if they have one
                     if request.args.get('acceptBreak'):
                         sD.studentDict[student]['excluded'] = True
                         sD.studentDict[student]['oldPerms'] = sD.studentDict[request.remote_addr]['perms'] #Get the student's current permissions so they can be stored later
                         sD.studentDict[student]['perms'] = sD.settings['perms']['banned']
-                        server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', student, 'server', 'The teacher accepted your break request.')))
-                        break
+                    #Commented out because WebSocket server isn't working
+                        #server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', name, 'server', 'The teacher accepted your break request.')))
+                    #elif helpList[name] == "<i>Requested a bathroom break</i>":
+                        #server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', name, 'server', 'The teacher rejected your break request.')))
             del helpList[remove]
             return redirect("/needshelp")
         else:

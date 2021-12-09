@@ -490,7 +490,7 @@
   function checkIfRemoved() {
     //If the user is removed by the teacher, send them back to the login page
     let res = getResponse("/getme");
-    if (res.error == "Insufficient permissions.") window.location = "/login?message=You have been logged out.";
+    if (res.error == "You are not logged in.") window.location = "/login?alert=You have been logged out.";
   }
 
   function shorten(container, maxHeight, text) {
@@ -751,7 +751,7 @@
     let content = innerPage.contentWindow.document.body.innerHTML;
     let tabs = document.querySelectorAll(".tab");
     let tabEl = document.getElementById(path.substring(1) + "Tab");
-    if (!content) openPage("chat?message='Page does not exist.'");
+    if (!content) openPage("chat?alert='Page does not exist.'");
     Array.from(tabs).forEach(tab => tab.classList.remove("open"));
     if (["/help", "/break"].includes(path)) document.getElementById("studentsTab").classList.add("open");
     if (["/2048", "/hangman", "/minesweeper", "/speedtype", "/ttt", "/fighter"].includes(path)) document.getElementById("gamesTab").classList.add("open");

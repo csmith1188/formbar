@@ -123,7 +123,7 @@
     overflow: auto;
   }
 
-  #tutdDiv, #surveyDiv {
+  #tutdDiv, #abcdDiv {
     width: 100%;
     text-align: center;
   }
@@ -223,7 +223,7 @@
     background: var(--color-cyan);
   }
 
-  #helpTab.open {
+  #studentsTab.open, #studentsMenu > .open {
     background: var(--color-gold);
   }
 
@@ -284,8 +284,8 @@
       <br><br><br>
     </div>
 
-    <div id="surveyDiv" class="hidden">
-      <h2>Survey</h2>
+    <div id="abcdDiv" class="hidden">
+      <h2>Letters</h2>
       <img src="{{ url_for('static', filename='img/home/letterButton0.png') }}" id="letterButton0" class="letterButton redColor" title="Vote A" onclick="letterVote(0);" tabindex="0">
       <br>
       <img src="{{ url_for('static', filename='img/home/letterButton1.png') }}" id="letterButton1" class="letterButton blueColor" title="Vote B" onclick="letterVote(1);" tabindex="0">
@@ -367,7 +367,11 @@
 <div id="rightSide">
   <div id="tabs">
     <div id="chatTab" class="tab" onclick="openPage('chat');"><img src="{{ url_for('static', filename='img/home/chat.png') }}" class="icon"> <b id="newMessages" style="color: var(--light-red);"></b> Chat</div>
-    <div id="helpTab" class="tab" onclick="openPage('help');"><img src="{{ url_for('static', filename='img/home/help.png') }}" class="icon"> Help!</div>
+    <div id="studentsTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/home/students.png') }}" class="icon"> Students</div>
+    <div id="studentsMenu" class="menu hidden" tabindex="-1">
+      <div id="breakTab" class="tab" onclick="openPage('break');">Bathroom break</div>
+      <div id="helpTab" class="tab" onclick="openPage('help');">Help!</div>
+    </div>
     <div id="wawdTab" class="tab" onclick="openPage('wawd');"><img src="{{ url_for('static', filename='img/home/wawd.png') }}" class="icon"> What are we doing?</div>
     <div id="quizTab" class="tab" onclick="openPage('quiz');"><img src="{{ url_for('static', filename='img/home/quiz.png') }}" class="icon"> Quiz</div>
     <div id="gamesTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/home/games.png') }}" class="icon"> Games</div>
@@ -468,7 +472,7 @@
   window.addEventListener("resize", bottomPosition);
 
   function menuPositions() {
-    ["games", "teacher"].forEach(group => document.getElementById(group + "Menu").style.left = document.getElementById(group + "Tab").getBoundingClientRect().left + "px"); //Give menu same X position as tab
+    ["students", "games", "teacher"].forEach(group => document.getElementById(group + "Menu").style.left = document.getElementById(group + "Tab").getBoundingClientRect().left + "px"); //Give menu same X position as tab
   }
 
   function getUsername() {
@@ -486,7 +490,7 @@
   function checkIfRemoved() {
     //If the user is removed by the teacher, send them back to the login page
     let res = getResponse("/getme");
-    if (res.error == "Insufficient permissions.") window.location = "/login?message=You have been logged out.";
+    if (res.error == "You are not logged in.") window.location = "/login?alert=You have been logged out.";
   }
 
   function shorten(container, maxHeight, text) {
@@ -541,17 +545,17 @@
     if (chosenLetter === letter) {
       chosenLetter = false;
       removeHighlight("letterButton" + letter);
-      request.open("GET", "/survey?vote=oops");
+      request.open("GET", "/abcd?vote=oops");
     } else {
       chosenLetter = letter;
       if (letter == 0) {
-        request.open("GET", "/survey?vote=a");
+        request.open("GET", "/abcd?vote=a");
       } else if (letter == 1) {
-        request.open("GET", "/survey?vote=b");
+        request.open("GET", "/abcd?vote=b");
       } else if (letter == 2) {
-        request.open("GET", "/survey?vote=c");
+        request.open("GET", "/abcd?vote=c");
       } else if (letter == 3) {
-        request.open("GET", "/survey?vote=d");
+        request.open("GET", "/abcd?vote=d");
       }
       //Highlight selected button and reset others
       Array.from(letterButtons).forEach((button, i) => {
@@ -570,10 +574,10 @@
     else if (res.thumb == "down") thumb = 2;
     else thumb = false;
     let letter;
-    if (res.survey == "a") letter = 0;
-    else if (res.survey == "b") letter = 1;
-    else if (res.survey == "c") letter = 2;
-    else if (res.survey == "d") letter = 3;
+    if (res.letter == "a") letter = 0;
+    else if (res.letter == "b") letter = 1;
+    else if (res.letter == "c") letter = 2;
+    else if (res.letter == "d") letter = 3;
     else letter = false;
     if (thumb === false && chosenThumb !== false) thumbsVote(chosenThumb); //Remove the vote
     else if (thumb !== chosenThumb) thumbsVote(thumb);
@@ -747,8 +751,9 @@
     let content = innerPage.contentWindow.document.body.innerHTML;
     let tabs = document.querySelectorAll(".tab");
     let tabEl = document.getElementById(path.substring(1) + "Tab");
-    if (!content) openPage("chat?message='Page does not exist.'");
+    if (!content) openPage("chat?alert='Page does not exist.'");
     Array.from(tabs).forEach(tab => tab.classList.remove("open"));
+    if (["/break", "/help"].includes(path)) document.getElementById("studentsTab").classList.add("open");
     if (["/2048", "/hangman", "/minesweeper", "/speedtype", "/ttt", "/fighter"].includes(path)) document.getElementById("gamesTab").classList.add("open");
     else if (["/needshelp", "/lesson", "/settings", "/users"].includes(path)) document.getElementById("teacherTab").classList.add("open");
     if (tabEl) tabEl.classList.add("open");
@@ -772,8 +777,12 @@
     });
   }
 
+  document.getElementById("studentsTab").onclick = () => showMenu("students");
   document.getElementById("gamesTab").onclick = () => showMenu("games");
   document.getElementById("teacherTab").onclick = () => showMenu("teacher");
+  document.getElementById("studentsTab").onmousedown = function() {
+    if (document.getElementById("studentsMenu") == document.activeElement) this.onclick = null;
+  };
   document.getElementById("gamesTab").onmousedown = function() {
     if (document.getElementById("gamesMenu") == document.activeElement) this.onclick = null;
   };
@@ -781,6 +790,7 @@
     if (document.getElementById("teacherMenu") == document.activeElement) this.onclick = null;
   };
   document.onclick = () => {
+    document.getElementById("studentsTab").onclick = () => showMenu("students");
     document.getElementById("gamesTab").onclick = () => showMenu("games");
     document.getElementById("teacherTab").onclick = () => showMenu("teacher");
   }

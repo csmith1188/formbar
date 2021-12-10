@@ -1811,7 +1811,7 @@ def endpoint_tutd():
                     tutdBar()
                     return render_template("message.html", forward=request.path, message = "Thank you for your tasty bytes... (" + thumb + ")" )
                 else:
-                    return render_template("message.html", forward=request.path, message = "You've already sunmitted this answer... (" + thumb + ")" )
+                    return render_template("message.html", forward=request.path, message = "You've already submitted this answer... (" + thumb + ")" )
             elif thumb == 'oops':
                 if sD.studentDict[request.remote_addr]['thumb']:
                     sD.studentDict[request.remote_addr]['thumb'] = ''

@@ -744,7 +744,7 @@ def endpoint_abcd():
                         abcdBar()
                         return render_template("message.html", forward=request.path, message = "Thank you for your tasty bytes... (" + vote + ")" )
                     else:
-                        return render_template("message.html", forward=request.path, message = "You've already sunmitted an answer... (" + sD.studentDict[request.remote_addr]['letter'] + ")" )
+                        return render_template("message.html", forward=request.path, message = "You've already submitted an answer... (" + sD.studentDict[request.remote_addr]['letter'] + ")" )
                 elif vote == 'oops':
                     if sD.studentDict[request.remote_addr]['letter']:
                         sD.studentDict[request.remote_addr]['letter'] = ''

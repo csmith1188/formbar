@@ -694,18 +694,21 @@ def updateStep():
 '''
 @app.route('/')
 def endpoint_home():
-    if not request.remote_addr in sD.studentDict:
-        return redirect('/login')
+    if True:
+        if not request.remote_addr in sD.studentDict:
+            return redirect('/login')
+        else:
+            username = sD.studentDict[request.remote_addr]['name']
+            sfx.updateFiles()
+            sounds = []
+            music = []
+            for key, value in sfx.sound.items():
+                sounds.append(key)
+            for key, value in bgm.bgm.items():
+                music.append(key)
+            return render_template('index.html', username = username, sfx = sounds, bgm = music)
     else:
-        username = sD.studentDict[request.remote_addr]['name']
-        sfx.updateFiles()
-        sounds = []
-        music = []
-        for key, value in sfx.sound.items():
-            sounds.append(key)
-        for key, value in bgm.bgm.items():
-            music.append(key)
-        return render_template('index.html', username = username, sfx = sounds, bgm = music)
+        redirect('/basic')
 
 @app.route('/2048')
 def endpoint_2048():
@@ -774,6 +777,17 @@ def endpoint_addfighteropponent():
 # ██████
 # ██   ██
 # ██████
+
+
+'''
+    /basic
+    A simplified homepage for beginners
+'''
+@app.route('/basic')
+def endpoint_basic():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    return render_template("basic.html")
 
 
 '''
@@ -850,10 +864,7 @@ def endpoint_bgmstop():
 def endpoint_break():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
-    if request.args.get('name'):
-        name = request.args.get('name')
-    else:
-        name = sD.studentDict[request.remote_addr]['name'].strip()
+    name = request.args.get('name') or sD.studentDict[request.remote_addr]['name'].strip()
     if name in helpList:
         ticket = helpList[name]
     else:

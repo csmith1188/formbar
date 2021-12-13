@@ -1635,9 +1635,9 @@ def endpoint_say():
                 showString(sD.activePhrase)
                 if ONRPi:
                     pixels.show()
+            return render_template("message.html", message = "Set phrase to: " + str(sD.activePhrase) + "" )
         else:
             return render_template("message.html", message = "<b>phrase</b> must contain a string. \'/say?phrase=<b>\'hello\'</b>\'" )
-            return render_template("message.html", message = "Set phrase to: " + str(sD.activePhrase) + "" )
 
 @app.route('/segment')
 def endpoint_segment():

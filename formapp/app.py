@@ -694,21 +694,21 @@ def updateStep():
 '''
 @app.route('/')
 def endpoint_home():
-    if True:
         if not request.remote_addr in sD.studentDict:
             return redirect('/login')
         else:
-            username = sD.studentDict[request.remote_addr]['name']
-            sfx.updateFiles()
-            sounds = []
-            music = []
-            for key, value in sfx.sound.items():
-                sounds.append(key)
-            for key, value in bgm.bgm.items():
-                music.append(key)
-            return render_template('index.html', username = username, sfx = sounds, bgm = music)
-    else:
-        redirect('/basic')
+            if True:
+                username = sD.studentDict[request.remote_addr]['name']
+                sfx.updateFiles()
+                sounds = []
+                music = []
+                for key, value in sfx.sound.items():
+                    sounds.append(key)
+                for key, value in bgm.bgm.items():
+                    music.append(key)
+                return render_template('index.html', username = username, sfx = sounds, bgm = music)
+            else:
+                redirect('/basic')
 
 @app.route('/2048')
 def endpoint_2048():
@@ -1178,7 +1178,7 @@ def endpoint_hangman():
             }
         return render_template("hangman.html", wordObj=wordObj)
 
-@app.route('/help', methods = ['POST', 'GET'])
+@app.route('/help')
 def endpoint_help():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)

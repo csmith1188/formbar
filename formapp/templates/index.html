@@ -69,10 +69,9 @@
     border-radius: 48px;
   }
 
-  .thumbButton:not(.highlight):hover:not(:active),
-  .letterButton:not(.highlight):hover:not(:active) {
-    transform: translate(4px, -4px);
-    box-shadow: -1px 1px, -2px 2px, -3px 3px, -4px 4px;
+  .highlight:hover {
+    transform: none !important;
+    box-shadow: none !important;
   }
 
   button:active,
@@ -274,6 +273,8 @@
   <div id="sidebarContent">
     <h2>Formbar Features</h2>
     <div style="text-align: center;">Features will appear when the teacher makes them available.</div>
+    <br><br>
+
     <div id="tutdDiv" class="hidden">
       <h2>Thumbs</h2>
       <img src="{{ url_for('static', filename='img/home/thumbButton0.png') }}" id="thumbButton0" class="thumbButton greenColor" title="Up" onclick="thumbsVote(0);" tabindex="0">
@@ -306,7 +307,7 @@
 
     <div id="musicDiv" class="hidden">
       <h2>Play music</h2>
-      <label for="volume">Volume: </label><input type="range" id="volume" value="1" max="1" step="0.1">
+      <label for="volume">Volume: </label><input type="range" id="volume" value="0.5" max="1" step="0.1">
       <span id="volNumber">1.0</span>
       <br>
       <img src="{{ url_for('static', filename='img/home/random.png') }}" id="randomMusic" class="smallImg" title="Random" onclick="randomBGM()"><input type="text" id="music" placeholder="Filename" list="bgmFiles">
@@ -402,14 +403,11 @@
 
 <!-- Extra javascript here -->
 {% block script %}
+<script src="{{ url_for('static', filename='js/home.js') }}"></script>
 <script>
-  let thumbButtons = document.querySelectorAll(".thumbButton");
-  let letterButtons = document.querySelectorAll(".letterButton");
   let bottom = document.getElementById("bottom");
   let menus = document.querySelectorAll(".menu");
   let innerPage = document.getElementById("innerPage");
-  let chosenThumb = false;
-  let chosenLetter = false;
   let segment;
   let gradient;
   let urlOpen;
@@ -500,109 +498,6 @@
     while (container.clientHeight > maxHeight) text.innerText = text.innerText.substring(0, text.innerText.length - 2) + "…";
     text.title = original;
     text.style.cursor = "help";
-  }
-
-  Array.from(thumbButtons).forEach((button, i) => {
-    button.addEventListener("keydown", event => {
-      if (event.code == "Enter") {
-        thumbsVote(i);
-      }
-    });
-  });
-
-  Array.from(letterButtons).forEach((button, i) => {
-    button.addEventListener("keydown", event => {
-      if (event.code == "Enter") {
-        letterVote(i);
-      }
-    });
-  });
-
-  function thumbsVote(thumb) {
-    if (chosenThumb === thumb) {
-      chosenThumb = false;
-      removeHighlight("thumbButton" + thumb);
-      request.open("GET", "/tutd?thumb=oops");
-    } else {
-      chosenThumb = thumb;
-      if (thumb == 0) {
-        request.open("GET", "/tutd?thumb=up");
-      } else if (thumb == 1) {
-        request.open("GET", "/tutd?thumb=wiggle");
-      } else if (thumb == 2) {
-        request.open("GET", "/tutd?thumb=down");
-      }
-      //Highlight selected button and reset others
-      Array.from(thumbButtons).forEach((button, i) => {
-        if (i == thumb) highlight("thumbButton" + thumb);
-        else removeHighlight("thumbButton" + i);
-      });
-    }
-    request.send();
-  }
-
-  function letterVote(letter) {
-    if (chosenLetter === letter) {
-      chosenLetter = false;
-      removeHighlight("letterButton" + letter);
-      request.open("GET", "/abcd?vote=oops");
-    } else {
-      chosenLetter = letter;
-      if (letter == 0) {
-        request.open("GET", "/abcd?vote=a");
-      } else if (letter == 1) {
-        request.open("GET", "/abcd?vote=b");
-      } else if (letter == 2) {
-        request.open("GET", "/abcd?vote=c");
-      } else if (letter == 3) {
-        request.open("GET", "/abcd?vote=d");
-      }
-      //Highlight selected button and reset others
-      Array.from(letterButtons).forEach((button, i) => {
-        if (i == letter) highlight("letterButton" + letter);
-        else removeHighlight("letterButton" + i);
-      });
-    }
-    request.send();
-  }
-
-  function updateVotes() { //Make sure displayed vote matches actual vote, for example if new poll is started or user reloads
-    let res = getResponse("/getme");
-    let thumb;
-    if (res.thumb == "up") thumb = 0;
-    else if (res.thumb == "wiggle") thumb = 1;
-    else if (res.thumb == "down") thumb = 2;
-    else thumb = false;
-    let letter;
-    if (res.letter == "a") letter = 0;
-    else if (res.letter == "b") letter = 1;
-    else if (res.letter == "c") letter = 2;
-    else if (res.letter == "d") letter = 3;
-    else letter = false;
-    if (thumb === false && chosenThumb !== false) thumbsVote(chosenThumb); //Remove the vote
-    else if (thumb !== chosenThumb) thumbsVote(thumb);
-    if (letter === false && chosenLetter !== false) thumbsVote(chosenLetter); //Remove the vote
-    else if (letter !== chosenLetter) letterVote(letter);
-  }
-
-  function highlight(image) {
-    let button = document.getElementById(image);
-    button.src = "/static/img/home/" + image + "-highlight.png";
-    button.classList.add("highlight");
-    button.title = "Cancel";
-  }
-
-  function removeHighlight(image) {
-    let button = document.getElementById(image);
-    button.src = "/static/img/home/" + image + ".png"
-    button.classList.remove("highlight");
-    if (image == "thumbButton0") button.title = "Up";
-    if (image == "thumbButton1") button.title = "Wiggle";
-    if (image == "thumbButton2") button.title = "Down";
-    if (image == "letterButton0") button.title = "Vote A";
-    if (image == "letterButton1") button.title = "Vote B";
-    if (image == "letterButton2") button.title = "Vote C";
-    if (image == "letterButton3") button.title = "Vote D";
   }
 
   let sfx = eval("{{ sfx }}".replaceAll("&#39;", "'"));

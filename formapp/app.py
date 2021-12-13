@@ -694,18 +694,21 @@ def updateStep():
 '''
 @app.route('/')
 def endpoint_home():
-    if not request.remote_addr in sD.studentDict:
-        return redirect('/login')
-    else:
-        username = sD.studentDict[request.remote_addr]['name']
-        sfx.updateFiles()
-        sounds = []
-        music = []
-        for key, value in sfx.sound.items():
-            sounds.append(key)
-        for key, value in bgm.bgm.items():
-            music.append(key)
-        return render_template('index.html', username = username, sfx = sounds, bgm = music)
+        if not request.remote_addr in sD.studentDict:
+            return redirect('/login')
+        else:
+            if True:
+                username = sD.studentDict[request.remote_addr]['name']
+                sfx.updateFiles()
+                sounds = []
+                music = []
+                for key, value in sfx.sound.items():
+                    sounds.append(key)
+                for key, value in bgm.bgm.items():
+                    music.append(key)
+                return render_template('index.html', username = username, sfx = sounds, bgm = music)
+            else:
+                redirect('/basic')
 
 @app.route('/2048')
 def endpoint_2048():
@@ -774,6 +777,22 @@ def endpoint_addfighteropponent():
 # ██████
 # ██   ██
 # ██████
+
+
+'''
+    /basic
+    A simplified homepage for beginners
+'''
+@app.route('/basic')
+def endpoint_basic():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    name = sD.studentDict[request.remote_addr]['name'].strip()
+    if name in helpList:
+        ticket = helpList[name]
+    else:
+        ticket = ''
+    return render_template("basic.html", helpTicket = ticket)
 
 
 '''
@@ -850,10 +869,7 @@ def endpoint_bgmstop():
 def endpoint_break():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
-    if request.args.get('name'):
-        name = request.args.get('name')
-    else:
-        name = sD.studentDict[request.remote_addr]['name'].strip()
+    name = request.args.get('name') or sD.studentDict[request.remote_addr]['name'].strip()
     if name in helpList:
         ticket = helpList[name]
     else:
@@ -1162,17 +1178,17 @@ def endpoint_hangman():
             }
         return render_template("hangman.html", wordObj=wordObj)
 
-@app.route('/help', methods = ['POST', 'GET'])
+@app.route('/help')
 def endpoint_help():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
-    if request.method == 'POST':
+    if request.args.get('action') == "send":
         name = sD.studentDict[request.remote_addr]['name']
         name = name.strip()
         if name in helpList:
             return redirect("/chat?alert=You already have a help ticket or break request in. If your problem is time-sensitive, or your last ticket was not cleared, please get the teacher's attention manually." )
         else:
-            helpList[name] = request.form['message'] or '<i>Sent a help ticket</i>'
+            helpList[name] = request.args.get('message') or '<i>Sent a help ticket</i>'
             sD.studentDict[request.remote_addr]['help'] = True
             playSFX("sfx_up04")
             return redirect("/chat?alert=Your ticket was sent. Keep working on the problem the best you can while you wait." )
@@ -1624,9 +1640,9 @@ def endpoint_say():
                 showString(sD.activePhrase)
                 if ONRPi:
                     pixels.show()
+            return render_template("message.html", message = "Set phrase to: " + str(sD.activePhrase) + "" )
         else:
             return render_template("message.html", message = "<b>phrase</b> must contain a string. \'/say?phrase=<b>\'hello\'</b>\'" )
-            return render_template("message.html", message = "Set phrase to: " + str(sD.activePhrase) + "" )
 
 @app.route('/segment')
 def endpoint_segment():

@@ -12,7 +12,9 @@
 <script src="../static/jquery/jquery-ui.min.js" charset="utf-8"></script>
 <script>
     $(function() {
-        $("#tabcontainer").accordion();
+        $("#tabcontainer").accordion({
+          heightStyle: "content"
+        });
     });
 </script>
 {% endblock %}
@@ -25,13 +27,13 @@
         <div class="entrylink -green" onclick="window.location = '/tutd';">
             Thumbspanel (/tutd)
         </div>
-        <div class="entrylink -blue" onclick="window.location = '/chat';">
+        <div class="entrylink -yellow" onclick="window.location = '/chat';">
             Chat (/chat)
         </div>
-        <div class="entrylink -red" onclick="window.location = '/help';">
+        <div class="entrylink -blue" onclick="window.location = '/help';">
             Help! (/help)
         </div>
-        <div class="entrylink -yellow" onclick="window.location = '/wawd';">
+        <div class="entrylink -red" onclick="window.location = '/wawd';">
             What Are We Doing? (/wawd)
         </div>
     </div>
@@ -40,13 +42,13 @@
         <div class="entrylink -green" onclick="window.location = '/bgm';">
             Background Music (/bgm)
         </div>
-        <div class="entrylink -blue" onclick="window.location = '/sfx';">
+        <div class="entrylink -yellow" onclick="window.location = '/sfx';">
             Sound Effects (/sfx)
         </div>
-        <div class="entrylink -red" onclick="window.location = '/expert';">
+        <div class="entrylink -blue" onclick="window.location = '/expert';">
             Expert Mode (/expert)
         </div>
-        <div class="entrylink -yellow" onclick="window.location = '/virtualbar';">
+        <div class="entrylink -red" onclick="window.location = '/virtualbar';">
             VirtualBar (/virtualbar)
         </div>
     </div>
@@ -55,13 +57,13 @@
         <div class="entrylink -green" onclick="window.location = '/2048';">
             2048 (/2048)
         </div>
-        <div class="entrylink -blue" onclick="window.location = '/hangman';">
+        <div class="entrylink -yellow" onclick="window.location = '/hangman';">
             Hang Man (/hangman)
         </div>
-        <div class="entrylink -red" onclick="window.location = '/ttt';">
+        <div class="entrylink -blue" onclick="window.location = '/ttt';">
             Tic-Tac-Toe (/ttt)
         </div>
-        <div class="entrylink -yellow" onclick="window.location = '/fighter';">
+        <div class="entrylink -red" onclick="window.location = '/fighter';">
             Turn-Based Fighter (/fighter)
         </div>
     </div>
@@ -70,13 +72,16 @@
         <div class="entrylink -green" onclick="window.location = '/settings';">
             Settings (/settings)
         </div>
+        <div class="entrylink -yellow" onclick="window.location = '/users';">
+            Users (/users)
+        </div>
         <div class="entrylink -blue" onclick="window.location = '/lesson';">
             Lesson (/lesson)
         </div>
         <div class="entrylink -red" onclick="window.location = '/needshelp';">
             Help Tickets (/needshelp)
         </div>
-        <div class="entrylink -red" onclick="window.location = '/debug';">
+        <div class="entrylink -green" onclick="window.location = '/debug';">
             API Debug (/debug)
         </div>
     </div>

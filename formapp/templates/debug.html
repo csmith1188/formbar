@@ -1,14 +1,8 @@
 {% extends 'header.html' %}
 
-{% block title %}Debugging{% endblock %}
+{% block title %}API Debugging{% endblock %}
 {% block style %}
 <style>
-  body {
-    background: var(--bg-dark);
-    color: white;
-    font: 16px "Segoe UI", sans-serif;
-  }
-
   #virtualBar {
     position: absolute;
     top: 0;
@@ -48,24 +42,11 @@
     height: 60px;
     box-sizing: border-box;
     padding: 10px;
-    background: var(--bg-dark-highlight);
+    background: var(--bg-darker);
   }
 
   button {
-    box-sizing: border-box;
-    border-radius: 15px;
     margin: 5px;
-    padding: 2px 8px;
-    background: transparent;
-    color: var(--light-red);
-    border: 1px var(--light-red) solid;
-    font: 18px "Segoe UI", sans-serif;
-    cursor: pointer;
-  }
-
-  button.open, button:hover {
-    background: var(--light-red);
-    color: var(--bg-dark);
   }
 
   #data {
@@ -86,7 +67,7 @@
     height: 28px;
     padding: 7px 14px;
     box-sizing: border-box;
-    background: linear-gradient(to right, var(--light-red), var(--light-red) 50%, var(--bg-dark-highlight) 50%);
+    background: linear-gradient(to right, var(--theme-color), var(--theme-color) 50%, var(--bg-dark-highlight) 50%);
     font-size: 14px;
     line-height: 14px;
     text-align: right;
@@ -113,21 +94,21 @@
 </style>
 {% endblock %}
 
+<!-- Change theme color here -->
+{% block color %}red{% endblock %}
+
 {% block main %}
   <div id="virtualBar">
     <div id="vbText"><!--Text goes here--></div>
     <span id="pixBox"></span>
   </div>
 
-  <div id="buttonContainer">
-    <button id="/getpix" onclick="request('/getpix')">/getpix</button>
-    <button id="/getme" onclick="request('/getme')">/getme</button>
-    <button id="/getpermissions" onclick="request('/getpermissions')">/getpermissions</button>
-  </div>
+  <div id="buttonContainer"></div>
 
   <div id="data"></div>
 
   <div id="updateBar">Updating in <span id="timeLeft">3</span></div>
+{% endblock %}
 
 <!-- Extra JavaScript here -->
 {% block script %}
@@ -172,9 +153,8 @@
         pixBox.innerHTML += "<div style='display: inline; flex-grow: 1; overflow: hidden; background-color: #" + pix[i][0] + "" + pix[i][1] + "" + pix[i][2] + ";'>&nbsp;</div>";
     }
 
-    function countdown() {
-      document.getElementById("timeLeft").innerHTML = timeLeft--;
-    }
+    timeLeft = 3;
+  }
 
   function countdown() {
     document.getElementById("timeLeft").innerHTML = timeLeft--;
@@ -202,7 +182,7 @@
     request.send();
   }
 
-    request(dataURL);
-    setInterval(() => request(dataURL), 3000);
-  </script>
+  getData(dataURL);
+  setInterval(() => getData(dataURL), 3000);
+</script>
 {% endblock %}

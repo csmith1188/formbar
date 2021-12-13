@@ -1,92 +1,304 @@
-body {
-    background-color: #000015;
+:root {
+  /*All pages can use this set of colors*/
+
+  --color-red: #bf0000;
+  --color-brown: #802000;
+  --color-orange: #ff4000;
+  --color-gold: #fa0;
+  --color-yellow: #ffbf00;
+  --color-green: #00bf00;
+  --color-cyan: #009fbf;
+  --color-blue: #0040bf;
+  --color-purple: #bf00ff;
+  --color-pink: #ff4080;
+  --dark-gray: #555;
+
+  --light-red: #ff6860;
+  --light-brown: #bf6040;
+  --light-orange: #ff8f40;
+  --light-yellow: #ffdf40;
+  --light-green: #80ff80;
+  --light-cyan: #80ffff;
+  --light-blue: #bfcfff;
+  --light-purple: #df80ff;
+  --light-pink: #ff80bfff;
+  --light-gray: #ccc;
+
+  --bg-dark: #333;
+  --bg-darker: #222;
+  --bg-dark-highlight: #444;
+  --bg-dark-red: #400;
+  --bg-dark-yellow: #430;
+  --bg-dark-green: #243;
+  --bg-dark-blue: #000922;
+  --bg-dark-purple: #423;
 }
-h1 {
+
+/*Every page should have a theme color*/
+
+.light {
+  --bg-color: white;
+  --theme-color: var(--color-blue);
+  --main-color: black;
+  --emphasis-color: white;
+  --highlight-color: var(--light-gray);
+}
+
+/*Dark mode is default*/
+.dark, body:not(.light) {
+  --bg-color: var(--bg-dark);
+  --main-color: white;
+  --emphasis-color: var(--bg-darker);
+  --highlight-color: var(--bg-dark-highlight);
+}
+
+.red {
+  --theme-color: var(--light-red);
+}
+
+.brown {
+  --theme-color: var(--light-brown);
+}
+
+.orange {
+  --theme-color: var(--light-orange);
+}
+
+.yellow {
+  --theme-color: var(--light-yellow);
+}
+
+.green {
+  --theme-color: var(--light-green);
+}
+
+.blue {
+  --theme-color: var(--light-blue);
+}
+
+.purple {
+  --theme-color: var(--light-purple);
+}
+
+body {
+  font: 16px "Segoe UI", sans-serif;
+  padding: 8px;
+}
+
+body, .light, .dark {
+  background: var(--bg-color);
+  color: var(--main-color);
+}
+
+.hidden {
+  display: none;
+}
+
+.fullScreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 8px;
+}
+
+.hCentered {
+  left: 50%;
+  transform: translateX(-50%);
   text-align: center;
 }
 
-#quickmenu {
-    text-align: center;
-    justify-content: center;
-    margin: auto;
+.vCentered {
+  top: 50%;
+  transform: translateY(-50%);
 }
 
-#content, #homebutton{
-    border-radius: 10px;
-    margin: auto;
-    padding: 10px;
-    max-width: 600px;
-    font-family: Arial;
-    background-color: #eae8ff;
+.hCentered.vCentered {
+  transform: translate(-50%, -50%);
 }
 
-.container1-flex {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-around;
+::selection {
+  background: var(--theme-color);
+  color: var(--bg-color);
 }
 
-.container2-flex {
-    display: flex;
-    justify-content: space-around;
-    flex-grow: 1;
+::-webkit-scrollbar {
+  width: 15px;
+  height: 15px;
 }
 
-
-.bigbutton, .smallbutton {
-    margin: auto;
-    padding: 10px;
-    width: 100px;
-    height: 100px;
-    border-radius: 20px;
-    border: 5px outset #eeeeee;
-    background-color: #cccccc;
-    font-size: 1.2em;
-    font-weight: bolder;
-    text-align: center;
-    box-shadow: 5px 5px #333333;
+::-webkit-scrollbar-thumb {
+  box-shadow: inset 0 0 5px 5px var(--inverse-color);
+  border: solid 5px transparent;
 }
 
-.smallbutton {
-  width: 25px;
-  height: 25px;
-  border-radius: 10px;
-  font-size: 0.6em;
+::-webkit-scrollbar-thumb:hover {
+  box-shadow: inset 0 0 5px 5px var(--main-color);
 }
 
-.bigbutton a {
-  margin: auto;
-  vertical-align: middle;
+::-webkit-scrollbar-thumb:active {
+  box-shadow: inset 0 0 15px 15px var(--main-color);
+  border: none;
 }
 
-.bb-green {
-    border: 5px outset #eeffee;
-    background-color: #ccffcc;
+::-webkit-scrollbar-corner {
+  box-shadow: inset 0 0 5px 5px;
+  border: solid 5px transparent;
 }
 
-.bb-yellow {
-    border: 5px outset #ffffee;
-    background-color: #ffffcc;
+* {
+  font-family: inherit;
+  color: inherit;
 }
 
-.bb-blue {
-    border: 5px outset #eeeeff;
-    background-color: #ccccff;
+input, button, textarea, select {
+  font-size: inherit;
 }
 
-.bb-red {
-    border: 5px outset #ffeeee;
-    background-color: #ffcccc;
+/*Text inputs should be given class "line" or "box"*/
+
+.line {
+  width: 144px;
+  background: transparent;
+  border-color: var(--main-color);
+  border-style: none none solid;
+  outline: none;
 }
 
-.bigbutton:hover, .smallbutton:hover {
-    border: 5px outset #eeeeee;
-    background-color: #ffffff;
+textarea, .box {
+  background: var(--emphasis-color);
+  color: var(--main-color);
+  border: 1px solid;
 }
 
-.user {
-   background-color: #cccccc;
-   border: 1px solid #000000;
-   border-radius: 5px;
-   overflow-x:auto;
+textarea:focus, .box:focus {
+  border: 1px solid;
+  outline: 1px solid;
+}
+
+/*Use class "button" for button-like inputs, such as submit and file*/
+
+button:not(.inline), .button:not(.inline) {
+  padding: 3px 9px;
+  border-radius: 9999px;
+  background: var(--emphasis-color);
+  color: var(--theme-color);
+  border: 1px solid;
+  font-size: 18px;
+  cursor: pointer;
+  user-select: none;
+}
+
+button:not(.popOut):not(.unselectable):not(.pressed):hover,
+.button:not(.popOut):not(.unselectable):not(.pressed):hover {
+  background: var(--highlight-color);
+}
+
+/*Use class "inline" for buttons that are within the flow of text. "inline" should always be used with "popOut" (but not vice versa)*/
+
+button.inline, .button.inline {
+  background: var(--emphasis-color);
+  border: 1px solid;
+  border-radius: 6px;
+  color: var(--theme-color);
+  font-weight: bold;
+  cursor: pointer;
+  user-select: none;
+}
+
+.popOut {
+  transition-duration: 0.2s;
+}
+
+.popOut:hover {
+  transform: translate(2px, -2px);
+  box-shadow: -1px 1px, -2px 2px;
+}
+
+.popOut:active {
+  transform: initial;
+  box-shadow: initial;
+  background: var(--highlight-color);
+}
+
+button.unselectable, .button.unselectable {
+  opacity: 50%;
+  cursor: not-allowed;
+}
+
+button.pressed, .button.pressed {
+  background: var(--theme-color);
+  color: var(--bg-dark);
+  cursor: default;
+}
+
+input[type="number"] {
+  width: 48px;
+}
+
+input[type="radio"] {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  margin: 3px 6px 3px 0;
+  background: var(--emphasis-color);
+  color: var(--main-color);
+  border: 1px solid;
+  border-radius: 50%;
+  vertical-align: text-bottom;
+}
+
+input[type="radio"]:checked {
+  background: var(--theme-color);
+  box-shadow: 0 0 0 2px var(--emphasis-color) inset;
+  color: var(--theme-color);
+}
+
+input[type="checkbox"] {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  margin: 3px 6px 3px 0;
+  background: var(--emphasis-color);
+  color: var(--main-color);
+  border: 1px solid;
+  border-radius: 0%;
+  vertical-align: text-bottom;
+}
+
+input[type="checkbox"]:checked {
+  background: var(--theme-color) url("{{ url_for('static', filename='img/fighter/checkMark.png') }}") no-repeat;
+  background-size: 100%;
+  color: var(--theme-color);
+}
+
+input[type="radio"]:hover, input[type="checkbox"]:hover {
+  box-shadow: 0 0 4px;
+}
+
+input[type="radio"]:checked:hover {
+  box-shadow: 0 0 0 2px var(--emphasis-color) inset, 0 0 4px;
+}
+
+textarea {
+  resize: none;
+}
+
+select {
+  background: var(--emphasis-color);
+  border: 1px var(--theme-color) solid;
+}
+
+select:focus {
+  outline: 1px solid;
+}
+
+a {
+  color: var(--theme-color);
+}
+
+table, th, td {
+  border: 1px solid;
+  border-collapse: collapse;
 }

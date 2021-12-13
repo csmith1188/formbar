@@ -5,30 +5,101 @@
 <!-- Change title here -->
 {% block title %}Formbar Login{% endblock %}
 
-<!-- Extra style declarations here -->
-{% block style %}{% endblock %}
+<!-- Change theme color here -->
+{% block color %}purple{% endblock %}
 
-<!-- Extra javascript here -->
-{% block script %}{% endblock %}
+<!-- Extra style declarations here -->
+{% block style %}
+<style>
+  body {
+    text-align: center;
+  }
+
+  button {
+    margin: 16px 2px;
+  }
+
+  input {
+    display: block;
+    margin: auto;
+    font-size: 20px !important;
+    width: 256px;
+    height: 36px !important;
+    box-sizing: border-box;
+    margin-top: 16px;
+  }
+</style>
+{% endblock %}
 
 <!-- Main content here -->
 {% block main %}
-
-<h1 style="color: blue">Login</h1>
+<button id="logInButton" class="pressed" onclick="changeUserType(this);">Log in</button>
+<button id="newAccountButton" onclick="changeUserType(this);">New account</button>
+<button id="guestButton" onclick="changeUserType(this);">Use as guest</button>
 <form action="login" method="post">
-    <p>Leave the password blank to sign in as a <b>Guest</b></p>
-    <input type="text" id="usernameBox" name="username" placeholder="Username" value="">
-    <input type="password" id="passwordBox" name="password" placeholder="Password" value="">
+    <input type="text" id="usernameBox" name="username" class="box" placeholder="Name" value="" autocomplete="off" required>
+    <input type="password" id="passwordBox" name="password" class="box" placeholder="Password" value="" required>
+    <input type="hidden" id="userTypeBox" name="userType" value="login">
     <input type="hidden" id="forwardBox" name="forward">
     <input type="hidden" id="botBox" name="bot" value="False">
-    <input type="submit" value="Log In">
+    <input type="submit" id="submitButton" class="button unselectable" value="Log in" onsubmit="return false;">
 </form>
+{% endblock %}
 
-<script type="text/javascript">
-    const urlParams = new URLSearchParams(window.location.search);
-    const forward = urlParams.get('forward');
-    if (forward) document.getElementById('forwardBox').value = forward;
-    else document.getElementById('forwardBox').value = null;
+<!-- Extra javascript here -->
+{% block script %}
+  <script type="text/javascript">
+    //const forward = urlParams.get('forward');
+    //if (forward) document.getElementById('forwardBox').value = forward;
+    //else document.getElementById('forwardBox').value = null;
+
+    //Prevent submission if a field is blank
+    let ub = document.getElementById("usernameBox");
+    let pb = document.getElementById("passwordBox");
+    let ut = document.getElementById("userTypeBox");
+    let sb = document.getElementById("submitButton");
+
+    function changeUserType(el) {
+      let liButton = document.getElementById("logInButton");
+      let naButton = document.getElementById("newAccountButton");
+      let gButton = document.getElementById("guestButton");
+
+      [liButton, naButton, gButton].forEach(button => button == el ? button.classList.add("pressed") : button.classList.remove("pressed"));
+      if (el == gButton) {
+        ub.value = null;
+        pb.value = null;
+        pb.classList.add("hidden");
+        pb.required = false;
+        sb.value = "Go";
+      } else {
+        pb.classList.remove("hidden");
+        pb.required = true;
+        if (el == liButton) sb.value = "Log in";
+        else if (el == naButton) {
+          ub.value = null;
+          pb.value = null;
+          sb.value = "Create account";
+        }
+      }
+
+      if (el == liButton) ut.value = "login";
+      else if (el == naButton) ut.value = "new";
+      else if (el == gButton) ut.value = "guest";
+
+      checkIfBlank();
+    }
+
+    function checkIfBlank() {
+      if (ub.value && (pb.value || ut.value == "guest")) {
+        sb.classList.remove("unselectable");
+        sb.onsubmit = () => true;
+      } else {
+        sb.classList.add("unselectable");
+        sb.onsubmit = () => false;
+      }
+    }
+
+    ub.oninput = checkIfBlank;
+    pb.oninput = checkIfBlank;
 </script>
-
 {% endblock %}

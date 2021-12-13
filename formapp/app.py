@@ -787,7 +787,12 @@ def endpoint_addfighteropponent():
 def endpoint_basic():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
-    return render_template("basic.html")
+    name = sD.studentDict[request.remote_addr]['name'].strip()
+    if name in helpList:
+        ticket = helpList[name]
+    else:
+        ticket = ''
+    return render_template("basic.html", helpTicket = ticket)
 
 
 '''
@@ -1177,13 +1182,13 @@ def endpoint_hangman():
 def endpoint_help():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
-    if request.method == 'POST':
+    if request.args.get('action') == "send":
         name = sD.studentDict[request.remote_addr]['name']
         name = name.strip()
         if name in helpList:
             return redirect("/chat?alert=You already have a help ticket or break request in. If your problem is time-sensitive, or your last ticket was not cleared, please get the teacher's attention manually." )
         else:
-            helpList[name] = request.form['message'] or '<i>Sent a help ticket</i>'
+            helpList[name] = request.args.get('message') or '<i>Sent a help ticket</i>'
             sD.studentDict[request.remote_addr]['help'] = True
             playSFX("sfx_up04")
             return redirect("/chat?alert=Your ticket was sent. Keep working on the problem the best you can while you wait." )

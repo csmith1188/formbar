@@ -69,10 +69,9 @@
     border-radius: 48px;
   }
 
-  .thumbButton:not(.highlight):hover:not(:active),
-  .letterButton:not(.highlight):hover:not(:active) {
-    transform: translate(4px, -4px);
-    box-shadow: -1px 1px, -2px 2px, -3px 3px, -4px 4px;
+  .highlight:hover {
+    transform: none !important;
+    box-shadow: none !important;
   }
 
   button:active,
@@ -274,6 +273,8 @@
   <div id="sidebarContent">
     <h2>Formbar Features</h2>
     <div style="text-align: center;">Features will appear when the teacher makes them available.</div>
+    <br><br>
+
     <div id="tutdDiv" class="hidden">
       <h2>Thumbs</h2>
       <img src="{{ url_for('static', filename='img/home/thumbButton0.png') }}" id="thumbButton0" class="thumbButton greenColor" title="Up" onclick="thumbsVote(0);" tabindex="0">
@@ -306,7 +307,7 @@
 
     <div id="musicDiv" class="hidden">
       <h2>Play music</h2>
-      <label for="volume">Volume: </label><input type="range" id="volume" value="1" max="1" step="0.1">
+      <label for="volume">Volume: </label><input type="range" id="volume" value="0.5" max="1" step="0.1">
       <span id="volNumber">1.0</span>
       <br>
       <img src="{{ url_for('static', filename='img/home/random.png') }}" id="randomMusic" class="smallImg" title="Random" onclick="randomBGM()"><input type="text" id="music" placeholder="Filename" list="bgmFiles">
@@ -404,13 +405,9 @@
 {% block script %}
 <script src="{{ url_for('static', filename='js/home.js') }}"></script>
 <script>
-  let thumbButtons = document.querySelectorAll(".thumbButton");
-  let letterButtons = document.querySelectorAll(".letterButton");
   let bottom = document.getElementById("bottom");
   let menus = document.querySelectorAll(".menu");
   let innerPage = document.getElementById("innerPage");
-  let chosenThumb = false;
-  let chosenLetter = false;
   let segment;
   let gradient;
   let urlOpen;

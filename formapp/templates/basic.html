@@ -35,6 +35,11 @@
     border-radius: 50% !important;
   }
 
+  .highlight:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
   button {
     width: 180px;
     font-size: 28px;
@@ -72,7 +77,7 @@
 {% block main %}
   <div class="centered">
     <h1>Thumbs</h1>
-    <h3 class="hidden">There is no thumbs survey right now.</h3>
+    <h2 id="noTUTD" class="hidden">There is no thumbs survey right now.</h2>
     <div id="thumbs">
       <img src="{{ url_for('static', filename='img/basic/thumbButton0.png') }}" id="thumbButton0" class="thumbButton button inline popOut moreDepth greenColor" title="Up" onclick="thumbsVote(0);" tabindex="0">
       <img src="{{ url_for('static', filename='img/basic/thumbButton1.png') }}" id="thumbButton1" class="thumbButton button inline popOut moreDepth cyanColor" title="Wiggle" onclick="thumbsVote(1);" tabindex="0">
@@ -80,7 +85,7 @@
     </div>
     <br><br>
     <h1>Letters</h1>
-    <h3 class="hidden">There is no letter survey right now.</h3>
+    <h2 id="noABCD" class="hidden">There is no letter survey right now.</h2>
     <div id="letters">
       <img src="{{ url_for('static', filename='img/basic/letterButton0.png') }}" id="letterButton0" class="letterButton button inline popOut moreDepth redColor" title="Vote A" onclick="letterVote(0);" tabindex="0">
       <img src="{{ url_for('static', filename='img/basic/letterButton1.png') }}" id="letterButton1" class="letterButton button inline popOut moreDepth blueColor" title="Vote B" onclick="letterVote(1);" tabindex="0">
@@ -91,7 +96,7 @@
     <h1>Other</h1>
     <div id="other">
       <button id="help" class="inline popOut moreDepth" title="Send the teacher a help ticket">Help!</button>
-      <button id="break" class="inline popOut moreDepth" title="Request a bathrrom break">End break</button>
+      <button id="break" class="inline popOut moreDepth" title="Request a bathroom break">Bathroom!</button>
     </div>
   </div>
 {% endblock %}
@@ -100,51 +105,83 @@
 {% block script %}
 <script src="{{ url_for('static', filename='js/home.js') }}"></script>
 <script>
-  setInterval();
+  checkForSurvey();
+  checkForHelpTicket();
+  setInterval(() => {
+    checkIfRemoved();
+    checkForSurvey();
+    checkForHelpTicket();
+  }, 1000);
 
-  document.getElementById("help").onclick = requestHelp();
-  document.getElementById("break").onclick = requestBreak();
+  document.getElementById("help").onclick = requestHelp;
+  document.getElementById("break").onclick = requestBreak;
 
-  function checkForHelpTicket() {
-    if ("{{ helpTicket }}") {
-      let sentEl;
-      let otherEl;
-      if ("{{ helpTicket }}" == "&lt;i&gt;Requested a bathroom break&lt;/i&gt;") {
-        sentEl = document.getElementById("break");
-        otherEl = document.getElementById("help");
-      } else {
-        sentEl = document.getElementById("help");
-        otherEl = document.getElementById("break");
-      }
-      sentEl.onclick = null;
-      otherEl.onclick = null;
+  function checkIfRemoved() {
+    //If the user is removed by the teacher, send them back to the login page
+    let res = getResponse("/getme");
+    if (res.error == "You are not logged in.") window.location = "/login?forward=/basic&alert=You have been logged out.";
+  }
+
+  function checkForSurvey() {
+    let res = getResponse("/getmode");
+    let mode = res.mode;
+    if (mode == "tutd") {
+      document.getElementById("thumbs").classList.remove("hidden");
+      document.getElementById("noTUTD").classList.add("hidden");
     } else {
-
+      document.getElementById("thumbs").classList.add("hidden");
+      document.getElementById("noTUTD").classList.remove("hidden");
+    }
+    if (mode == "abcd") {
+      document.getElementById("letters").classList.remove("hidden");
+      document.getElementById("noABCD").classList.add("hidden");
+    } else {
+      document.getElementById("letters").classList.add("hidden");
+      document.getElementById("noABCD").classList.remove("hidden");
     }
   }
 
-  ticketSent() {
-    
+  function checkForHelpTicket() {
+    ////Don't use param
+    if ("{{ helpTicket }}") {
+      if ("{{ helpTicket }}" == "&lt;i&gt;Requested a bathroom break&lt;/i&gt;") ticketSent("break");
+      else ticketSent("help");
+    } else {
+      document.getElementById("help").onclick = requestHelp;
+      document.getElementById("break").onclick = requestBreak;
+    }
+  }
+
+  function ticketSent(type) {
+    let sentEl;
+    let otherEl;
+    if (type == "help") {
+      sentEl = document.getElementById("help");
+      otherEl = document.getElementById("break");
+    } else if (type == "break") {
+      sentEl = document.getElementById("break");
+      otherEl = document.getElementById("help");
+    }
+    sentEl.onclick = null;
+    otherEl.onclick = null;
+    sentEl.classList.add("pressed");
+    sentEl.classList.add("unselectable");
+    sentEl.innerText = "Ticket sent";
+    otherEl.classList.add("unselectable");
   }
 
   function requestHelp() {
     let el = document.getElementById("help");
-    request.open("POST", "/help");
+    request.open("GET", "/help?action=send");
     request.send();
-    el.classList.add("pressed");
-    el.classList.add("unselectable");
-    el.innerText = "Ticket sent";
-    document.getElementById("break").classList.add("unselectable");
+    ticketSent("help");
   }
 
   function requestBreak() {
     let el = document.getElementById("break");
-    request.open("GET", "/break?request=true");
+    request.open("GET", "/break?action=request");
     request.send();
-    el.classList.add("pressed");
-    el.classList.add("unselectable");
-    el.innerText = "Ticket sent";
-    document.getElementById("help").classList.add("unselectable");
+    ticketSent("break");
   }
 </script>
 {% endblock %}

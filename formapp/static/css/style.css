@@ -91,7 +91,7 @@ body, .light, .dark {
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 .fullScreen {
@@ -289,11 +289,11 @@ input[type="checkbox"]:checked {
   color: var(--theme-color);
 }
 
-input[type="radio"]:hover, input[type="checkbox"]:hover {
+input[type="radio"]:hover:not(,[disabled]) input[type="checkbox"]:hover:not([disabled]) {
   box-shadow: 0 0 4px;
 }
 
-input[type="radio"]:checked:hover {
+input[type="radio"]:checked:hover:not([disabled]) {
   box-shadow: 0 0 0 2px var(--emphasis-color) inset, 0 0 4px;
 }
 
@@ -307,7 +307,7 @@ select {
 }
 
 select:focus {
-  outline: 1px solid;
+  outline: 1px var(--theme-color) solid;
 }
 
 a {

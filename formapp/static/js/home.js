@@ -1,10 +1,13 @@
 //This code is used in both index.html and basic.html
 
+let thumbButtons = document.querySelectorAll(".thumbButton");
+let letterButtons = document.querySelectorAll(".letterButton");
+let chosenThumb = false;
+let chosenLetter = false;
+
 Array.from(thumbButtons).forEach((button, i) => {
   button.addEventListener("keydown", event => {
-    if (event.code == "Enter") {
-      thumbsVote(i);
-    }
+    if (event.code == "Enter") thumbsVote(i);
   });
 });
 
@@ -32,8 +35,7 @@ function thumbsVote(thumb) {
     }
     //Highlight selected button and reset others
     Array.from(thumbButtons).forEach((button, i) => {
-      if (i == thumb) highlight("thumbButton" + thumb);
-      else removeHighlight("thumbButton" + i);
+      i == thumb ? highlight("thumbButton" + thumb) : removeHighlight("thumbButton" + i);
     });
   }
   request.send();
@@ -57,14 +59,14 @@ function letterVote(letter) {
     }
     //Highlight selected button and reset others
     Array.from(letterButtons).forEach((button, i) => {
-      if (i == letter) highlight("letterButton" + letter);
-      else removeHighlight("letterButton" + i);
+      i == letter ? highlight("letterButton" + letter) : removeHighlight("letterButton" + i);
     });
   }
   request.send();
 }
 
-function updateVotes() { //Make sure displayed vote matches actual vote, for example if new poll is started or user reloads
+function updateVotes() {
+  //Make sure displayed vote matches actual vote, for example if new poll is started or user reloads
   let res = getResponse("/getme");
   let thumb;
   if (res.thumb == "up") thumb = 0;
@@ -85,14 +87,14 @@ function updateVotes() { //Make sure displayed vote matches actual vote, for exa
 
 function highlight(image) {
   let button = document.getElementById(image);
-  button.src = "/static/img/home/" + image + "-highlight.png";
+  button.src = button.src.replace(".png", "-highlight.png");
   button.classList.add("highlight");
   button.title = "Cancel";
 }
 
 function removeHighlight(image) {
   let button = document.getElementById(image);
-  button.src = "/static/img/home/" + image + ".png"
+  button.src = button.src.replace("-highlight", "");
   button.classList.remove("highlight");
   if (image == "thumbButton0") button.title = "Up";
   if (image == "thumbButton1") button.title = "Wiggle";

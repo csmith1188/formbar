@@ -8,10 +8,6 @@
 <!-- Extra style declarations here -->
 {% block style %}
 <style>
-  body {
-    text-align: center;
-  }
-
   .user {
     position: relative;
     left: 21px;
@@ -96,7 +92,7 @@
 
     setInterval(function() {
         checkUpdates('/getstudents');
-        let studentBox = document.getElementById('tabcontainer');
+        let studentBox = document.getElementById('students');
         if (studentData == undefined) {
           studentBox.innerHTML = 'Cannot get students. Are you logged in and connected?';
         } else if (studentData != oldStudentData) {

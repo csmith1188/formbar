@@ -579,6 +579,8 @@ def tutdBar():
         showString("TUTD " + str(complete) + "/" + str(sD.settings['numStudents']))
         if ONRPi:
             pixels.show()
+    # Sets up 'max gamer' mode. If upCounts is greater than or equal to the number of students,
+    # Change the bar color and display the words 'MAX GAMER' on the formbar.
     if upCount >= sD.settings['numStudents']:
         if ONRPi:
             pixels.fill((0,0,0))
@@ -590,7 +592,7 @@ def tutdBar():
         if sD.settings['captions']:
             clearString()
             showString("MAX GAMER!", 0, colors['purple'])
-    #The Funny Number
+    # The Funny Number
     if sD.settings['numStudents'] == 9 and complete == 6:
         playSFX("clicknice")
     else:
@@ -622,6 +624,7 @@ def autoStudentCount():
     if sD.settings['numStudents'] == 0:
         sD.settings['numStudents'] = 1
 
+# Allows the teacher to strip the permissions of a student / admin.
 def stripUser(perm, exclude=True):
     newList = {}
     for student in sD.studentDict:
@@ -822,7 +825,7 @@ def endpoint_bgmstop():
     /chat
     This endpoint allows students and teacher to chat realTime.
 '''
-# Chat endpoint
+# Chat endpoint. Highly buggy and usually broken, but allows for fast comm without the need for slack opened.
 @app.route('/chat')
 def endpoint_chat():
     if not request.remote_addr in sD.studentDict:
@@ -1100,7 +1103,7 @@ def endpoint_hangman():
                 'words': 'here'
             }
         return render_template("hangman.html", wordObj=wordObj)
-# Help endpoint
+# Help endpoint. Students can use this to let the teacher know they have an issue that they cannot figure out.
 @app.route('/help', methods = ['POST', 'GET'])
 def endpoint_help():
     if not request.remote_addr in sD.studentDict:
@@ -1715,6 +1718,7 @@ def endpoint_sfx():
 '''
     /speedtype
 '''
+# Takes you to a speed typing game.
 @app.route('/speedtype')
 def endpoint_speedtype():
     if not request.remote_addr in sD.studentDict:
@@ -1885,12 +1889,14 @@ def endpoint_users():
         if user:
             if request.args.get('action'):
                 action = request.args.get('action')
+                # Kicks a specific student off the formbar for a short time.
                 if action == 'kick':
                     if user in sD.studentDict:
                         del sD.studentDict[user]
                         return "User removed"
                     else:
                         return render_template("message.html", forward=request.path, message = "User not in list. " )
+                # Allows the teacher to ban students.
                 if action == 'ban':
                     if user in sD.studentDict:
                         banList.append(user)
@@ -1922,12 +1928,14 @@ def endpoint_users():
             if request.args.get('refresh'):
                 refresh = request.args.get('refresh')
                 if refresh == 'all':
+                    # Removes all student responses.
                     if refreshUsers(user):
                         return render_template("message.html", forward=request.path, message = "Removed all student responses.")
                     else:
                         return render_template("message.html", forward=request.path, message = "Error removing responses from all students.")
                 else:
                     if refreshUsers(user, refresh):
+                    # Removes a specific student's response.
                         return render_template("message.html", forward=request.path, message = "Removed " + refresh + " responses from " + user + ".")
                     else:
                         return render_template("message.html", forward=request.path, message = "Error removgin " + refresh + " responses from " + user + ".")

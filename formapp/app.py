@@ -1659,19 +1659,19 @@ def endpoint_segment():
         start = request.args.get('start')
         end = request.args.get('end')
         if not hex:
-            return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=#FF00FF</b> (you need at least one color)"
+            return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=FF00FF</b> (you need at least one color)"
         if not hex2dec(hex):
-            return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=#FF00FF</b> (you did not use a proper hexadecimal color)"
+            return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=FF00FF</b> (you did not use a proper hexadecimal color)"
         if not start or not end:
-            return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=#FF00FF</b> (you need a start and end point)"
+            return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=FF00FF</b> (you need a start and end point)"
         else:
             try:
                 start = int(start)
                 end = int(end)
             except:
-                return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=#FF00FF</b> (start and end must be and integer)"
+                return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=FF00FF</b> (start and end must be and integer)"
         if start > BARPIX or end > BARPIX:
-            return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=#FF00FF</b> (Your start or end was higher than the number of pixels: " + str(BARPIX) + ")"
+            return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=FF00FF</b> (Your start or end was higher than the number of pixels: " + str(BARPIX) + ")"
         pixRange = range(start, end)
         if type == 'fadein':
             for i, pix in enumerate(pixRange):
@@ -1681,9 +1681,9 @@ def endpoint_segment():
                 pixels[pix] = fadeout(pixRange, i, hex2dec(hex))
         elif type == 'blend':
             if not hex:
-                return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=#FF00FF&hex2=#00FF00</b> (you need at least two colors)"
+                return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=FF00FF&hex2=#00FF00</b> (you need at least two colors)"
             if not hex2dec(hex):
-                return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=#FF00FF&hex2=#00FF00</b> (you did not use a proper hexadecimal color)"
+                return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=FF00FF&hex2=#00FF00</b> (you did not use a proper hexadecimal color)"
             else:
                 for i, pix in enumerate(pixRange):
                     pixels[pix] = blend(pixRange, i, hex2dec(hex), hex2dec(hex2))
@@ -1694,7 +1694,7 @@ def endpoint_segment():
             if hex2dec(hex):
                 fillBar(hex2dec(hex))
             else:
-                return "Bad ArgumentsTry <b>/color?hex=#FF00FF</b> or <b>/color?r=255&g=0&b=255</b>"
+                return "Bad ArgumentsTry <b>/color?hex=FF00FF</b> or <b>/color?r=255&g=0&b=255</b>"
         if ONRPi:
             pixels.show()
         return render_template("message.html", message = "Color sent!" )

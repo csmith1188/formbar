@@ -10,13 +10,26 @@
 <style>
   body {
     width: fit-content;
-    max-width: 25%;
+    max-width: 400px;
     margin: auto;
     text-align: center;
   }
 
+  h1 {
+    margin-bottom: 0;
+  }
+
+  h3 {
+    display: inline;
+  }
+
   label {
     text-align: left;
+  }
+
+  span {
+    display: inline-block;
+    margin-left: 21px;
   }
 </style>
 {% endblock %}
@@ -32,14 +45,14 @@
   <form method="post">
     <label>
       <div>
-        <input type="radio" name="mode" value="basic" checked><h3 style="display: inline;">Basic mode</h3><br>
-        <span style="margin-left: 21px;">A simple page with the main features. This is the best for new users.</span><br>
+        <input type="radio" name="mode" value="basic" checked><h3>Basic mode</h3><br>
+        <span>A simple page with the main features. This is the best for new users.</span><br>
       </div>
     </label><br>
     <label>
       <div>
-        <input type="radio" name="mode" value="advanced"><h3 style="display: inline;">Advanced mode</h3><br>
-        <span style="margin-left: 21px;">A compact page with all features.</span><br>
+        <input type="radio" name="mode" value="advanced"><h3>Advanced mode</h3><br>
+        <span>A compact page with all features.</span><br>
       </div>
     </label><br>
     <input type="submit" class="button" value="OK">

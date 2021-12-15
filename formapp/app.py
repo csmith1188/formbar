@@ -1824,18 +1824,17 @@ def endpoint_speedtype():
     else:
         return render_template("speedtype.html")
 
-#Start a letter abcd
-@app.route('/startabcd')
-def endpoint_startabcd():
-    changeMode('abcd')
-    repeatMode()
-    return redirect('/settings')
-
 #Start a thumbs survey
-@app.route('/starttutd')
-def endpoint_starttutd():
-    changeMode('tutd')
-    repeatMode()
+@app.route('/startsurvey', methods = ['POST', 'GET'])
+def endpoint_startsurvey():
+    if request.method == 'POST':
+        if not request.form['type']:
+            return redirect("/chat?alert=You need a survey type.")
+        type = request.form['type']
+        if not (type == 'tutd' or type == 'abcd'):
+            return redirect("/chat?alert=Invalid survey type.")
+        changeMode(type)
+        repeatMode()
     return redirect('/settings')
 
 # ████████
@@ -1872,7 +1871,7 @@ def endpoint_ttt():
 
 
         #If there is no game with these players
-        return redirect("/chat", message="No game found")
+        return redirect("/chat?alert=No game found")
 
 '''
     /tutd

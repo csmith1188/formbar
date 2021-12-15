@@ -9,15 +9,16 @@
 {% block style %}
 <style>
   h1 {
-    font-size: 30px;
+    margin: 0 0 12px;
+    font-size: 26px;
     color: var(--color-blue);
+    text-align: center;
   }
 
   h2 {
-    margin: 0 0 12px;
-    font-size: 24px;
+    margin: 48px 0 12px;
+    font-size: 23px;
     color: var(--color-blue);
-    text-align: center;
   }
 
   h3 {
@@ -147,6 +148,7 @@
     bottom: 0;
     width: 100%;
     box-sizing: border-box;
+    margin-top: 48px;
     padding: inherit;
   }
 
@@ -210,7 +212,7 @@
     padding: 4.5px 16px;
   }
 
-  .tab:not(.open):hover {
+  .tab:not(.open):hover, .tab.menuOpen {
     background: var(--bg-dark-highlight);
   }
 
@@ -271,9 +273,8 @@
 {% block main %}
 <div id="sidebar" class="light">
   <div id="sidebarContent">
-    <h2>Formbar Features</h2>
+    <h1>Formbar Features</h1>
     <div style="text-align: center;">Features will appear when the teacher makes them available.</div>
-    <br><br>
 
     <div id="tutdDiv" class="hidden">
       <h2>Thumbs</h2>
@@ -282,7 +283,6 @@
       <img src="{{ url_for('static', filename='img/home/thumbButton1.png') }}" id="thumbButton1" class="thumbButton cyanColor" title="Wiggle" onclick="thumbsVote(1);" tabindex="0">
       <br>
       <img src="{{ url_for('static', filename='img/home/thumbButton2.png') }}" id="thumbButton2" class="thumbButton redColor" title="Down" onclick="thumbsVote(2);" tabindex="0">
-      <br><br><br>
     </div>
 
     <div id="abcdDiv" class="hidden">
@@ -294,7 +294,6 @@
       <img src="{{ url_for('static', filename='img/home/letterButton2.png') }}" id="letterButton2" class="letterButton yellowColor" title="Vote C" onclick="letterVote(2);" tabindex="0">
       <br>
       <img src="{{ url_for('static', filename='img/home/letterButton3.png') }}" id="letterButton3" class="letterButton greenColor" title="Vote D" onclick="letterVote(3);" tabindex="0">
-      <br><br><br>
     </div>
 
     <div id="soundDiv" class="hidden">
@@ -302,7 +301,6 @@
       <input type="text" id="sound" placeholder="Filename" list="sfxFiles">
       <datalist id="sfxFiles"></datalist>
       <img src="{{ url_for('static', filename='img/home/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendSound();">
-      <br><br><br>
     </div>
 
     <div id="musicDiv" class="hidden">
@@ -315,45 +313,41 @@
       <img src="{{ url_for('static', filename='img/home/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendMusic();"><br>
       <div id="nowPlaying" class="hidden">Now playing: <b id="nowPlayingTitle" title="Song"></b></div>
       <button id="stopMusicButton" class="inline popOut" style="margin-top: 12px;" onclick="stopMusic();">Stop music</button>
-      <br><br><br>
     </div>
 
     <div id="textDiv" class="hidden">
       <h2>Change text</h2>
       <input type="text" id="text" placeholder="Phrase">
       <img src="{{ url_for('static', filename='img/home/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendText();">
-      <br><br><br>
     </div>
 
     <div id="colorDiv" class="hidden">
       <h2>Change color</h2>
       <input type="radio" id="hideSegment" name="segment" checked onclick="hideSegment();" style="margin-left: 0;"><label for="hideSegment">Entire bar</label>
-      <input type="radio" id="showSegment" name="segment" onclick="showSegment();"><label for="showSegment">Segment</label>
+      <input type="radio" id="showSegment" name="segment" style="margin-left: 8px;" onclick="showSegment();"><label for="showSegment">Segment</label>
       <br>
-      <div id="segment" class="hidden">
-        <input type="number" id="segmentStart" min="0" max="240" value="0" onchange="validNumber(this);"> –
-        <input type="number" id="segmentEnd" min="0" max="240" value="240" onchange="validNumber(this);">
+      <div id="segment" class="hidden" style="margin-bottom: 8px;">
+        <input type="number" id="segmentStart" min="0" value="0" onchange="validNumber(this);"> –
+        <input type="number" id="segmentEnd" min="0" onchange="validNumber(this);">
       </div>
-      <input type="radio" id="hideColor2" name="gradient" checked onclick="hideColor2();" style="margin: 8px 3px 8px 0;"><label for="hideColor2">Single color</label>
-      <input type="radio" id="showColor2" name="gradient" onclick="showColor2();"><label for="showColor2">Gradient</label>
+      <input type="radio" id="hideColor2" name="gradient" checked onclick="hideColor2();" style="margin-left: 0;"><label for="hideColor2">Single color</label>
+      <input type="radio" id="showColor2" name="gradient" style="margin-left: 8px;" onclick="showColor2();"><label for="showColor2">Gradient</label>
       <br>
       <div style="display: inline-block;">
-        <h3 id="color1Heading" class="hidden">Color 1</h3>
+        <h3 id="color1Heading" class="hidden" style="margin-bottom: 0;">Color 1</h3>
         <input type="color" id="color1" class="button inline popOut">
       </div>
       <div id="color2Div" class="hidden" style="margin-left: 8px;">
-        <h3>Color 2</h3>
+        <h3 style="margin-bottom: 0;">Color 2</h3>
         <input type="color" id="color2" class="button inline popOut">
       </div>
       <img src="{{ url_for('static', filename='img/home/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendColor();">
-      <br><br><br>
     </div>
 
     <div id="percentDiv" class="hidden">
       <h2>Fill percentage</h2>
       <input type="number" id="percent" value="0" min="0" max="100" onchange="validNumber(this);"><label for="percent">%</label>
       <img src="{{ url_for('static', filename='img/home/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendPercent();">
-      <br><br><br>
     </div>
   </div>
 
@@ -413,6 +407,8 @@
   let urlOpen;
   let newMessages = 0;
   let username = "{{ username }}";
+  let pixRes = getResponse("/getpix");
+  let barpix = eval(pixRes.pixels);
 
   menuPositions();
   updateVotes();
@@ -430,10 +426,21 @@
   }, 1000);
 
   function showEnabled() {
+    let tutdDiv = document.getElementById("tutdDiv");
+    let abcdDiv = document.getElementById("abcdDiv");
     let soundDiv = document.getElementById("soundDiv");
     let musicDiv = document.getElementById("musicDiv");
     let textDiv = document.getElementById("textDiv");
     let colorDiv = document.getElementById("colorDiv");
+
+    let modeRes = getResponse("/getmode");
+    let mode = modeRes.mode;
+
+    if (mode == "tutd") tutdDiv.classList.remove("hidden");
+    else tutdDiv.classList.add("hidden");
+
+    if (mode == "abcd") abcdDiv.classList.remove("hidden");
+    else abcdDiv.classList.add("hidden");
 
     let meRes = getResponse("/getme");
     let myPerms = meRes.perms;
@@ -604,6 +611,10 @@
     else el.value = number;
   }
 
+  document.getElementById("segmentStart").max = barpix.length;
+  document.getElementById("segmentEnd").max = barpix.length;
+  document.getElementById("segmentEnd").value = barpix.length;
+
   function hideColor2() {
     gradient = false;
     document.getElementById("color1Heading").classList.add("hidden");
@@ -623,13 +634,13 @@
     let hex2 = document.getElementById("color2").value.slice(1);
     if (!segment) {
       start = 0;
-      end = 240;
+      end = barpix.length;
     }
     if (!gradient) hex2 = hex1;
     request.open("GET", "/segment?start=" + start + "&end=" + end + "&hex=" + hex1 + "&hex2=" + hex2);
     request.send();
     document.getElementById("segmentStart").value = 0;
-    document.getElementById("segmentEnd").value = 240;
+    document.getElementById("segmentEnd").value = barpix.length;
   }
 
   function feedback() {
@@ -668,6 +679,7 @@
       if (menu == el) {
         menu.classList.remove("hidden");
         menu.focus();
+        document.getElementById(name + "Tab").classList.add("menuOpen");
       }
     });
   }

@@ -1,0 +1,51 @@
+{% extends 'header.html' %}
+<!-- ^^ This means add this file to the end of the contents of header.html -->
+<!-- This is where the title, top buttons, and stylesheet is located -->
+
+<!-- Change title here -->
+{% block title %}Choose Formbar Mode{% endblock %}
+
+<!-- Extra style declarations here -->
+{% block style %}
+<style>
+  body {
+    width: fit-content;
+    max-width: 25%;
+    margin: auto;
+    text-align: center;
+  }
+
+  label {
+    text-align: left;
+  }
+</style>
+{% endblock %}
+
+<!-- Change theme color here -->
+{% block color %}purple{% endblock %}
+
+<!-- Main content here -->
+{% block main %}
+  <h1>Choose your default mode</h1>
+  You can change this at any time.<br>
+  <br>
+  <form method="post">
+    <label>
+      <div>
+        <input type="radio" name="mode" value="basic" checked><h3 style="display: inline;">Basic mode</h3><br>
+        <span style="margin-left: 21px;">A simple page with the main features. This is the best for new users.</span><br>
+      </div>
+    </label><br>
+    <label>
+      <div>
+        <input type="radio" name="mode" value="advanced"><h3 style="display: inline;">Advanced mode</h3><br>
+        <span style="margin-left: 21px;">A compact page with all features.</span><br>
+      </div>
+    </label><br>
+    <input type="submit" class="button" value="OK">
+  </form>
+{% endblock %}
+
+<!-- Extra JavaScript here -->
+{% block script %}
+{% endblock %}

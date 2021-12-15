@@ -690,25 +690,17 @@ def updateStep():
 
 '''
     /
-    Homepage (root)
+    Redirect to either basic or advanced mode based on the user's preference
 '''
 @app.route('/')
-def endpoint_home():
-        if not request.remote_addr in sD.studentDict:
-            return redirect('/login')
-        else:
-            if True:
-                username = sD.studentDict[request.remote_addr]['name']
-                sfx.updateFiles()
-                sounds = []
-                music = []
-                for key, value in sfx.sound.items():
-                    sounds.append(key)
-                for key, value in bgm.bgm.items():
-                    music.append(key)
-                return render_template('index.html', username = username, sfx = sounds, bgm = music)
-            else:
-                redirect('/basic')
+def endpoint_root():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login')
+    if True:
+        return redirect('/home')
+    if False:
+        return redirect('/basic')
+    return redirect('/setdefault')
 
 @app.route('/2048')
 def endpoint_2048():
@@ -1194,6 +1186,20 @@ def endpoint_help():
             return redirect("/chat?alert=Your ticket was sent. Keep working on the problem the best you can while you wait." )
     else:
         return render_template("help.html")
+
+@app.route('/home')
+def endpoint_home():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login')
+    username = sD.studentDict[request.remote_addr]['name']
+    sfx.updateFiles()
+    sounds = []
+    music = []
+    for key, value in sfx.sound.items():
+        sounds.append(key)
+    for key, value in bgm.bgm.items():
+        music.append(key)
+    return render_template('index.html', username = username, sfx = sounds, bgm = music)
 
 # ██
 # ██
@@ -1717,6 +1723,18 @@ def endpoint_sendblock():
     else:
         return "Bad Arguments. Requires 'id' and 'data'"
 '''
+
+#Choose whether you want to use basic or expert mode
+@app.route('/setdefault', methods = ['POST', 'GET'])
+def endpoint_setdefault():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    if request.method == 'POST':
+        print(request.form['mode'])
+        ##Store the user's preference in the database
+        return redirect('/')
+    else:
+        return render_template('setdefault.html')
 
 #This endpoint is exclusive only to the teacher.
 @app.route('/settings', methods = ['POST', 'GET'])

@@ -652,7 +652,7 @@
     if (["/2048", "/hangman", "/minesweeper", "/speedtype", "/ttt", "/fighter"].includes(path)) document.getElementById("gamesTab").classList.add("open");
     else if (["/needshelp", "/lesson", "/settings", "/users"].includes(path)) document.getElementById("teacherTab").classList.add("open");
     if (tabEl) tabEl.classList.add("open");
-    if (path == "/") openPage("chat");
+    if (path == "/home" || path == "/basic") openPage("chat");
     if (path == "/chat") {
       newMessages = 0;
       document.getElementById("newMessages").innerText = null;

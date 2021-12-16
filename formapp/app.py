@@ -170,7 +170,8 @@ def newStudent(remote, username, bot=False):
             'quizRes': [],
             'essayRes': '',
             'bot': bot,
-            'excluded': False
+            'excluded': False,
+            'preferredMode': None
         }
         #Track if this is the first human login or not
         humanUsers = 0
@@ -694,11 +695,12 @@ def updateStep():
 '''
 @app.route('/')
 def endpoint_root():
+    ##Also check database
     if not request.remote_addr in sD.studentDict:
         return redirect('/login')
-    if True:
+    if sD.studentDict[request.remote_addr]['preferredMode'] == 'advanced':
         return redirect('/home')
-    if False:
+    if sD.studentDict[request.remote_addr]['preferredMode'] == 'basic':
         return redirect('/basic')
     return redirect('/setdefault')
 
@@ -1730,8 +1732,16 @@ def endpoint_setdefault():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     if request.method == 'POST':
-        print(request.form['mode'])
-        ##Store the user's preference in the database
+        if request.form['mode'] == 'basic' or request.form['mode'] == 'advanced':
+            db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+            dbcmd = db.cursor()
+            sD.studentDict[request.remote_addr]['preferredMode'] = request.form['mode']
+            ##Test this
+            dbcmd.execute("UPDATE users SET preferredMode=:mode WHERE username=:uname", {"uname": sD.studentDict[request.remote_addr]['name'], "mode": request.form['mode']})
+            db.commit()
+            db.close()
+        else:
+            return 'Invalid mode.'
         return redirect('/')
     else:
         return render_template('setdefault.html')

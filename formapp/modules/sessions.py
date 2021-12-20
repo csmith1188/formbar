@@ -41,7 +41,7 @@ class Session():
             'wigglecolor': 'blue',
             'downcolor': 'red',
             'barmode': 'tutd',
-            'modes': ['tutd', 'survey', 'quiz', 'essay', 'progress', 'playtime'],
+            'modes': ['tutd', 'abcd', 'quiz', 'essay', 'progress', 'playtime'],
             'whitelist': [
                 '127.0.0.1',
                 '172.21.3.5'
@@ -66,7 +66,7 @@ class Student():
         self.name = username
         self.help = False
         self.thumb = ''
-        self.survey = ''
+        self.letter = ''
         self.progress = []
         self.perms = 2
         self.quizResults = {}

@@ -69,10 +69,9 @@
     border-radius: 48px;
   }
 
-  .thumbButton:not(.highlight):hover:not(:active),
-  .letterButton:not(.highlight):hover:not(:active) {
-    transform: translate(4px, -4px);
-    box-shadow: -1px 1px, -2px 2px, -3px 3px, -4px 4px;
+  .highlight:hover {
+    transform: none !important;
+    box-shadow: none !important;
   }
 
   button:active,
@@ -123,7 +122,7 @@
     overflow: auto;
   }
 
-  #tutdDiv, #surveyDiv {
+  #tutdDiv, #abcdDiv {
     width: 100%;
     text-align: center;
   }
@@ -223,7 +222,7 @@
     background: var(--color-cyan);
   }
 
-  #helpTab.open {
+  #studentsTab.open, #studentsMenu > .open {
     background: var(--color-gold);
   }
 
@@ -274,6 +273,8 @@
   <div id="sidebarContent">
     <h2>Formbar Features</h2>
     <div style="text-align: center;">Features will appear when the teacher makes them available.</div>
+    <br><br>
+
     <div id="tutdDiv" class="hidden">
       <h2>Thumbs</h2>
       <img src="{{ url_for('static', filename='img/home/thumbButton0.png') }}" id="thumbButton0" class="thumbButton greenColor" title="Up" onclick="thumbsVote(0);" tabindex="0">
@@ -284,8 +285,8 @@
       <br><br><br>
     </div>
 
-    <div id="surveyDiv" class="hidden">
-      <h2>Survey</h2>
+    <div id="abcdDiv" class="hidden">
+      <h2>Letters</h2>
       <img src="{{ url_for('static', filename='img/home/letterButton0.png') }}" id="letterButton0" class="letterButton redColor" title="Vote A" onclick="letterVote(0);" tabindex="0">
       <br>
       <img src="{{ url_for('static', filename='img/home/letterButton1.png') }}" id="letterButton1" class="letterButton blueColor" title="Vote B" onclick="letterVote(1);" tabindex="0">
@@ -306,7 +307,7 @@
 
     <div id="musicDiv" class="hidden">
       <h2>Play music</h2>
-      <label for="volume">Volume: </label><input type="range" id="volume" value="1" max="1" step="0.1">
+      <label for="volume">Volume: </label><input type="range" id="volume" value="0.5" max="1" step="0.1">
       <span id="volNumber">1.0</span>
       <br>
       <img src="{{ url_for('static', filename='img/home/random.png') }}" id="randomMusic" class="smallImg" title="Random" onclick="randomBGM()"><input type="text" id="music" placeholder="Filename" list="bgmFiles">
@@ -367,7 +368,11 @@
 <div id="rightSide">
   <div id="tabs">
     <div id="chatTab" class="tab" onclick="openPage('chat');"><img src="{{ url_for('static', filename='img/home/chat.png') }}" class="icon"> <b id="newMessages" style="color: var(--light-red);"></b> Chat</div>
-    <div id="helpTab" class="tab" onclick="openPage('help');"><img src="{{ url_for('static', filename='img/home/help.png') }}" class="icon"> Help!</div>
+    <div id="studentsTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/home/students.png') }}" class="icon"> Students</div>
+    <div id="studentsMenu" class="menu hidden" tabindex="-1">
+      <div id="breakTab" class="tab" onclick="openPage('break');">Bathroom break</div>
+      <div id="helpTab" class="tab" onclick="openPage('help');">Help!</div>
+    </div>
     <div id="wawdTab" class="tab" onclick="openPage('wawd');"><img src="{{ url_for('static', filename='img/home/wawd.png') }}" class="icon"> What are we doing?</div>
     <div id="quizTab" class="tab" onclick="openPage('quiz');"><img src="{{ url_for('static', filename='img/home/quiz.png') }}" class="icon"> Quiz</div>
     <div id="gamesTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/home/games.png') }}" class="icon"> Games</div>
@@ -398,14 +403,11 @@
 
 <!-- Extra javascript here -->
 {% block script %}
+<script src="{{ url_for('static', filename='js/home.js') }}"></script>
 <script>
-  let thumbButtons = document.querySelectorAll(".thumbButton");
-  let letterButtons = document.querySelectorAll(".letterButton");
   let bottom = document.getElementById("bottom");
   let menus = document.querySelectorAll(".menu");
   let innerPage = document.getElementById("innerPage");
-  let chosenThumb = false;
-  let chosenLetter = false;
   let segment;
   let gradient;
   let urlOpen;
@@ -468,7 +470,7 @@
   window.addEventListener("resize", bottomPosition);
 
   function menuPositions() {
-    ["games", "teacher"].forEach(group => document.getElementById(group + "Menu").style.left = document.getElementById(group + "Tab").getBoundingClientRect().left + "px"); //Give menu same X position as tab
+    ["students", "games", "teacher"].forEach(group => document.getElementById(group + "Menu").style.left = document.getElementById(group + "Tab").getBoundingClientRect().left + "px"); //Give menu same X position as tab
   }
 
   function getUsername() {
@@ -486,7 +488,7 @@
   function checkIfRemoved() {
     //If the user is removed by the teacher, send them back to the login page
     let res = getResponse("/getme");
-    if (res.error == "Insufficient permissions.") window.location = "/login?message=You have been logged out.";
+    if (res.error == "You are not logged in.") window.location = "/login?alert=You have been logged out.";
   }
 
   function shorten(container, maxHeight, text) {
@@ -496,109 +498,6 @@
     while (container.clientHeight > maxHeight) text.innerText = text.innerText.substring(0, text.innerText.length - 2) + "…";
     text.title = original;
     text.style.cursor = "help";
-  }
-
-  Array.from(thumbButtons).forEach((button, i) => {
-    button.addEventListener("keydown", event => {
-      if (event.code == "Enter") {
-        thumbsVote(i);
-      }
-    });
-  });
-
-  Array.from(letterButtons).forEach((button, i) => {
-    button.addEventListener("keydown", event => {
-      if (event.code == "Enter") {
-        letterVote(i);
-      }
-    });
-  });
-
-  function thumbsVote(thumb) {
-    if (chosenThumb === thumb) {
-      chosenThumb = false;
-      removeHighlight("thumbButton" + thumb);
-      request.open("GET", "/tutd?thumb=oops");
-    } else {
-      chosenThumb = thumb;
-      if (thumb == 0) {
-        request.open("GET", "/tutd?thumb=up");
-      } else if (thumb == 1) {
-        request.open("GET", "/tutd?thumb=wiggle");
-      } else if (thumb == 2) {
-        request.open("GET", "/tutd?thumb=down");
-      }
-      //Highlight selected button and reset others
-      Array.from(thumbButtons).forEach((button, i) => {
-        if (i == thumb) highlight("thumbButton" + thumb);
-        else removeHighlight("thumbButton" + i);
-      });
-    }
-    request.send();
-  }
-
-  function letterVote(letter) {
-    if (chosenLetter === letter) {
-      chosenLetter = false;
-      removeHighlight("letterButton" + letter);
-      request.open("GET", "/survey?vote=oops");
-    } else {
-      chosenLetter = letter;
-      if (letter == 0) {
-        request.open("GET", "/survey?vote=a");
-      } else if (letter == 1) {
-        request.open("GET", "/survey?vote=b");
-      } else if (letter == 2) {
-        request.open("GET", "/survey?vote=c");
-      } else if (letter == 3) {
-        request.open("GET", "/survey?vote=d");
-      }
-      //Highlight selected button and reset others
-      Array.from(letterButtons).forEach((button, i) => {
-        if (i == letter) highlight("letterButton" + letter);
-        else removeHighlight("letterButton" + i);
-      });
-    }
-    request.send();
-  }
-
-  function updateVotes() { //Make sure displayed vote matches actual vote, for example if new poll is started or user reloads
-    let res = getResponse("/getme");
-    let thumb;
-    if (res.thumb == "up") thumb = 0;
-    else if (res.thumb == "wiggle") thumb = 1;
-    else if (res.thumb == "down") thumb = 2;
-    else thumb = false;
-    let letter;
-    if (res.survey == "a") letter = 0;
-    else if (res.survey == "b") letter = 1;
-    else if (res.survey == "c") letter = 2;
-    else if (res.survey == "d") letter = 3;
-    else letter = false;
-    if (thumb === false && chosenThumb !== false) thumbsVote(chosenThumb); //Remove the vote
-    else if (thumb !== chosenThumb) thumbsVote(thumb);
-    if (letter === false && chosenLetter !== false) thumbsVote(chosenLetter); //Remove the vote
-    else if (letter !== chosenLetter) letterVote(letter);
-  }
-
-  function highlight(image) {
-    let button = document.getElementById(image);
-    button.src = "/static/img/home/" + image + "-highlight.png";
-    button.classList.add("highlight");
-    button.title = "Cancel";
-  }
-
-  function removeHighlight(image) {
-    let button = document.getElementById(image);
-    button.src = "/static/img/home/" + image + ".png"
-    button.classList.remove("highlight");
-    if (image == "thumbButton0") button.title = "Up";
-    if (image == "thumbButton1") button.title = "Wiggle";
-    if (image == "thumbButton2") button.title = "Down";
-    if (image == "letterButton0") button.title = "Vote A";
-    if (image == "letterButton1") button.title = "Vote B";
-    if (image == "letterButton2") button.title = "Vote C";
-    if (image == "letterButton3") button.title = "Vote D";
   }
 
   let sfx = eval("{{ sfx }}".replaceAll("&#39;", "'"));
@@ -747,8 +646,9 @@
     let content = innerPage.contentWindow.document.body.innerHTML;
     let tabs = document.querySelectorAll(".tab");
     let tabEl = document.getElementById(path.substring(1) + "Tab");
-    if (!content) openPage("chat?message='Page does not exist.'");
+    if (!content) openPage("chat?alert='Page does not exist.'");
     Array.from(tabs).forEach(tab => tab.classList.remove("open"));
+    if (["/break", "/help"].includes(path)) document.getElementById("studentsTab").classList.add("open");
     if (["/2048", "/hangman", "/minesweeper", "/speedtype", "/ttt", "/fighter"].includes(path)) document.getElementById("gamesTab").classList.add("open");
     else if (["/needshelp", "/lesson", "/settings", "/users"].includes(path)) document.getElementById("teacherTab").classList.add("open");
     if (tabEl) tabEl.classList.add("open");
@@ -772,8 +672,12 @@
     });
   }
 
+  document.getElementById("studentsTab").onclick = () => showMenu("students");
   document.getElementById("gamesTab").onclick = () => showMenu("games");
   document.getElementById("teacherTab").onclick = () => showMenu("teacher");
+  document.getElementById("studentsTab").onmousedown = function() {
+    if (document.getElementById("studentsMenu") == document.activeElement) this.onclick = null;
+  };
   document.getElementById("gamesTab").onmousedown = function() {
     if (document.getElementById("gamesMenu") == document.activeElement) this.onclick = null;
   };
@@ -781,6 +685,7 @@
     if (document.getElementById("teacherMenu") == document.activeElement) this.onclick = null;
   };
   document.onclick = () => {
+    document.getElementById("studentsTab").onclick = () => showMenu("students");
     document.getElementById("gamesTab").onclick = () => showMenu("games");
     document.getElementById("teacherTab").onclick = () => showMenu("teacher");
   }

@@ -91,7 +91,7 @@ body, .light, .dark {
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 .fullScreen {
@@ -103,19 +103,25 @@ body, .light, .dark {
   padding: 8px;
 }
 
+.centered, .hCentered.vCentered {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
 .hCentered {
+  position: absolute;
   left: 50%;
   transform: translateX(-50%);
   text-align: center;
 }
 
 .vCentered {
+  position: absolute;
   top: 50%;
   transform: translateY(-50%);
-}
-
-.hCentered.vCentered {
-  transform: translate(-50%, -50%);
 }
 
 ::selection {
@@ -207,30 +213,40 @@ button.inline, .button.inline {
   user-select: none;
 }
 
+img.button.inline {
+  border: none;
+}
+
 .popOut {
   transition-duration: 0.2s;
 }
 
-.popOut:hover {
+.popOut:hover:not(.unselectable):not(.pressed) {
   transform: translate(2px, -2px);
   box-shadow: -1px 1px, -2px 2px;
 }
 
-.popOut:active {
+.popOut.moreDepth:not(.unselectable):not(.pressed):hover:not(:active) {
+  transform: translate(4px, -4px);
+  box-shadow: -1px 1px, -2px 2px, -3px 3px, -4px 4px;
+}
+
+.popOut:not(.unselectable):not(.pressed):active {
   transform: initial;
   box-shadow: initial;
   background: var(--highlight-color);
 }
 
+button.pressed, .button.pressed {
+  background: var(--theme-color);
+  border-color: var(--theme-color);
+  color: var(--bg-color);
+  cursor: default;
+}
+
 button.unselectable, .button.unselectable {
   opacity: 50%;
   cursor: not-allowed;
-}
-
-button.pressed, .button.pressed {
-  background: var(--theme-color);
-  color: var(--bg-dark);
-  cursor: default;
 }
 
 input[type="number"] {
@@ -273,11 +289,11 @@ input[type="checkbox"]:checked {
   color: var(--theme-color);
 }
 
-input[type="radio"]:hover, input[type="checkbox"]:hover {
+input[type="radio"]:hover:not(,[disabled]) input[type="checkbox"]:hover:not([disabled]) {
   box-shadow: 0 0 4px;
 }
 
-input[type="radio"]:checked:hover {
+input[type="radio"]:checked:hover:not([disabled]) {
   box-shadow: 0 0 0 2px var(--emphasis-color) inset, 0 0 4px;
 }
 
@@ -291,7 +307,7 @@ select {
 }
 
 select:focus {
-  outline: 1px solid;
+  outline: 1px var(--theme-color) solid;
 }
 
 a {

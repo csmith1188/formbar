@@ -23,7 +23,8 @@
 <!-- Main content here -->
 {% block main %}
 <h1>Ask For Help</h1>
-<form action="help" method="post">
+<form action="help" method="get">
+    <input type="hidden" name="action" value="send">
     <textarea name="message" class="box" rows="4" cols="40" placeholder="Message (optional)"></textarea><br>
     <br>
     <input type="submit" class="button" value="Send ticket">

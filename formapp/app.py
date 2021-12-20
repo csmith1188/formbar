@@ -244,13 +244,15 @@ def changeMode(newMode='', direction='next'):
     index = sD.settings['modes'].index(sD.settings['barmode'])
     if newMode in sD.settings['modes']:
         sD.settings['barmode'] = newMode
+    elif newMode:
+        return "[warning] " + 'Invalid mode.'
     else:
         if direction == 'next':
             index += 1
         elif direction == 'prev':
             index -= 1
         else:
-            print("[warning] " + 'Invalid direction. Needs next or prev.')
+            return "[warning] " + 'Invalid direction. Needs next or prev.'
         if index >= len(sD.settings['modes']):
             index = 0
         elif index < 0:
@@ -268,6 +270,7 @@ def changeMode(newMode='', direction='next'):
     elif sD.settings['barmode'] == 'playtime':
         clearString()
         showString(sD.activePhrase)
+    return 'Changed mode to ' + (newMode or direction)
 
 #This function Allows you to choose and play whatever sound effect you want
 def playSFX(sound):
@@ -898,6 +901,13 @@ def endpoint_break():
 # ██
 #  ██████
 
+@app.route('/changemode')
+def endpoint_changemode():
+    newMode = request.args.get('newMode') or ''
+    direction = request.args.get('direction') or 'next'
+    print(newMode)
+    print(direction)
+    return changeMode(newMode, direction)
 
 '''
     /chat

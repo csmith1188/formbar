@@ -67,7 +67,7 @@
   .letterButton {
     width: 144px;
     margin: 12px;
-    border-radius: 48px;
+    border-radius: 48px !important;
   }
 
   .highlight:hover {
@@ -85,23 +85,23 @@
   }
 
   .redColor {
-    color: var(--color-red);
+    color: var(--color-red) !important;
   }
 
   .yellowColor {
-    color: var(--color-yellow);
+    color: var(--color-yellow) !important;
   }
 
   .greenColor {
-    color: var(--color-green);
+    color: var(--color-green) !important;
   }
 
   .cyanColor {
-    color: var(--color-cyan);
+    color: var(--color-cyan) !important;
   }
 
   .blueColor {
-    color: var(--color-blue);
+    color: var(--color-blue) !important;
   }
 
   .smallImg {
@@ -202,6 +202,7 @@
   .menu {
     position: fixed;
     top: 32px;
+    box-sizing: border-box;
     border: 1px var(--dark-gray);
     border-style: none solid solid;
     z-index: 2;
@@ -278,22 +279,22 @@
 
     <div id="tutdDiv" class="hidden">
       <h2>Thumbs</h2>
-      <img src="{{ url_for('static', filename='img/home/thumbButton0.png') }}" id="thumbButton0" class="thumbButton greenColor" title="Up" onclick="thumbsVote(0);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/home/thumbButton0.png') }}" id="thumbButton0" class="thumbButton button inline popOut moreDepth greenColor" title="Up" onclick="thumbsVote(0);" tabindex="0">
       <br>
-      <img src="{{ url_for('static', filename='img/home/thumbButton1.png') }}" id="thumbButton1" class="thumbButton cyanColor" title="Wiggle" onclick="thumbsVote(1);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/home/thumbButton1.png') }}" id="thumbButton1" class="thumbButton button inline popOut moreDepth cyanColor" title="Wiggle" onclick="thumbsVote(1);" tabindex="0">
       <br>
-      <img src="{{ url_for('static', filename='img/home/thumbButton2.png') }}" id="thumbButton2" class="thumbButton redColor" title="Down" onclick="thumbsVote(2);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/home/thumbButton2.png') }}" id="thumbButton2" class="thumbButton button inline popOut moreDepth redColor" title="Down" onclick="thumbsVote(2);" tabindex="0">
     </div>
 
     <div id="abcdDiv" class="hidden">
       <h2>Letters</h2>
-      <img src="{{ url_for('static', filename='img/home/letterButton0.png') }}" id="letterButton0" class="letterButton redColor" title="Vote A" onclick="letterVote(0);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/home/letterButton0.png') }}" id="letterButton0" class="letterButton button inline popOut moreDepth redColor" title="Vote A" onclick="letterVote(0);" tabindex="0">
       <br>
-      <img src="{{ url_for('static', filename='img/home/letterButton1.png') }}" id="letterButton1" class="letterButton blueColor" title="Vote B" onclick="letterVote(1);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/home/letterButton1.png') }}" id="letterButton1" class="letterButton button inline popOut moreDepth blueColor" title="Vote B" onclick="letterVote(1);" tabindex="0">
       <br>
-      <img src="{{ url_for('static', filename='img/home/letterButton2.png') }}" id="letterButton2" class="letterButton yellowColor" title="Vote C" onclick="letterVote(2);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/home/letterButton2.png') }}" id="letterButton2" class="letterButton button inline popOut moreDepth yellowColor" title="Vote C" onclick="letterVote(2);" tabindex="0">
       <br>
-      <img src="{{ url_for('static', filename='img/home/letterButton3.png') }}" id="letterButton3" class="letterButton greenColor" title="Vote D" onclick="letterVote(3);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/home/letterButton3.png') }}" id="letterButton3" class="letterButton button inline popOut moreDepth greenColor" title="Vote D" onclick="letterVote(3);" tabindex="0">
     </div>
 
     <div id="soundDiv" class="hidden">
@@ -365,8 +366,8 @@
     <div id="chatTab" class="tab" onclick="openPage('chat');"><img src="{{ url_for('static', filename='img/home/chat.png') }}" class="icon"> <b id="newMessages" style="color: var(--light-red);"></b> Chat</div>
     <div id="studentsTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/home/students.png') }}" class="icon"> Students</div>
     <div id="studentsMenu" class="menu hidden" tabindex="-1">
-      <div id="breakTab" class="tab" onclick="openPage('break');">Bathroom break</div>
       <div id="helpTab" class="tab" onclick="openPage('help');">Help!</div>
+      <div id="breakTab" class="tab" onclick="openPage('break');">Bathroom break</div>
     </div>
     <div id="wawdTab" class="tab" onclick="openPage('wawd');"><img src="{{ url_for('static', filename='img/home/wawd.png') }}" class="icon"> What are we doing?</div>
     <div id="quizTab" class="tab" onclick="openPage('quiz');"><img src="{{ url_for('static', filename='img/home/quiz.png') }}" class="icon"> Quiz</div>
@@ -382,9 +383,9 @@
     <div id="teacherTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/home/teacher.png') }}" class="icon"> Teacher</div>
     <div id="teacherMenu" class="menu hidden" tabindex="-1">
       <div id="needshelpTab" class="tab" onclick="openPage('needshelp');">Help tickets</div>
-      <div id="lessonTab" class="tab" onclick="openPage('lesson');">Lesson</div>
       <div id="settingsTab" class="tab" onclick="openPage('settings');">Settings</div>
       <div id="usersTab" class="tab" onclick="openPage('users');">User list</div>
+      <div id="lessonTab" class="tab" onclick="openPage('lesson');">Lesson</div>
     </div>
     <div id="debugTab" class="tab" onclick="openPage('debug');"><img src="{{ url_for('static', filename='img/home/debug.png') }}" class="icon"> API debugging</div>
     <div id="reload" class="tab" style="margin-left: auto;" onclick="document.getElementById('innerPage').contentWindow.location.reload();"><img src="{{ url_for('static', filename='img/home/reload.png') }}" class="icon"> Reload inner page</div>
@@ -401,7 +402,7 @@
 <script src="{{ url_for('static', filename='js/home.js') }}"></script>
 <script>
   let bottom = document.getElementById("bottom");
-  let menus = document.querySelectorAll(".menu");
+  let menus = ["students", "games", "teacher"];
   let innerPage = document.getElementById("innerPage");
   let segment;
   let gradient;
@@ -478,7 +479,14 @@
   window.addEventListener("resize", bottomPosition);
 
   function menuPositions() {
-    ["students", "games", "teacher"].forEach(group => document.getElementById(group + "Menu").style.left = document.getElementById(group + "Tab").getBoundingClientRect().left + "px"); //Give menu same X position as tab
+    menus.forEach(menu => {
+      let menuEl = document.getElementById(menu + "Menu");
+      let tabEl = document.getElementById(menu + "Tab");
+      console.log(menuEl.offsetWidth);
+      console.log(tabEl.offsetWidth);
+      menuEl.style.left = tabEl.getBoundingClientRect().left + "px"; //Give menu same X position as tab
+      if (menuEl.offsetWidth < tabEl.offsetWidth) menuEl.style.width = tabEl.offsetWidth;
+    });
   }
 
   function getUsername() {
@@ -651,7 +659,10 @@
 
   function openPage(page) {
     innerPage.contentWindow.location = "/" + page;
-    Array.from(menus).forEach(menu => menu.classList.add("hidden"));
+    menus.forEach(menu => {
+      document.getElementById(menu + "Menu").classList.add("hidden");
+      document.getElementById(menu + "Tab").classList.remove("menuOpen");
+    });
   }
 
   function pageOpened(path) {
@@ -675,11 +686,10 @@
   }
 
   function showMenu(name) {
-    let el = document.getElementById(name + "Menu");
     menus.forEach(menu => {
-      if (menu == el) {
-        menu.classList.remove("hidden");
-        menu.focus();
+      if (menu == name) {
+        document.getElementById(name + "Menu").classList.remove("hidden");
+        document.getElementById(name + "Menu").focus();
         document.getElementById(name + "Tab").classList.add("menuOpen");
       }
     });
@@ -703,10 +713,11 @@
     document.getElementById("teacherTab").onclick = () => showMenu("teacher");
   }
   menus.forEach(menu => {
-    menu.addEventListener("blur", function() {
+    document.getElementById(menu + "Menu").addEventListener("blur", function() {
       this.classList.add("hidden"); //Hide menu when user clicks elsewhere
+      document.getElementById(menu + "Tab").classList.remove("menuOpen"); //Remove highlight from the tab
     });
-    menu.addEventListener("keydown", function() {
+    document.getElementById(menu + "Menu").addEventListener("keydown", function() {
       if (event.code == "Escape") this.blur(); //Hide menu when Esc key pressed
     });
   });

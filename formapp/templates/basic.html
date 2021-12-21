@@ -3,11 +3,33 @@
 <!-- This is where the title, top buttons, and stylesheet is located -->
 
 <!-- Change title here -->
-{% block title %}Formbar (Basic View){% endblock %}
+{% block title %}Formbar (Basic Mode){% endblock %}
 
 <!-- Extra style declarations here -->
 {% block style %}
 <style>
+  #advancedLink {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 48px;
+    background: var(--color-green);
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 48px;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  #setDefaultButton {
+    position: fixed;
+    top: 60px;
+    color: var(--color-purple);
+  }
+
   #thumbs, #letters {
     width: 480px;
     display: flex;
@@ -75,18 +97,20 @@
 
 <!-- Main content here -->
 {% block main %}
+  <div id="advancedLink" onclick="window.location = '/home';">Go to advanced mode to use all features</div>
+  <button id="setDefaultButton" class="hCentered" onclick="window.location = '/setdefault';">Set default mode</button>
   <div class="centered">
     <h1>Thumbs</h1>
-    <h2 id="noTUTD" class="hidden">There is no thumbs survey right now.</h2>
-    <div id="thumbs">
+    <h2 id="noTUTD">There is no thumbs survey right now.</h2>
+    <div id="thumbs" class="hidden">
       <img src="{{ url_for('static', filename='img/basic/thumbButton0.png') }}" id="thumbButton0" class="thumbButton button inline popOut moreDepth greenColor" title="Up" onclick="thumbsVote(0);" tabindex="0">
       <img src="{{ url_for('static', filename='img/basic/thumbButton1.png') }}" id="thumbButton1" class="thumbButton button inline popOut moreDepth cyanColor" title="Wiggle" onclick="thumbsVote(1);" tabindex="0">
       <img src="{{ url_for('static', filename='img/basic/thumbButton2.png') }}" id="thumbButton2" class="thumbButton button inline popOut moreDepth redColor" title="Down" onclick="thumbsVote(2);" tabindex="0">
     </div>
     <br><br>
     <h1>Letters</h1>
-    <h2 id="noABCD" class="hidden">There is no letter survey right now.</h2>
-    <div id="letters">
+    <h2 id="noABCD">There is no letter survey right now.</h2>
+    <div id="letters" class="hidden">
       <img src="{{ url_for('static', filename='img/basic/letterButton0.png') }}" id="letterButton0" class="letterButton button inline popOut moreDepth redColor" title="Vote A" onclick="letterVote(0);" tabindex="0">
       <img src="{{ url_for('static', filename='img/basic/letterButton1.png') }}" id="letterButton1" class="letterButton button inline popOut moreDepth blueColor" title="Vote B" onclick="letterVote(1);" tabindex="0">
       <img src="{{ url_for('static', filename='img/basic/letterButton2.png') }}" id="letterButton2" class="letterButton button inline popOut moreDepth yellowColor" title="Vote C" onclick="letterVote(2);" tabindex="0">
@@ -105,6 +129,7 @@
 {% block script %}
 <script src="{{ url_for('static', filename='js/home.js') }}"></script>
 <script>
+  ////Check for break, fix buttons
   checkForSurvey();
   checkForHelpTicket();
   setInterval(() => {

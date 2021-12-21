@@ -6,15 +6,25 @@
 {% block title %}Formbar Alert{% endblock %}
 
 <!-- Extra style declarations here -->
-{% block style %}{% endblock %}
+{% block style %}
+<style>
+  body {
+    text-align: center;
+  }
+</style>
+{% endblock %}
 
-<!-- Extra javascript here -->
-{% block script %}{% endblock %}
+<!-- Change theme color here -->
+{% block color %}purple{% endblock %}
 
 <!-- Main content here -->
 {% block main %}
 {{ message|safe }}
 <br><br><button onclick='goBack()'>Go Back</button>
+{% endblock %}
+
+<!-- Extra javascript here -->
+{% block script %}
 <script language='JavaScript' type='text/javascript'>
     var forward = '{{ forward }}'
     function goBack() {

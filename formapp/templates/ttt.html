@@ -80,6 +80,7 @@
 
 
   <script>
+    // ws = new WebSocket("ws://{{ serverIp }}:9001");
     console.log({{game|safe}});
     var gameState = {{game|safe}};
     console.log(gameState);
@@ -219,6 +220,9 @@
       turn: player.shape
     })));
 
+    //MAKE THE THINGIE, DECLARE IT KID
+    ws = new WebSocket("ws://{{ serverIp }}:9001");
+
     //YOUR USERNAME BE LIKE:
     var username = "{{ username }}";
 
@@ -241,12 +245,12 @@
 
         //IF THE SENDER IS THE PERSON YOU ARE IN A LOBBY WITH
         if (messageSender == "yaboi69") {
-          receiveTurn(data.content);
+          recieveTurn(data.content);
         }
       }
     };
 
-    function receiveTurn(move) {
+    function recieveTurn(move) {
       //CHECK IF ITS THEIR TURN
       if (player2.turn) {
         //ALTER YOUR BOARD

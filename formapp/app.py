@@ -270,7 +270,7 @@ def changeMode(newMode='', direction='next'):
     elif sD.settings['barmode'] == 'playtime':
         clearString()
         showString(sD.activePhrase)
-    return 'Changed mode to ' + (newMode or direction)
+    return 'Changed mode to ' + (newMode or direction) + '.'
 
 #This function Allows you to choose and play whatever sound effect you want
 def playSFX(sound):
@@ -837,6 +837,15 @@ def endpoint_bgm():
                 return render_template("message.html", message = 'Music volume decreased by one increment.' )
             else:
                 return render_template("message.html", message = 'Invalid voladj. Use \'up\' or \'down\'.' )
+        elif request.args.get('playpause'):
+            playpauseBGM()
+            if sD.bgm['paused']:
+                return render_template("message.html", message = 'Music resumed.')
+            else:
+                return render_template("message.html", message = 'Music paused.')
+        elif request.args.get('rewind'):
+            rewindBGM()
+            return render_template("message.html", message = 'Music rewound.')
         else:
             resString = '<a href="/bgmstop">Stop Music</a>'
             resString += '<h2>Now playing: ' + sD.bgm['nowplaying'] + '</h2>'
@@ -907,7 +916,7 @@ def endpoint_changemode():
     direction = request.args.get('direction') or 'next'
     print(newMode)
     print(direction)
-    return changeMode(newMode, direction)
+    return render_template("message.html", message = changeMode(newMode, direction))
 
 '''
     /chat

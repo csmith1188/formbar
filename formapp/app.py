@@ -1025,8 +1025,8 @@ def endpoint_fighter():
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
         return redirect("/chat?alert=You do not have high enough permissions to do this right now.")
     else:
-        return render_template('fighter.html', username = sD.studentDict[request.remote_addr]['name'])
-        #return redirect("/chat?alert=Fighter will be ready to play soon.")
+        #return render_template('fighter.html', username = sD.studentDict[request.remote_addr]['name'])
+        return redirect("/chat?alert=Fighter will be ready to play soon.")
 
 '''
     /flush

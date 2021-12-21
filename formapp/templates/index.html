@@ -404,6 +404,7 @@
   let bottom = document.getElementById("bottom");
   let menus = ["students", "games", "teacher"];
   let innerPage = document.getElementById("innerPage");
+  let innerPageTitle;
   let segment;
   let gradient;
   let urlOpen;
@@ -665,6 +666,8 @@
 
   function pageOpened(path) {
     let content = innerPage.contentWindow.document.body.innerHTML;
+    innerPageTitle = innerPage.contentWindow.document.title;
+    document.title = `${innerPageTitle} - Formbar`;
     let tabs = document.querySelectorAll(".tab");
     let tabEl = document.getElementById(path.substring(1) + "Tab");
     if (!content) openPage("chat?alert='Page does not exist.'");
@@ -678,7 +681,6 @@
       newMessages = 0;
       document.getElementById("newMessages").innerText = null;
       menuPositions();
-      document.title = "Formbar";
     }
     /*Change page title here*/
   }
@@ -725,7 +727,7 @@
     if (data.type == 'message' || data.type == 'alert') {
       if (document.hidden || !innerPage.contentWindow.location.pathname == "/chat") {
         newMessages++;
-        document.title = `(${newMessages}) Formbar`;
+        document.title = `(${newMessages}) ${innerPageTitle} - Formbar`;
         if (innerPage.contentWindow.location.pathname != "chat") {
           document.getElementById("newMessages").innerText = "(" + newMessages + ")";
           menuPositions();
@@ -734,6 +736,6 @@
     }
   }
 
-  document.addEventListener("visibilitychange", () => {if (!document.hidden && innerPage.contentWindow.location.pathname == "chat") document.title = "Formbar"}); //When user goes to this page, if chat is open, remove number of new messages from title
+  document.addEventListener("visibilitychange", () => {if (!document.hidden && innerPage.contentWindow.location.pathname == "chat") document.title = `${innerPageTitle} - Formbar`}); //When user goes to this page, if chat is open, remove number of new messages from title
 </script>
 {% endblock %}

@@ -1568,6 +1568,8 @@ def endpoint_perc():
 # User profiles
 @app.route('/profile')
 def endpoint_profile():
+    if sD.studentDict[request.remote_addr]['perms'] >= sD.settings['perms']['teacher']:
+        return render_template("profile.html")
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     elif sD.studentDict[request.remote_addr]['perms'] >= sD.settings['perms']['banned']:

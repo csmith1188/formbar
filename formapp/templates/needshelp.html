@@ -3,17 +3,37 @@
 <!-- This is where the title, top buttons, and stylesheet is located -->
 
 <!-- Change title here -->
-{% block title %}Formbar Tickets{% endblock %}
+{% block title %}Help Tickets{% endblock %}
 
 <!-- Extra style declarations here -->
-{% block style %}<meta http-equiv="refresh" content="5">{% endblock %}
+{% block style %}
+<meta http-equiv="refresh" content="5">
+<style>
+  body {
+    text-align: center;
+  }
 
-<!-- Extra javascript here -->
-{% block script %}{% endblock %}
+  button {
+    margin-left: 4px;
+  }
+
+  .ticket {
+    display: block;
+    margin: -4px auto;
+  }
+</style>
+{% endblock %}
+
+<!-- Change theme color here -->
+{% block color %}orange{% endblock %}
 
 <!-- Main content here -->
 {% block main %}
-<h1 style="color: blue">Ask For Help</h1>
-{{ table|safe }}
-
+  <h1>Help tickets</h1>
+  <div id="list">
+    {{ list|safe }}
+  </div>
 {% endblock %}
+
+<!-- Extra javascript here -->
+{% block script %}{% endblock %}

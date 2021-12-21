@@ -744,7 +744,7 @@ def endpoint_abcd():
                         abcdBar()
                         return render_template("message.html", forward=request.path, message = "Thank you for your tasty bytes... (" + vote + ")" )
                     else:
-                        return render_template("message.html", forward=request.path, message = "You've already sunmitted an answer... (" + sD.studentDict[request.remote_addr]['letter'] + ")" )
+                        return render_template("message.html", forward=request.path, message = "You've already submitted an answer... (" + sD.studentDict[request.remote_addr]['letter'] + ")" )
                 elif vote == 'oops':
                     if sD.studentDict[request.remote_addr]['letter']:
                         sD.studentDict[request.remote_addr]['letter'] = ''
@@ -768,6 +768,25 @@ def endpoint_addfighteropponent():
     code = request.args.get('code')
     name = request.args.get('name')
     sD.fighter['match' + code]['opponent'] = name #Set "opponent" of object to arg "name"
+
+'''
+/addfile
+'''
+@app.route('/addfile', methods = ['POST', 'GET'])
+def endpoint_addfile():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    else:
+        if request.method == 'POST':
+            title = request.form['title']
+            file = request.form['file']
+            list = request.form['list']
+            print("Title: " + title)
+            print("Filename: " + file)
+            print("List: " + list)
+            return render_template("message.html", forward=request.path, message = 'File submitted to teacher.')
+        else:
+            return render_template('addfile.html')
 
 # ██████
 # ██   ██
@@ -1927,7 +1946,7 @@ def endpoint_tutd():
                         tutdBar()
                         return render_template("message.html", forward=request.path, message = "Thank you for your tasty bytes... (" + thumb + ")" )
                     else:
-                        return render_template("message.html", forward=request.path, message = "You've already sunmitted this answer... (" + thumb + ")" )
+                        return render_template("message.html", forward=request.path, message = "You've already submitted this answer... (" + thumb + ")" )
                 elif thumb == 'oops':
                     if sD.studentDict[request.remote_addr]['thumb']:
                         sD.studentDict[request.remote_addr]['thumb'] = ''

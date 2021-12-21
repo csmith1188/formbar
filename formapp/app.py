@@ -1856,15 +1856,20 @@ def endpoint_speedtype():
 #Start a thumbs survey
 @app.route('/startsurvey', methods = ['POST', 'GET'])
 def endpoint_startsurvey():
-    if request.method == 'POST':
-        if not request.form['type']:
-            return redirect("/chat?alert=You need a survey type.")
-        type = request.form['type']
-        if not (type == 'tutd' or type == 'abcd'):
-            return redirect("/chat?alert=Invalid survey type.")
-        changeMode(type)
-        repeatMode()
-    return redirect('/settings')
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['assistant']:
+        return redirect("/chat?alert=You do not have high enough permissions to do this right now.")
+    else:
+        if request.method == 'POST':
+            if not request.form['type']:
+                return redirect("/chat?alert=You need a survey type.")
+            type = request.form['type']
+            if not (type == 'tutd' or type == 'abcd'):
+                return redirect("/chat?alert=Invalid survey type.")
+            changeMode(type)
+            repeatMode()
+        return redirect('/settings')
 
 # ████████
 #    ██

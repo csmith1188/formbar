@@ -702,7 +702,7 @@ def endpoint_root():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login')
     if sD.studentDict[request.remote_addr]['preferredMode'] == 'advanced':
-        return redirect('/home')
+        return redirect('/advanced')
     if sD.studentDict[request.remote_addr]['preferredMode'] == 'basic':
         return redirect('/basic')
     return redirect('/setdefault')
@@ -787,6 +787,20 @@ def endpoint_addfile():
             return render_template("message.html", forward=request.path, message = 'File submitted to teacher.')
         else:
             return render_template('addfile.html')
+
+@app.route('/advanced')
+def endpoint_home():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login')
+    username = sD.studentDict[request.remote_addr]['name']
+    sfx.updateFiles()
+    sounds = []
+    music = []
+    for key, value in sfx.sound.items():
+        sounds.append(key)
+    for key, value in bgm.bgm.items():
+        music.append(key)
+    return render_template('advanced.html', username = username, sfx = sounds, bgm = music)
 
 # ██████
 # ██   ██
@@ -1226,20 +1240,6 @@ def endpoint_help():
             return redirect("/chat?alert=Your ticket was sent. Keep working on the problem the best you can while you wait." )
     else:
         return render_template("help.html")
-
-@app.route('/home')
-def endpoint_home():
-    if not request.remote_addr in sD.studentDict:
-        return redirect('/login')
-    username = sD.studentDict[request.remote_addr]['name']
-    sfx.updateFiles()
-    sounds = []
-    music = []
-    for key, value in sfx.sound.items():
-        sounds.append(key)
-    for key, value in bgm.bgm.items():
-        music.append(key)
-    return render_template('index.html', username = username, sfx = sounds, bgm = music)
 
 # ██
 # ██

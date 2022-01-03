@@ -279,29 +279,29 @@
 
     <div id="tutdDiv" class="hidden">
       <h2>Thumbs</h2>
-      <img src="{{ url_for('static', filename='img/home/thumbButton0.png') }}" id="thumbButton0" class="thumbButton button inline popOut moreDepth greenColor" title="Up" onclick="thumbsVote(0);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/advanced/thumbButton0.png') }}" id="thumbButton0" class="thumbButton button inline popOut moreDepth greenColor" title="Up" onclick="thumbsVote(0);" tabindex="0">
       <br>
-      <img src="{{ url_for('static', filename='img/home/thumbButton1.png') }}" id="thumbButton1" class="thumbButton button inline popOut moreDepth cyanColor" title="Wiggle" onclick="thumbsVote(1);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/advanced/thumbButton1.png') }}" id="thumbButton1" class="thumbButton button inline popOut moreDepth cyanColor" title="Wiggle" onclick="thumbsVote(1);" tabindex="0">
       <br>
-      <img src="{{ url_for('static', filename='img/home/thumbButton2.png') }}" id="thumbButton2" class="thumbButton button inline popOut moreDepth redColor" title="Down" onclick="thumbsVote(2);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/advanced/thumbButton2.png') }}" id="thumbButton2" class="thumbButton button inline popOut moreDepth redColor" title="Down" onclick="thumbsVote(2);" tabindex="0">
     </div>
 
     <div id="abcdDiv" class="hidden">
       <h2>Letters</h2>
-      <img src="{{ url_for('static', filename='img/home/letterButton0.png') }}" id="letterButton0" class="letterButton button inline popOut moreDepth redColor" title="Vote A" onclick="letterVote(0);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/advanced/letterButton0.png') }}" id="letterButton0" class="letterButton button inline popOut moreDepth redColor" title="Vote A" onclick="letterVote(0);" tabindex="0">
       <br>
-      <img src="{{ url_for('static', filename='img/home/letterButton1.png') }}" id="letterButton1" class="letterButton button inline popOut moreDepth blueColor" title="Vote B" onclick="letterVote(1);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/advanced/letterButton1.png') }}" id="letterButton1" class="letterButton button inline popOut moreDepth blueColor" title="Vote B" onclick="letterVote(1);" tabindex="0">
       <br>
-      <img src="{{ url_for('static', filename='img/home/letterButton2.png') }}" id="letterButton2" class="letterButton button inline popOut moreDepth yellowColor" title="Vote C" onclick="letterVote(2);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/advanced/letterButton2.png') }}" id="letterButton2" class="letterButton button inline popOut moreDepth yellowColor" title="Vote C" onclick="letterVote(2);" tabindex="0">
       <br>
-      <img src="{{ url_for('static', filename='img/home/letterButton3.png') }}" id="letterButton3" class="letterButton button inline popOut moreDepth greenColor" title="Vote D" onclick="letterVote(3);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/advanced/letterButton3.png') }}" id="letterButton3" class="letterButton button inline popOut moreDepth greenColor" title="Vote D" onclick="letterVote(3);" tabindex="0">
     </div>
 
     <div id="soundDiv" class="hidden">
       <h2>Sound effects</h2>
       <input type="text" id="sound" placeholder="Filename" list="sfxFiles">
       <datalist id="sfxFiles"></datalist>
-      <img src="{{ url_for('static', filename='img/home/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendSound();">
+      <img src="{{ url_for('static', filename='img/advanced/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendSound();">
     </div>
 
     <div id="musicDiv" class="hidden">
@@ -309,9 +309,9 @@
       <label for="volume">Volume: </label><input type="range" id="volume" value="0.5" max="1" step="0.1">
       <span id="volNumber">0.5</span>
       <br>
-      <img src="{{ url_for('static', filename='img/home/random.png') }}" id="randomMusic" class="smallImg" title="Random" onclick="randomBGM()"><input type="text" id="music" placeholder="Filename" list="bgmFiles">
+      <img src="{{ url_for('static', filename='img/advanced/random.png') }}" id="randomMusic" class="smallImg" title="Random" onclick="randomBGM()"><input type="text" id="music" placeholder="Filename" list="bgmFiles">
       <datalist id="bgmFiles"></datalist>
-      <img src="{{ url_for('static', filename='img/home/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendMusic();"><br>
+      <img src="{{ url_for('static', filename='img/advanced/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendMusic();"><br>
       <div id="nowPlaying" class="hidden">Now playing: <b id="nowPlayingTitle" title="Song"></b></div>
       <button id="stopMusicButton" class="inline popOut" style="margin-top: 12px;" onclick="stopMusic();">Stop music</button>
     </div>
@@ -319,7 +319,7 @@
     <div id="textDiv" class="hidden">
       <h2>Change text</h2>
       <input type="text" id="text" placeholder="Phrase">
-      <img src="{{ url_for('static', filename='img/home/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendText();">
+      <img src="{{ url_for('static', filename='img/advanced/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendText();">
     </div>
 
     <div id="colorDiv" class="hidden">
@@ -342,13 +342,13 @@
         <h3 style="margin-bottom: 0;">Color 2</h3>
         <input type="color" id="color2" class="button inline popOut">
       </div>
-      <img src="{{ url_for('static', filename='img/home/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendColor();">
+      <img src="{{ url_for('static', filename='img/advanced/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendColor();">
     </div>
 
     <div id="percentDiv" class="hidden">
       <h2>Fill percentage</h2>
       <input type="number" id="percent" value="0" min="0" max="100" onchange="validNumber(this);"><label for="percent">%</label>
-      <img src="{{ url_for('static', filename='img/home/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendPercent();">
+      <img src="{{ url_for('static', filename='img/advanced/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendPercent();">
     </div>
   </div>
 
@@ -363,15 +363,15 @@
 
 <div id="rightSide">
   <div id="tabs">
-    <div id="chatTab" class="tab" onclick="openPage('chat');"><img src="{{ url_for('static', filename='img/home/chat.png') }}" class="icon"> <b id="newMessages" style="color: var(--light-red);"></b> Chat</div>
-    <div id="studentsTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/home/students.png') }}" class="icon"> Students</div>
+    <div id="chatTab" class="tab" onclick="openPage('chat');"><img src="{{ url_for('static', filename='img/advanced/chat.png') }}" class="icon"> <b id="newMessages" style="color: var(--light-red);"></b> Chat</div>
+    <div id="studentsTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/advanced/students.png') }}" class="icon"> Students</div>
     <div id="studentsMenu" class="menu hidden" tabindex="-1">
       <div id="helpTab" class="tab" onclick="openPage('help');">Help!</div>
       <div id="breakTab" class="tab" onclick="openPage('break');">Bathroom break</div>
     </div>
-    <div id="wawdTab" class="tab" onclick="openPage('wawd');"><img src="{{ url_for('static', filename='img/home/wawd.png') }}" class="icon"> What are we doing?</div>
-    <div id="quizTab" class="tab" onclick="openPage('quiz');"><img src="{{ url_for('static', filename='img/home/quiz.png') }}" class="icon"> Quiz</div>
-    <div id="gamesTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/home/games.png') }}" class="icon"> Games</div>
+    <div id="wawdTab" class="tab" onclick="openPage('wawd');"><img src="{{ url_for('static', filename='img/advanced/wawd.png') }}" class="icon"> What are we doing?</div>
+    <div id="quizTab" class="tab" onclick="openPage('quiz');"><img src="{{ url_for('static', filename='img/advanced/quiz.png') }}" class="icon"> Quiz</div>
+    <div id="gamesTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/advanced/games.png') }}" class="icon"> Games</div>
     <div id="gamesMenu" class="menu hidden" tabindex="-1">
       <div id="2048Tab" class="tab" onclick="openPage('2048');">2048</div>
       <div id="hangmanTab" class="tab" onclick="openPage('hangman');">Hangman</div>
@@ -380,15 +380,15 @@
       <div id="tttTab" class="tab" onclick="openPage('ttt');">Tic-tac-toe</div>
       <div id="fighterTab" class="tab" onclick="openPage('fighter');">Turn-Based Fighter</div>
     </div>
-    <div id="teacherTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/home/teacher.png') }}" class="icon"> Teacher</div>
+    <div id="teacherTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/advanced/teacher.png') }}" class="icon"> Teacher</div>
     <div id="teacherMenu" class="menu hidden" tabindex="-1">
       <div id="needshelpTab" class="tab" onclick="openPage('needshelp');">Help tickets</div>
       <div id="settingsTab" class="tab" onclick="openPage('settings');">Settings</div>
       <div id="usersTab" class="tab" onclick="openPage('users');">User list</div>
       <div id="lessonTab" class="tab" onclick="openPage('lesson');">Lesson</div>
     </div>
-    <div id="debugTab" class="tab" onclick="openPage('debug');"><img src="{{ url_for('static', filename='img/home/debug.png') }}" class="icon"> API debugging</div>
-    <div id="reload" class="tab" style="margin-left: auto;" onclick="document.getElementById('innerPage').contentWindow.location.reload();"><img src="{{ url_for('static', filename='img/home/reload.png') }}" class="icon"> Reload inner page</div>
+    <div id="debugTab" class="tab" onclick="openPage('debug');"><img src="{{ url_for('static', filename='img/advanced/debug.png') }}" class="icon"> API debugging</div>
+    <div id="reload" class="tab" style="margin-left: auto;" onclick="document.getElementById('innerPage').contentWindow.location.reload();"><img src="{{ url_for('static', filename='img/advanced/reload.png') }}" class="icon"> Reload inner page</div>
   </div>
 
   <div>
@@ -483,8 +483,6 @@
     menus.forEach(menu => {
       let menuEl = document.getElementById(menu + "Menu");
       let tabEl = document.getElementById(menu + "Tab");
-      console.log(menuEl.offsetWidth);
-      console.log(tabEl.offsetWidth);
       menuEl.style.left = tabEl.getBoundingClientRect().left + "px"; //Give menu same X position as tab
       if (menuEl.offsetWidth < tabEl.offsetWidth) menuEl.style.width = tabEl.offsetWidth;
     });
@@ -676,7 +674,7 @@
     if (["/2048", "/hangman", "/minesweeper", "/speedtype", "/ttt", "/fighter"].includes(path)) document.getElementById("gamesTab").classList.add("open");
     else if (["/needshelp", "/lesson", "/settings", "/users"].includes(path)) document.getElementById("teacherTab").classList.add("open");
     if (tabEl) tabEl.classList.add("open");
-    if (path == "/home" || path == "/basic") openPage("chat");
+    if (path == "/advanced" || path == "/basic") openPage("chat");
     if (path == "/chat") {
       newMessages = 0;
       document.getElementById("newMessages").innerText = null;

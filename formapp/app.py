@@ -170,7 +170,8 @@ def newStudent(remote, username, bot=False):
             'quizRes': [],
             'essayRes': '',
             'bot': bot,
-            'excluded': False
+            'excluded': False,
+            'preferredMode': None
         }
         #Track if this is the first human login or not
         humanUsers = 0
@@ -243,13 +244,15 @@ def changeMode(newMode='', direction='next'):
     index = sD.settings['modes'].index(sD.settings['barmode'])
     if newMode in sD.settings['modes']:
         sD.settings['barmode'] = newMode
+    elif newMode:
+        return "[warning] " + 'Invalid mode.'
     else:
         if direction == 'next':
             index += 1
         elif direction == 'prev':
             index -= 1
         else:
-            print("[warning] " + 'Invalid direction. Needs next or prev.')
+            return "[warning] " + 'Invalid direction. Needs next or prev.'
         if index >= len(sD.settings['modes']):
             index = 0
         elif index < 0:
@@ -267,6 +270,7 @@ def changeMode(newMode='', direction='next'):
     elif sD.settings['barmode'] == 'playtime':
         clearString()
         showString(sD.activePhrase)
+    return 'Changed mode to ' + (newMode or direction) + '.'
 
 #This function Allows you to choose and play whatever sound effect you want
 def playSFX(sound):
@@ -697,26 +701,19 @@ def updateStep():
 
 '''
     /
-    Homepage (root)
+    Redirect to either basic or advanced mode based on the user's preference
 '''
 # Root directory.
 @app.route('/')
-def endpoint_home():
-        if not request.remote_addr in sD.studentDict:
-            return redirect('/login')
-        else:
-            if True:
-                username = sD.studentDict[request.remote_addr]['name']
-                sfx.updateFiles()
-                sounds = []
-                music = []
-                for key, value in sfx.sound.items():
-                    sounds.append(key)
-                for key, value in bgm.bgm.items():
-                    music.append(key)
-                return render_template('index.html', username = username, sfx = sounds, bgm = music)
-            else:
-                redirect('/basic')
+def endpoint_root():
+    ##Also check database
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login')
+    if sD.studentDict[request.remote_addr]['preferredMode'] == 'advanced':
+        return redirect('/home')
+    if sD.studentDict[request.remote_addr]['preferredMode'] == 'basic':
+        return redirect('/basic')
+    return redirect('/setdefault')
 
 # Endpoint for the 2048 game
 @app.route('/2048')
@@ -756,7 +753,7 @@ def endpoint_abcd():
                         abcdBar()
                         return render_template("message.html", forward=request.path, message = "Thank you for your tasty bytes... (" + vote + ")" )
                     else:
-                        return render_template("message.html", forward=request.path, message = "You've already sunmitted an answer... (" + sD.studentDict[request.remote_addr]['letter'] + ")" )
+                        return render_template("message.html", forward=request.path, message = "You've already submitted an answer... (" + sD.studentDict[request.remote_addr]['letter'] + ")" )
                 elif vote == 'oops':
                     if sD.studentDict[request.remote_addr]['letter']:
                         sD.studentDict[request.remote_addr]['letter'] = ''
@@ -781,6 +778,25 @@ def endpoint_addfighteropponent():
     code = request.args.get('code')
     name = request.args.get('name')
     sD.fighter['match' + code]['opponent'] = name #Set "opponent" of object to arg "name"
+
+'''
+/addfile
+'''
+@app.route('/addfile', methods = ['POST', 'GET'])
+def endpoint_addfile():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    else:
+        if request.method == 'POST':
+            title = request.form['title']
+            file = request.form['file']
+            list = request.form['list']
+            print("Title: " + title)
+            print("Filename: " + file)
+            print("List: " + list)
+            return render_template("message.html", forward=request.path, message = 'File submitted to teacher.')
+        else:
+            return render_template('addfile.html')
 
 # ██████
 # ██   ██
@@ -851,6 +867,15 @@ def endpoint_bgm():
                 return render_template("message.html", message = 'Music volume decreased by one increment.' )
             else:
                 return render_template("message.html", message = 'Invalid voladj. Use \'up\' or \'down\'.' )
+        elif request.args.get('playpause'):
+            playpauseBGM()
+            if sD.bgm['paused']:
+                return render_template("message.html", message = 'Music resumed.')
+            else:
+                return render_template("message.html", message = 'Music paused.')
+        elif request.args.get('rewind'):
+            rewindBGM()
+            return render_template("message.html", message = 'Music rewound.')
         else:
             resString = '<a href="/bgmstop">Stop Music</a>'
             resString += '<h2>Now playing: ' + sD.bgm['nowplaying'] + '</h2>'
@@ -916,6 +941,13 @@ def endpoint_break():
 # ██
 #  ██████
 
+@app.route('/changemode')
+def endpoint_changemode():
+    newMode = request.args.get('newMode') or ''
+    direction = request.args.get('direction') or 'next'
+    print(newMode)
+    print(direction)
+    return render_template("message.html", message = changeMode(newMode, direction))
 
 '''
     /chat
@@ -1217,6 +1249,20 @@ def endpoint_help():
             return redirect("/chat?alert=Your ticket was sent. Keep working on the problem the best you can while you wait." )
     else:
         return render_template("help.html")
+
+@app.route('/home')
+def endpoint_home():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login')
+    username = sD.studentDict[request.remote_addr]['name']
+    sfx.updateFiles()
+    sounds = []
+    music = []
+    for key, value in sfx.sound.items():
+        sounds.append(key)
+    for key, value in bgm.bgm.items():
+        music.append(key)
+    return render_template('index.html', username = username, sfx = sounds, bgm = music)
 
 # ██
 # ██
@@ -1690,19 +1736,19 @@ def endpoint_segment():
         start = request.args.get('start')
         end = request.args.get('end')
         if not hex:
-            return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=#FF00FF</b> (you need at least one color)"
+            return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=FF00FF</b> (you need at least one color)"
         if not hex2dec(hex):
-            return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=#FF00FF</b> (you did not use a proper hexadecimal color)"
+            return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=FF00FF</b> (you did not use a proper hexadecimal color)"
         if not start or not end:
-            return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=#FF00FF</b> (you need a start and end point)"
+            return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=FF00FF</b> (you need a start and end point)"
         else:
             try:
                 start = int(start)
                 end = int(end)
             except:
-                return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=#FF00FF</b> (start and end must be and integer)"
+                return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=FF00FF</b> (start and end must be and integer)"
         if start > BARPIX or end > BARPIX:
-            return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=#FF00FF</b> (Your start or end was higher than the number of pixels: " + str(BARPIX) + ")"
+            return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=FF00FF</b> (Your start or end was higher than the number of pixels: " + str(BARPIX) + ")"
         pixRange = range(start, end)
         if type == 'fadein':
             for i, pix in enumerate(pixRange):
@@ -1712,9 +1758,9 @@ def endpoint_segment():
                 pixels[pix] = fadeout(pixRange, i, hex2dec(hex))
         elif type == 'blend':
             if not hex:
-                return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=#FF00FF&hex2=#00FF00</b> (you need at least two colors)"
+                return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=FF00FF&hex2=#00FF00</b> (you need at least two colors)"
             if not hex2dec(hex):
-                return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=#FF00FF&hex2=#00FF00</b> (you did not use a proper hexadecimal color)"
+                return "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=FF00FF&hex2=#00FF00</b> (you did not use a proper hexadecimal color)"
             else:
                 for i, pix in enumerate(pixRange):
                     pixels[pix] = blend(pixRange, i, hex2dec(hex), hex2dec(hex2))
@@ -1725,7 +1771,7 @@ def endpoint_segment():
             if hex2dec(hex):
                 fillBar(hex2dec(hex))
             else:
-                return "Bad ArgumentsTry <b>/color?hex=#FF00FF</b> or <b>/color?r=255&g=0&b=255</b>"
+                return "Bad ArgumentsTry <b>/color?hex=FF00FF</b> or <b>/color?r=255&g=0&b=255</b>"
         if ONRPi:
             pixels.show()
         return render_template("message.html", message = "Color sent!" )
@@ -1748,6 +1794,26 @@ def endpoint_sendblock():
     else:
         return "Bad Arguments. Requires 'id' and 'data'"
 '''
+
+#Choose whether you want to use basic or expert mode
+@app.route('/setdefault', methods = ['POST', 'GET'])
+def endpoint_setdefault():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    if request.method == 'POST':
+        if request.form['mode'] == 'basic' or request.form['mode'] == 'advanced':
+            db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+            dbcmd = db.cursor()
+            sD.studentDict[request.remote_addr]['preferredMode'] = request.form['mode']
+            ##Test this
+            dbcmd.execute("UPDATE users SET preferredMode=:mode WHERE username=:uname", {"uname": sD.studentDict[request.remote_addr]['name'], "mode": request.form['mode']})
+            db.commit()
+            db.close()
+        else:
+            return 'Invalid mode.'
+        return redirect('/')
+    else:
+        return render_template('setdefault.html')
 
 #This endpoint is exclusive only to the teacher.
 @app.route('/settings', methods = ['POST', 'GET'])
@@ -1838,19 +1904,23 @@ def endpoint_speedtype():
     else:
         return render_template("speedtype.html")
 
-#Start a letter abcd
-@app.route('/startabcd')
-def endpoint_startabcd():
-    changeMode('abcd')
-    repeatMode()
-    return redirect('/settings')
-
 #Start a thumbs survey
-@app.route('/starttutd')
-def endpoint_starttutd():
-    changeMode('tutd')
-    repeatMode()
-    return redirect('/settings')
+@app.route('/startsurvey', methods = ['POST', 'GET'])
+def endpoint_startsurvey():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['assistant']:
+        return redirect("/chat?alert=You do not have high enough permissions to do this right now.")
+    else:
+        if request.method == 'POST':
+            if not request.form['type']:
+                return redirect("/chat?alert=You need a survey type.")
+            type = request.form['type']
+            if not (type == 'tutd' or type == 'abcd'):
+                return redirect("/chat?alert=Invalid survey type.")
+            changeMode(type)
+            repeatMode()
+        return redirect('/settings')
 
 '''
     /survey
@@ -1923,7 +1993,7 @@ def endpoint_ttt():
 
 
         #If there is no game with these players
-        return redirect("/chat", message="No game found")
+        return redirect("/chat?alert=No game found")
 
 '''
     /tutd

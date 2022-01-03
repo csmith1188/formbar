@@ -49,9 +49,9 @@
 <!-- Extra javascript here -->
 {% block script %}
   <script type="text/javascript">
-    //const forward = urlParams.get('forward');
-    //if (forward) document.getElementById('forwardBox').value = forward;
-    //else document.getElementById('forwardBox').value = null;
+    const forward = urlParams.get('forward');
+    if (forward) document.getElementById('forwardBox').value = forward;
+    else document.getElementById('forwardBox').value = null;
 
     //Prevent submission if a field is blank
     let ub = document.getElementById("usernameBox");

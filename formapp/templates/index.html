@@ -9,15 +9,16 @@
 {% block style %}
 <style>
   h1 {
-    font-size: 30px;
+    margin: 0 0 12px;
+    font-size: 26px;
     color: var(--color-blue);
+    text-align: center;
   }
 
   h2 {
-    margin: 0 0 12px;
-    font-size: 24px;
+    margin: 48px 0 12px;
+    font-size: 23px;
     color: var(--color-blue);
-    text-align: center;
   }
 
   h3 {
@@ -66,7 +67,7 @@
   .letterButton {
     width: 144px;
     margin: 12px;
-    border-radius: 48px;
+    border-radius: 48px !important;
   }
 
   .highlight:hover {
@@ -84,23 +85,23 @@
   }
 
   .redColor {
-    color: var(--color-red);
+    color: var(--color-red) !important;
   }
 
   .yellowColor {
-    color: var(--color-yellow);
+    color: var(--color-yellow) !important;
   }
 
   .greenColor {
-    color: var(--color-green);
+    color: var(--color-green) !important;
   }
 
   .cyanColor {
-    color: var(--color-cyan);
+    color: var(--color-cyan) !important;
   }
 
   .blueColor {
-    color: var(--color-blue);
+    color: var(--color-blue) !important;
   }
 
   .smallImg {
@@ -147,6 +148,7 @@
     bottom: 0;
     width: 100%;
     box-sizing: border-box;
+    margin-top: 48px;
     padding: inherit;
   }
 
@@ -200,6 +202,7 @@
   .menu {
     position: fixed;
     top: 32px;
+    box-sizing: border-box;
     border: 1px var(--dark-gray);
     border-style: none solid solid;
     z-index: 2;
@@ -210,7 +213,7 @@
     padding: 4.5px 16px;
   }
 
-  .tab:not(.open):hover {
+  .tab:not(.open):hover, .tab.menuOpen {
     background: var(--bg-dark-highlight);
   }
 
@@ -271,30 +274,27 @@
 {% block main %}
 <div id="sidebar" class="light">
   <div id="sidebarContent">
-    <h2>Formbar Features</h2>
+    <h1>Formbar Features</h1>
     <div style="text-align: center;">Features will appear when the teacher makes them available.</div>
-    <br><br>
 
     <div id="tutdDiv" class="hidden">
       <h2>Thumbs</h2>
-      <img src="{{ url_for('static', filename='img/home/thumbButton0.png') }}" id="thumbButton0" class="thumbButton greenColor" title="Up" onclick="thumbsVote(0);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/home/thumbButton0.png') }}" id="thumbButton0" class="thumbButton button inline popOut moreDepth greenColor" title="Up" onclick="thumbsVote(0);" tabindex="0">
       <br>
-      <img src="{{ url_for('static', filename='img/home/thumbButton1.png') }}" id="thumbButton1" class="thumbButton cyanColor" title="Wiggle" onclick="thumbsVote(1);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/home/thumbButton1.png') }}" id="thumbButton1" class="thumbButton button inline popOut moreDepth cyanColor" title="Wiggle" onclick="thumbsVote(1);" tabindex="0">
       <br>
-      <img src="{{ url_for('static', filename='img/home/thumbButton2.png') }}" id="thumbButton2" class="thumbButton redColor" title="Down" onclick="thumbsVote(2);" tabindex="0">
-      <br><br><br>
+      <img src="{{ url_for('static', filename='img/home/thumbButton2.png') }}" id="thumbButton2" class="thumbButton button inline popOut moreDepth redColor" title="Down" onclick="thumbsVote(2);" tabindex="0">
     </div>
 
     <div id="abcdDiv" class="hidden">
       <h2>Letters</h2>
-      <img src="{{ url_for('static', filename='img/home/letterButton0.png') }}" id="letterButton0" class="letterButton redColor" title="Vote A" onclick="letterVote(0);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/home/letterButton0.png') }}" id="letterButton0" class="letterButton button inline popOut moreDepth redColor" title="Vote A" onclick="letterVote(0);" tabindex="0">
       <br>
-      <img src="{{ url_for('static', filename='img/home/letterButton1.png') }}" id="letterButton1" class="letterButton blueColor" title="Vote B" onclick="letterVote(1);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/home/letterButton1.png') }}" id="letterButton1" class="letterButton button inline popOut moreDepth blueColor" title="Vote B" onclick="letterVote(1);" tabindex="0">
       <br>
-      <img src="{{ url_for('static', filename='img/home/letterButton2.png') }}" id="letterButton2" class="letterButton yellowColor" title="Vote C" onclick="letterVote(2);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/home/letterButton2.png') }}" id="letterButton2" class="letterButton button inline popOut moreDepth yellowColor" title="Vote C" onclick="letterVote(2);" tabindex="0">
       <br>
-      <img src="{{ url_for('static', filename='img/home/letterButton3.png') }}" id="letterButton3" class="letterButton greenColor" title="Vote D" onclick="letterVote(3);" tabindex="0">
-      <br><br><br>
+      <img src="{{ url_for('static', filename='img/home/letterButton3.png') }}" id="letterButton3" class="letterButton button inline popOut moreDepth greenColor" title="Vote D" onclick="letterVote(3);" tabindex="0">
     </div>
 
     <div id="soundDiv" class="hidden">
@@ -302,65 +302,61 @@
       <input type="text" id="sound" placeholder="Filename" list="sfxFiles">
       <datalist id="sfxFiles"></datalist>
       <img src="{{ url_for('static', filename='img/home/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendSound();">
-      <br><br><br>
     </div>
 
     <div id="musicDiv" class="hidden">
       <h2>Play music</h2>
       <label for="volume">Volume: </label><input type="range" id="volume" value="0.5" max="1" step="0.1">
-      <span id="volNumber">1.0</span>
+      <span id="volNumber">0.5</span>
       <br>
       <img src="{{ url_for('static', filename='img/home/random.png') }}" id="randomMusic" class="smallImg" title="Random" onclick="randomBGM()"><input type="text" id="music" placeholder="Filename" list="bgmFiles">
       <datalist id="bgmFiles"></datalist>
       <img src="{{ url_for('static', filename='img/home/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendMusic();"><br>
       <div id="nowPlaying" class="hidden">Now playing: <b id="nowPlayingTitle" title="Song"></b></div>
       <button id="stopMusicButton" class="inline popOut" style="margin-top: 12px;" onclick="stopMusic();">Stop music</button>
-      <br><br><br>
     </div>
 
     <div id="textDiv" class="hidden">
       <h2>Change text</h2>
       <input type="text" id="text" placeholder="Phrase">
       <img src="{{ url_for('static', filename='img/home/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendText();">
-      <br><br><br>
     </div>
 
     <div id="colorDiv" class="hidden">
       <h2>Change color</h2>
       <input type="radio" id="hideSegment" name="segment" checked onclick="hideSegment();" style="margin-left: 0;"><label for="hideSegment">Entire bar</label>
-      <input type="radio" id="showSegment" name="segment" onclick="showSegment();"><label for="showSegment">Segment</label>
+      <input type="radio" id="showSegment" name="segment" style="margin-left: 8px;" onclick="showSegment();"><label for="showSegment">Segment</label>
       <br>
-      <div id="segment" class="hidden">
-        <input type="number" id="segmentStart" min="0" max="240" value="0" onchange="validNumber(this);"> –
-        <input type="number" id="segmentEnd" min="0" max="240" value="240" onchange="validNumber(this);">
+      <div id="segment" class="hidden" style="margin-bottom: 8px;">
+        <input type="number" id="segmentStart" min="0" value="0" onchange="validNumber(this);"> –
+        <input type="number" id="segmentEnd" min="0" onchange="validNumber(this);">
       </div>
-      <input type="radio" id="hideColor2" name="gradient" checked onclick="hideColor2();" style="margin: 8px 3px 8px 0;"><label for="hideColor2">Single color</label>
-      <input type="radio" id="showColor2" name="gradient" onclick="showColor2();"><label for="showColor2">Gradient</label>
+      <input type="radio" id="hideColor2" name="gradient" checked onclick="hideColor2();" style="margin-left: 0;"><label for="hideColor2">Single color</label>
+      <input type="radio" id="showColor2" name="gradient" style="margin-left: 8px;" onclick="showColor2();"><label for="showColor2">Gradient</label>
       <br>
       <div style="display: inline-block;">
-        <h3 id="color1Heading" class="hidden">Color 1</h3>
+        <h3 id="color1Heading" class="hidden" style="margin-bottom: 0;">Color 1</h3>
         <input type="color" id="color1" class="button inline popOut">
       </div>
       <div id="color2Div" class="hidden" style="margin-left: 8px;">
-        <h3>Color 2</h3>
+        <h3 style="margin-bottom: 0;">Color 2</h3>
         <input type="color" id="color2" class="button inline popOut">
       </div>
       <img src="{{ url_for('static', filename='img/home/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendColor();">
-      <br><br><br>
     </div>
 
     <div id="percentDiv" class="hidden">
       <h2>Fill percentage</h2>
       <input type="number" id="percent" value="0" min="0" max="100" onchange="validNumber(this);"><label for="percent">%</label>
       <img src="{{ url_for('static', filename='img/home/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendPercent();">
-      <br><br><br>
     </div>
   </div>
 
   <div id="bottom">
     Name: <span id="name"></span> <span id="guest"></span><br>
-    <button id="logOut" class="inline popOut" onclick="window.location = '/logout'">Log out</button>
-    <br>
+    <button class="inline popOut" onclick="window.location = '/logout';">Log out</button><br>
+    <button id="logOut" class="inline popOut" onclick="window.location = '/basic';">Use basic mode</button><br>
+    <button class="inline popOut" onclick="window.location = '/setdefault';">Set default mode</button>
     <button class="inline popOut" onclick="feedback();">Send feedback</button>
   </div>
 </div>
@@ -370,8 +366,8 @@
     <div id="chatTab" class="tab" onclick="openPage('chat');"><img src="{{ url_for('static', filename='img/home/chat.png') }}" class="icon"> <b id="newMessages" style="color: var(--light-red);"></b> Chat</div>
     <div id="studentsTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/home/students.png') }}" class="icon"> Students</div>
     <div id="studentsMenu" class="menu hidden" tabindex="-1">
-      <div id="breakTab" class="tab" onclick="openPage('break');">Bathroom break</div>
       <div id="helpTab" class="tab" onclick="openPage('help');">Help!</div>
+      <div id="breakTab" class="tab" onclick="openPage('break');">Bathroom break</div>
     </div>
     <div id="wawdTab" class="tab" onclick="openPage('wawd');"><img src="{{ url_for('static', filename='img/home/wawd.png') }}" class="icon"> What are we doing?</div>
     <div id="quizTab" class="tab" onclick="openPage('quiz');"><img src="{{ url_for('static', filename='img/home/quiz.png') }}" class="icon"> Quiz</div>
@@ -387,9 +383,9 @@
     <div id="teacherTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/home/teacher.png') }}" class="icon"> Teacher</div>
     <div id="teacherMenu" class="menu hidden" tabindex="-1">
       <div id="needshelpTab" class="tab" onclick="openPage('needshelp');">Help tickets</div>
-      <div id="lessonTab" class="tab" onclick="openPage('lesson');">Lesson</div>
       <div id="settingsTab" class="tab" onclick="openPage('settings');">Settings</div>
       <div id="usersTab" class="tab" onclick="openPage('users');">User list</div>
+      <div id="lessonTab" class="tab" onclick="openPage('lesson');">Lesson</div>
     </div>
     <div id="debugTab" class="tab" onclick="openPage('debug');"><img src="{{ url_for('static', filename='img/home/debug.png') }}" class="icon"> API debugging</div>
     <div id="reload" class="tab" style="margin-left: auto;" onclick="document.getElementById('innerPage').contentWindow.location.reload();"><img src="{{ url_for('static', filename='img/home/reload.png') }}" class="icon"> Reload inner page</div>
@@ -406,13 +402,16 @@
 <script src="{{ url_for('static', filename='js/home.js') }}"></script>
 <script>
   let bottom = document.getElementById("bottom");
-  let menus = document.querySelectorAll(".menu");
+  let menus = ["students", "games", "teacher"];
   let innerPage = document.getElementById("innerPage");
+  let innerPageTitle;
   let segment;
   let gradient;
   let urlOpen;
   let newMessages = 0;
   let username = "{{ username }}";
+  let pixRes = getResponse("/getpix");
+  let barpix = eval(pixRes.pixels);
 
   menuPositions();
   updateVotes();
@@ -430,10 +429,21 @@
   }, 1000);
 
   function showEnabled() {
+    let tutdDiv = document.getElementById("tutdDiv");
+    let abcdDiv = document.getElementById("abcdDiv");
     let soundDiv = document.getElementById("soundDiv");
     let musicDiv = document.getElementById("musicDiv");
     let textDiv = document.getElementById("textDiv");
     let colorDiv = document.getElementById("colorDiv");
+
+    let modeRes = getResponse("/getmode");
+    let mode = modeRes.mode;
+
+    if (mode == "tutd") tutdDiv.classList.remove("hidden");
+    else tutdDiv.classList.add("hidden");
+
+    if (mode == "abcd") abcdDiv.classList.remove("hidden");
+    else abcdDiv.classList.add("hidden");
 
     let meRes = getResponse("/getme");
     let myPerms = meRes.perms;
@@ -470,7 +480,14 @@
   window.addEventListener("resize", bottomPosition);
 
   function menuPositions() {
-    ["students", "games", "teacher"].forEach(group => document.getElementById(group + "Menu").style.left = document.getElementById(group + "Tab").getBoundingClientRect().left + "px"); //Give menu same X position as tab
+    menus.forEach(menu => {
+      let menuEl = document.getElementById(menu + "Menu");
+      let tabEl = document.getElementById(menu + "Tab");
+      console.log(menuEl.offsetWidth);
+      console.log(tabEl.offsetWidth);
+      menuEl.style.left = tabEl.getBoundingClientRect().left + "px"; //Give menu same X position as tab
+      if (menuEl.offsetWidth < tabEl.offsetWidth) menuEl.style.width = tabEl.offsetWidth;
+    });
   }
 
   function getUsername() {
@@ -544,8 +561,6 @@
     if (event.code == "Enter") sendMusic();
   });
 
-  document.getElementById("nowPlayingTitle").innerText = "aaa";
-
   function nowPlaying() {
     //Get current song from server
     let res = getResponse("/getbgm");
@@ -604,6 +619,10 @@
     else el.value = number;
   }
 
+  document.getElementById("segmentStart").max = barpix.length;
+  document.getElementById("segmentEnd").max = barpix.length;
+  document.getElementById("segmentEnd").value = barpix.length;
+
   function hideColor2() {
     gradient = false;
     document.getElementById("color1Heading").classList.add("hidden");
@@ -619,17 +638,17 @@
   function sendColor() {
     let start = document.getElementById("segmentStart").value;
     let end = document.getElementById("segmentEnd").value;
-    let hex1 = document.getElementById("color1").value;
-    let hex2 = document.getElementById("color2").value;
+    let hex1 = document.getElementById("color1").value.slice(1);
+    let hex2 = document.getElementById("color2").value.slice(1);
     if (!segment) {
       start = 0;
-      end = 240;
+      end = barpix.length;
     }
     if (!gradient) hex2 = hex1;
     request.open("GET", "/segment?start=" + start + "&end=" + end + "&hex=" + hex1 + "&hex2=" + hex2);
     request.send();
     document.getElementById("segmentStart").value = 0;
-    document.getElementById("segmentEnd").value = 240;
+    document.getElementById("segmentEnd").value = barpix.length;
   }
 
   function feedback() {
@@ -639,11 +658,16 @@
 
   function openPage(page) {
     innerPage.contentWindow.location = "/" + page;
-    Array.from(menus).forEach(menu => menu.classList.add("hidden"));
+    menus.forEach(menu => {
+      document.getElementById(menu + "Menu").classList.add("hidden");
+      document.getElementById(menu + "Tab").classList.remove("menuOpen");
+    });
   }
 
   function pageOpened(path) {
     let content = innerPage.contentWindow.document.body.innerHTML;
+    innerPageTitle = innerPage.contentWindow.document.title;
+    document.title = `${innerPageTitle} - Formbar`;
     let tabs = document.querySelectorAll(".tab");
     let tabEl = document.getElementById(path.substring(1) + "Tab");
     if (!content) openPage("chat?alert='Page does not exist.'");
@@ -652,22 +676,21 @@
     if (["/2048", "/hangman", "/minesweeper", "/speedtype", "/ttt", "/fighter"].includes(path)) document.getElementById("gamesTab").classList.add("open");
     else if (["/needshelp", "/lesson", "/settings", "/users"].includes(path)) document.getElementById("teacherTab").classList.add("open");
     if (tabEl) tabEl.classList.add("open");
-    if (path == "/") openPage("chat");
+    if (path == "/home" || path == "/basic") openPage("chat");
     if (path == "/chat") {
       newMessages = 0;
       document.getElementById("newMessages").innerText = null;
       menuPositions();
-      document.title = "Formbar";
     }
     /*Change page title here*/
   }
 
   function showMenu(name) {
-    let el = document.getElementById(name + "Menu");
     menus.forEach(menu => {
-      if (menu == el) {
-        menu.classList.remove("hidden");
-        menu.focus();
+      if (menu == name) {
+        document.getElementById(name + "Menu").classList.remove("hidden");
+        document.getElementById(name + "Menu").focus();
+        document.getElementById(name + "Tab").classList.add("menuOpen");
       }
     });
   }
@@ -690,10 +713,11 @@
     document.getElementById("teacherTab").onclick = () => showMenu("teacher");
   }
   menus.forEach(menu => {
-    menu.addEventListener("blur", function() {
+    document.getElementById(menu + "Menu").addEventListener("blur", function() {
       this.classList.add("hidden"); //Hide menu when user clicks elsewhere
+      document.getElementById(menu + "Tab").classList.remove("menuOpen"); //Remove highlight from the tab
     });
-    menu.addEventListener("keydown", function() {
+    document.getElementById(menu + "Menu").addEventListener("keydown", function() {
       if (event.code == "Escape") this.blur(); //Hide menu when Esc key pressed
     });
   });
@@ -703,7 +727,7 @@
     if (data.type == 'message' || data.type == 'alert') {
       if (document.hidden || !innerPage.contentWindow.location.pathname == "/chat") {
         newMessages++;
-        document.title = `(${newMessages}) Formbar`;
+        document.title = `(${newMessages}) ${innerPageTitle} - Formbar`;
         if (innerPage.contentWindow.location.pathname != "chat") {
           document.getElementById("newMessages").innerText = "(" + newMessages + ")";
           menuPositions();
@@ -712,6 +736,6 @@
     }
   }
 
-  document.addEventListener("visibilitychange", () => {if (!document.hidden && innerPage.contentWindow.location.pathname == "chat") document.title = "Formbar"}); //When user goes to this page, if chat is open, remove number of new messages from title
+  document.addEventListener("visibilitychange", () => {if (!document.hidden && innerPage.contentWindow.location.pathname == "chat") document.title = `${innerPageTitle} - Formbar`}); //When user goes to this page, if chat is open, remove number of new messages from title
 </script>
 {% endblock %}

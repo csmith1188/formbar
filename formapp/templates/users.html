@@ -13,47 +13,47 @@
     left: 21px;
   }
 
-  .up::before,
-  .wiggle::before,
-  .down::before,
-  .a::before,
-  .b::before,
-  .c::before,
-  .d::before {
+  .up::after,
+  .wiggle::after,
+  .down::after,
+  .a::after,
+  .b::after,
+  .c::after,
+  .d::after {
     content: "";
-    background-size: 1em 1em;
-    width: 1em;
-    height: 1em;
+    background-size: 1.2em 1.2em;
+    width: 1.2em;
+    height: 1.2em;
     display: inline-block;
     vertical-align: text-bottom;
-    margin-right: 4px;
+    margin-left: 8px;
   }
 
-  .up::before {
+  .up::after {
     background-image: url("{{ url_for('static', filename='img/settings/up.png') }}");
   }
 
-  .wiggle::before {
+  .wiggle::after {
     background-image: url("{{ url_for('static', filename='img/settings/wiggle.png') }}");
   }
 
-  .down::before {
+  .down::after {
     background-image: url("{{ url_for('static', filename='img/settings/down.png') }}");
   }
 
-  .a::before {
+  .a::after {
     background-image: url("{{ url_for('static', filename='img/settings/a.png') }}");
   }
 
-  .b::before {
+  .b::after {
     background-image: url("{{ url_for('static', filename='img/settings/b.png') }}");
   }
 
-  .c::before {
+  .c::after {
     background-image: url("{{ url_for('static', filename='img/settings/c.png') }}");
   }
 
-  .d::before {
+  .d::after {
     background-image: url("{{ url_for('static', filename='img/settings/d.png') }}");
   }
 </style>

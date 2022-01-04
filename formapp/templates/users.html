@@ -99,13 +99,13 @@
             studentBox.innerHTML = '';
             oldStudentData = studentData;
             let studentList = JSON.parse(studentData);
-            console.log(studentList);
             //Loop through each student in the list
             for (student in studentList) {
                 let newStudent = document.createElement('h3');
                 newStudent.innerHTML = studentList[student].name;
                 let newDetails = document.createElement('span');
                 newDetails.classList.add('user');
+                console.log(studentList[student]);
                 if (studentList[student].excluded) {
                     newStudent.style.background = "var(--highlight-color)";
                     newDetails.HTML = "Taking a bathroom break <button class='inline popOut' onclick='request.open(\"GET\", \"/break?action=end&name=" + studentList[student].name + "\");  request.send();'>End break</button>";
@@ -122,8 +122,7 @@
                     </select>
                     `
                 //Check to see if the student's complete flag is checked
-                if (studentList[student]['complete']) var checked = 'checked'; else var checked = '';
-                newDetails.innerHTML += `[<input type="checkbox" disabled ${checked}>]`
+                if (studentList[student]['complete']) newDetails.classList.add("complete");
                 //Check the results of the student's current progress bar
                 if (studentList[student]['progress'] && studentList[student]['progress'].length) {
                     let dotbox = document.createElement('div');
@@ -176,9 +175,9 @@
                 else if (studentList[student]['thumb'] == 'wiggle') newStudent.classList.add('wiggle')
                 else if (studentList[student]['thumb'] == 'down') newStudent.classList.add('down')
                 else {
-                    newDetails.classList.remove('up')
-                    newDetails.classList.remove('wiggle')
-                    newDetails.classList.remove('down')
+                    newDetails.classList.remove('up');
+                    newDetails.classList.remove('wiggle');
+                    newDetails.classList.remove('down');
                 }
                 //Change student letter according to survey response
                 if (studentList[student]['letter'] == 'a') newStudent.classList.add('a')
@@ -186,10 +185,10 @@
                 else if (studentList[student]['letter'] == 'c') newStudent.classList.add('c')
                 else if (studentList[student]['letter'] == 'c') newStudent.classList.add('d')
                 else {
-                    newDetails.classList.remove('a')
-                    newDetails.classList.remove('b')
-                    newDetails.classList.remove('c')
-                    newDetails.classList.remove('d')
+                    newDetails.classList.remove('a');
+                    newDetails.classList.remove('b');
+                    newDetails.classList.remove('c');
+                    newDetails.classList.remove('d');
                 }
                 studentBox.appendChild(newStudent)
                 studentBox.appendChild(newDetails)

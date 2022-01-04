@@ -13,6 +13,15 @@
     left: 21px;
   }
 
+  h3 {
+    margin: 0 0 8px 0;
+  }
+
+  button {
+    margin-left: 4px;
+    margin-bottom: 8px;
+  }
+
   .up::after,
   .wiggle::after,
   .down::after,
@@ -102,13 +111,14 @@
             //Loop through each student in the list
             for (student in studentList) {
                 let newStudent = document.createElement('h3');
-                newStudent.innerHTML = studentList[student].name;
+                let nsIcons = document.createElement('span');
+                nsIcons.innerHTML = "aaaa";
+                newStudent.innerHTML = nsIcons + studentList[student].name;
                 let newDetails = document.createElement('span');
                 newDetails.classList.add('user');
-                console.log(studentList[student]);
-                if (studentList[student].excluded) {
+                if (studentList[student].excluded || true) {
                     newStudent.style.background = "var(--highlight-color)";
-                    newDetails.HTML = "Taking a bathroom break <button class='inline popOut' onclick='request.open(\"GET\", \"/break?action=end&name=" + studentList[student].name + "\");  request.send();'>End break</button>";
+                    newDetails.innerHTML += "Taking a bathroom break <button class='inline popOut' onclick='request.open(\"GET\", \"/break?action=end&name=" + studentList[student].name + "\");  request.send();'>End break</button><br>";
                 }
                 newDetails.innerHTML += permNames[studentList[student]['perms']];
                 newDetails.innerHTML += "	&nbsp; ";

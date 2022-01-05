@@ -91,23 +91,23 @@
                 let newStudent = document.createElement('h3');
                 let icons = "";
 
-                if (studentList[student]['complete']) icons += `<img src="{{ url_for('static', filename='img/users/complete.png') }}" class="icon">`;
+                if (studentList[student]['complete']) icons += `<img src="{{ url_for('static', filename='img/users/complete.png') }}" class="icon" title="Complete">`;
 
-                if (studentList[student]['help'] == true) icons += `<img src="{{ url_for('static', filename='img/users/help.png') }}" class="icon">`;
+                if (studentList[student]['help'] == true) icons += `<img src="{{ url_for('static', filename='img/users/help.png') }}" class="icon" title="Help ticket">`;
 
                 //Change student color according to thumb response
                 let thumb = studentList[student]['thumb'];
                 if (thumb) var thumbIcon = document.createElement("img");
-                if (thumb == "up") icons += `<img src="{{ url_for('static', filename='img/users/up.png') }}" class="icon">`;
-                if (thumb == "wiggle") icons += `<img src="{{ url_for('static', filename='img/users/wiggle.png') }}" class="icon">`;
-                if (thumb == "down") icons += `<img src="{{ url_for('static', filename='img/users/down.png') }}" class="icon">`;
+                if (thumb == "up") icons += `<img src="{{ url_for('static', filename='img/users/up.png') }}" class="icon" title="Up">`;
+                if (thumb == "wiggle") icons += `<img src="{{ url_for('static', filename='img/users/wiggle.png') }}" class="icon" title="Wiggle">`;
+                if (thumb == "down") icons += `<img src="{{ url_for('static', filename='img/users/down.png') }}" class="icon" title="Down">`;
 
                 //Change student letter according to survey response
                 let letter = studentList[student]['letter']
-                if (letter == "a") icons += `<img src="{{ url_for('static', filename='img/users/a.png') }}" class="icon">`;
-                if (letter == "b") icons += `<img src="{{ url_for('static', filename='img/users/b.png') }}" class="icon">`;
-                if (letter == "c") icons += `<img src="{{ url_for('static', filename='img/users/c.png') }}" class="icon">`;
-                if (letter == "d") icons += `<img src="{{ url_for('static', filename='img/users/d.png') }}" class="icon">`;
+                if (letter == "a") icons += `<img src="{{ url_for('static', filename='img/users/a.png') }}" class="icon" title="A">`;
+                if (letter == "b") icons += `<img src="{{ url_for('static', filename='img/users/b.png') }}" class="icon" title="B">`;
+                if (letter == "c") icons += `<img src="{{ url_for('static', filename='img/users/c.png') }}" class="icon" title="C">`;
+                if (letter == "d") icons += `<img src="{{ url_for('static', filename='img/users/d.png') }}" class="icon" title="D">`;
                 newStudent.innerHTML = icons + studentList[student].name;
                 let newDetails = document.createElement('span');
                 newDetails.classList.add('user');

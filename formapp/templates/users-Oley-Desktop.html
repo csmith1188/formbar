@@ -27,7 +27,7 @@
     height: 1.2em;
     display: inline-block;
     vertical-align: text-bottom;
-    margin-right: 8px;
+    margin-right: 4px;
   }
 </style>
 {% endblock %}
@@ -38,7 +38,6 @@
 <!-- Main content here -->
 {% block main %}
 <h1>Users</h1>
-<button id="collapseButton" class="inline popOut">Collapse all</button>
 <div id="students">
 </div>
 {% endblock %}
@@ -46,22 +45,9 @@
 <!-- Extra javascript here -->
 {% block script %}
 <script type="text/javascript">
-    let studentData = null;
+    let studentData;
     let oldStudentData;
     let permNames = ['Teacher', 'Assistant', 'Student', 'Guest']
-    let collapsed = false;
-
-    collapseButton.onclick = function() {
-      collapsed = !collapsed;
-      let userDetails = Array.from(document.getElementsByClassName("user"));
-      if (collapsed) {
-        userDetails.forEach(user => user.classList.add("hidden"));
-        this.innerText = "Expand all";
-      } else {
-        userDetails.forEach(user => user.classList.remove("hidden"));
-        this.innerText = "Collapse all";
-      }
-    }
 
     function checkUpdates(url) {
         request.open('GET', url);
@@ -91,10 +77,6 @@
                 let newStudent = document.createElement('h3');
                 let icons = "";
 
-                if (studentList[student]['complete']) icons += `<img src="{{ url_for('static', filename='img/users/complete.png') }}" class="icon">`;
-
-                if (studentList[student]['help'] == true) icons += `<img src="{{ url_for('static', filename='img/users/help.png') }}" class="icon">`;
-
                 //Change student color according to thumb response
                 let thumb = studentList[student]['thumb'];
                 if (thumb) var thumbIcon = document.createElement("img");
@@ -108,10 +90,10 @@
                 if (letter == "b") icons += `<img src="{{ url_for('static', filename='img/users/b.png') }}" class="icon">`;
                 if (letter == "c") icons += `<img src="{{ url_for('static', filename='img/users/c.png') }}" class="icon">`;
                 if (letter == "d") icons += `<img src="{{ url_for('static', filename='img/users/d.png') }}" class="icon">`;
-                newStudent.innerHTML = icons + studentList[student].name;
+                newStudent.innerHTML = `${icons} ${studentList[student].name}`;
                 let newDetails = document.createElement('span');
                 newDetails.classList.add('user');
-                if (studentList[student].excluded) {
+                if (studentList[student].excluded || true) {
                     newStudent.style.background = "var(--highlight-color)";
                     newDetails.innerHTML += "Taking a bathroom break <button class='inline popOut' onclick='request.open(\"GET\", \"/break?action=end&name=" + studentList[student].name + "\");  request.send();'>End break</button><br>";
                 }
@@ -126,6 +108,8 @@
                     <option value="/users?name=${studentList[student]['name']}&action=perm&perm=3" selected="selected">${permNames[3]}</option>
                     </select>
                     `
+                //Check to see if the student's complete flag is checked
+                if (studentList[student]['complete']) newDetails.classList.add("complete");
                 //Check the results of the student's current progress bar
                 if (studentList[student]['progress'] && studentList[student]['progress'].length) {
                     let dotbox = document.createElement('div');
@@ -164,9 +148,9 @@
                           img.height = 16;
                           if (studentList[student]['quizRes'][i]) {
                             newQuiz++;
-                            img.src = "{{ url_for('static', filename='img/dot_green.png') }}"; ////These need to be updated
+                            img.src = "{{ url_for('static', filename='img/dot_green.png') }}";
                           } else {
-                            img.src = "{{ url_for('static', filename='img/dot_red.png') }}"; ////
+                            img.src = "{{ url_for('static', filename='img/dot_red.png') }}";
                           }
                           dotbox.appendChild(img)
                     }
@@ -180,6 +164,7 @@
                 newDetails.innerHTML += "	&nbsp; ";
                 newDetails.innerHTML += `<a href="#" onclick="banip('${studentList[student]['name']}')">Ban Device</a>`;
                 if (studentList[student]['help'] == true) {
+                  newStudent.classList.add('help')
                   newDetails.innerHTML += "	&nbsp; ";
                   newDetails.innerHTML += `<a href=\'/needshelp?remove=${studentList[student]['name']}\'>Clear Help</a>`;
                 }

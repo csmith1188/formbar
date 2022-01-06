@@ -92,7 +92,7 @@
     }
 
     function resetPerms() {
-        document.getElementById("saypermsDrop").value = "/settings?say=3";
+        document.getElementById("saypermsDrop").value = "/settings?say=2";
         document.getElementById("apipermsDrop").value = "/settings?api=3";
         document.getElementById("gamespermsDrop").value = "/settings?games=2";
         document.getElementById("barpermsDrop").value = "/settings?bar=0";
@@ -166,12 +166,13 @@
     <select onchange="updatePerm(this)" id="saypermsDrop" name="saypermsDrop" style="margin-top: 8px;">
         <option value="/settings?say=0">Teacher</option>
         <option value="/settings?say=1">Assistant</option>
-        <option value="/settings?say=2">Student</option>
-        <option value="/settings?say=3" selected>Anyone</option>
+        <option value="/settings?say=2" selected>Student</option>
+        <option value="/settings?say=3">Anyone</option>
     </select><br>
     <br>
     <h3>API</h3>
     The ability to access data from the server<br>
+    <b>Warning: Changing API permissions may cause problems for students.</b><br>
     <select onchange="updatePerm(this)" id="apipermsDrop" name="apipermsDrop" style="margin-top: 8px;">
         <option value="/settings?api=0">Teacher</option>
         <option value="/settings?api=1">Assistant</option>

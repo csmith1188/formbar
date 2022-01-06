@@ -127,16 +127,37 @@
   let timeLeft = 3;
   let dataURL = "/getpix";
 
-  urls.forEach(url => document.getElementById("buttonContainer").innerHTML += `<button id="${url}" onclick="getData('${url}')">${url}</button>`);
+  urls.forEach(url => document.getElementById("buttonContainer").innerHTML += `<button id="${url}" onclick="update('${url}')">${url}</button>`);
 
   function updateBar() {
+  }
+
+  function countdown() {
+    document.getElementById("timeLeft").innerHTML = timeLeft--;
+  }
+
+  function update(newURL = dataURL) {
+    //Update the text
+    request.open('GET', newURL, false);
+    request.send(null);
+    if (newURL != dataURL) {
+      urls.forEach(url => {
+        let el = document.getElementById(url);
+        if (url == newURL) el.classList.add("pressed");
+        else el.classList.remove("pressed");
+      });
+      dataURL = newURL;
+    }
+    document.getElementById("data").innerText = request.responseText;
+
+    //Update the virtual bar
     request.open("GET", '/getphrase', false);
     request.send(null);
     let phraseRes = JSON.parse(request.responseText);
     let phrase = phraseRes.phrase;
     let vbText = document.getElementById("vbText");
     vbText.innerText = phrase;
-    //To do: update color
+    ////To do: update color
 
     request.open("GET", '/getpix', false);
     request.send(null);
@@ -153,36 +174,13 @@
         pixBox.innerHTML += "<div style='display: inline; flex-grow: 1; overflow: hidden; background-color: #" + pix[i][0] + "" + pix[i][1] + "" + pix[i][2] + ";'>&nbsp;</div>";
     }
 
+    //Reset the update time
     timeLeft = 3;
   }
 
-  function countdown() {
-    document.getElementById("timeLeft").innerHTML = timeLeft--;
-  }
-
-  setInterval(updateBar, 3000);
-  setInterval(countdown, 1000);
-  updateBar();
+  update();
   countdown();
-
-  function getData(newURL) {
-    dataURL = newURL;
-    request.open('GET', newURL);
-    request.onload = function() {
-        data = request.response;
-        if (newURL) {
-          urls.forEach(url => {
-            let el = document.getElementById(url);
-            if (url == newURL) el.classList.add("pressed");
-            else el.classList.remove("pressed");
-          });
-          document.getElementById("data").innerText = data;
-        }
-    };
-    request.send();
-  }
-
-  getData(dataURL);
-  setInterval(() => getData(dataURL), 3000);
-</script>
+  setInterval(update, 3000);
+  setInterval(countdown, 1000);
+  </script>
 {% endblock %}

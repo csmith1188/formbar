@@ -40,7 +40,6 @@
     }
 
     function updatePerm(el) {
-        console.log("GET", el.value);
         request.open("GET", el.value);
         request.onload = function() {
             // console.log(request.response);

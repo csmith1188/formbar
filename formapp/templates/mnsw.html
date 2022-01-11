@@ -89,6 +89,7 @@
                   tile[row][column] = document.createElement('img');
                   tile[row][column].src = '../static/img/mnsw/hidden.png';
                   tile[row][column].style = 'position:absolute;height:30px;width:30px;top:'+(row*30)+'px;left:'+(column*30)+'px;';
+                  tile[row][column].draggable = false;
                   // tile[row][column].style.top = 150 + row * 30;
                   // tile[row][column].style.left = 50 + column * 30;
                   tile[row][column].addEventListener('mousedown', click);

@@ -17,18 +17,35 @@
 
 <!-- Extra style declarations here -->
 {% block style %}
+  <style>
+    body {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 32px;
+    }
+
+    #button {
+      margin-top: 24px;
+      font-size: 24px;
+    }
+
+    #minebox {
+      position: fixed;
+      left: calc(50% - 300px);
+      top: 20%;
+    }
+  </style>
 {% endblock %}
 
 <!-- Change theme color here -->
-{% block color %}purple{% endblock %}
+{% block color %}green{% endblock %}
 
 <!-- Main content here -->
 {% block main %}
-  <label id='status'></label>
+  <label id='status'></label><br>
+  <button id="button" class="hidden">Restart</button>
   <br>
-  <div id="minebox">
-
-  </div>
+  <div id="minebox"></div>
 {% endblock %}
 
 <!-- Extra JavaScript here -->
@@ -39,9 +56,10 @@
       const dense = {{ dense }};
       let mines, remaining, revealed;
       let status = document.getElementById('status');
+      let button = document.getElementById('button');
       var minebox = document.getElementById('minebox')
       minebox.setAttribute("oncontextmenu", "return false;")
-      status.addEventListener('click', init)
+      button.addEventListener('click', init)
 
       let board = new Array(rows);
       let picture = new Array(rows);
@@ -64,12 +82,13 @@
           remaining = mines;
           revealed = 0;
           status.innerHTML = 'Click on the tiles to reveal them';
+          button.classList.add('hidden');
           for (let row = 0; row < rows; row++)
               for (let column = 0; column < columns; column++) {
                   let index = row * columns + column;
                   tile[row][column] = document.createElement('img');
                   tile[row][column].src = '../static/img/mnsw/hidden.png';
-                  tile[row][column].style = 'position:absolute;height:30px;width:30px;top:'+(150+row*30)+'px;left:'+(50+column*30)+'px;';
+                  tile[row][column].style = 'position:absolute;height:30px;width:30px;top:'+(row*30)+'px;left:'+(column*30)+'px;';
                   // tile[row][column].style.top = 150 + row * 30;
                   // tile[row][column].style.left = 50 + column * 30;
                   tile[row][column].addEventListener('mousedown', click);
@@ -112,6 +131,8 @@
           let row = Math.floor(id / columns);
           let column = id % columns;
 
+          button.classList.remove('hidden');
+
           if (event.which == 3) {
               switch (picture[row][column]) {
                   case 'hidden':
@@ -131,7 +152,7 @@
               }
               event.preventDefault();
           }
-          status.innerHTML = 'Mines remaining: ' + remaining;
+          status.innerHTML = 'Mines remaining: ' + (remaining < 0 ? 0 : remaining);
 
           if (event.which == 1 && picture[row][column] != 'flag') {
               if (board[row][column] == 'mine') {
@@ -144,13 +165,16 @@
                               tile[row][column].src = '../static/img/mnsw/misplaced.png';
                           }
                       }
-                  status.innerHTML = 'GAME OVER<br><br>Click here to restart';
+                  status.innerHTML = 'GAME OVER';
+                  document.body.style.background = "var(--bg-dark-red)";
               } else
               if (picture[row][column] == 'hidden') reveal(row, column);
           }
 
-          if (revealed == rows * columns - mines)
-              status.innerHTML = 'YOU WIN!<br><br>Click here to restart';
+          if (revealed == rows * columns - mines) {
+              status.innerHTML = 'YOU WIN!';
+              document.body.style.background = "var(--bg-dark-blue)";
+          }
       }
 
       function reveal(row, column) {

@@ -82,6 +82,7 @@
           remaining = mines;
           revealed = 0;
           status.innerHTML = 'Click on the tiles to reveal them';
+          document.body.style.background = null;
           button.classList.add('hidden');
           for (let row = 0; row < rows; row++)
               for (let column = 0; column < columns; column++) {
@@ -153,7 +154,7 @@
               }
               event.preventDefault();
           }
-          status.innerHTML = 'Mines remaining: ' + (remaining < 0 ? 0 : remaining);
+          status.innerHTML = 'Mines remaining: ' + remaining;
 
           if (event.which == 1 && picture[row][column] != 'flag') {
               if (board[row][column] == 'mine') {
@@ -168,6 +169,9 @@
                       }
                   status.innerHTML = 'GAME OVER';
                   document.body.style.background = "var(--bg-dark-red)";
+                  for (let row = 0; row < rows; row++)
+                      for (let column = 0; column < columns; column++)
+                        tile[row][column].removeEventListener('mousedown', click);
               } else
               if (picture[row][column] == 'hidden') reveal(row, column);
           }

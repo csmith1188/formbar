@@ -65,9 +65,8 @@ function letterVote(letter) {
   request.send();
 }
 
-function updateVotes() {
+function updateVotes(res) {
   //Make sure displayed vote matches actual vote, for example if new poll is started or user reloads
-  let res = getResponse("/getme");
   let thumb;
   if (res.thumb == "up") thumb = 0;
   else if (res.thumb == "wiggle") thumb = 1;

@@ -736,8 +736,10 @@
         }
       }
     }
-  }
+  };
 
   document.addEventListener("visibilitychange", () => {if (!document.hidden && innerPage.contentWindow.location.pathname == "chat") document.title = `${innerPageTitle} - Formbar`}); //When user goes to this page, if chat is open, remove number of new messages from title
+
+  document.onunload = () => document.title = "Formbar"; //Reset the page title when the page is closed
 </script>
 {% endblock %}

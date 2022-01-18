@@ -1562,10 +1562,11 @@
 
       updateStats();
 
-      ////save to account instead?
-      //Add a loss and reset win streak in case player leaves during match
-      localStorage.setItem("fighterLosses", me.losses + 1);
-      localStorage.setItem("fighterWinStreak", 0);
+      //Add a loss and reset win streak if player leaves during match
+      document.body.onunload = () => {
+        localStorage.setItem("fighterLosses", me.losses + 1);
+        localStorage.setItem("fighterWinStreak", 0);
+      };
 
       players = [player1, player2];
 
@@ -2357,6 +2358,8 @@
       }
       updateStats();
     }
+
+    document.body.onunload = null;
 
     function rematchButton() {
       let el = document.getElementById("rematchButton");

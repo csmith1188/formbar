@@ -339,6 +339,8 @@ select:focus {
 
 a {
   color: var(--theme-color);
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 table, th, td {

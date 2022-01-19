@@ -240,7 +240,6 @@ def refreshUsers(selectedStudent='', category=''):
             return True
 
 def changeMode(newMode='', direction='next'):
-    playSFX("sfx_pickup01")
     index = sD.settings['modes'].index(sD.settings['barmode'])
     if newMode in sD.settings['modes']:
         sD.settings['barmode'] = newMode
@@ -597,7 +596,7 @@ def tutdBar():
     #The Funny Number
     if sD.settings['numStudents'] == 9 and complete == 6:
         playSFX("clicknice")
-    else:
+    elif complete:
         playSFX("sfx_blip01")
     if ONRPi:
         pixels.show()
@@ -758,7 +757,7 @@ def endpoint_abcd():
             else:
                 return render_template("message.html", forward=request.path, message = "Not in ABCD mode." )
         else:
-            return render_template("thumbsrental.html")
+            return redirect("/")
 
 '''
     /addfighteropponent
@@ -1592,7 +1591,15 @@ def endpoint_profile():
         return redirect("/chat?alert=You do not have high enough permissions to do this right now.")
     else:
         if request.args.get('user'):
-            return render_template("message.html", forward=request.path, message = "Looking up users by name is not yet supported." )
+            nameArg = request.args.get('user')
+            for item in sD.studentDict:
+                user = sD.studentDict[item]
+                name = user['name'].strip()
+                if name == nameArg:
+                    return render_template("profile.html", username = user['name'], perms = sD.settings['permname'][user['perms']], bot = user['bot'])
+            #If there are no matches
+            return render_template("message.html", message = "There are no users with that name.")
+
         else:
             user = sD.studentDict[request.remote_addr]
             return render_template("profile.html", username = user['name'], perms = sD.settings['permname'][user['perms']], bot = user['bot'])
@@ -1873,21 +1880,20 @@ def endpoint_speedtype():
         return render_template("speedtype.html")
 
 #Start a thumbs survey
-@app.route('/startsurvey', methods = ['POST', 'GET'])
+@app.route('/startsurvey')
 def endpoint_startsurvey():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
-    elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['assistant']:
+    elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['mod']:
         return redirect("/chat?alert=You do not have high enough permissions to do this right now.")
     else:
-        if request.method == 'POST':
-            if not request.form['type']:
-                return redirect("/chat?alert=You need a survey type.")
-            type = request.form['type']
-            if not (type == 'tutd' or type == 'abcd'):
-                return redirect("/chat?alert=Invalid survey type.")
-            changeMode(type)
-            repeatMode()
+        if not request.args.get('type'):
+            return redirect("/chat?alert=You need a survey type.")
+        type = request.args.get('type')
+        if not (type == 'tutd' or type == 'abcd'):
+            return redirect("/chat?alert=Invalid survey type.")
+        changeMode(type)
+        repeatMode()
         return redirect('/settings')
 
 # ████████
@@ -1967,7 +1973,7 @@ def endpoint_tutd():
                 prompt += '<i>' + sD.activePrompt+'</i></h2>'
             else:
                 prompt = ''
-            return render_template("thumbsrental.html", prompt=prompt)
+            return redirect("/")
 
 # ██    ██
 # ██    ██

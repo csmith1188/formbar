@@ -37,7 +37,6 @@
         // console.log(request.response);
         // };
         request.send();
-        console.log(request.response);
     }
 
     function updatePerm(el) {
@@ -50,16 +49,9 @@
 
     setInterval(function() {
         if (document.getElementById("autoStudents").checked) {
-          document.getElementById("studentNum").value = getResponse("/getmode");
+          document.getElementById("studentNum").value = 999;
           ////
         }
-
-        let modeRes = getResponse("/getmode");
-        let mode = modeRes.mode;
-        document.getElementById("survey").checked = mode == "tutd" || mode == "survey";
-        document.getElementById("progress").checked = mode == "progress";
-        document.getElementById("countdown").checked = mode == "countdown";
-        document.getElementById("playtime").checked = mode == "playtime";
     }, 1000);
 
     function changeMode() {
@@ -69,7 +61,7 @@
         document.getElementById("surveyType").classList.add("hidden");
       }
       if (document.getElementById("progress").checked) {
-        request.open('GET', `/settings?barmode=progress`);
+        request.open('GET', '/settings?barmode=progress');
         request.send();
       }
       if (document.getElementById("countdown").checked) {
@@ -78,30 +70,57 @@
         document.getElementById("countdownTime").classList.add("hidden");
       }
       if (document.getElementById("playtime").checked) {
-        request.open('GET', `/settings?barmode=playtime`);
+        request.open('GET', '/settings?barmode=playtime');
         request.send();
       }
     }
 
     function changeSurveyType() {
+      if (document.getElementById("thumbs").checked) document.getElementById("surveyDescription").innerText = "thumbs up, thumbs down, and wiggle";
+      else if (document.getElementById("letters").checked) document.getElementById("surveyDescription").innerText = "four options";
+    }
+
+    function startSurvey() {
       if (document.getElementById("thumbs").checked) {
-        document.getElementById("surveyType").action = "/starttutd";
-        document.getElementById("surveyDescription").innerText = "thumbs up, thumbs down, and wiggle";
+        request.open('GET', '/startsurvey?type=tutd');
+        request.send();
       } else if (document.getElementById("letters").checked) {
-        document.getElementById("surveyType").action = "/startsurvey";
-        document.getElementById("surveyDescription").innerText = "four options";
+        request.open('GET', '/startsurvey?type=abcd');
+        request.send();
       }
     }
 
     function resetPerms() {
         document.getElementById("saypermsDrop").value = "/settings?say=2";
-        document.getElementById("apipermsDrop").value = "/settings?api=3";
         document.getElementById("gamespermsDrop").value = "/settings?games=2";
         document.getElementById("barpermsDrop").value = "/settings?bar=0";
         document.getElementById("sfxpermsDrop").value = "/settings?sfx=0";
         document.getElementById("bgmpermsDrop").value = "/settings?bgm=0";
-        let dropdowns = ["saypermsDrop", "apipermsDrop", "barpermsDrop", "sfxpermsDrop", "bgmpermsDrop", "gamespermsDrop"];
+        document.getElementById("apipermsDrop").value = "/settings?api=3";
+        let dropdowns = ["saypermsDrop", "barpermsDrop", "sfxpermsDrop", "bgmpermsDrop", "gamespermsDrop", "apipermsDrop"];
         dropdowns.forEach(id => updatePerm(document.getElementById(id)));
+    }
+
+
+    let modeRes = getResponse("/getmode");
+    let mode = modeRes.mode;
+    if (mode == "tutd") {
+      document.getElementById("survey").checked = true;
+      document.getElementById("surveyType").classList.remove("hidden");
+      document.getElementById("thumbs").checked = true;
+      changeSurveyType();
+    } else if (mode == "abcd") {
+      document.getElementById("survey").checked = true;
+      document.getElementById("surveyType").classList.remove("hidden");
+      document.getElementById("letters").checked = true;
+      changeSurveyType();
+    } else if (mode == "progress") {
+      document.getElementById("progress").checked = true;
+    } else if (mode == "countdown") {
+      document.getElementById("countdown").checked = true;
+      document.getElementById("countdownTime").classList.remove("hidden");
+    } else if (mode == "playtime") {
+      document.getElementById("playtime").checked = true;
     }
 </script>
 {% endblock %}
@@ -122,12 +141,12 @@
         <span style="margin-left: 21px;">Students' votes are displayed on the bar.</span><br>
       </div>
     </label>
-    <form action="" id="surveyType" class="hidden" style="margin: 8px 0 0 21px;" onchange="changeSurveyType();">
+    <form id="surveyType" class="hidden" style="margin: 8px 0 0 21px;" onchange="changeSurveyType();">
       Type:
       <input type="radio" id="thumbs" name="type" checked style="margin-left: 8px;"><label for="thumbs">Thumbs</label>
       <input type="radio" id="letters" name="type" style="margin-left: 8px;"><label for="letters">Letters</label><br>
       Students can choose between <span id="surveyDescription">thumbs up, thumbs down, and wiggle</span>.<br>
-      <input type="submit" class="button inline popOut" value="Start new survey" style="margin-top: 8px;">
+      <input type="button" class="button inline popOut" value="Start new survey" style="margin-top: 8px;" onclick="startSurvey();">
     </form>
     <br>
 
@@ -155,7 +174,7 @@
 
     <label>
       <div>
-        <input type="radio" id="playtime" name="mode" checked><h3 style="display: inline;">Playtime</h3><br>
+        <input type="radio" id="playtime" name="mode"><h3 style="display: inline;">Playtime</h3><br>
         <span style="margin-left: 21px;">Students can change the colors of the bar.</span><br>
       </div>
     </label>
@@ -167,26 +186,16 @@
     The ability to send chat messages. All users will still be able to read others' messages.<br>
     <select onchange="updatePerm(this)" id="saypermsDrop" name="saypermsDrop" style="margin-top: 8px;">
         <option value="/settings?say=0">Teacher</option>
-        <option value="/settings?say=1">Assistant</option>
+        <option value="/settings?say=1">Mod</option>
         <option value="/settings?say=2" selected>Student</option>
         <option value="/settings?say=3">Anyone</option>
-    </select><br>
-    <br>
-    <h3>API</h3>
-    The ability to access data from the server<br>
-    <b>Warning: Changing API permissions may cause problems for students.</b><br>
-    <select onchange="updatePerm(this)" id="apipermsDrop" name="apipermsDrop" style="margin-top: 8px;">
-        <option value="/settings?api=0">Teacher</option>
-        <option value="/settings?api=1">Assistant</option>
-        <option value="/settings?api=2">Student</option>
-        <option value="/settings?api=3" selected>Anyone</option>
     </select><br>
     <br>
     <h3>Games</h3>
     The ability to play any games<br>
     <select onchange="updatePerm(this)" id="gamespermsDrop" name="gamespermsDrop" style="margin-top: 8px;">
         <option value="/settings?games=0">Teacher</option>
-        <option value="/settings?games=1">Assistant</option>
+        <option value="/settings?games=1">Mod</option>
         <option value="/settings?games=2" selected>Student</option>
         <option value="/settings?games=3">Anyone</option>
     </select><br>
@@ -195,7 +204,7 @@
     The ability to change the appearance of the Formbar. Does not affect surveys.<br>
     <select onchange="updatePerm(this)" id="barpermsDrop" name="barpermsDrop" style="margin-top: 8px;">
         <option value="/settings?bar=0" selected>Teacher</option>
-        <option value="/settings?bar=1">Assistant</option>
+        <option value="/settings?bar=1">Mod</option>
         <option value="/settings?bar=2">Student</option>
         <option value="/settings?bar=3">Anyone</option>
     </select><br>
@@ -204,7 +213,7 @@
     The ability to play short audio clips<br>
     <select onchange="updatePerm(this)" id="sfxpermsDrop" name="sfxpermsDrop" style="margin-top: 8px;">
         <option value="/settings?sfx=0" selected>Teacher</option>
-        <option value="/settings?sfx=1">Assistant</option>
+        <option value="/settings?sfx=1">Mod</option>
         <option value="/settings?sfx=2">Student</option>
         <option value="/settings?sfx=3">Anyone</option>
     </select><br>
@@ -213,9 +222,19 @@
     The ability to play background music<br>
     <select onchange="updatePerm(this)" id="bgmpermsDrop" name="bgmpermsDrop" style="margin-top: 8px;">
         <option value="/settings?bgm=0" selected>Teacher</option>
-        <option value="/settings?bgm=1">Assistant</option>
+        <option value="/settings?bgm=1">Mod</option>
         <option value="/settings?bgm=2">Student</option>
         <option value="/settings?bgm=3">Anyone</option>
+    </select><br>
+    <br>
+    <h3>API</h3>
+    The ability to access data from the server<br>
+    <b>Warning: Changing API permissions may cause problems for students.</b><br>
+    <select onchange="updatePerm(this)" id="apipermsDrop" name="apipermsDrop" style="margin-top: 8px;">
+        <option value="/settings?api=0">Teacher</option>
+        <option value="/settings?api=1">Mod</option>
+        <option value="/settings?api=2">Student</option>
+        <option value="/settings?api=3" selected>Anyone</option>
     </select><br>
     <br>
     <button class="inline popOut" onclick="resetPerms();">Reset permissions</button>

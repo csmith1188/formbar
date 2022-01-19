@@ -12,7 +12,6 @@
     margin: 0 0 12px;
     font-size: 26px;
     color: var(--color-blue);
-    text-align: center;
   }
 
   h2 {
@@ -65,9 +64,9 @@
 
   .thumbButton,
   .letterButton {
-    width: 144px;
-    margin: 12px;
-    border-radius: 48px !important;
+    height: 80px;
+    margin: 8px;
+    border-radius: 40px !important;
   }
 
   .highlight:hover {
@@ -125,7 +124,6 @@
 
   #tutdDiv, #abcdDiv {
     width: 100%;
-    text-align: center;
   }
 
   #text {
@@ -275,10 +273,11 @@
 <div id="sidebar" class="light">
   <div id="sidebarContent">
     <h1>Formbar Features</h1>
-    <div style="text-align: center;">Features will appear when the teacher makes them available.</div>
+    <div>Features will appear when the teacher makes them available.</div>
 
     <div id="tutdDiv" class="hidden">
       <h2>Thumbs</h2>
+      {{ prompt|safe }}
       <img src="{{ url_for('static', filename='img/advanced/thumbButton0.png') }}" id="thumbButton0" class="thumbButton button inline popOut moreDepth greenColor" title="Up" onclick="thumbsVote(0);" tabindex="0">
       <br>
       <img src="{{ url_for('static', filename='img/advanced/thumbButton1.png') }}" id="thumbButton1" class="thumbButton button inline popOut moreDepth cyanColor" title="Wiggle" onclick="thumbsVote(1);" tabindex="0">
@@ -288,6 +287,7 @@
 
     <div id="abcdDiv" class="hidden">
       <h2>Letters</h2>
+      {{ prompt|safe }}
       <img src="{{ url_for('static', filename='img/advanced/letterButton0.png') }}" id="letterButton0" class="letterButton button inline popOut moreDepth redColor" title="Vote A" onclick="letterVote(0);" tabindex="0">
       <br>
       <img src="{{ url_for('static', filename='img/advanced/letterButton1.png') }}" id="letterButton1" class="letterButton button inline popOut moreDepth blueColor" title="Vote B" onclick="letterVote(1);" tabindex="0">
@@ -306,7 +306,7 @@
 
     <div id="musicDiv" class="hidden">
       <h2>Play music</h2>
-      <label for="volume">Volume: </label><input type="range" id="volume" value="0.5" max="1" step="0.1">
+      <label for="volume">Volume: </label><input type="range" id="volume" value="0.5" min="0.1" max="1" step="0.1">
       <span id="volNumber">0.5</span>
       <br>
       <img src="{{ url_for('static', filename='img/advanced/random.png') }}" id="randomMusic" class="smallImg" title="Random" onclick="randomBGM()"><input type="text" id="music" placeholder="Filename" list="bgmFiles">
@@ -353,10 +353,10 @@
   </div>
 
   <div id="bottom">
-    Name: <span id="name"></span> <span id="guest"></span><br>
+    Name: <a id="name"></a><br>
     <button class="inline popOut" onclick="window.location = '/logout';">Log out</button>
     <button class="inline popOut" onclick="feedback();">Send feedback</button>
-    <button id="logOut" class="inline popOut" onclick="window.location = '/basic';">Use basic mode</button>
+    <button id="logOut" class="inline popOut" onclick="window.location = '/basic';">Basic mode</button>
     <button class="inline popOut" onclick="window.location = '/setdefault';">Set default</button>
   </div>
 </div>
@@ -497,9 +497,8 @@
     let nameBox = document.getElementById("name");
     let oldHeight = bottom.clientHeight;
     nameBox.innerText = username;
+    nameBox.onclick = () => openPage("profile");
     let myPerms = res.perms;
-    let guestBox = document.getElementById("guest");
-    myPerms == 3 ? guestBox.innerText = "(guest)" : guestBox.innerText = null;
     if (bottom.clientHeight > oldHeight) shorten(bottom, oldHeight, nameBox);
     else nameBox.removeAttribute("title");
   }
@@ -552,7 +551,7 @@
   function sendMusic() {
     let musicFile = document.getElementById("music").value;
     let volume = document.getElementById("volume").value;
-    if (volume == 0 || volume == 1) volume += ".0";
+    if (volume == 1) volume = "1.0";
     request.open("GET", "/bgm?file=" + musicFile + "&volume=" + volume);
     request.send();
     if (bgm.includes(musicFile)) document.getElementById("music").value = null;

@@ -3,17 +3,20 @@
 <!-- This is where the title, top buttons, and stylesheet is located -->
 
 <!-- Change title here -->
-{% block title %}Formbar Alert{% endblock %}
+{% block title %}{{ username }}'s profile{% endblock %}
 
 <!-- Extra style declarations here -->
 {% block style %}{% endblock %}
+
+<!-- Change theme color here -->
+{% block color %}purple{% endblock %}
 
 <!-- Extra javascript here -->
 {% block script %}{% endblock %}
 
 <!-- Main content here -->
 {% block main %}
-<h1>{{ username }}</h1>
+<h1>{{ username }}'s profile</h1>
 <ul>
     <li>Permissions: {{ perms }}</li>
     <li>Bot: {{ bot }}</li>

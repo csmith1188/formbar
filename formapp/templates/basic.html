@@ -8,13 +8,10 @@
 <!-- Extra style declarations here -->
 {% block style %}
 <style>
-  #advancedLink {
+  #banner * {
     position: fixed;
     top: 0;
-    left: 0;
-    width: 100%;
     height: 48px;
-    background: var(--color-green);
     color: white;
     font-size: 24px;
     font-weight: bold;
@@ -24,10 +21,16 @@
     user-select: none;
   }
 
-  #setDefaultButton {
-    position: fixed;
-    top: 60px;
-    color: var(--color-purple);
+  #bannerLeft {
+    left: 0;
+    width: 75%;
+    background: var(--color-blue);
+  }
+
+  #bannerRight {
+    right: 0;
+    width: 25%;
+    background: var(--color-cyan);
   }
 
   #thumbs, #letters {
@@ -97,8 +100,10 @@
 
 <!-- Main content here -->
 {% block main %}
-  <div id="advancedLink" onclick="window.location = '/advanced';">Go to advanced mode to use all features</div>
-  <button id="setDefaultButton" class="hCentered" onclick="window.location = '/setdefault';">Set default mode</button>
+  <div id="banner">
+    <div id="bannerLeft" onclick="window.location = '/advanced';">Go to advanced mode to use all features</div>
+    <div id="bannerRight" onclick="window.location = '/setdefault';">Set default mode</div>
+  </div>
   <div class="centered">
     <h1>Thumbs</h1>
     <h2 id="noTUTD">There is no thumbs survey right now.</h2>

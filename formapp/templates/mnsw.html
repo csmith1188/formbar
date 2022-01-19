@@ -19,13 +19,26 @@
 {% block style %}
   <style>
     body {
-      text-align: center;
-      margin-top: 24px;
       font-size: 32px;
     }
 
+    #status {
+      position: fixed;
+      left: calc(50% - 300px);
+      top: 32px;
+    }
+
+    #timer {
+      position: fixed;
+      right: calc(50% - 300px);
+      top: 32px;
+    }
+
     #button {
-      margin-top: 24px;
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      top: 108px;
       font-size: 24px;
     }
 
@@ -33,6 +46,7 @@
       position: fixed;
       left: calc(50% - 300px);
       top: 20%;
+      user-select: none;
     }
   </style>
 {% endblock %}
@@ -43,6 +57,7 @@
 <!-- Main content here -->
 {% block main %}
   <label id='status'></label><br>
+  <div id="timer" class="hidden">0:00</div>
   <button id="button" class="hidden">Restart</button>
   <br>
   <div id="minebox"></div>
@@ -60,6 +75,8 @@
       var minebox = document.getElementById('minebox')
       minebox.setAttribute("oncontextmenu", "return false;")
       button.addEventListener('click', init)
+      let startingSeconds;
+      let timer;
 
       let board = new Array(rows);
       let picture = new Array(rows);
@@ -81,6 +98,8 @@
           mines = (rows*columns)/dense;
           remaining = mines;
           revealed = 0;
+          clearInterval(timer);
+          startingSeconds = undefined;
           status.innerHTML = 'Click on the tiles to reveal them';
           document.body.style.background = null;
           button.classList.add('hidden');
@@ -135,6 +154,16 @@
 
           button.classList.remove('hidden');
 
+          if (!startingSeconds) {
+            startingSeconds = Date.now();
+            document.getElementById("timer").classList.remove("hidden");
+            timer = setInterval(() => {
+              let seconds = Math.floor((Date.now() - startingSeconds) / 1000);
+              let time = `${Math.floor(seconds / 60)}:${seconds % 60 < 10 ? "0" + seconds % 60 : seconds % 60}`; //Show minutes and seconds since the game started
+              document.getElementById("timer").innerText = time;
+            }, 1000);
+          }
+
           if (event.which == 3) {
               switch (picture[row][column]) {
                   case 'hidden':
@@ -167,6 +196,7 @@
                               tile[row][column].src = '../static/img/mnsw/misplaced.png';
                           }
                       }
+                  clearInterval(timer);
                   status.innerHTML = 'GAME OVER';
                   document.body.style.background = "var(--bg-dark-red)";
                   for (let row = 0; row < rows; row++)

@@ -48,7 +48,7 @@
 <script type="text/javascript">
     let studentData = null;
     let oldStudentData;
-    let permNames = ['Teacher', 'Assistant', 'Student', 'Guest']
+    let permNames = ['Teacher', 'Mod', 'Student', 'Guest']
     let collapsed = false;
 
     collapseButton.onclick = function() {
@@ -115,15 +115,14 @@
                     newStudent.style.background = "var(--highlight-color)";
                     newDetails.innerHTML += "Taking a bathroom break <button class='inline popOut' onclick='request.open(\"GET\", \"/break?action=end&name=" + studentList[student].name + "\");  request.send();'>End break</button><br>";
                 }
-                newDetails.innerHTML += permNames[studentList[student]['perms']];
-                newDetails.innerHTML += "	&nbsp; ";
+                let studentPerms = studentList[student]['perms'];
                 newDetails.innerHTML +=
                     `
                     <select onchange="updatePerm(this)" id="userpermsDrop" name="userpermsDrop">
-                    <option value="/users?name=${studentList[student]['name']}&action=perm&perm=0">${permNames[0]}</option>
-                    <option value="/users?name=${studentList[student]['name']}&action=perm&perm=1">${permNames[1]}</option>
-                    <option value="/users?name=${studentList[student]['name']}&action=perm&perm=2">${permNames[2]}</option>
-                    <option value="/users?name=${studentList[student]['name']}&action=perm&perm=3" selected="selected">${permNames[3]}</option>
+                    <option value="/users?name=${studentList[student]['name']}&action=perm&perm=0" ${studentPerms === 0 ? "selected" : ""}>${permNames[0]}</option>
+                    <option value="/users?name=${studentList[student]['name']}&action=perm&perm=1" ${studentPerms === 1 ? "selected" : ""}>${permNames[1]}</option>
+                    <option value="/users?name=${studentList[student]['name']}&action=perm&perm=2" ${studentPerms === 2 ? "selected" : ""}>${permNames[2]}</option>
+                    <option value="/users?name=${studentList[student]['name']}&action=perm&perm=3" ${studentPerms === 3 ? "selected" : ""}>${permNames[3]}</option>
                     </select>
                     `
                 //Check the results of the student's current progress bar

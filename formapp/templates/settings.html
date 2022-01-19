@@ -37,6 +37,7 @@
         // console.log(request.response);
         // };
         request.send();
+        console.log(request.response);
     }
 
     function updatePerm(el) {
@@ -48,15 +49,17 @@
     }
 
     setInterval(function() {
+        if (document.getElementById("autoStudents").checked) {
+          document.getElementById("studentNum").value = getResponse("/getmode");
+          ////
+        }
+
         let modeRes = getResponse("/getmode");
         let mode = modeRes.mode;
         document.getElementById("survey").checked = mode == "tutd" || mode == "survey";
         document.getElementById("progress").checked = mode == "progress";
         document.getElementById("countdown").checked = mode == "countdown";
         document.getElementById("playtime").checked = mode == "playtime";
-
-        let studentsRes = getResponse("/getstudents");
-        let students;
     }, 1000);
 
     function changeMode() {
@@ -109,7 +112,7 @@
 
 <h2>Number of students</h2>
 <input type="number" id="studentNum" class="line" onchange="sendStudents()" name="studentNum" min="1" max="30">&nbsp;&nbsp;
-<input type="checkBox" id="autoStudents" checked onchange=""><label for="autoStudents">Auto</label><br>
+<input type="checkBox" id="autoStudents" checked onchange="sendStudents(0)"><label for="autoStudents">Auto</label><br>
 
 <div onchange="changeMode();">
     <h2>Bar mode</h2>

@@ -354,10 +354,10 @@
 
   <div id="bottom">
     Name: <span id="name"></span> <span id="guest"></span><br>
-    <button class="inline popOut" onclick="window.location = '/logout';">Log out</button><br>
-    <button id="logOut" class="inline popOut" onclick="window.location = '/basic';">Use basic mode</button><br>
-    <button class="inline popOut" onclick="window.location = '/setdefault';">Set default mode</button>
+    <button class="inline popOut" onclick="window.location = '/logout';">Log out</button>
     <button class="inline popOut" onclick="feedback();">Send feedback</button>
+    <button id="logOut" class="inline popOut" onclick="window.location = '/basic';">Use basic mode</button>
+    <button class="inline popOut" onclick="window.location = '/setdefault';">Set default</button>
   </div>
 </div>
 
@@ -519,6 +519,7 @@
   }
 
   let sfx = eval("{{ sfx }}".replaceAll("&#39;", "'"));
+  sfx = sfx.filter(file => !file.startsWith("sfx_"));
 
   sfx.forEach(sound => document.getElementById("sfxFiles").innerHTML += "<option value='" + sound + "'></option>");
 
@@ -654,7 +655,10 @@
   }
 
   function feedback() {
-    let addresses = "csmith@ytech.edu,john2022026@live.ytech.edu,chris2023608@live.ytech.edu,john2023219@live.ytech.edu,jaysi2023227@live.ytech.edu";
+    let addresses = `
+      csmith@ytech.edu,
+      john2022026@live.ytech.edu,
+    `;
     window.open(`mailto:${addresses}?subject=Formbar Feedback`);
   }
 
@@ -739,7 +743,5 @@
   };
 
   document.addEventListener("visibilitychange", () => {if (!document.hidden && innerPage.contentWindow.location.pathname == "chat") document.title = `${innerPageTitle} - Formbar`}); //When user goes to this page, if chat is open, remove number of new messages from title
-
-  document.onunload = () => document.title = "Formbar"; //Reset the page title when the page is closed
 </script>
 {% endblock %}

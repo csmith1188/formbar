@@ -1563,7 +1563,7 @@
       updateStats();
 
       //Add a loss and reset win streak if player leaves during match
-      document.body.onunload = () => {
+      window.onunload = () => {
         localStorage.setItem("fighterLosses", me.losses + 1);
         localStorage.setItem("fighterWinStreak", 0);
       };
@@ -2359,7 +2359,7 @@
       updateStats();
     }
 
-    document.body.onunload = null;
+    window.onunload = null;
 
     function rematchButton() {
       let el = document.getElementById("rematchButton");
@@ -2378,7 +2378,7 @@
       sendMessage(me.name + " wants to rematch.");
     }
 
-    function opponentDisconnected() { ////
+    function opponentDisconnected() { ////!
       if (opponent.fighters) { //If in match
         sendMessage(opponent.name + " disconnected.");
         document.getElementById("rematchButton").classList.add("unselectable");

@@ -919,7 +919,7 @@ def endpoint_break():
         else:
             helpList[name] = '<i>Requested a bathroom break</i>'
             playSFX("sfx_pickup02")
-            return redirect("/chat?alert=Your request was sent. The teacher still needs to approve it.")
+            return redirect("/break?alert=Your request was sent. The teacher still needs to approve it.")
     elif request.args.get('action') == 'end':
         #Find the student whose username matches the "name" argument
         for student in sD.studentDict:
@@ -927,7 +927,7 @@ def endpoint_break():
                 if sD.studentDict[student]['excluded']:
                     sD.studentDict[student]['excluded'] = False
                     sD.studentDict[student]['perms'] = sD.studentDict[request.remote_addr]['oldPerms']
-                    #Commented out because WebSocket server isn't working
+                    ##Commented out because WebSocket server isn't working
                     #server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', student, 'server', 'Your break was ended.')))
                     return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'], ticket = ticket)
                 else:
@@ -1232,12 +1232,12 @@ def endpoint_help():
         name = sD.studentDict[request.remote_addr]['name']
         name = name.strip()
         if name in helpList:
-            return redirect("/chat?alert=You already have a help ticket or break request in. If your problem is time-sensitive, or your last ticket was not cleared, please get the teacher's attention manually." )
+            return redirect("/help?alert=You already have a help ticket or break request in. If your problem is time-sensitive, or your last ticket was not cleared, please get the teacher's attention manually." )
         else:
             helpList[name] = request.args.get('message') or '<i>Sent a help ticket</i>'
             sD.studentDict[request.remote_addr]['help'] = True
             playSFX("sfx_up04")
-            return redirect("/chat?alert=Your ticket was sent. Keep working on the problem the best you can while you wait." )
+            return redirect("/help?alert=Your ticket was sent. Keep working on the problem the best you can while you wait." )
     else:
         return render_template("help.html")
 

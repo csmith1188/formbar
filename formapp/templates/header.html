@@ -19,6 +19,7 @@
     request.send(null);
     let serverIp = request.responseText;
     //let ws = new WebSocket(`ws://${serverIp}:9001`);
+    let ws = {};
     let urlParams = new URLSearchParams(window.location.search);
 
     function getResponse(endpoint) {

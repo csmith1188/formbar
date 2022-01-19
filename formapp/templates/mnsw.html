@@ -99,6 +99,8 @@
           remaining = mines;
           revealed = 0;
           clearInterval(timer);
+          document.getElementById("timer").classList.add("hidden");
+          document.getElementById("timer").innerText = "0:00";
           startingSeconds = undefined;
           status.innerHTML = 'Click on the tiles to reveal them';
           document.body.style.background = null;
@@ -205,8 +207,8 @@
               } else
               if (picture[row][column] == 'hidden') reveal(row, column);
           }
-
           if (revealed == rows * columns - mines) {
+              clearInterval(timer);
               status.innerHTML = 'YOU WIN!';
               document.body.style.background = "var(--bg-dark-blue)";
           }

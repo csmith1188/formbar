@@ -3,6 +3,7 @@ class Session():
         self.refresh()
         self.ip = ip
         self.studentDict = {}
+        self.mainPage = '/chat'
         self.bgm = {
             'nowplaying': '',
             'lastTime': 0,
@@ -50,7 +51,7 @@ class Session():
 
     def refresh(self):
         self.currentStep = 0
-        self.wawdLink = '/'
+        self.wawdLink = ''
         self.agendaStep = 0
         self.activePhrase = ''
         self.activePrompt = ''

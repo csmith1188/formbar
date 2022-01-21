@@ -10,7 +10,6 @@ let modeRes = getResponse("/getmode");
 let permsRes = getResponse("/getpermissions");
 let pixRes = getResponse("/getpix");
 
-
 updateVotes(meRes);
 setInterval(() => {
   meRes = getResponse("/getme");

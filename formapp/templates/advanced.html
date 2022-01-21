@@ -410,18 +410,18 @@
   let barpix = eval(pixRes.pixels);
 
   menuPositions();
-  nowPlaying(bgmRes);
-  getUsername(meRes);
-  showEnabled(modeRes, meRes);
+  nowPlaying();
+  getUsername();
+  showEnabled();
   bottomPosition();
   openPage("{{ page }}" || "{{ mainPage }}"); //If there is no "page" param, go to the main page
   setInterval(() => {
-    showEnabled(modeRes, meRes, permsRes);
-    nowPlaying(bgmRes);
+    showEnabled();
+    nowPlaying();
     bottomPosition();
   }, 1000);
 
-  function showEnabled(modeRes, meRes) {
+  function showEnabled() {
     let tutdDiv = document.getElementById("tutdDiv");
     let abcdDiv = document.getElementById("abcdDiv");
     let soundDiv = document.getElementById("soundDiv");
@@ -430,14 +430,14 @@
     let colorDiv = document.getElementById("colorDiv");
 
     let mode = modeRes.mode;
+    let myPerms = meRes.perms;
+    let studentPerms = permsRes.student;
 
-    if (mode == "tutd") tutdDiv.classList.remove("hidden");
+    if (mode == "tutd" && myPerms == permsRes.student) tutdDiv.classList.remove("hidden");
     else tutdDiv.classList.add("hidden");
 
-    if (mode == "abcd") abcdDiv.classList.remove("hidden");
+    if (mode == "abcd" == permsRes.student) abcdDiv.classList.remove("hidden");
     else abcdDiv.classList.add("hidden");
-
-    let myPerms = meRes.perms;
 
     let sfxPerm = permsRes.sfx;
     let bgmPerm = permsRes.bgm;
@@ -478,12 +478,12 @@
     });
   }
 
-  function getUsername(res) {
+  function getUsername() {
     let nameBox = document.getElementById("name");
     let oldHeight = bottom.clientHeight;
     nameBox.innerText = username;
     nameBox.onclick = () => openPage("profile");
-    let myPerms = res.perms;
+    let myPerms = meRes.perms;
     if (bottom.clientHeight > oldHeight) shorten(bottom, oldHeight, nameBox);
     else nameBox.removeAttribute("title");
   }
@@ -542,9 +542,9 @@
     if (event.code == "Enter") sendMusic();
   });
 
-  function nowPlaying(res) {
+  function nowPlaying() {
     //Get current song from server
-    let songName = res.bgm;
+    let songName = bgmRes.bgm;
 
     let np = document.getElementById("nowPlaying");
     let npTitle = document.getElementById("nowPlayingTitle");

@@ -252,6 +252,6 @@ Results won't be shown until the survey is complete.<br>
 When votes are missing, there will be empty spaces on the bar.<br>
 <input type="checkBox" id="showMissing" checked onchange="request.open('GET', `/settings?showinc=${this.value}`); request.send();"><label for="showMissing">Show</label><br>
 
-<h2>Remove all students</h2>
-<button class="inline popOut" onclick="request.open('GET', '/flush'); request.send();">Clear</button><br>
+<h2>Restart session</h2>
+<button class="inline popOut" onclick="request.open('GET', '/flush'); request.send();">Remove all students and restart</button><br>
 {% endblock %}

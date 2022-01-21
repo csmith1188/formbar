@@ -24,7 +24,7 @@
   #bannerLeft {
     left: 0;
     width: 75%;
-    background: var(--color-blue);
+    background: var(--color-green);
   }
 
   #bannerRight {
@@ -150,21 +150,34 @@
   document.getElementById("break").onclick = requestBreak;
 
   function checkForSurvey() {
-    let res = getResponse("/getmode");
-    let mode = res.mode;
+    let mode = modeRes.mode;
+    let myPerms = meRes.perms;
+    let studentPerms = permsRes.student;
+    let thumbs = document.getElementById("thumbs");
+    let noTUTD = document.getElementById("noTUTD");
+    let letters = document.getElementById("letters");
+    let noABCD = document.getElementById("noABCD");
     if (mode == "tutd") {
-      document.getElementById("thumbs").classList.remove("hidden");
-      document.getElementById("noTUTD").classList.add("hidden");
+      if (myPerms == studentPerms) {
+        thumbs.classList.remove("hidden");
+        noTUTD.classList.add("hidden");
+      } else {
+        noTUTD.innerText = "Only students can vote in surveys.";
+      }
     } else {
-      document.getElementById("thumbs").classList.add("hidden");
-      document.getElementById("noTUTD").classList.remove("hidden");
+      thumbs.classList.add("hidden");
+      noTUTD.classList.remove("hidden");
     }
     if (mode == "abcd") {
-      document.getElementById("letters").classList.remove("hidden");
-      document.getElementById("noABCD").classList.add("hidden");
+      if (myPerms == studentPerms) {
+        letters.classList.remove("hidden");
+        noABCD.classList.add("hidden");
+      } else {
+        noABCD.innerText = "Only students can vote in surveys.";
+      }
     } else {
-      document.getElementById("letters").classList.add("hidden");
-      document.getElementById("noABCD").classList.remove("hidden");
+      letters.classList.add("hidden");
+      noABCD.classList.remove("hidden");
     }
   }
 

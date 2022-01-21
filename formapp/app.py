@@ -528,6 +528,7 @@ def tutdBar():
     if sD.settings['autocount']:
         autoStudentCount()
     upFill = upCount = downFill = wiggleFill = 0
+    complete = 0
     for x in sD.studentDict:
         if sD.studentDict[x]['perms'] == sD.settings['perms']['student'] and sD.studentDict[x]['thumb']:
             if sD.studentDict[x]['thumb'] == 'up':
@@ -726,7 +727,7 @@ def endpoint_abcd():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['student']:
-        return redirect(sD.mainPage + "?alert=You do not have high enough permissions to do this right now.")
+        return "You do not have high enough permissions to do this right now."
     else:
         ip = request.remote_addr
         vote = request.args.get('vote')
@@ -831,7 +832,7 @@ def endpoint_bgm():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['bgm']:
-        return redirect(sD.mainPage + "?alert=You do not have high enough permissions to do this right now.")
+        return "You do not have high enough permissions to do this right now."
     else:
         bgm.updateFiles()
         bgm_file = request.args.get('file')
@@ -970,7 +971,7 @@ def endpoint_color():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['bar']:
-        return redirect(sD.mainPage + "?alert=You do not have high enough permissions to do this right now.")
+        return "You do not have high enough permissions to do this right now."
     else:
         try:
             r = int(request.args.get('r'))
@@ -1066,7 +1067,7 @@ def endpoint_flush():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['admin']:
-        return redirect(sD.mainPage + "?alert=You do not have high enough permissions to do this right now.")
+        return "You do not have high enough permissions to do this right now."
     else:
         flushUsers()
         sD.refresh()
@@ -1568,7 +1569,7 @@ def endpoint_perc():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['bar']:
-        return redirect(sD.mainPage + "?alert=You do not have high enough permissions to do this right now.")
+        return "You do not have high enough permissions to do this right now."
     else:
         percAmount = request.args.get('amount')
         try:
@@ -1677,7 +1678,7 @@ def endpoint_say():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['bar']:
-        return redirect(sD.mainPage + "?alert=You do not have high enough permissions to do this right now.")
+        return "You do not have high enough permissions to do this right now."
     else:
         sD.activePhrase = request.args.get('phrase')
         fgColor = request.args.get('fg')
@@ -1702,7 +1703,7 @@ def endpoint_segment():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['bar']:
-        return redirect(sD.mainPage + "?alert=You do not have high enough permissions to do this right now.")
+        return "You do not have high enough permissions to do this right now."
     else:
         type = request.args.get('type')
         hex = request.args.get('hex')
@@ -1851,7 +1852,7 @@ def endpoint_sfx():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['sfx']:
-        return redirect(sD.mainPage + "?alert=You do not have high enough permissions to do this right now.")
+        return "You do not have high enough permissions to do this right now."
     else:
         sfx.updateFiles()
         sfx_file = request.args.get('file')
@@ -1883,13 +1884,13 @@ def endpoint_startsurvey():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['mod']:
-        return redirect(sD.mainPage + "?alert=You do not have high enough permissions to do this right now.")
+        return "You do not have high enough permissions to do this right now."
     else:
         if not request.args.get('type'):
-            return redirect(sD.mainPage + "?alert=You need a survey type.")
+            return "You need a survey type."
         type = request.args.get('type')
         if not (type == 'tutd' or type == 'abcd'):
-            return redirect(sD.mainPage + "?alert=Invalid survey type.")
+            return "Invalid survey type."
         changeMode(type)
         repeatMode()
         return 'Started a new ' + type + ' survey.'

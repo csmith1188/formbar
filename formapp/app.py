@@ -1446,23 +1446,15 @@ def endpoint_login():
                     else:
                         return redirect('/', code=302)
 
-        elif request.args.get('name'):
-            newStudent(remote, request.args.get('name'))
-            return redirect('/', code=302)
         else:
+            #If the user is logged in, log them out
+            if remote in sD.studentDict:
+                del sD.studentDict[request.remote_addr]
+                playSFX('sfx_laser01')
+            if request.args.get('name'): ##needs update
+                newStudent(remote, request.args.get('name'))
+                return redirect('/', code=302)
             return render_template("login.html")
-
-'''
-    /logout
-'''
-@app.route('/logout')
-def endpoint_logout():
-    if not request.remote_addr in sD.studentDict:
-        return redirect('/')
-    else:
-        del sD.studentDict[request.remote_addr]
-        playSFX('sfx_laser01')
-        return redirect('/')
 
 # ███    ███
 # ████  ████

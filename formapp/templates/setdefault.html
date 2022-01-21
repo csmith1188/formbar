@@ -45,13 +45,13 @@
   <form method="post">
     <label>
       <div>
-        <input type="radio" name="mode" value="basic" checked><h3>Basic mode</h3><br>
+        <input type="radio" id="basic" name="mode" value="basic"><h3>Basic mode</h3><br>
         <span>A simple page with the main features. This is the best for new users.</span><br>
       </div>
     </label><br>
     <label>
       <div>
-        <input type="radio" name="mode" value="advanced"><h3>Advanced mode</h3><br>
+        <input type="radio" id="advanced" name="mode" value="advanced"><h3>Advanced mode</h3><br>
         <span>A compact page with all features.</span><br>
       </div>
     </label><br>
@@ -61,4 +61,7 @@
 
 <!-- Extra JavaScript here -->
 {% block script %}
+  <script>
+    "{{ pm }}" == "advanced" ? document.getElementById("advanced").checked = true : document.getElementById("basic").checked = true;
+  </script>
 {% endblock %}

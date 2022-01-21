@@ -140,14 +140,12 @@
     //Update the text
     request.open('GET', newURL, false);
     request.send(null);
-    if (newURL != dataURL) {
-      urls.forEach(url => {
-        let el = document.getElementById(url);
-        if (url == newURL) el.classList.add("pressed");
-        else el.classList.remove("pressed");
-      });
-      dataURL = newURL;
-    }
+    urls.forEach(url => {
+      let el = document.getElementById(url);
+      if (url == newURL) el.classList.add("pressed");
+      else el.classList.remove("pressed");
+    });
+    dataURL = newURL;
     document.getElementById("data").innerText = request.responseText;
 
     //Update the virtual bar

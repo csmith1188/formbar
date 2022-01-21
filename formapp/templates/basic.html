@@ -50,6 +50,10 @@
     color: var(--theme-color);
   }
 
+  h2 {
+    margin: 0;
+  }
+
   .thumbButton {
     width: 144px;
     border-radius: 50% !important;
@@ -138,19 +142,12 @@
   checkForSurvey();
   checkForHelpTicket();
   setInterval(() => {
-    checkIfRemoved();
     checkForSurvey();
     checkForHelpTicket();
   }, 1000);
 
   document.getElementById("help").onclick = requestHelp;
   document.getElementById("break").onclick = requestBreak;
-
-  function checkIfRemoved() {
-    //If the user is removed by the teacher, send them back to the login page
-    let res = getResponse("/getme");
-    if (res.error == "You are not logged in.") window.location = "/login?forward=/basic&alert=You have been logged out.";
-  }
 
   function checkForSurvey() {
     let res = getResponse("/getmode");

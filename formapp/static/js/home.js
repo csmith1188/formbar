@@ -4,6 +4,22 @@ let thumbButtons = document.querySelectorAll(".thumbButton");
 let letterButtons = document.querySelectorAll(".letterButton");
 let chosenThumb = false;
 let chosenLetter = false;
+let meRes = getResponse("/getme");
+let bgmRes = getResponse("/getbgm");
+let modeRes = getResponse("/getmode");
+let permsRes = getResponse("/getpermissions");
+let pixRes = getResponse("/getpix");
+
+
+updateVotes(meRes);
+setInterval(() => {
+  meRes = getResponse("/getme");
+  ////bgmRes = getResponse("/getbgm");
+  ////modeRes = getResponse("/getmode");
+  ////permsRes = getResponse("/getpermissions");
+  checkIfRemoved(meRes);
+  updateVotes(meRes);
+}, 1000);
 
 Array.from(thumbButtons).forEach((button, i) => {
   button.addEventListener("keydown", event => {
@@ -18,6 +34,11 @@ Array.from(letterButtons).forEach((button, i) => {
     }
   });
 });
+
+function checkIfRemoved(res) {
+  //If the user is removed by the teacher, send them back to the login page
+  if (res.error == "You are not logged in.") window.location = "/login?alert=You have been logged out.";
+}
 
 function thumbsVote(thumb) {
   if (chosenThumb === thumb) {

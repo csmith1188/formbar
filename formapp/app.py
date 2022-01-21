@@ -173,21 +173,21 @@ def newStudent(remote, username, bot=False):
             'excluded': False,
             'preferredMode': None
         }
-        #Track if this is the first human login or not
-        humanUsers = 0
+        #Track if the teacher is logged in
+        teacher = False
 
-        #Check each student so far to make sure that none of them are bots
+        #Check each student so far to make sure that none of them have teacher perms
         for user in sD.studentDict:
-            if not sD.studentDict[user]['bot']:
-                humanUsers += 1
+            if sD.studentDict[user]['perms'] == 0:
+                teacher = True
 
         #Login bots as guest
         if bot:
             print("[info] " +"Bot successful login. Made them a guest: " + username)
             sD.studentDict[remote]['perms'] = sD.settings['perms']['anyone']
 
-        #Login first user as teacher
-        elif humanUsers == 1:
+        #Login as teacher if there is no teacher yet
+        elif not teacher:
             print("[info] " +username + " logged in. Made them the teacher...")
             sD.studentDict[remote]['perms'] = sD.settings['perms']['admin']
 
@@ -204,7 +204,7 @@ def newStudent(remote, username, bot=False):
         db.close()
         for user in userFound:
             if username in user:
-                if humanUsers == 1:
+                if not teacher:
                     sD.studentDict[remote]['perms'] = sD.settings['perms']['admin']
                 else:
                     sD.studentDict[remote]['perms'] = int(user[3])
@@ -528,7 +528,6 @@ def tutdBar():
     if sD.settings['autocount']:
         autoStudentCount()
     upFill = upCount = downFill = wiggleFill = 0
-    complete = 0
     for x in sD.studentDict:
         if sD.studentDict[x]['perms'] == sD.settings['perms']['student'] and sD.studentDict[x]['thumb']:
             if sD.studentDict[x]['thumb'] == 'up':
@@ -788,6 +787,8 @@ def endpoint_addfile():
 def endpoint_home():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login')
+    page = request.args.get('page') or ''
+    mainPage = sD.mainPage.lstrip("/")
     username = sD.studentDict[request.remote_addr]['name']
     sfx.updateFiles()
     sounds = []
@@ -796,7 +797,7 @@ def endpoint_home():
         sounds.append(key)
     for key, value in bgm.bgm.items():
         music.append(key)
-    return render_template('advanced.html', username = username, sfx = sounds, bgm = music)
+    return render_template('advanced.html', page = page, mainPage = mainPage, username = username, sfx = sounds, bgm = music)
 
 # ██████
 # ██   ██
@@ -1589,8 +1590,8 @@ def endpoint_profile():
     else:
         if request.args.get('user'):
             nameArg = request.args.get('user')
-            for item in sD.studentDict:
-                user = sD.studentDict[item]
+            for x in sD.studentDict:
+                user = sD.studentDict[x]
                 name = user['name'].strip()
                 if name == nameArg:
                     return render_template("profile.html", username = user['name'], perms = sD.settings['permname'][user['perms']], bot = user['bot'])
@@ -1775,9 +1776,9 @@ def endpoint_setdefault():
         return redirect('/login?forward=' + request.path)
     if request.method == 'POST':
         if request.form['mode'] == 'basic' or request.form['mode'] == 'advanced':
+            sD.studentDict[request.remote_addr]['preferredMode'] = request.form['mode']
             db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
             dbcmd = db.cursor()
-            sD.studentDict[request.remote_addr]['preferredMode'] = request.form['mode']
             ##Test this
             dbcmd.execute("UPDATE users SET preferredMode=:mode WHERE username=:uname", {"uname": sD.studentDict[request.remote_addr]['name'], "mode": request.form['mode']})
             db.commit()
@@ -1786,7 +1787,7 @@ def endpoint_setdefault():
             return 'Invalid mode.'
         return redirect('/')
     else:
-        return render_template('setdefault.html')
+        return render_template('setdefault.html', pm = sD.studentDict[request.remote_addr]['preferredMode'])
 
 #This endpoint is exclusive only to the teacher.
 @app.route('/settings', methods = ['POST', 'GET'])

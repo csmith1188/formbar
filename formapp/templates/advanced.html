@@ -386,11 +386,10 @@
       <div id="lessonTab" class="tab" onclick="openPage('lesson');">Lesson</div>
     </div>
     <div id="debugTab" class="tab" onclick="openPage('debug');"><img src="{{ url_for('static', filename='img/advanced/debug.png') }}" class="icon"> API debugging</div>
-    <div id="reload" class="tab" style="margin-left: auto;" onclick="document.getElementById('innerPage').contentWindow.location.reload();"><img src="{{ url_for('static', filename='img/advanced/reload.png') }}" class="icon"> Reload inner page</div>
   </div>
 
   <div>
-    <iframe src="/chat" id="innerPage" onload="pageOpened(this.contentWindow.location.pathname);"></iframe>
+    <iframe id="innerPage" onload="pageOpened(this.contentWindow.location.pathname);"></iframe>
   </div>
 </div>
 {% endblock %}
@@ -408,27 +407,15 @@
   let urlOpen;
   let newMessages = 0;
   let username = "{{ username }}";
-  let meRes = getResponse("/getme");
-  let bgmRes = getResponse("/getbgm");
-  let modeRes = getResponse("/getmode");
-  let permsRes = getResponse("/getpermissions");
-  let pixRes = getResponse("/getpix");
   let barpix = eval(pixRes.pixels);
 
   menuPositions();
-  updateVotes(meRes);
   nowPlaying(bgmRes);
   getUsername(meRes);
   showEnabled(modeRes, meRes);
   bottomPosition();
-  openPage("chat");
+  openPage("{{ page }}" || "{{ mainPage }}"); //If there is no "page" param, go to the main page
   setInterval(() => {
-    ////meRes = getResponse("/getme");
-    ////bgmRes = getResponse("/getbgm");
-    ////modeRes = getResponse("/getmode");
-    ////permsRes = getResponse("/getpermissions");
-    checkIfRemoved(meRes);
-    updateVotes(meRes);
     showEnabled(modeRes, meRes, permsRes);
     nowPlaying(bgmRes);
     bottomPosition();
@@ -499,11 +486,6 @@
     let myPerms = res.perms;
     if (bottom.clientHeight > oldHeight) shorten(bottom, oldHeight, nameBox);
     else nameBox.removeAttribute("title");
-  }
-
-  function checkIfRemoved(res) {
-    //If the user is removed by the teacher, send them back to the login page
-    if (res.error == "You are not logged in.") window.location = "/login?alert=You have been logged out.";
   }
 
   function shorten(container, maxHeight, text) {
@@ -671,15 +653,16 @@
     let content = innerPage.contentWindow.document.body.innerHTML;
     innerPageTitle = innerPage.contentWindow.document.title;
     document.title = `${innerPageTitle} - Formbar`;
+    window.history.pushState({}, '', "?page=" + path.slice(1)); //Update the URL to include the title
     let tabs = document.querySelectorAll(".tab");
     let tabEl = document.getElementById(path.substring(1) + "Tab");
-    if (!content) openPage("chat?alert='Page does not exist.'");
+    if (!content) openPage("{{ mainPage }}?alert='Page does not exist.'");
     Array.from(tabs).forEach(tab => tab.classList.remove("open"));
     if (["/break", "/help"].includes(path)) document.getElementById("studentsTab").classList.add("open");
     if (["/2048", "/hangman", "/minesweeper", "/speedtype", "/ttt", "/fighter"].includes(path)) document.getElementById("gamesTab").classList.add("open");
     else if (["/needshelp", "/lesson", "/settings", "/users"].includes(path)) document.getElementById("teacherTab").classList.add("open");
     if (tabEl) tabEl.classList.add("open");
-    if (path == "/advanced" || path == "/basic") openPage("chat");
+    if (path == "/advanced" || path == "/basic") openPage("{{ mainPage }}");
     if (path == "/chat") {
       newMessages = 0;
       document.getElementById("newMessages").innerText = null;

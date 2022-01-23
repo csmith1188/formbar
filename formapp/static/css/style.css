@@ -298,13 +298,13 @@ input[type="checkbox"] {
 }
 
 input[type="checkbox"]:checked {
-  background: var(--theme-color) url("{{ url_for('static', filename='img/checkMark.png') }}") no-repeat;
+  background: var(--theme-color) url("../img/checkMark.png") no-repeat;
   background-size: 100%;
   color: var(--theme-color);
 }
 
 .light input[type="checkbox"]:checked {
-  background: var(--theme-color) url("{{ url_for('static', filename='img/checkMarkLight.png') }}") no-repeat;
+  background: var(--theme-color) url("../img/checkMarkLight.png") no-repeat;
 }
 
 input[type="radio"]:hover:not([disabled]), input[type="checkbox"]:hover:not([disabled]) {

@@ -106,7 +106,6 @@
   .smallImg {
     width: 24px;
     margin-left: 4px;
-    border-radius: 12px;
     vertical-align: middle;
     cursor: pointer;
   }
@@ -304,14 +303,18 @@
 
     <div id="musicDiv" class="hidden">
       <h2>Play music</h2>
-      <label for="volume">Volume: </label><input type="range" id="volume" value="0.5" min="0.1" max="1" step="0.1">
-      <span id="volNumber">0.5</span>
-      <br>
       <img src="{{ url_for('static', filename='img/advanced/random.png') }}" id="randomMusic" class="smallImg" title="Random" onclick="randomBGM()"><input type="text" id="music" placeholder="Filename" list="bgmFiles">
       <datalist id="bgmFiles"></datalist>
       <img src="{{ url_for('static', filename='img/advanced/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendMusic();"><br>
       <div id="nowPlaying" class="hidden">Now playing: <b id="nowPlayingTitle" title="Song"></b></div>
-      <button id="stopMusicButton" class="inline popOut" style="margin-top: 12px;" onclick="stopMusic();">Stop music</button>
+      <label for="volume">Volume: </label><input type="range" id="volume" value="0.5" min="0.1" max="1" step="0.1">
+      <span id="volNumber">0.5</span>
+      <br>
+      <div id="musicControls" class="hidden">
+        <img src="{{ url_for('static', filename='img/advanced/pause.png') }}" class="smallImg" id="playPauseMusic" title="Pause" onclick="playPauseauseMusic();">
+        <img src="{{ url_for('static', filename='img/advanced/restart.png') }}" class="smallImg" id="restartMusic" title="Restart" onclick="restartMusic();">
+        <img src="{{ url_for('static', filename='img/advanced/stop.png') }}" class="smallImg" id="stopMusic" title="Stop" onclick="stopMusic();">
+      </div>
     </div>
 
     <div id="textDiv" class="hidden">
@@ -386,10 +389,11 @@
       <div id="lessonTab" class="tab" onclick="openPage('lesson');">Lesson</div>
     </div>
     <div id="debugTab" class="tab" onclick="openPage('debug');"><img src="{{ url_for('static', filename='img/advanced/debug.png') }}" class="icon"> API debugging</div>
+    <div id="reload" class="tab" style="margin-left: auto;" onclick="document.getElementById('innerPage').requestFullscreen();"><img src="{{ url_for('static', filename='img/advanced/fullscreen.png') }}" class="icon"> Fullscreen</div>
   </div>
 
   <div>
-    <iframe id="innerPage" onload="pageOpened(this.contentWindow.location.pathname);"></iframe>
+    <iframe id="innerPage" onload="if (this.contentWindow.location.pathname.startsWith('/')) pageOpened(this.contentWindow.location.pathname);"></iframe>
   </div>
 </div>
 {% endblock %}
@@ -516,7 +520,7 @@
 
   document.getElementById("volume").addEventListener("input", () => {
     let volume = document.getElementById("volume").value;
-    if (volume == 0 || volume == 1) volume += ".0";
+    if (volume == 1) volume += ".0";
     document.getElementById("volNumber").innerText = volume;
   });
 
@@ -545,9 +549,12 @@
   function nowPlaying() {
     //Get current song from server
     let songName = bgmRes.bgm;
+    let paused = bgmRes.paused;
 
+    let controls = document.getElementById("musicControls");
     let np = document.getElementById("nowPlaying");
     let npTitle = document.getElementById("nowPlayingTitle");
+    let playPause = document.getElementById("playPauseMusic");
 
     //If a song is currently playing
     if (songName) {
@@ -557,10 +564,28 @@
         npTitle.innerText = songName;
         if (np.clientHeight > 21) shorten(np, 21, npTitle);
         else np.removeAttribute("title");
+        controls.classList.remove("hidden");
       }
+    } else {
+      //If no song is playing, hide
+      np.classList.add("hidden");
     }
-    //If no song is playing, hide
-    else np.classList.add("hidden");
+
+    if (paused) {
+      playPause.title = "Play";
+    } else {
+      playPause.title = "Pause";
+    }
+  }
+
+  function pauseMusic() {
+    request.open("GET", "/bgm?playpause=true");
+    request.send();
+  }
+
+  function restartMusic() {
+    request.open("GET", "/bgm?rewind=true");
+    request.send();
   }
 
   function stopMusic() {

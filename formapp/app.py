@@ -294,6 +294,7 @@ def startBGM(bgm_filename, volume=sD.bgm['volume']):
 def stopBGM():
     sD.bgm['paused'] = False
     pygame.mixer.music.stop()
+    sD.bgm['nowplaying'] = ''
     playSFX("sfx_pickup01")
 
 #This function stops BGM
@@ -1087,7 +1088,7 @@ def endpoint_getbgm():
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
         return '{"error": "Insufficient permissions."}'
     else:
-        return '{"bgm": "'+ str(sD.bgm['nowplaying']) +'"}'
+        return '{"bgm": "' + str(sD.bgm['nowplaying']) + '", "paused": "' + str(sD.bgm['paused']) + '"}'
 
 @app.route('/getfightermatches')
 def endpoint_getfightermatches():

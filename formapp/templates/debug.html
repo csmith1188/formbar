@@ -3,41 +3,10 @@
 {% block title %}API Debugging{% endblock %}
 {% block style %}
 <style>
-  #virtualBar {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    box-sizing: border-box;
-    padding: 8px;
-    background: black;
-  }
-
-  #vbText {
-    height: 24px;
-    width: 10ch;
-    padding: 0 4px;
-    box-sizing:
-    border-box; border: 1px white;
-    border-style: solid solid none;
-    font: 20px monospace;
-    text-transform: uppercase;
-  }
-
-  #pixBox {
-    width: 100%;
-    height: 16px;
-    box-sizing: border-box;
-    border: 1px solid white;
-    display: flex;
-    justify-content: space-around;
-    user-select: none;
-  }
-
   #buttonContainer {
     position: fixed;
     left: 0;
-    top: 56px;
+    top: 0;
     width: 100%;
     height: 60px;
     box-sizing: border-box;
@@ -52,9 +21,9 @@
   #data {
     position: absolute;
     left: 0;
-    top: 116px;
+    top: 60px;
     width: 100%;
-    height: calc(100% - 56px - 60px - 24px);
+    height: calc(100% - 60px - 24px);
     box-sizing: border-box;
     padding: 8px;
   }
@@ -83,14 +52,6 @@
       background-position: 0% 50%;
     }
   }
-
-  #quickmenu {
-    display: none;
-  }
-
-  #content {
-    background-color: transparent;
-  }
 </style>
 {% endblock %}
 
@@ -98,11 +59,6 @@
 {% block color %}red{% endblock %}
 
 {% block main %}
-  <div id="virtualBar">
-    <div id="vbText"><!--Text goes here--></div>
-    <span id="pixBox"></span>
-  </div>
-
   <div id="buttonContainer"></div>
 
   <div id="data"></div>
@@ -142,41 +98,10 @@
     dataURL = newURL;
 
     //Update the data
-    let dataTextRequest = new XMLHttpRequest();
-    dataTextRequest.open("GET", newURL);
-    dataTextRequest.onload = () => document.getElementById("data").innerText = dataTextRequest.responseText;
-    dataTextRequest.send(null);
-
-    //Update the virtual bar
-    let pixRequest = new XMLHttpRequest();
-    pixRequest.open("GET", '/getpix');
-    pixRequest.onload = () => {
-      let pixRes = JSON.parse(pixRequest.responseText);
-      let pix = eval(pixRes.pixels);
-      let pixBox = document.getElementById("pixBox");
-      pixBox.innerHTML = '';
-      for (let i = pix.length - 1; i >= 0; i--) {
-          for (let color = 0; color < pix[i].length; color++) {
-              pix[i][color] = pix[i][color].toString(16);
-              if (pix[i][color].length < 2)
-                  pix[i][color] = "0" + pix[i][color];
-          }
-          pixBox.innerHTML += "<div style='display: inline; flex-grow: 1; overflow: hidden; background-color: #" + pix[i][0] + "" + pix[i][1] + "" + pix[i][2] + ";'>&nbsp;</div>";
-      }
-    }
-    pixRequest.send(null);
-
-    //Update the virtual bar's text
-    let vbTextRequest = new XMLHttpRequest();
-    vbTextRequest.open("GET", '/getphrase');
-    vbTextRequest.onload = () => {
-      let phraseRes = JSON.parse(vbTextRequest.responseText);
-      let phrase = phraseRes.phrase;
-      let vbText = document.getElementById("vbText");
-      vbText.innerText = phrase;
-      ////To do: update color
-    }
-    vbTextRequest.send(null);
+    let newRequest = new XMLHttpRequest();
+    newRequest.open("GET", newURL);
+    newRequest.onload = () => document.getElementById("data").innerText = newRequest.responseText;
+    newRequest.send(null);
 
     //Reset the update time
     timeLeft = 3;

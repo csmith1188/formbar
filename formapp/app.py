@@ -313,12 +313,14 @@ def playpauseBGM(state='none'):
             pygame.mixer.music.unpause()
     playSFX("sfx_pickup01")
 
-def volBGM(direction):
+def volBGM(value):
     sD.bgm['volume'] = pygame.mixer.music.get_volume()
-    if direction == 'up':
+    if value == 'up':
         sD.bgm['volume'] += 0.1
-    elif direction == 'down':
+    elif value == 'down':
         sD.bgm['volume'] -= 0.1
+    else:
+        sD.bgm['volume'] = value
     if sD.bgm['volume'] > 1.0:
         sD.bgm['volume'] = 1.0
     if sD.bgm['volume'] < 0:
@@ -868,7 +870,12 @@ def endpoint_bgm():
                 volBGM('down')
                 return render_template("message.html", message = 'Music volume decreased by one increment.' )
             else:
-                return render_template("message.html", message = 'Invalid voladj. Use \'up\' or \'down\'.' )
+                try:
+                    bgm_volume = float(request.args.get('voladj'))
+                    volBGM(bgm_volume)
+                    return render_template("message.html", message = 'Music volume set to ' + request.args.get('voladj') + '.')
+                except:
+                    return render_template("message.html", message = 'Invalid voladj. Use \'up\', \'down\', or a number from 0.0 to 1.0.' )
         elif request.args.get('playpause'):
             playpauseBGM()
             if sD.bgm['paused']:
@@ -1088,7 +1095,7 @@ def endpoint_getbgm():
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
         return '{"error": "Insufficient permissions."}'
     else:
-        return '{"bgm": "' + str(sD.bgm['nowplaying']) + '", "paused": "' + str(sD.bgm['paused']) + '"}'
+        return '{"bgm": "' + str(sD.bgm['nowplaying']) + '", "paused": "' + str(sD.bgm['paused']) + '", "volume": "' + str(sD.bgm['volume']) + '"}'
 
 @app.route('/getfightermatches')
 def endpoint_getfightermatches():

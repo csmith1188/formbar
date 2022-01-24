@@ -309,14 +309,14 @@
       <img src="{{ url_for('static', filename='img/advanced/random.png') }}" id="randomMusic" class="smallImg" title="Random" onclick="randomBGM()"><input type="text" id="music" placeholder="Filename" list="bgmFiles">
       <datalist id="bgmFiles"></datalist>
       <img src="{{ url_for('static', filename='img/advanced/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendMusic();"><br>
+      <label for="volume">Volume: </label><input type="range" id="volume" min="0.1" max="1" step="0.1">
+      <span id="volNumber"></span>
       <div id="nowPlaying" class="hidden">Now playing: <b id="nowPlayingTitle" title="Song"></b></div>
       <div id="musicControls" class="hidden">
-        <img src="{{ url_for('static', filename='img/advanced/pause.png') }}" class="smallImg" id="playPauseMusic" title="Pause" onclick="playPauseauseMusic();">
+        <img src="{{ url_for('static', filename='img/advanced/pause.png') }}" class="smallImg" id="playPauseMusic" title="Pause" onclick="playPauseMusic();">
         <img src="{{ url_for('static', filename='img/advanced/restart.png') }}" class="smallImg" id="restartMusic" title="Restart" onclick="restartMusic();">
         <img src="{{ url_for('static', filename='img/advanced/stop.png') }}" class="smallImg" id="stopMusic" title="Stop" onclick="stopMusic();">
       </div>
-      <label for="volume">Volume: </label><input type="range" id="volume" value="0.5" min="0.1" max="1" step="0.1">
-      <span id="volNumber">0.5</span>
     </div>
 
     <div id="textDiv" class="hidden">
@@ -412,12 +412,14 @@
   let gradient;
   let urlOpen;
   let barpix;
+  let changingVolume;
   let newMessages = 0;
   let username = "{{ username }}";
 
   let init = () => {
     menuPositions();
     nowPlaying();
+    updateVolume();
     getUsername();
     showEnabled();
     bottomPosition();
@@ -435,6 +437,7 @@
     updateVotes();
     showEnabled();
     nowPlaying();
+    if (!changingVolume) updateVolume();
     bottomPosition();
   };
   setInterval(getApiData, 1000);
@@ -538,6 +541,16 @@
     document.getElementById("volNumber").innerText = volume;
   });
 
+  document.getElementById("volume").addEventListener("change", () => {
+    let volume = document.getElementById("volume").value;
+    if (volume == 1) volume += ".0";
+    request.open("GET", "/bgm?voladj=" + volume);
+    request.send();
+  });
+
+  document.getElementById("volume").addEventListener("mousedown", () => changingVolume = true);
+  document.getElementById("volume").addEventListener("mouseup", () => changingVolume = false);
+
   let bgm = eval("{{ bgm }}".replaceAll("&#39;", "'"));
 
   bgm.forEach(song => document.getElementById("bgmFiles").innerHTML += "<option value='" + song + "'></option>");
@@ -550,7 +563,7 @@
     let musicFile = document.getElementById("music").value;
     let volume = document.getElementById("volume").value;
     if (volume == 1) volume = "1.0";
-    request.open("GET", "/bgm?file=" + musicFile + "&volume=" + volume);
+    request.open("GET", "/bgm?file=" + musicFile);
     request.send();
     if (bgm.includes(musicFile)) document.getElementById("music").value = null;
     else alert("File does not exist");
@@ -593,7 +606,13 @@
     }
   }
 
-  function pauseMusic() {
+  function updateVolume() {
+    let volume = bgmRes.volume;
+    document.getElementById("volume").value = volume;
+    document.getElementById("volNumber").innerText = volume;
+  }
+
+  function playPauseMusic() {
     request.open("GET", "/bgm?playpause=true");
     request.send();
   }

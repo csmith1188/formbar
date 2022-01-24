@@ -1207,7 +1207,7 @@
 
     function createMatch() {
       //Give this match a six-digit ID
-      matchCode = pickRandom(1000000).toString();
+      matchCode = pickRandom(1_000_000).toString();
       while (matchCode.length < 6) matchCode = "0" + matchCode;
       me.team = 1;
       me.fighters = [fighter1a, fighter1b];

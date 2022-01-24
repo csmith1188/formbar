@@ -15,7 +15,7 @@
   }
 
   h2 {
-    margin: 48px 0 12px;
+    margin: 48px 0 4px;
     font-size: 23px;
     color: var(--color-blue);
   }
@@ -321,6 +321,8 @@
 
     <div id="textDiv" class="hidden">
       <h2>Change text</h2>
+      Text color: <input type="color" id="fgColor" class="button inline popOut" value="#404040"><br>
+      Background: <input type="color" id="bgColor" class="button inline popOut"><br>
       <input type="text" id="text" placeholder="Phrase">
       <img src="{{ url_for('static', filename='img/advanced/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendText();">
     </div>
@@ -632,11 +634,11 @@
 
   function sendText() {
     let text = document.getElementById("text").value;
-    //Replace spaces with underscores
-    text = text.replace(/\s/g, "_");
+    let fg = document.getElementById("fgColor").value.slice(1);
+    let bg = document.getElementById("bgColor").value.slice(1);
     //If input is blank, replace with underscore
     text ||= "_";
-    request.open("GET", "/say?phrase=" + text);
+    request.open("GET", "/say?phrase=" + text + "&fg=" + fg + "&bg=" + bg);
     request.send();
     document.getElementById("text").value = null;
   }

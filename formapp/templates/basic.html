@@ -139,12 +139,20 @@
 <script src="{{ url_for('static', filename='js/home.js') }}"></script>
 <script>
   ////Check for break, fix buttons
-  checkForSurvey();
-  checkForHelpTicket();
-  setInterval(() => {
+  let init = () => {
+    updateVotes();
     checkForSurvey();
     checkForHelpTicket();
-  }, 1000);
+  };
+  getApiData(true);
+
+  let update = () => {
+    checkIfRemoved();
+    updateVotes();
+    checkForSurvey();
+    checkForHelpTicket();
+  };
+  setInterval(getApiData, 1000);
 
   document.getElementById("help").onclick = requestHelp;
   document.getElementById("break").onclick = requestBreak;
@@ -162,7 +170,7 @@
         thumbs.classList.remove("hidden");
         noTUTD.classList.add("hidden");
       } else {
-        noTUTD.innerText = "Only students can vote in surveys.";
+        noTUTD.innerText = "Only students can vote in surveys."; ////
       }
     } else {
       thumbs.classList.add("hidden");

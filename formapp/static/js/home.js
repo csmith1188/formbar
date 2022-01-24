@@ -4,21 +4,28 @@ let thumbButtons = document.querySelectorAll(".thumbButton");
 let letterButtons = document.querySelectorAll(".letterButton");
 let chosenThumb = false;
 let chosenLetter = false;
-let meRes = getResponse("/getme");
-let bgmRes = getResponse("/getbgm");
-let modeRes = getResponse("/getmode");
-let permsRes = getResponse("/getpermissions");
-let pixRes = getResponse("/getpix");
+let meRes;
+let bgmRes;
+let modeRes;
+let permsRes;
+let pixRes;
 
-updateVotes(meRes);
-setInterval(() => {
-  meRes = getResponse("/getme");
-  ////bgmRes = getResponse("/getbgm");
-  ////modeRes = getResponse("/getmode");
-  ////permsRes = getResponse("/getpermissions");
-  checkIfRemoved(meRes);
-  updateVotes(meRes);
-}, 1000);
+async function getApiData(first) {
+  let apiData = await Promise.all([
+    getResponse("/getme"),
+    getResponse("/getbgm"),
+    getResponse("/getmode"),
+    getResponse("/getpermissions"),
+    getResponse("/getpix")
+  ]);
+  meRes = apiData[0];
+  bgmRes = apiData[1];
+  modeRes = apiData[2];
+  permsRes = apiData[3];
+  pixRes = apiData[4];
+  if (first) init();
+  else update();
+}
 
 Array.from(thumbButtons).forEach((button, i) => {
   button.addEventListener("keydown", event => {
@@ -34,9 +41,9 @@ Array.from(letterButtons).forEach((button, i) => {
   });
 });
 
-function checkIfRemoved(res) {
+function checkIfRemoved() {
   //If the user is removed by the teacher, send them back to the login page
-  if (res.error == "You are not logged in.") window.location = "/login?alert=You have been logged out.";
+  if (meRes.error == "You are not logged in.") window.location = "/login?alert=You have been logged out.";
 }
 
 function thumbsVote(thumb) {
@@ -85,18 +92,18 @@ function letterVote(letter) {
   request.send();
 }
 
-function updateVotes(res) {
+function updateVotes() {
   //Make sure displayed vote matches actual vote, for example if new poll is started or user reloads
   let thumb;
-  if (res.thumb == "up") thumb = 0;
-  else if (res.thumb == "wiggle") thumb = 1;
-  else if (res.thumb == "down") thumb = 2;
+  if (meRes.thumb == "up") thumb = 0;
+  else if (meRes.thumb == "wiggle") thumb = 1;
+  else if (meRes.thumb == "down") thumb = 2;
   else thumb = false;
   let letter;
-  if (res.letter == "a") letter = 0;
-  else if (res.letter == "b") letter = 1;
-  else if (res.letter == "c") letter = 2;
-  else if (res.letter == "d") letter = 3;
+  if (meRes.letter == "a") letter = 0;
+  else if (meRes.letter == "b") letter = 1;
+  else if (meRes.letter == "c") letter = 2;
+  else if (meRes.letter == "d") letter = 3;
   else letter = false;
   if (thumb === false && chosenThumb !== false) thumbsVote(chosenThumb); //Remove the vote
   else if (thumb !== chosenThumb) thumbsVote(thumb);

@@ -136,7 +136,10 @@
 
   #randomMusic {
     margin: 0 4px 0 0;
-    border-radius: 0;
+  }
+
+  #playPauseMusic, #restartMusic, #stopMusic {
+    margin: 0;
   }
 
   #bottom {
@@ -307,14 +310,13 @@
       <datalist id="bgmFiles"></datalist>
       <img src="{{ url_for('static', filename='img/advanced/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendMusic();"><br>
       <div id="nowPlaying" class="hidden">Now playing: <b id="nowPlayingTitle" title="Song"></b></div>
-      <label for="volume">Volume: </label><input type="range" id="volume" value="0.5" min="0.1" max="1" step="0.1">
-      <span id="volNumber">0.5</span>
-      <br>
       <div id="musicControls" class="hidden">
         <img src="{{ url_for('static', filename='img/advanced/pause.png') }}" class="smallImg" id="playPauseMusic" title="Pause" onclick="playPauseauseMusic();">
         <img src="{{ url_for('static', filename='img/advanced/restart.png') }}" class="smallImg" id="restartMusic" title="Restart" onclick="restartMusic();">
         <img src="{{ url_for('static', filename='img/advanced/stop.png') }}" class="smallImg" id="stopMusic" title="Stop" onclick="stopMusic();">
       </div>
+      <label for="volume">Volume: </label><input type="range" id="volume" value="0.5" min="0.1" max="1" step="0.1">
+      <span id="volNumber">0.5</span>
     </div>
 
     <div id="textDiv" class="hidden">
@@ -409,21 +411,35 @@
   let segment;
   let gradient;
   let urlOpen;
+  let barpix;
   let newMessages = 0;
   let username = "{{ username }}";
-  let barpix = eval(pixRes.pixels);
 
-  menuPositions();
-  nowPlaying();
-  getUsername();
-  showEnabled();
-  bottomPosition();
-  openPage("{{ page }}" || "{{ mainPage }}"); //If there is no "page" param, go to the main page
-  setInterval(() => {
+  let init = () => {
+    menuPositions();
+    nowPlaying();
+    getUsername();
+    showEnabled();
+    bottomPosition();
+    updateVotes();
+
+    barpix = eval(pixRes.pixels);
+    document.getElementById("segmentStart").max = barpix.length;
+    document.getElementById("segmentEnd").max = barpix.length;
+    document.getElementById("segmentEnd").value = barpix.length;
+  }
+  getApiData(true);
+
+  let update = () => {
+    checkIfRemoved();
+    updateVotes();
     showEnabled();
     nowPlaying();
     bottomPosition();
-  }, 1000);
+  };
+  setInterval(getApiData, 1000);
+
+  openPage("{{ page }}" || "{{ mainPage }}"); //If there is no "page" param, go to the main page
 
   function showEnabled() {
     let tutdDiv = document.getElementById("tutdDiv");
@@ -470,8 +486,6 @@
       bottom.style.padding = "inherit";
     }
   }
-
-  window.addEventListener("resize", bottomPosition);
 
   function menuPositions() {
     menus.forEach(menu => {
@@ -569,6 +583,7 @@
     } else {
       //If no song is playing, hide
       np.classList.add("hidden");
+      controls.classList.add("hidden");
     }
 
     if (paused) {
@@ -598,7 +613,7 @@
     //Replace spaces with underscores
     text = text.replace(/\s/g, "_");
     //If input is blank, replace with underscore
-    if (!text) text = "_";
+    text ||= "_";
     request.open("GET", "/say?phrase=" + text);
     request.send();
     document.getElementById("text").value = null;
@@ -625,10 +640,6 @@
     else if (number > el.max) el.value = el.max;
     else el.value = number;
   }
-
-  document.getElementById("segmentStart").max = barpix.length;
-  document.getElementById("segmentEnd").max = barpix.length;
-  document.getElementById("segmentEnd").value = barpix.length;
 
   function hideColor2() {
     gradient = false;

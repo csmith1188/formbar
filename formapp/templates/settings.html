@@ -102,26 +102,28 @@
     }
 
 
-    let modeRes = getResponse("/getmode");
-    let mode = modeRes.mode;
-    if (mode == "tutd") {
-      document.getElementById("survey").checked = true;
-      document.getElementById("surveyType").classList.remove("hidden");
-      document.getElementById("thumbs").checked = true;
-      changeSurveyType();
-    } else if (mode == "abcd") {
-      document.getElementById("survey").checked = true;
-      document.getElementById("surveyType").classList.remove("hidden");
-      document.getElementById("letters").checked = true;
-      changeSurveyType();
-    } else if (mode == "progress") {
-      document.getElementById("progress").checked = true;
-    } else if (mode == "countdown") {
-      document.getElementById("countdown").checked = true;
-      document.getElementById("countdownTime").classList.remove("hidden");
-    } else if (mode == "playtime") {
-      document.getElementById("playtime").checked = true;
-    }
+    (async () => {
+      let modeRes = await getResponse("/getmode");
+      let mode = modeRes.mode;
+      if (mode == "tutd") {
+        document.getElementById("survey").checked = true;
+        document.getElementById("surveyType").classList.remove("hidden");
+        document.getElementById("thumbs").checked = true;
+        changeSurveyType();
+      } else if (mode == "abcd") {
+        document.getElementById("survey").checked = true;
+        document.getElementById("surveyType").classList.remove("hidden");
+        document.getElementById("letters").checked = true;
+        changeSurveyType();
+      } else if (mode == "progress") {
+        document.getElementById("progress").checked = true;
+      } else if (mode == "countdown") {
+        document.getElementById("countdown").checked = true;
+        document.getElementById("countdownTime").classList.remove("hidden");
+      } else if (mode == "playtime") {
+        document.getElementById("playtime").checked = true;
+      }
+    })();
 </script>
 {% endblock %}
 

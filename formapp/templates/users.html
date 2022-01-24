@@ -188,7 +188,6 @@
     }, 1000);
 
     function updatePerm(el) {
-        let request = new XMLHttpRequest();
         console.log(el.value);
         request.open("GET", el.value);
         request.onload = function() {

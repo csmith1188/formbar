@@ -560,14 +560,16 @@
     document.getElementById("music").value = bgm[Math.floor(Math.random() * bgm.length)];
   }
 
-  function sendMusic() {
+  async function sendMusic() {
     let musicFile = document.getElementById("music").value;
     let volume = document.getElementById("volume").value;
     if (volume == 1) volume = "1.0";
-    request.open("GET", "/bgm?file=" + musicFile);
-    request.send();
-    if (bgm.includes(musicFile)) document.getElementById("music").value = null;
-    else alert("File does not exist");
+    let res = await getResponse("/bgm?file=" + musicFile, false);
+    if (bgm.includes(musicFile)) {
+      (res.startsWith("It has only been")) ? alert(res) : document.getElementById("music").value = null;
+    } else {
+      alert("File does not exist");
+    }
   }
 
   document.getElementById("music").addEventListener("keydown", event => {

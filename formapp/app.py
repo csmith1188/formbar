@@ -741,21 +741,21 @@ def endpoint_abcd():
                         sD.studentDict[request.remote_addr]['letter'] = vote
                         playSFX("sfx_blip01")
                         abcdBar()
-                        return render_template("message.html", forward=request.path, message = "Thank you for your tasty bytes... (" + vote + ")" )
+                        return "Thank you for your tasty bytes... (" + vote + ")"
                     else:
-                        return render_template("message.html", forward=request.path, message = "You've already submitted an answer... (" + sD.studentDict[request.remote_addr]['letter'] + ")" )
+                        return "You've already submitted an answer... (" + sD.studentDict[request.remote_addr]['letter'] + ")"
                 elif vote == 'oops':
                     if sD.studentDict[request.remote_addr]['letter']:
                         sD.studentDict[request.remote_addr]['letter'] = ''
                         playSFX("sfx_hit01")
                         abcdBar()
-                        return render_template("message.html", forward=request.path, message = "I won\'t mention it if you don\'t" )
+                        return "I won\'t mention it if you don\'t"
                     else:
-                        return render_template("message.html", forward=request.path, message = "You don't have an answer to erase." )
+                        return "You don't have an answer to erase."
                 else:
-                    return render_template("message.html", forward=request.path, message = "Bad arguments..." )
+                    return "Bad arguments..."
             else:
-                return render_template("message.html", forward=request.path, message = "Not in ABCD mode." )
+                return "Not in ABCD mode."
         else:
             return redirect("/")
 
@@ -783,7 +783,7 @@ def endpoint_addfile():
             print("Title: " + title)
             print("Filename: " + file)
             print("List: " + list)
-            return render_template("message.html", forward=request.path, message = 'File submitted to teacher.')
+            return 'File submitted to teacher.'
         else:
             return render_template('addfile.html')
 
@@ -857,34 +857,34 @@ def endpoint_bgm():
                         startBGM(bgm_file, bgm_volume)
                     else:
                         startBGM(bgm_file)
-                    return render_template("message.html", forward=request.path, message = 'Playing: ' + bgm_file )
+                    return 'Playing: ' + bgm_file
                 else:
-                    return render_template("message.html", forward=request.path, message = "It has only been " + str(int(time.time() - sD.bgm['lastTime'])) + " seconds since the last song started. Please wait at least 60 seconds.")
+                    return "It has only been " + str(int(time.time() - sD.bgm['lastTime'])) + " seconds since the last song started. Please wait at least 60 seconds."
             else:
-                return render_template("message.html", forward=request.path, message = "Cannot find that filename!")
+                return "Cannot find that filename!"
         elif request.args.get('voladj'):
             if request.args.get('voladj') == 'up':
                 volBGM('up')
-                return render_template("message.html", message = 'Music volume increased by one increment.' )
+                return 'Music volume increased by one increment.'
             elif request.args.get('voladj') == 'down':
                 volBGM('down')
-                return render_template("message.html", message = 'Music volume decreased by one increment.' )
+                return 'Music volume decreased by one increment.'
             else:
                 try:
                     bgm_volume = float(request.args.get('voladj'))
                     volBGM(bgm_volume)
-                    return render_template("message.html", message = 'Music volume set to ' + request.args.get('voladj') + '.')
+                    return 'Music volume set to ' + request.args.get('voladj') + '.'
                 except:
-                    return render_template("message.html", message = 'Invalid voladj. Use \'up\', \'down\', or a number from 0.0 to 1.0.' )
+                    return 'Invalid voladj. Use \'up\', \'down\', or a number from 0.0 to 1.0.'
         elif request.args.get('playpause'):
             playpauseBGM()
             if sD.bgm['paused']:
-                return render_template("message.html", message = 'Music resumed.')
+                return 'Music resumed.'
             else:
-                return render_template("message.html", message = 'Music paused.')
+                return 'Music paused.'
         elif request.args.get('rewind'):
             rewindBGM()
-            return render_template("message.html", message = 'Music rewound.')
+            return 'Music rewound.'
         else:
             resString = '<a href="/bgmstop">Stop Music</a>'
             resString += '<h2>Now playing: ' + sD.bgm['nowplaying'] + '</h2>'
@@ -903,7 +903,7 @@ def endpoint_bgm():
 def endpoint_bgmstop():
     sD.bgm['paused'] = False
     stopBGM()
-    return render_template("message.html", message = 'Stopped music...' )
+    return 'Stopped music...'
 
 '''
     /break
@@ -938,7 +938,7 @@ def endpoint_break():
                     return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'], ticket = ticket)
                 else:
                     return redirect(request.path + "?alert=This student is not currently taking a bathroom break.")
-        return render_template("message.html", message = 'Student not found.')
+        return 'Student not found.'
     else:
         return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'], ticket = ticket)
 
@@ -955,7 +955,7 @@ def endpoint_changemode():
     direction = request.args.get('direction') or 'next'
     print(newMode)
     print(direction)
-    return render_template("message.html", message = changeMode(newMode, direction))
+    return changeMode(newMode, direction)
 
 '''
     /chat
@@ -998,12 +998,12 @@ def endpoint_color():
             return "Bad ArgumentsTry <b>/color?hex=FF00FF</b> or <b>/color?r=255&g=0&b=255</b>"
         if ONRPi:
             pixels.show()
-        return render_template("message.html", message = "Color sent!" )
+        return "Color sent!"
 
 
 @app.route('/countdown')
 def endpoint_countdown():
-    return render_template('message.html', message='This feature is not available yet.')
+    return 'This feature is not available yet.'
 
 @app.route('/createfightermatch')
 def endpoint_createfightermatch():
@@ -1079,7 +1079,7 @@ def endpoint_flush():
     else:
         flushUsers()
         sD.refresh()
-        return render_template("message.html", message = "Session was restarted." )
+        return "Session was restarted."
 
 #  ██████
 # ██
@@ -1199,7 +1199,7 @@ def endpoint_getword():
                 return json.dumps(wordlist)
         except Exception as e:
             print("[error] " + "Could not convert number. " + str(e))
-            return render_template("message.html", message="Could not convert number. " + str(e))
+            return "Could not convert number. " + str(e)
     else:
         word = random.choice(list(words.keys()))
         return str(word)
@@ -1271,7 +1271,7 @@ def endpoint_lesson():
     else:
         if request.method == 'POST':
             if not request.files['file']:
-                return render_template('message.html', message='Lesson file required.')
+                return 'Lesson file required.'
             else:
                 f = request.files['file']
                 f.save(os.path.join('lessondata', secure_filename(f.filename.strip(' '))))
@@ -1285,13 +1285,13 @@ def endpoint_lesson():
             except Exception as e:
                 print(traceback.format_exc())
                 print("[error] " + e)
-                return render_template('message.html', message='<b>Error:</b> ' + str(e))
+                return '<b>Error:</b> ' + str(e)
         elif request.args.get('action'):
             if request.args.get('action') == 'next':
                 sD.currentStep += 1
                 if sD.currentStep >= len(sD.lesson.steps):
                     sD.currentStep = len(sD.lesson.steps)
-                    return render_template('message.html', message='End of lesson!')
+                    return 'End of lesson!'
                 else:
                     updateStep()
                     return redirect('/lesson')
@@ -1299,13 +1299,13 @@ def endpoint_lesson():
                 sD.currentStep -= 1
                 if sD.currentStep <= 0:
                     sD.currentStep = 0
-                    return render_template('message.html', message='Already at start of lesson!')
+                    return 'Already at start of lesson!'
                 else:
                     updateStep()
                     return redirect('/lesson')
             elif request.args.get('action') == 'unload':
                 sD.refresh()
-                return render_template('message.html', message='Unloaded lesson.')
+                return 'Unloaded lesson.'
             elif request.args.get('action') == 'upload':
                 return render_template('general.html', content='<form method=post enctype=multipart/form-data><input type=file name=file accept=".xlsx"><input type=submit value=Upload></form>')
             else:
@@ -1542,7 +1542,7 @@ def endpoint_needshelp():
             del helpList[remove]
             return redirect("/needshelp")
         else:
-            return render_template("message.html", forward=request.referrer, message = "Couldn't find ticket for: " + remove +"" )
+            return "Couldn't find ticket for: " + remove + "."
     else:
         resString = '<meta http-equiv="refresh" content="5">'
         if not helpList:
@@ -1576,8 +1576,8 @@ def endpoint_perc():
             percAmount = int(percAmount)
             percFill(percAmount)
         except:
-            return render_template("message.html", forward=request.path, message = "<b>amount</b> must be an integer between 0 and 100 \'/perc?amount=<b>50</b>\'" )
-        return render_template("message.html", forward=request.path, message = "Set perecentage to: " + str(percAmount) + "" )
+            return "<b>amount</b> must be an integer between 0 and 100 \'/perc?amount=<b>50</b>\'"
+        return "Set perecentage to: " + str(percAmount) + "."
 
 '''
     /profile
@@ -1597,7 +1597,7 @@ def endpoint_profile():
                 if name == nameArg:
                     return render_template("profile.html", username = user['name'], perms = sD.settings['permname'][user['perms']], bot = user['bot'])
             #If there are no matches
-            return render_template("message.html", message = "There are no users with that name.")
+            return "There are no users with that name."
 
         else:
             user = sD.studentDict[request.remote_addr]
@@ -1620,15 +1620,15 @@ def endpoint_progress():
                 percAmount = sD.lesson.checkProg(sD.studentDict)
                 if sD.settings['barmode'] == 'progress':
                     percFill(percAmount)
-                return render_template('message.html', message=str(check) + " was toggled.")
+                return str(check) + " was toggled."
             except Exception as e:
                 print("[error] " + e)
-                return render_template('message.html', message='<b>Error:</b> ' + str(e))
+                return '<b>Error:</b> ' + str(e)
         else:
             if sD.activeProgress:
                 return render_template('progress.html', progress=sD.activeProgress)
             else:
-                return render_template('message.html', message='There is no progress tracker active right now.')
+                return 'There is no progress tracker active right now.'
 
 #  ██████
 # ██    ██
@@ -1692,9 +1692,9 @@ def endpoint_say():
                 showString(sD.activePhrase)
                 if ONRPi:
                     pixels.show()
-            return render_template("message.html", message = "Set phrase to: " + str(sD.activePhrase) + "" )
+            return "Set phrase to: " + str(sD.activePhrase) + "."
         else:
-            return render_template("message.html", message = "<b>phrase</b> must contain a string. \'/say?phrase=<b>\'hello\'</b>\'" )
+            return "<b>phrase</b> must contain a string. \'/say?phrase=<b>\'hello\'</b>\'"
 
 @app.route('/segment')
 def endpoint_segment():
@@ -1749,13 +1749,13 @@ def endpoint_segment():
                 return "Bad ArgumentsTry <b>/color?hex=FF00FF</b> or <b>/color?r=255&g=0&b=255</b>"
         if ONRPi:
             pixels.show()
-        return render_template("message.html", message = "Color sent!" )
+        return "Color sent!"
 
 '''
 @app.route('/sendblock')
 def endpoint_sendblock():
     if not sD.settings['barmode'] == 'blockchest':
-        return render_template("message.html", forward=request.path, message = "Not in blockchest sD.settings['barmode'] " )
+        return "Not in blockchest sD.settings['barmode']"
     blockId = request.args.get("id")
     blockData = request.args.get("data")
     if blockId and blockData:
@@ -1858,7 +1858,7 @@ def endpoint_sfx():
         sfx_file = request.args.get('file')
         if sfx_file in sfx.sound:
             playSFX(sfx_file)
-            return render_template("message.html", forward=request.path, message = 'Playing: ' + sfx_file )
+            return 'Playing: ' + sfx_file
         else:
             resString = '<h2>List of available sound files:</h2><ul>'
             for key, value in sfx.sound.items():
@@ -1949,21 +1949,21 @@ def endpoint_tutd():
                     if sD.studentDict[request.remote_addr]['thumb'] != thumb:
                         sD.studentDict[request.remote_addr]['thumb'] = thumb
                         tutdBar()
-                        return render_template("message.html", forward=request.path, message = "Thank you for your tasty bytes... (" + thumb + ")" )
+                        return "Thank you for your tasty bytes... (" + thumb + ")"
                     else:
-                        return render_template("message.html", forward=request.path, message = "You've already submitted this answer... (" + thumb + ")" )
+                        return "You've already submitted this answer... (" + thumb + ")"
                 elif thumb == 'oops':
                     if sD.studentDict[request.remote_addr]['thumb']:
                         sD.studentDict[request.remote_addr]['thumb'] = ''
                         playSFX("sfx_hit01")
                         tutdBar()
-                        return render_template("message.html", forward=request.path, message = "I won\'t mention it if you don\'t" )
+                        return "I won\'t mention it if you don\'t"
                     else:
-                        return render_template("message.html", forward=request.path, message = "You don't have an answer to erase." )
+                        return "You don't have an answer to erase."
                 else:
-                    return render_template("message.html", forward=request.path, message = "Bad ArgumentsTry <b>/tutd?thumb=wiggle</b>You can also try <b>down</b> and <b>up</b> instead of <b>wiggle</b>")
+                    return "Bad ArgumentsTry <b>/tutd?thumb=wiggle</b>You can also try <b>down</b> and <b>up</b> instead of <b>wiggle</b>"
             else:
-                return render_template("message.html", forward=request.path, message = "Not in TUTD mode.")
+                return "Not in TUTD mode."
         else:
             return redirect("/")
 
@@ -1989,12 +1989,12 @@ def endpoint_users():
                     user = key
                     break
             if not user:
-                return render_template("message.html", forward=request.path, message = "That user was not found by their name. " )
+                return "That user was not found by their name."
         if request.args.get('ip'):
             if request.args.get('ip') in sD.studentDict:
                 user = request.args.get('ip')
             else:
-                return render_template("message.html", forward=request.path, message = "That user was not found by their IP address. " )
+                return "That user was not found by their IP address."
         if user:
             if request.args.get('action'):
                 action = request.args.get('action')
@@ -2003,21 +2003,21 @@ def endpoint_users():
                         del sD.studentDict[user]
                         return "User removed"
                     else:
-                        return render_template("message.html", forward=request.path, message = "User not in list. " )
+                        return "User not in list."
                 if action == 'ban':
                     if user in sD.studentDict:
                         banList.append(user)
                         del sD.studentDict[user]
                         return "User removed and added to ban list."
                     else:
-                        return render_template("message.html", forward=request.path, message = "User not in list. " )
+                        return "User not in list."
                 if action == 'perm':
                     if request.args.get('perm'):
                         try:
                             perm = int(request.args.get('perm'))
                             if user in sD.studentDict:
                                 if perm > 4 or perm < 0 :
-                                    return render_template("message.html", forward=request.path, message = "Permissions out of range." )
+                                    return "Permissions out of range."
                                 else:
                                     sD.studentDict[user]['perms'] = perm
                                     #Open and connect to database
@@ -2027,25 +2027,25 @@ def endpoint_users():
                                     db.commit()
                                     db.close()
                                     print("[info] " + "")
-                                    return render_template("message.html", forward=request.path, message = "Changed user permission." )
+                                    return "Changed user permission."
                             else:
-                                return render_template("message.html", forward=request.path, message = "User not in list." )
+                                return "User not in list."
                         except:
-                            return render_template("message.html", forward=request.path, message = "Perm was not an integer." )
+                            return "Perm was not an integer."
             if request.args.get('refresh'):
                 refresh = request.args.get('refresh')
                 if refresh == 'all':
                     if refreshUsers(user):
-                        return render_template("message.html", forward=request.path, message = "Removed all student responses.")
+                        return "Removed all student responses."
                     else:
-                        return render_template("message.html", forward=request.path, message = "Error removing responses from all students.")
+                        return "Error removing responses from all students."
                 else:
                     if refreshUsers(user, refresh):
-                        return render_template("message.html", forward=request.path, message = "Removed " + refresh + " responses from " + user + ".")
+                        return "Removed " + refresh + " responses from " + user + "."
                     else:
-                        return render_template("message.html", forward=request.path, message = "Error removgin " + refresh + " responses from " + user + ".")
+                        return "Error removgin " + refresh + " responses from " + user + "."
             else:
-                return render_template("message.html", forward=request.path, message = "No action given. " )
+                return "No action given."
         else:
             return render_template("users.html")
 

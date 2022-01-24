@@ -21,11 +21,13 @@
     //let ws = new WebSocket(`ws://${serverIp}:9001`);
     let ws = {};
 
-    function getResponse(endpoint) {
+    function getResponse(endpoint, parse = true) {
       return new Promise((resolve, reject) => {
         let newRequest = new XMLHttpRequest();
         newRequest.open("GET", endpoint);
-        newRequest.onload = () => resolve(JSON.parse(newRequest.responseText));
+        newRequest.onload = () => {
+          parse ? resolve(JSON.parse(newRequest.responseText)) : resolve(newRequest.responseText);
+        };
         newRequest.send(null);
       });
     }

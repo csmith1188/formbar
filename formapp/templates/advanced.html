@@ -415,7 +415,6 @@
   let gradient;
   let urlOpen;
   let barpix;
-  let changingVolume;
   let newMessages = 0;
   let username = "{{ username }}";
 
@@ -440,7 +439,7 @@
     updateVotes();
     showEnabled();
     nowPlaying();
-    if (!changingVolume) updateVolume();
+    if (document.getElementById("volume") != document.activeElement) updateVolume();
     bottomPosition();
   };
   setInterval(getApiData, 1000);
@@ -550,9 +549,6 @@
     request.open("GET", "/bgm?voladj=" + volume);
     request.send();
   });
-
-  document.getElementById("volume").addEventListener("mousedown", () => changingVolume = true);
-  document.getElementById("volume").addEventListener("mouseup", () => changingVolume = false);
 
   let bgm = eval("{{ bgm }}".replaceAll("&#39;", "'"));
 

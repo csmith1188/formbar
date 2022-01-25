@@ -1534,7 +1534,7 @@ def endpoint_needshelp():
                     if request.args.get('acceptBreak'):
                         sD.studentDict[student]['excluded'] = True
                         sD.studentDict[student]['oldPerms'] = sD.studentDict[request.remote_addr]['perms'] #Get the student's current permissions so they can be restored later
-                        sD.studentDict[student]['perms'] = sD.settings['perms']['banned']
+                        sD.studentDict[student]['perms'] = sD.settings['perms']['anyone']
                     ##Commented out because WebSocket server isn't working
                         #server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', name, 'server', 'The teacher accepted your break request.')))
                     #elif helpList[name] == "<i>Requested a bathroom break</i>":

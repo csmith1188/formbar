@@ -152,9 +152,8 @@
     padding: inherit;
   }
 
-  .alert {
-    font-weight: bold;
-    color: #ff8040;
+  #excluded {
+    color: var(--color-red);
   }
 
   #rightSide {
@@ -358,7 +357,7 @@
   </div>
 
   <div id="bottom">
-    Name: <a id="name"></a><br>
+    Name: <a id="name"></a><span id="excluded"></span><br>
     <button class="inline popOut" onclick="window.location = '/login';">Log out</button>
     <button class="inline popOut" onclick="feedback();">Send feedback</button>
     <button class="inline popOut" onclick="window.location = '/basic';">Basic mode</button>
@@ -441,6 +440,7 @@
     nowPlaying();
     if (document.getElementById("volume") != document.activeElement) updateVolume();
     bottomPosition();
+    checkIfExcluded();
   };
   setInterval(getApiData, 1000);
 
@@ -509,6 +509,14 @@
     let myPerms = meRes.perms;
     if (bottom.clientHeight > oldHeight) shorten(bottom, oldHeight, nameBox);
     else nameBox.removeAttribute("title");
+  }
+
+  function checkIfExcluded() {
+    let exclBox = document.getElementById("excluded");
+    let nameBox = document.getElementById("name");
+    let oldHeight = bottom.clientHeight;
+    if (meRes.excluded) exclBox.innerText = " (excluded)";
+    if (bottom.clientHeight > oldHeight) shorten(bottom, oldHeight, nameBox);
   }
 
   function shorten(container, maxHeight, text) {

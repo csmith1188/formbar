@@ -260,7 +260,7 @@
       definitionRequest.open('GET', "https://api.dictionaryapi.dev/api/v2/entries/en_US/" + newWord);
       definitionRequest.onload = function() {
         newDefinition = JSON.parse(definitionRequest.response);
-        if (newDefinition.title == "No Definitions Found") {
+        if (newDefinition.title == "No Definitions Found" || newDefinition[0].word != newWord) {
           getNewWord();
         } else {
           newDefinition = newDefinition[0].meanings[0].definitions[0].definition;

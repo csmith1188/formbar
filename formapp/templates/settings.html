@@ -31,13 +31,27 @@
 
     }
 
-    function sendStudents(studentNum = document.getElementById('studentNum').value) {
+    function sendStudents() {
+        let input = document.getElementById('studentNum');
+        if (document.getElementById("autoStudents").checked) {
+          studentNum = 0;
+          input.setAttribute("readonly", "true");
+          updateStudents();
+        } else {
+          studentNum = parseInt(input.value);
+          if (studentNum < input.min || isNaN(studentNum)) studentNum = input.min;
+          if (studentNum > input.max) studentNum = input.max;
+          input.value = studentNum;
+          input.removeAttribute("readonly");
+        }
         request.open("GET", "/settings?students=" + studentNum);
         // request.onload = function() {
         // console.log(request.response);
         // };
         request.send();
     }
+
+    sendStudents();
 
     function updatePerm(el) {
         request.open("GET", el.value);
@@ -47,12 +61,15 @@
         request.send();
     }
 
-    setInterval(function() {
+    async function updateStudents() {
         if (document.getElementById("autoStudents").checked) {
-          document.getElementById("studentNum").value = 999;
-          ////
+          let res = await getResponse("/getstudents");
+          document.getElementById("studentNum").value = Object.keys(res).length;
         }
-    }, 1000);
+    }
+
+    updateStudents();
+    setInterval(updateStudents, 1000);
 
     function changeMode() {
       if (document.getElementById("survey").checked) {
@@ -65,7 +82,9 @@
         request.send();
       }
       if (document.getElementById("countdown").checked) {
-        document.getElementById("countdownTime").classList.remove("hidden");
+        alert("This feature is not available yet.");
+        document.getElementById("playtime").checked = true;
+        ////document.getElementById("countdownTime").classList.remove("hidden");
       } else {
         document.getElementById("countdownTime").classList.add("hidden");
       }
@@ -132,8 +151,8 @@
 <h1>Settings</h1>
 
 <h2>Number of students</h2>
-<input type="number" id="studentNum" class="line" onchange="sendStudents()" name="studentNum" min="1" max="30">&nbsp;&nbsp;
-<input type="checkBox" id="autoStudents" checked onchange="sendStudents(0)"><label for="autoStudents">Auto</label><br>
+<input type="number" id="studentNum" class="line" onchange="sendStudents();" name="studentNum" min="1" max="30">&nbsp;&nbsp;
+<input type="checkBox" id="autoStudents" checked onchange="sendStudents();"><label for="autoStudents">Auto</label><br>
 
 <div onchange="changeMode();">
     <h2>Bar mode</h2>

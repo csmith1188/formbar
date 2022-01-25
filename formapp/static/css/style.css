@@ -186,6 +186,12 @@ input, button, textarea, select {
   outline: none;
 }
 
+.line[readonly] {
+  opacity: 50%;
+  cursor: not-allowed;
+  background: var(--highlight-color);
+}
+
 textarea, .box {
   background: var(--emphasis-color);
   color: var(--main-color);

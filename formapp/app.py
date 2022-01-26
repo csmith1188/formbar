@@ -788,7 +788,7 @@ def endpoint_addfile():
             return render_template('addfile.html')
 
 @app.route('/advanced')
-def endpoint_home():
+def endpoint_advanced():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login')
     page = request.args.get('page') or ''
@@ -802,6 +802,10 @@ def endpoint_home():
     for key, value in bgm.bgm.items():
         music.append(key)
     return render_template('advanced.html', page = page, mainPage = mainPage, username = username, sfx = sounds, bgm = music)
+
+@app.route('/api')
+def endpoint_api():
+    return "New API endpoint"
 
 # ██████
 # ██   ██

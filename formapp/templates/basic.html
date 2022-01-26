@@ -8,9 +8,21 @@
 <!-- Extra style declarations here -->
 {% block style %}
 <style>
+  #topButtons {
+    width: fit-content;
+    margin: auto;
+  }
+
+  #topButtons * {
+    font-size: 24px;
+    font-weight: bold;
+    border-width: 2px !important;
+    color: var(--color-purple);
+  }
+
   #banner * {
     position: fixed;
-    top: 0;
+    bottom: 0;
     height: 48px;
     color: white;
     font-size: 24px;
@@ -69,7 +81,7 @@
     box-shadow: none !important;
   }
 
-  button {
+  #other button {
     width: 180px;
     font-size: 28px;
     font-weight: bold;
@@ -104,9 +116,8 @@
 
 <!-- Main content here -->
 {% block main %}
-  <div id="banner">
-    <div id="bannerLeft" onclick="window.location = '/advanced';">Go to advanced mode to use all features</div>
-    <div id="bannerRight" onclick="window.location = '/setdefault';">Set default mode</div>
+  <div id="topButtons">
+    <button>Survey panel</button>
   </div>
   <div class="centered">
     <h1>Thumbs</h1>
@@ -132,6 +143,10 @@
       <button id="break" class="inline popOut moreDepth" title="Request a bathroom break">Bathroom!</button>
     </div>
   </div>
+    <div id="banner">
+      <div id="bannerLeft" onclick="window.location = '/advanced';">Go to advanced mode to use all features</div>
+      <div id="bannerRight" onclick="window.location = '/setdefault';">Set default mode</div>
+    </div>
 {% endblock %}
 
 <!-- Extra JavaScript here -->

@@ -82,7 +82,6 @@ function letterVote(letter) {
 
 function updateVotes() {
   //Make sure displayed vote matches actual vote, for example if new poll is started or user reloads
-  let thumb;
   let thumb = meRes.thumb ? thumbs.indexOf(meRes.thumb) : false;
   let letter = meRes.letter ? letters.indexOf(meRes.letter) : false;
   if (thumb === false && chosenThumb !== false) thumbsVote(chosenThumb); //Remove the vote

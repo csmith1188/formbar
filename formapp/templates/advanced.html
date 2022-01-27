@@ -378,6 +378,7 @@
     <div id="gamesTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/advanced/games.png') }}" class="icon"> Games</div>
     <div id="gamesMenu" class="menu hidden" tabindex="-1">
       <div id="2048Tab" class="tab" onclick="openPage('2048');">2048</div>
+      <div id="bitshifterTab" class="tab" onclick="openPage('bitshifter');">Bitshifter</div>
       <div id="hangmanTab" class="tab" onclick="openPage('hangman');">Hangman</div>
       <div id="minesweeperTab" class="tab" onclick="openPage('minesweeper');">Minesweeper</div>
       <div id="speedtypeTab" class="tab" onclick="openPage('speedtype');">Speed Typer</div>
@@ -392,7 +393,7 @@
       <div id="lessonTab" class="tab" onclick="openPage('lesson');">Lesson</div>
       <div id="virtualbarTab" class="tab" onclick="openPage('virtualbar');">Virtual bar</div>
     </div>
-    <div id="debugTab" class="tab" onclick="openPage('debug');"><img src="{{ url_for('static', filename='img/advanced/debug.png') }}" class="icon"> API debugging</div>
+    <div id="debugTab" class="tab" onclick="openPage('debug');"><img src="{{ url_for('static', filename='img/advanced/debug.png') }}" class="icon"> Debug data</div>
     <div id="reload" class="tab" style="margin-left: auto;" onclick="document.getElementById('innerPage').requestFullscreen();"><img src="{{ url_for('static', filename='img/advanced/fullscreen.png') }}" class="icon"> Fullscreen</div>
   </div>
 
@@ -723,7 +724,7 @@
     if (!content) openPage("{{ mainPage }}?alert='Page does not exist.'");
     Array.from(tabs).forEach(tab => tab.classList.remove("open"));
     if (["/break", "/help"].includes(path)) document.getElementById("studentsTab").classList.add("open");
-    if (["/2048", "/hangman", "/minesweeper", "/speedtype", "/ttt", "/fighter"].includes(path)) document.getElementById("gamesTab").classList.add("open");
+    if (["/2048", "bitshifter", "/hangman", "/minesweeper", "/speedtype", "/ttt", "/fighter"].includes(path)) document.getElementById("gamesTab").classList.add("open");
     else if (["/needshelp", "/lesson", "/settings", "/users"].includes(path)) document.getElementById("teacherTab").classList.add("open");
     if (tabEl) tabEl.classList.add("open");
     if (path == "/advanced" || path == "/basic") openPage("{{ mainPage }}");

@@ -14,10 +14,17 @@
   }
 
   #topButtons * {
+    margin: 0 8px;
     font-size: 24px;
     font-weight: bold;
     border-width: 2px !important;
     color: var(--color-purple);
+  }
+
+  #topButtons .pressed {
+    background: var(--color-purple);
+    border-color: var(--color-purple);
+    color: white;
   }
 
   #banner * {
@@ -81,12 +88,18 @@
     box-shadow: none !important;
   }
 
-  #other button {
+  #other button, #more button {
     width: 180px;
     font-size: 28px;
     font-weight: bold;
     border-width: 2px !important;
     border-radius: 9999px !important;
+  }
+
+  #more button {
+    width: 400px;
+    padding: 8px 0;
+    margin: 16px 0;
   }
 
   .redColor {
@@ -117,9 +130,11 @@
 <!-- Main content here -->
 {% block main %}
   <div id="topButtons">
-    <button>Survey panel</button>
+    <button id="surveyPanelButton" class="pressed">Survey panel</button>
+    <button id="moreButton">More</button>
   </div>
-  <div class="centered">
+
+  <div id="surveyPanel" class="centered">
     <h1>Thumbs</h1>
     <h2 id="noTUTD">There is no thumbs survey right now.</h2>
     <div id="thumbs" class="hidden">
@@ -143,10 +158,16 @@
       <button id="break" class="inline popOut moreDepth" title="Request a bathroom break">Bathroom!</button>
     </div>
   </div>
-    <div id="banner">
-      <div id="bannerLeft" onclick="window.location = '/advanced';">Go to advanced mode to use all features</div>
-      <div id="bannerRight" onclick="window.location = '/setdefault';">Set default mode</div>
-    </div>
+
+  <div id="more" class="centered hidden">
+    <button id="sfx" class="inline popOut moreDepth" title="Request a bathroom break">Play sound effects 🡆</button><br>
+    <button id="bgm" class="inline popOut moreDepth" title="Send the teacher a help ticket">Play background music 🡆</button>
+  </div>
+
+  <div id="banner">
+    <div id="bannerLeft" onclick="window.location = '/advanced';">Go to advanced mode to use all features</div>
+    <div id="bannerRight" onclick="window.location = '/setdefault';">Set default mode</div>
+  </div>
 {% endblock %}
 
 <!-- Extra JavaScript here -->
@@ -169,8 +190,28 @@
   };
   setInterval(getApiData, 1000);
 
+  document.getElementById("surveyPanelButton").onclick = showSurveyPanel;
+  document.getElementById("moreButton").onclick = showMore;
+
+  function showSurveyPanel() {
+    document.getElementById("more").classList.add("hidden");
+    document.getElementById("surveyPanel").classList.remove("hidden");
+    document.getElementById("moreButton").classList.remove("pressed");
+    document.getElementById("surveyPanelButton").classList.add("pressed");
+  }
+
+  function showMore() {
+    document.getElementById("surveyPanel").classList.add("hidden");
+    document.getElementById("more").classList.remove("hidden");
+    document.getElementById("surveyPanelButton").classList.remove("pressed");
+    document.getElementById("moreButton").classList.add("pressed");
+  }
+
   document.getElementById("help").onclick = requestHelp;
   document.getElementById("break").onclick = requestBreak;
+
+  document.getElementById("sfx").onclick = () => window.open("/sfx");
+  document.getElementById("bgm").onclick = () => window.open("/bgm");
 
   function checkForSurvey() {
     let mode = modeRes.mode;

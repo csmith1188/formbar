@@ -909,6 +909,15 @@ def endpoint_bgmstop():
     stopBGM()
     return 'Stopped music...'
 
+@app.route('/bitshifter')
+def endpoint_bitshifter():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
+        return redirect(sD.mainPage + "?alert=You do not have high enough permissions to do this right now.")
+    else:
+        return render_template('bitshifter.html')
+
 '''
     /break
     For when a student is temporarily unable to participate

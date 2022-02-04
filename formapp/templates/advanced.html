@@ -508,7 +508,7 @@
     nameBox.innerText = username;
     nameBox.onclick = () => openPage("profile");
     let myPerms = meRes.perms;
-    if (bottom.clientHeight > oldHeight) shorten(bottom, oldHeight, nameBox);
+    shorten(bottom, oldHeight, nameBox);
     else nameBox.removeAttribute("title");
   }
 
@@ -517,7 +517,7 @@
     let nameBox = document.getElementById("name");
     let oldHeight = bottom.clientHeight;
     if (meRes.excluded) exclBox.innerText = " (excluded)";
-    if (bottom.clientHeight > oldHeight) shorten(bottom, oldHeight, nameBox);
+    shorten(bottom, oldHeight, nameBox);
   }
 
   function shorten(container, maxHeight, text) {
@@ -599,7 +599,7 @@
       if (songName != npTitle.innerText) {
         np.classList.remove("hidden");
         npTitle.innerText = songName;
-        if (np.clientHeight > 21) shorten(np, 21, npTitle);
+        shorten(np, 21, npTitle);
         else np.removeAttribute("title");
         controls.classList.remove("hidden");
       }

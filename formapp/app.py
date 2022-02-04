@@ -927,33 +927,36 @@ def endpoint_bitshifter():
 def endpoint_break():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
-    name = request.args.get('name') or sD.studentDict[request.remote_addr]['name'].strip()
-    if name in helpList:
-        ticket = helpList[name]
+    if sD.studentDict[request.remote_addr]['perms'] == sD.settings['perms']['teacher']:
+        return redirect(sD.mainPage + "?alert=Teachers can't request bathroom breaks.")
     else:
-        ticket = ''
-    if request.args.get('action') == 'request':
+        name = request.args.get('name') or sD.studentDict[request.remote_addr]['name'].strip()
         if name in helpList:
-            return redirect(request.path + "?alert=You already have a help ticket or break request in." )
+            ticket = helpList[name]
         else:
-            helpList[name] = '<i>Requested a bathroom break</i>'
-            playSFX("sfx_pickup02")
-            return redirect(request.path + "?alert=Your request was sent. The teacher still needs to approve it.")
-    elif request.args.get('action') == 'end':
-        #Find the student whose username matches the "name" argument
-        for student in sD.studentDict:
-            if sD.studentDict[student]['name'].strip() == name:
-                if sD.studentDict[student]['excluded']:
-                    sD.studentDict[student]['excluded'] = False
-                    sD.studentDict[student]['perms'] = sD.studentDict[request.remote_addr]['oldPerms']
-                    ##Commented out because WebSocket server isn't working
-                    #server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', student, 'server', 'Your break was ended.')))
-                    return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'], ticket = ticket)
-                else:
-                    return redirect(request.path + "?alert=This student is not currently taking a bathroom break.")
-        return 'Student not found.'
-    else:
-        return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'], ticket = ticket)
+            ticket = ''
+        if request.args.get('action') == 'request':
+            if name in helpList:
+                return redirect(request.path + "?alert=You already have a help ticket or break request in." )
+            else:
+                helpList[name] = '<i>Requested a bathroom break</i>'
+                playSFX("sfx_pickup02")
+                return redirect(request.path + "?alert=Your request was sent. The teacher still needs to approve it.")
+        elif request.args.get('action') == 'end':
+            #Find the student whose username matches the "name" argument
+            for student in sD.studentDict:
+                if sD.studentDict[student]['name'].strip() == name:
+                    if sD.studentDict[student]['excluded']:
+                        sD.studentDict[student]['excluded'] = False
+                        sD.studentDict[student]['perms'] = sD.studentDict[request.remote_addr]['oldPerms']
+                        ##Commented out because WebSocket server isn't working
+                        #server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', student, 'server', 'Your break was ended.')))
+                        return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'], ticket = ticket)
+                    else:
+                        return redirect(request.path + "?alert=This student is not currently taking a bathroom break.")
+            return 'Student not found.'
+        else:
+            return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'], ticket = ticket)
 
 
 #  ██████
@@ -1247,18 +1250,21 @@ def endpoint_hangman():
 def endpoint_help():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
-    if request.args.get('action') == "send":
-        name = sD.studentDict[request.remote_addr]['name']
-        name = name.strip()
-        if name in helpList:
-            return redirect("/help?alert=You already have a help ticket or break request in. If your problem is time-sensitive, or your last ticket was not cleared, please get the teacher's attention manually." )
-        else:
-            helpList[name] = request.args.get('message') or '<i>Sent a help ticket</i>'
-            sD.studentDict[request.remote_addr]['help'] = True
-            playSFX("sfx_up04")
-            return redirect("/help?alert=Your ticket was sent. Keep working on the problem the best you can while you wait." )
+    if sD.studentDict[request.remote_addr]['perms'] == sD.settings['perms']['teacher']:
+        return redirect(sD.mainPage + "?alert=Teachers can't send help tickets.")
     else:
-        return render_template("help.html")
+        if request.args.get('action') == "send":
+            name = sD.studentDict[request.remote_addr]['name']
+            name = name.strip()
+            if name in helpList:
+                return redirect("/help?alert=You already have a help ticket or break request in. If your problem is time-sensitive, or your last ticket was not cleared, please get the teacher's attention manually." )
+            else:
+                helpList[name] = request.args.get('message') or '<i>Sent a help ticket</i>'
+                sD.studentDict[request.remote_addr]['help'] = True
+                playSFX("sfx_up04")
+                return redirect("/help?alert=Your ticket was sent. Keep working on the problem the best you can while you wait." )
+        else:
+            return render_template("help.html")
 
 # ██
 # ██

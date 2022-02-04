@@ -1,9 +1,9 @@
-//This code is used in both index.html and basic.html
+//This code is used in both advanced.html and basic.html
 
 let thumbs = ["up", "wiggle", "down"];
 let letters = ["a", "b", "c", "d"];
-let thumbButtons = document.querySelectorAll(".thumbButton");
-let letterButtons = document.querySelectorAll(".letterButton");
+let thumbButtons = Array.from(document.querySelectorAll(".thumbButton"));
+let letterButtons = Array.from(document.querySelectorAll(".letterButton"));
 let chosenThumb = false;
 let chosenLetter = false;
 let meRes;
@@ -29,13 +29,13 @@ async function getApiData(first) {
   else update();
 }
 
-Array.from(thumbButtons).forEach((button, i) => {
+thumbButtons.forEach((button, i) => {
   button.addEventListener("keydown", event => {
     if (event.code == "Enter") thumbsVote(i);
   });
 });
 
-Array.from(letterButtons).forEach((button, i) => {
+letterButtons.forEach((button, i) => {
   button.addEventListener("keydown", event => {
     if (event.code == "Enter") {
       letterVote(i);
@@ -57,7 +57,7 @@ function thumbsVote(thumb) {
     chosenThumb = thumb;
     request.open("GET", "/tutd?thumb=" + thumbs[thumb]);
     //Highlight selected button and reset others
-    Array.from(thumbButtons).forEach((button, i) => {
+    thumbButtons.forEach((button, i) => {
       i == thumb ? highlight("thumbButton" + thumb) : removeHighlight("thumbButton" + i);
     });
   }
@@ -73,7 +73,7 @@ function letterVote(letter) {
     chosenLetter = letter;
     request.open("GET", "/tutd?thumb=" + letters[letter]);
     //Highlight selected button and reset others
-    Array.from(letterButtons).forEach((button, i) => {
+    letterButtons.forEach((button, i) => {
       i == letter ? highlight("letterButton" + letter) : removeHighlight("letterButton" + i);
     });
   }

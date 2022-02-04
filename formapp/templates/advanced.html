@@ -363,14 +363,14 @@
 
 <div id="rightSide">
   <div id="tabs">
-    <div id="chatTab" class="tab" onclick="openPage('chat');"><img src="{{ url_for('static', filename='img/advanced/chat.png') }}" class="icon"> <b id="newMessages" style="color: var(--light-red);"></b> Chat</div>
-    <div id="studentsTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/advanced/students.png') }}" class="icon"> Students</div>
+    <div id="chatTab" class="tab" onclick="openPage('chat');"><img src="{{ url_for('static', filename='img/advanced/chat.png') }}" class="icon"> <b id="newMessages" style="color: var(--light-red);"></b> <span class="tabText">Chat</span></div>
+    <div id="studentsTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/advanced/students.png') }}" class="icon"> <span class="tabText">Students</span></div>
     <div id="studentsMenu" class="menu hidden" tabindex="-1">
       <div id="helpTab" class="tab" onclick="openPage('help');">Help!</div>
       <div id="breakTab" class="tab" onclick="openPage('break');">Bathroom break</div>
     </div>
-    <div id="wawdTab" class="tab" onclick="openPage('wawd');"><img src="{{ url_for('static', filename='img/advanced/wawd.png') }}" class="icon"> What are we doing?</div>
-    <div id="gamesTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/advanced/games.png') }}" class="icon"> Games</div>
+    <div id="wawdTab" class="tab" onclick="openPage('wawd');"><img src="{{ url_for('static', filename='img/advanced/wawd.png') }}" class="icon"> <span class="tabText">What are we doing?</span></div>
+    <div id="gamesTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/advanced/games.png') }}" class="icon"> <span class="tabText">Games</span></div>
     <div id="gamesMenu" class="menu hidden" tabindex="-1">
       <div id="2048Tab" class="tab" onclick="openPage('2048');">2048</div>
       <div id="bitshifterTab" class="tab" onclick="openPage('bitshifter');">Bitshifter</div>
@@ -380,7 +380,7 @@
       <div id="tttTab" class="tab" onclick="openPage('ttt');">Tic-tac-toe</div>
       <div id="fighterTab" class="tab" onclick="openPage('fighter');">Turn-Based Fighter</div>
     </div>
-    <div id="teacherTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/advanced/teacher.png') }}" class="icon"> Teacher</div>
+    <div id="teacherTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/advanced/teacher.png') }}" class="icon"> <span class="tabText">Teacher</span></div>
     <div id="teacherMenu" class="menu hidden" tabindex="-1">
       <div id="needshelpTab" class="tab" onclick="openPage('needshelp');">Help tickets</div>
       <div id="settingsTab" class="tab" onclick="openPage('settings');">Settings</div>
@@ -388,8 +388,8 @@
       <div id="lessonTab" class="tab" onclick="openPage('lesson');">Lesson</div>
       <div id="virtualbarTab" class="tab" onclick="openPage('virtualbar');">Virtual bar</div>
     </div>
-    <div id="debugTab" class="tab" onclick="openPage('debug');"><img src="{{ url_for('static', filename='img/advanced/debug.png') }}" class="icon"> Debug data</div>
-    <div id="reload" class="tab" style="margin-left: auto;" onclick="document.getElementById('innerPage').requestFullscreen();"><img src="{{ url_for('static', filename='img/advanced/fullscreen.png') }}" class="icon"> Fullscreen</div>
+    <div id="debugTab" class="tab" onclick="openPage('debug');"><img src="{{ url_for('static', filename='img/advanced/debug.png') }}" class="icon"> <span class="tabText">Debug data</span></div>
+    <div id="reload" class="tab" style="margin-left: auto;" onclick="document.getElementById('innerPage').requestFullscreen();"><img src="{{ url_for('static', filename='img/advanced/fullscreen.png') }}" class="icon"> <span class="tabText">Fullscreen</span></div>
   </div>
 
   <div>
@@ -403,6 +403,7 @@
 <script src="{{ url_for('static', filename='js/home.js') }}"></script>
 <script>
   let bottom = document.getElementById("bottom");
+  let tabLabels = Array.from(document.querySelectorAll(".tabText"));
   let menus = ["students", "games", "teacher"];
   let innerPage = document.getElementById("innerPage");
   let innerPageTitle;
@@ -415,6 +416,7 @@
 
   let init = () => {
     menuPositions();
+    minimizeTabs();
     nowPlaying();
     updateVolume();
     getUsername();
@@ -439,6 +441,8 @@
     checkIfExcluded();
   };
   setInterval(getApiData, 1000);
+
+  window.addEventListener("resize", minimizeTabs);
 
   openPage("{{ page }}" || "{{ mainPage }}"); //If there is no "page" param, go to the main page
 
@@ -486,6 +490,14 @@
       bottom.style.position = "absolute";
       bottom.style.padding = "inherit";
     }
+  }
+
+  function minimizeTabs() {
+    let container = document.getElementById("tabs");
+    tabLabels.forEach(label => label.classList.remove("hidden"));
+    //If container has overflow, show only icons
+    if (container.scrollHeight > container.clientHeight) tabLabels.forEach(label => label.classList.add("hidden"));
+
   }
 
   function menuPositions() {

@@ -518,6 +518,7 @@
     let oldHeight = bottom.clientHeight;
     if (meRes.excluded) exclBox.innerText = " (excluded)";
     if (bottom.clientHeight > oldHeight) shorten(bottom, oldHeight, nameBox);
+    else nameBox.removeAttribute("title");
   }
 
   function shorten(container, maxHeight, text) {

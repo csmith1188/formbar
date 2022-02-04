@@ -396,10 +396,10 @@
           var usernameTitle = "Send a private message";
         }
 
-        //Use this if you want to allow HTML
+        //Use this if you want to allow HTML\
         newMSG.innerHTML = `
           <b class="username" onclick="${usernameOnclick}" title="${usernameTitle}">${message.from}</b>
-          <span style="color: var(--light-gray);">${getDate()} ${message.to != "all" ? "· Private message" : ""}</span>
+          <span style="color: var(--light-gray);">${getDate()} ${message.to != "all" ? (message.from ? "· Private message" : "· From server") : ""}</span>
           <div class="content">${message.content}</div>
         `;
         //Use this if you want to convert HTML into text

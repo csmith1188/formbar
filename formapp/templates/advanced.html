@@ -359,7 +359,7 @@
   <div id="bottom">
     Name: <a id="name"></a><span id="excluded"></span><br>
     <button class="inline popOut" onclick="window.location = '/login';">Log out</button>
-    <button class="inline popOut" onclick="feedback();">Send feedback</button>
+    <button class="inline popOut" onclick="window.open('https://github.com/csmith1188/formbar/issues/new');">Send feedback</button>
     <button class="inline popOut" onclick="window.location = '/basic';">Basic mode</button>
     <button class="inline popOut" onclick="window.location = '/setdefault';">Set default</button>
   </div>
@@ -696,14 +696,6 @@
     request.send();
     document.getElementById("segmentStart").value = 0;
     document.getElementById("segmentEnd").value = barpix.length;
-  }
-
-  function feedback() {
-    let addresses = `
-      csmith@ytech.edu,
-      john2022026@live.ytech.edu,
-    `;
-    window.open(`mailto:${addresses}?subject=Formbar Feedback`);
   }
 
   function openPage(page) {

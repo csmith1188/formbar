@@ -8,22 +8,49 @@
 <!-- Extra style declarations here -->
 {% block style %}
   <style media="screen">
-    div {
-      border: 1px solid;
-      margin: 3px;
-      padding: 3px;
+    body {
+      background: var(--bg-dark-highlight);
+    }
+
+    #gamebox {
+      width: 250px;
+      margin: auto;
+      border: 1px solid white;
+      background: var(--bg-dark);
       text-align: center;
     }
-    #gamebox {
-      width: 200px;
-      margin: auto;
+
+    #gamebox > div {
+      margin: 12px 0;
+      line-heigt: 200%;
     }
-    .left {
-      float: left;
+
+    span {
+      border: 1px solid var(--light-gray);
+      padding: 0 3px;
     }
-    .full {
-      display: flex;
-      justify-content: space-around;
+
+    h3 {
+      margin: 0;
+      display: inline-block;
+    }
+
+    #scorebox, #targetbox {
+      margin-right: 8px;
+    }
+
+    #bitbox {
+      width: fit-content;
+      margin: 3px auto 6px;
+      font-size: 20px;
+    }
+
+    #answerboxcontainer {
+      height: 32px;
+    }
+
+    #checkbutt {
+      width: 75px;
     }
   </style>
 {% endblock %}
@@ -34,26 +61,29 @@
 <!-- Main content here -->
 {% block main %}
   <div id="gamebox">
-    Make your byte match the target by shifting the bits left or right, then submiting with "=="
-    <div id="scores" class="full">
-      <div class="left">Score:</div>
-      <div id="scorebox">0</div>
-      <div class="left">Highest:</div>
-      <div id="hiscorebox">0</div>
+    <div>Make your byte match the target by shifting the bits left or right, then submiting with "=="</div>
+    <div id="scores">
+      <h3>Score: <span id="scorebox">0</span></h3>
+      Highest: <span id="hiscorebox">0</span>
     </div>
-    Target:
-    <div id="targets" class="full">
-      <div class="left" id="charabox"></div>
-      <div id="targetbox"></div>
+    <div id="targets">
+      <h3>Target: <span id="targetbox"></span></h3>
+      Character: <span id="charabox"></span>
     </div>
-    Your byte:
-    <div id="bitbox"></div>
-    <div id="controlsbox" class="full">
+    <div>
+      Your byte:<br>
+      <span id="bitbox"></span>
+    </div>
+    <div id="controlsbox">
       <button type="button" name="leftbutt" onclick="left()">&lt;&lt;</button>
-      <button type="button" name="checkbutt" onclick="check()">==</button>
       <button type="button" name="ritebutt" onclick="right()">&gt;&gt;</button>
     </div>
-  <div id="answerbox" class="full"></div>
+    <div id="answerboxcontainer" class="hidden">
+      <h3 id="answerbox"></h3>
+    </div>
+    <div>
+      <button type="button" id="checkbutt" name="checkbutt" onclick="check()">==</button>
+    </div>
 </div>
 {% endblock %}
 
@@ -63,6 +93,7 @@
     var score = 0;
     var hiscore = 0;
     var hexChar = ["0", "1", "2", "3", "4", "5", "6", "7","8", "9", "A", "B", "C", "D", "E", "F"];
+    document.getElementById('answerboxcontainer').classList.add("hidden");
     function byteToHex(b) {
       return hexChar[(b >> 4) & 0x0f] + hexChar[b & 0x0f];
     }
@@ -120,11 +151,19 @@
     }
     function check() {
       let answerBox = document.getElementById('answerbox');
-      if (answerBox.innerHTML) {
-        answerBox.innerHTML = "";
+      let container = document.getElementById('answerboxcontainer');
+      let controlsBox = document.getElementById('controlsbox');
+      let checkButton = document.getElementById("checkbutt");
+      if (controlsBox.classList.contains("hidden")) {
+        container.classList.add("hidden");
+        controlsBox.classList.remove("hidden");
+        checkButton.innerText = "==";
         gameData = newTarget();
         draw();
       } else {
+        controlsBox.classList.add("hidden");
+        container.classList.remove("hidden");
+        checkButton.innerText = "OK";
         if (gameData.arr == gameData.guess) {
           answerBox.innerHTML = "You win!";
           score++;

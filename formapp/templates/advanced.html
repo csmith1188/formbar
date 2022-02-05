@@ -74,15 +74,6 @@
     box-shadow: none !important;
   }
 
-  button:active,
-  input[type="color"]:active,
-  .thumbButton:active,
-  .letterButton:active {
-    transform: initial;
-    box-shadow: initial;
-    background: var(--light-gray);
-  }
-
   .redColor {
     color: var(--color-red) !important;
   }
@@ -117,8 +108,14 @@
     width: 250px;
     height: 100%;
     box-sizing: border-box;
-    padding: 8px;
+    padding: 0 8px 8px;
     overflow: auto;
+  }
+
+  #sidebarButtons {
+    display: flex;
+    justify-content: space-around;
+    padding: 8px 0 16px;
   }
 
   #tutdDiv, #abcdDiv {
@@ -142,18 +139,26 @@
     margin: 0;
   }
 
-  #bottom {
+  #excluded {
+    color: var(--color-red);
+  }
+
+  #otherSidebar {
+    text-align: center;
+  }
+
+  #otherSidebar button {
+    width: 60%;
+  }
+
+  #chatSidebar {
     position: absolute;
     left: 0;
     bottom: 0;
     width: 100%;
-    box-sizing: border-box;
-    margin-top: 48px;
-    padding: inherit;
-  }
-
-  #excluded {
-    color: var(--color-red);
+    height: calc(100% - 64px);
+    border: 1px solid var(--dark-gray);
+    border-style: solid none none;
   }
 
   #rightSide {
@@ -268,8 +273,13 @@
 <!-- Main content here -->
 {% block main %}
 <div id="sidebar" class="light">
-  <div id="sidebarContent">
-    <h1>Formbar Features</h1>
+  <div id="sidebarButtons">
+    <button id="formbarButton" class="pressed" onclick="changeSidebar('formbar')">Formbar</button>
+    <button id="chatButton" onclick="changeSidebar('chat')">Chat</button>
+    <button id="otherButton" onclick="changeSidebar('other')">Other</button>
+  </div>
+
+  <div id="formbarSidebar">
     <div>Features will appear when the teacher makes them available.</div>
 
     <div id="tutdDiv" class="hidden">
@@ -352,11 +362,13 @@
     </div>
   </div>
 
-  <div id="bottom">
+  <iframe id="chatSidebar" class="hidden" src="/chat?sidebar=true"></iframe>
+
+  <div id="otherSidebar" class="hidden">
     Name: <a id="name"></a><span id="excluded"></span><br>
-    <button class="inline popOut" onclick="window.location = '/login';">Log out</button>
-    <button class="inline popOut" onclick="window.open('https://github.com/csmith1188/formbar/issues/new');">Send feedback</button>
-    <button class="inline popOut" onclick="window.location = '/basic';">Basic mode</button>
+    <button class="inline popOut" onclick="window.location = '/login';">Log out</button><br>
+    <button class="inline popOut" onclick="window.open('https://github.com/csmith1188/formbar/issues/new');">Send feedback</button><br>
+    <button class="inline popOut" onclick="window.location = '/basic';">Basic mode</button><br>
     <button class="inline popOut" onclick="window.location = '/setdefault';">Set default</button>
   </div>
 </div>
@@ -368,8 +380,8 @@
     <div id="studentsMenu" class="menu hidden" tabindex="-1">
       <div id="helpTab" class="tab" onclick="openPage('help');">Help!</div>
       <div id="breakTab" class="tab" onclick="openPage('break');">Bathroom break</div>
+      <div id="wawdTab" class="tab" onclick="openPage('wawd');">What are we doing?</div>
     </div>
-    <div id="wawdTab" class="tab" onclick="openPage('wawd');"><img src="{{ url_for('static', filename='img/advanced/wawd.png') }}" class="icon"> <span class="tabText">What are we doing?</span></div>
     <div id="gamesTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/advanced/games.png') }}" class="icon"> <span class="tabText">Games</span></div>
     <div id="gamesMenu" class="menu hidden" tabindex="-1">
       <div id="2048Tab" class="tab" onclick="openPage('2048');">2048</div>
@@ -402,7 +414,8 @@
 {% block script %}
 <script src="{{ url_for('static', filename='js/home.js') }}"></script>
 <script>
-  let bottom = document.getElementById("bottom");
+  let other = document.getElementById("otherSidebar");
+  let sbSections = ["formbar", "chat", "other"];
   let tabLabels = Array.from(document.querySelectorAll(".tabText"));
   let menus = ["students", "games", "teacher"];
   let innerPage = document.getElementById("innerPage");
@@ -421,7 +434,6 @@
     updateVolume();
     getUsername();
     showEnabled();
-    bottomPosition();
     updateVotes();
 
     barpix = eval(pixRes.pixels);
@@ -437,7 +449,6 @@
     showEnabled();
     nowPlaying();
     if (document.getElementById("volume") != document.activeElement) updateVolume();
-    bottomPosition();
     checkIfExcluded();
   };
   setInterval(getApiData, 1000);
@@ -445,6 +456,18 @@
   window.addEventListener("resize", minimizeTabs);
 
   openPage("{{ page }}" || "{{ mainPage }}"); //If there is no "page" param, go to the main page
+
+  function changeSidebar(el) {
+    sbSections.forEach(section => {
+      if (section == el) {
+        document.getElementById(section + "Sidebar").classList.remove("hidden");
+        document.getElementById(section + "Button").classList.add("pressed");
+      } else {
+        document.getElementById(section + "Sidebar").classList.add("hidden");
+        document.getElementById(section + "Button").classList.remove("pressed");
+      }
+    });
+  }
 
   function showEnabled() {
     let tutdDiv = document.getElementById("tutdDiv");
@@ -481,17 +504,6 @@
     }
   }
 
-  function bottomPosition() {
-    let sbc = document.getElementById("sidebarContent");
-    if (sbc.clientHeight > window.innerHeight - bottom.clientHeight) {
-      bottom.style.position = "static";
-      bottom.style.padding = 0;
-    } else {
-      bottom.style.position = "absolute";
-      bottom.style.padding = "inherit";
-    }
-  }
-
   function minimizeTabs() {
     let container = document.getElementById("tabs");
     tabLabels.forEach(label => label.classList.remove("hidden"));
@@ -511,20 +523,20 @@
 
   function getUsername() {
     let nameBox = document.getElementById("name");
-    let oldHeight = bottom.clientHeight;
+    let oldHeight = other.clientHeight;
     nameBox.innerText = username;
     nameBox.onclick = () => openPage("profile");
     let myPerms = meRes.perms;
-    if (bottom.clientHeight > oldHeight) shorten(bottom, oldHeight, nameBox);
+    if (other.clientHeight > oldHeight) shorten(other, oldHeight, nameBox);
     else nameBox.removeAttribute("title");
   }
 
   function checkIfExcluded() {
     let exclBox = document.getElementById("excluded");
     let nameBox = document.getElementById("name");
-    let oldHeight = bottom.clientHeight;
+    let oldHeight = other.clientHeight;
     if (meRes.excluded) exclBox.innerText = " (excluded)";
-    if (bottom.clientHeight > oldHeight) shorten(bottom, oldHeight, nameBox);
+    if (other.clientHeight > oldHeight) shorten(other, oldHeight, nameBox);
     else nameBox.removeAttribute("title");
   }
 

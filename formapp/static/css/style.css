@@ -40,6 +40,7 @@
   --bg-color: white;
   --theme-color: var(--color-blue);
   --main-color: black;
+  --gray-color: var(--dark-gray);
   --emphasis-color: white;
   --highlight-color: var(--light-gray);
 }
@@ -48,6 +49,7 @@
 .dark, body:not(.light) {
   --bg-color: var(--bg-dark);
   --main-color: white;
+  --gray-color: var(--light-gray);
   --emphasis-color: var(--bg-darker);
   --highlight-color: var(--bg-dark-highlight);
 }

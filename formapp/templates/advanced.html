@@ -209,6 +209,7 @@
     box-sizing: border-box;
     border: 1px var(--dark-gray);
     border-style: none solid solid;
+    background: var(--bg-darker);
     z-index: 2;
     outline: none;
   }
@@ -217,7 +218,7 @@
     padding: 4.5px 16px;
   }
 
-  .tab:not(.open):hover, .tab.menuOpen {
+  .tab:not(.open):not(.unselectable):hover, .tab.menuOpen {
     background: var(--bg-dark-highlight);
   }
 
@@ -434,6 +435,7 @@
     updateVolume();
     getUsername();
     showEnabled();
+    disableTabs();
     updateVotes();
 
     barpix = eval(pixRes.pixels);
@@ -502,6 +504,21 @@
       textDiv.classList.add("hidden");
       colorDiv.classList.add("hidden");
     }
+  }
+
+  function disableTabs() {
+    ["help", "break"].forEach(tab => {
+      let cl = document.getElementById(tab + "Tab").classList;
+      meRes.perms === permsRes.teacher ? cl.add("unselectable") : cl.remove("unselectable");
+    });
+    ["2048", "bitshifter", "hangman", "minesweeper", "speedtype", "ttt", "fighter"].forEach(tab => {
+      let cl = document.getElementById(tab + "Tab").classList;
+      meRes.perms > permsRes.games ? cl.add("unselectable") : cl.remove("unselectable");
+    });
+    ["needshelp", "settings", "users", "lesson"].forEach(tab => {
+      let cl = document.getElementById(tab + "Tab").classList;
+      meRes.perms > permsRes.teacher ? cl.add("unselectable") : cl.remove("unselectable");
+    });
   }
 
   function minimizeTabs() {
@@ -591,7 +608,7 @@
     let musicFile = document.getElementById("music").value;
     let volume = document.getElementById("volume").value;
     if (volume == 1) volume = "1.0";
-    let res = await getResponse("/bgm?file=" + musicFile, false);
+    let res = await getResponse("/bgm?file=" + musicFile + "&volume=" + volume, false);
     if (bgm.includes(musicFile)) {
       (res.startsWith("It has only been")) ? alert(res) : document.getElementById("music").value = null;
     } else {
@@ -735,9 +752,9 @@
     let tabEl = document.getElementById(path.substring(1) + "Tab");
     if (!content) openPage("{{ mainPage }}?alert='Page does not exist.'");
     Array.from(tabs).forEach(tab => tab.classList.remove("open"));
-    if (["/break", "/help"].includes(path)) document.getElementById("studentsTab").classList.add("open");
-    if (["/2048", "bitshifter", "/hangman", "/minesweeper", "/speedtype", "/ttt", "/fighter"].includes(path)) document.getElementById("gamesTab").classList.add("open");
-    else if (["/needshelp", "/lesson", "/settings", "/users"].includes(path)) document.getElementById("teacherTab").classList.add("open");
+    if (["/help", "/break"].includes(path)) document.getElementById("studentsTab").classList.add("open");
+    if (["/2048", "/bitshifter", "/hangman", "/minesweeper", "/speedtype", "/ttt", "/fighter"].includes(path)) document.getElementById("gamesTab").classList.add("open");
+    else if (["/needshelp", "/settings", "/users", "/lesson", "/virtualbar"].includes(path)) document.getElementById("teacherTab").classList.add("open");
     if (tabEl) tabEl.classList.add("open");
     if (path == "/advanced" || path == "/basic") openPage("{{ mainPage }}");
     if (path == "/chat") {

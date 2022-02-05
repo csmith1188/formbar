@@ -266,7 +266,7 @@ button.pressed, .button.pressed {
   cursor: default;
 }
 
-button.unselectable, .button.unselectable {
+.unselectable.unselectable {
   opacity: 50%;
   cursor: not-allowed;
 }

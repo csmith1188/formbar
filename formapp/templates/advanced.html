@@ -11,19 +11,19 @@
   h1 {
     margin: 0 0 12px;
     font-size: 26px;
-    color: var(--color-blue);
+    color: var(--theme-color);
   }
 
   h2 {
     margin: 48px 0 4px;
     font-size: 23px;
-    color: var(--color-blue);
+    color: var(--theme-color);
   }
 
   h3 {
     margin: 0 0 10px;
     font-size: 20px;
-    color: var(--color-blue);
+    color: var(--theme-color);
   }
 
   button, .button {
@@ -390,8 +390,8 @@
       <div id="hangmanTab" class="tab" onclick="openPage('hangman');">Hangman</div>
       <div id="minesweeperTab" class="tab" onclick="openPage('minesweeper');">Minesweeper</div>
       <div id="speedtypeTab" class="tab" onclick="openPage('speedtype');">Speed Typer</div>
-      <div id="tttTab" class="tab" onclick="openPage('ttt');">Tic-tac-toe</div>
-      <div id="fighterTab" class="tab" onclick="openPage('fighter');">Turn-Based Fighter</div>
+      <div id="tttTab" class="tab hidden" onclick="openPage('ttt');">Tic-tac-toe</div>
+      <div id="fighterTab" class="tab hidden" onclick="openPage('fighter');">Turn-Based Fighter</div>
     </div>
     <div id="teacherTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/advanced/teacher.png') }}" class="icon"> <span class="tabText">Teacher</span></div>
     <div id="teacherMenu" class="menu hidden" tabindex="-1">
@@ -515,7 +515,6 @@
     ["2048", "bitshifter", "hangman", "minesweeper", "speedtype", "ttt", "fighter"].forEach(tab => {
       let cl = document.getElementById(tab + "Tab").classList;
       meRes.perms > permsRes.games ? cl.add("unselectable") : cl.remove("unselectable");
-      if (tab == "ttt" || tab == "fighter") cl.add("unselectable"); //Gray these out until they work
     });
     ["needshelp", "settings", "users", "lesson"].forEach(tab => {
       let cl = document.getElementById(tab + "Tab").classList;

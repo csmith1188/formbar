@@ -435,7 +435,7 @@
     updateVolume();
     getUsername();
     showEnabled();
-    disableTabs();
+    grayOutTabs();
     updateVotes();
 
     barpix = eval(pixRes.pixels);
@@ -449,6 +449,7 @@
     checkIfRemoved();
     updateVotes();
     showEnabled();
+    grayOutTabs();
     nowPlaying();
     if (document.getElementById("volume") != document.activeElement) updateVolume();
     checkIfExcluded();
@@ -506,7 +507,7 @@
     }
   }
 
-  function disableTabs() {
+  function grayOutTabs() {
     ["help", "break"].forEach(tab => {
       let cl = document.getElementById(tab + "Tab").classList;
       meRes.perms === permsRes.teacher ? cl.add("unselectable") : cl.remove("unselectable");
@@ -514,6 +515,7 @@
     ["2048", "bitshifter", "hangman", "minesweeper", "speedtype", "ttt", "fighter"].forEach(tab => {
       let cl = document.getElementById(tab + "Tab").classList;
       meRes.perms > permsRes.games ? cl.add("unselectable") : cl.remove("unselectable");
+      if (tab == "ttt" || tab == "fighter") cl.add("unselectable"); //Gray these out until they work
     });
     ["needshelp", "settings", "users", "lesson"].forEach(tab => {
       let cl = document.getElementById(tab + "Tab").classList;

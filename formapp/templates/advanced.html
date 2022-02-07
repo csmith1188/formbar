@@ -355,12 +355,6 @@
       </div>
       <img src="{{ url_for('static', filename='img/advanced/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendColor();">
     </div>
-
-    <div id="percentDiv" class="hidden">
-      <h2>Fill percentage</h2>
-      <input type="number" id="percent" value="0" min="0" max="100" onchange="validNumber(this);"><label for="percent">%</label>
-      <img src="{{ url_for('static', filename='img/advanced/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendPercent();">
-    </div>
   </div>
 
   <iframe id="chatSidebar" class="hidden" src="/chat?sidebar=true"></iframe>

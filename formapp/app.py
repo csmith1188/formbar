@@ -827,7 +827,13 @@ def endpoint_basic():
         ticket = helpList[name]
     else:
         ticket = ''
-    return render_template("basic.html", helpTicket = ticket)
+    sounds = []
+    music = []
+    for key, value in sfx.sound.items():
+        sounds.append(key)
+    for key, value in bgm.bgm.items():
+        music.append(key)
+    return render_template("basic.html", helpTicket = ticket, sfx = sounds, bgm = music)
 
 
 '''

@@ -275,6 +275,16 @@ input[type="number"] {
   width: 48px;
 }
 
+input[type="color"] {
+  width: 80px;
+  height: 20px;
+}
+
+input[type="range"] {
+  width: 96px;
+  vertical-align: middle;
+}
+
 input[type="radio"] {
   -webkit-appearance: none;
   width: 14px;
@@ -284,7 +294,7 @@ input[type="radio"] {
   color: var(--main-color);
   border: 1px solid;
   border-radius: 50%;
-  vertical-align: text-bottom;
+  vertical-align: middle;
 }
 
 input[type="radio"]:checked {
@@ -354,4 +364,31 @@ a {
 table, th, td {
   border: 1px solid;
   border-collapse: collapse;
+}
+
+.redColor {
+  color: var(--color-red) !important;
+}
+
+.yellowColor {
+  color: var(--color-yellow) !important;
+}
+
+.greenColor {
+  color: var(--color-green) !important;
+}
+
+.cyanColor {
+  color: var(--color-cyan) !important;
+}
+
+.blueColor {
+  color: var(--color-blue) !important;
+}
+
+.smallImg {
+  width: 24px;
+  margin-left: 4px;
+  vertical-align: middle;
+  cursor: pointer;
 }

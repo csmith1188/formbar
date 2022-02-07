@@ -8,6 +8,10 @@
 <!-- Extra style declarations here -->
 {% block style %}
 <style>
+  html {
+    height: 100%;
+  }
+
   #topButtons {
     width: fit-content;
     margin: auto;
@@ -88,7 +92,7 @@
     box-shadow: none !important;
   }
 
-  #other button, #more button {
+  #other button {
     width: 180px;
     font-size: 28px;
     font-weight: bold;
@@ -96,30 +100,52 @@
     border-radius: 9999px !important;
   }
 
-  #more button {
-    width: 400px;
-    padding: 8px 0;
-    margin: 16px 0;
+  #more {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    top: 30%;
+    display: flex;
+    justify-content: center;
+    font-size: 22px;
+    text-align: left;
   }
 
-  .redColor {
-    color: var(--color-red) !important;
+  #more > div {
+    display: inline-block;
+    vertical-align: top;
+    margin: 0 48px;
   }
 
-  .yellowColor {
-    color: var(--color-yellow) !important;
+  #more h1 {
+    font-size: 32px;
+    margin: 0 0 4px;
   }
 
-  .greenColor {
-    color: var(--color-green) !important;
+  #more .smallImg {
+    width: 33px;
   }
 
-  .cyanColor {
-    color: var(--color-cyan) !important;
+  #more input[type="color"] {
+    height: 23px;
   }
 
-  .blueColor {
-    color: var(--color-blue) !important;
+  #more h3 {
+    margin: 0 0 10px;
+    font-size: 26px;
+    color: var(--theme-color);
+  }
+
+  #randomMusic {
+    margin: 0 4px 0 0;
+  }
+
+  #playPauseMusic, #restartMusic, #stopMusic {
+    margin: 0;
+  }
+
+  #color2Div:not(.hidden) {
+    display: inline-block;
   }
 </style>
 {% endblock %}
@@ -159,9 +185,59 @@
     </div>
   </div>
 
-  <div id="more" class="centered hidden">
-    <button id="sfx" class="inline popOut moreDepth" title="Request a bathroom break">Play sound effects 🡆</button><br>
-    <button id="bgm" class="inline popOut moreDepth" title="Send the teacher a help ticket">Play background music 🡆</button>
+  <div id="more" class="hidden">
+    <div id="soundDiv">
+      <h1>Sound effects</h1>
+      <input type="text" class="line" id="sound" placeholder="Filename" list="sfxFiles">
+      <datalist id="sfxFiles"></datalist>
+      <img src="{{ url_for('static', filename='img/advanced/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendSound();">
+    </div>
+
+    <div id="musicDiv">
+      <h1>Play music</h1>
+      <img src="{{ url_for('static', filename='img/advanced/random.png') }}" id="randomMusic" class="smallImg" title="Random" onclick="randomBGM()"><input type="text" id="music" class="line" placeholder="Filename" list="bgmFiles">
+      <datalist id="bgmFiles"></datalist>
+      <img src="{{ url_for('static', filename='img/advanced/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendMusic();"><br>
+      <label for="volume">Volume: </label><input type="range" id="volume" min="0.1" max="1" step="0.1">
+      <span id="volNumber"></span>
+      <div id="nowPlaying" class="hidden">Now playing: <b id="nowPlayingTitle" title="Song"></b></div>
+      <div id="musicControls" class="hidden">
+        <img src="{{ url_for('static', filename='img/advanced/pause.png') }}" class="smallImg" id="playPauseMusic" title="Pause" onclick="playPauseMusic();">
+        <img src="{{ url_for('static', filename='img/advanced/restart.png') }}" class="smallImg" id="restartMusic" title="Restart" onclick="restartMusic();">
+        <img src="{{ url_for('static', filename='img/advanced/stop.png') }}" class="smallImg" id="stopMusic" title="Stop" onclick="stopMusic();">
+      </div>
+    </div>
+
+    <div id="textDiv">
+      <h1>Change text</h1>
+      Text color: <input type="color" id="fgColor" class="button inline popOut" value="#404040"><br>
+      Background: <input type="color" id="bgColor" class="button inline popOut"><br>
+      <input type="text" class="line" id="text" placeholder="Phrase">
+      <img src="{{ url_for('static', filename='img/advanced/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendText();">
+    </div>
+
+    <div id="colorDiv">
+      <h1>Change color</h1>
+      <input type="radio" id="hideSegment" name="segment" checked onclick="hideSegment();" style="margin-left: 0;"><label for="hideSegment">Entire bar</label>
+      <input type="radio" id="showSegment" name="segment" style="margin-left: 8px;" onclick="showSegment();"><label for="showSegment">Segment</label>
+      <br>
+      <div id="segment" class="hidden" style="margin-bottom: 8px;">
+        <input type="number" id="segmentStart" class="line" min="0" value="0" onchange="validNumber(this);"> –
+        <input type="number" id="segmentEnd" class="line" min="0" onchange="validNumber(this);">
+      </div>
+      <input type="radio" id="hideColor2" name="gradient" checked onclick="hideColor2();" style="margin-left: 0;"><label for="hideColor2">Single color</label>
+      <input type="radio" id="showColor2" name="gradient" style="margin-left: 8px;" onclick="showColor2();"><label for="showColor2">Gradient</label>
+      <br>
+      <div style="display: inline-block;">
+        <h3 id="color1Heading" class="hidden" style="margin-bottom: 0;">Color 1</h3>
+        <input type="color" id="color1" class="button inline popOut">
+      </div>
+      <div id="color2Div" class="hidden" style="margin-left: 8px;">
+        <h3 style="margin-bottom: 0;">Color 2</h3>
+        <input type="color" id="color2" class="button inline popOut">
+      </div>
+      <img src="{{ url_for('static', filename='img/advanced/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendColor();">
+    </div>
   </div>
 
   <div id="banner">
@@ -179,6 +255,10 @@
     updateVotes();
     checkForSurvey();
     checkForHelpTicket();
+    nowPlaying();
+    updateVolume();
+    listSounds("{{ sfx }}");
+    listMusic("{{ bgm }}");
   };
   getApiData(true);
 
@@ -187,6 +267,8 @@
     updateVotes();
     checkForSurvey();
     checkForHelpTicket();
+    nowPlaying();
+    if (document.getElementById("volume") != document.activeElement) updateVolume();
   };
   setInterval(getApiData, 1000);
 
@@ -209,9 +291,6 @@
 
   document.getElementById("help").onclick = requestHelp;
   document.getElementById("break").onclick = requestBreak;
-
-  document.getElementById("sfx").onclick = () => window.open("/sfx");
-  document.getElementById("bgm").onclick = () => window.open("/bgm");
 
   function checkForSurvey() {
     let mode = modeRes.mode;

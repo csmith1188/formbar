@@ -30,34 +30,6 @@
     margin-top: 8px;
   }
 
-  input[type="text"],
-  input[type="number"] {
-    background: transparent;
-    border-color: black;
-    border-style: none none solid;
-    font-size: 16px;
-    font-family: "Segoe UI", sans-serif;
-    outline: none;
-  }
-
-  input[type="text"] {
-    width: 144px;
-  }
-
-  input[type="range"] {
-    width: 96px;
-    vertical-align: middle;
-  }
-
-  input[type="number"] {
-    width: 48px;
-  }
-
-  input[type="color"] {
-    width: 80px;
-    height: 20px;
-  }
-
   a:active {
     filter: brightness(50%);
   }
@@ -72,33 +44,6 @@
   .highlight:hover {
     transform: none !important;
     box-shadow: none !important;
-  }
-
-  .redColor {
-    color: var(--color-red) !important;
-  }
-
-  .yellowColor {
-    color: var(--color-yellow) !important;
-  }
-
-  .greenColor {
-    color: var(--color-green) !important;
-  }
-
-  .cyanColor {
-    color: var(--color-cyan) !important;
-  }
-
-  .blueColor {
-    color: var(--color-blue) !important;
-  }
-
-  .smallImg {
-    width: 24px;
-    margin-left: 4px;
-    vertical-align: middle;
-    cursor: pointer;
   }
 
   #sidebar {
@@ -122,6 +67,14 @@
     width: 100%;
   }
 
+  #randomMusic {
+    margin: 0 4px 0 0;
+  }
+
+  #playPauseMusic, #restartMusic, #stopMusic {
+    margin: 0;
+  }
+
   #text {
     text-transform: uppercase;
     font-family: monospace;
@@ -129,14 +82,6 @@
 
   #color2Div:not(.hidden) {
     display: inline-block;
-  }
-
-  #randomMusic {
-    margin: 0 4px 0 0;
-  }
-
-  #playPauseMusic, #restartMusic, #stopMusic {
-    margin: 0;
   }
 
   #excluded {
@@ -148,7 +93,7 @@
   }
 
   #otherSidebar button {
-    width: 60%;
+    width: 75%;
   }
 
   #chatSidebar {
@@ -305,14 +250,14 @@
 
     <div id="soundDiv" class="hidden">
       <h2>Sound effects</h2>
-      <input type="text" id="sound" placeholder="Filename" list="sfxFiles">
+      <input type="text" id="sound" class="line" placeholder="Filename" list="sfxFiles">
       <datalist id="sfxFiles"></datalist>
       <img src="{{ url_for('static', filename='img/advanced/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendSound();">
     </div>
 
     <div id="musicDiv" class="hidden">
       <h2>Play music</h2>
-      <img src="{{ url_for('static', filename='img/advanced/random.png') }}" id="randomMusic" class="smallImg" title="Random" onclick="randomBGM()"><input type="text" id="music" placeholder="Filename" list="bgmFiles">
+      <img src="{{ url_for('static', filename='img/advanced/random.png') }}" id="randomMusic" class="smallImg" title="Random" onclick="randomBGM()"><input type="text" id="music" class="line" placeholder="Filename" list="bgmFiles">
       <datalist id="bgmFiles"></datalist>
       <img src="{{ url_for('static', filename='img/advanced/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendMusic();"><br>
       <label for="volume">Volume: </label><input type="range" id="volume" min="0.1" max="1" step="0.1">
@@ -329,7 +274,7 @@
       <h2>Change text</h2>
       Text color: <input type="color" id="fgColor" class="button inline popOut" value="#404040"><br>
       Background: <input type="color" id="bgColor" class="button inline popOut"><br>
-      <input type="text" id="text" placeholder="Phrase">
+      <input type="text" id="text" class="line" placeholder="Phrase">
       <img src="{{ url_for('static', filename='img/advanced/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendText();">
     </div>
 
@@ -339,8 +284,8 @@
       <input type="radio" id="showSegment" name="segment" style="margin-left: 8px;" onclick="showSegment();"><label for="showSegment">Segment</label>
       <br>
       <div id="segment" class="hidden" style="margin-bottom: 8px;">
-        <input type="number" id="segmentStart" min="0" value="0" onchange="validNumber(this);"> –
-        <input type="number" id="segmentEnd" min="0" onchange="validNumber(this);">
+        <input type="number" id="segmentStart" class="line" min="0" value="0" onchange="validNumber(this);"> –
+        <input type="number" id="segmentEnd" class="line" min="0" onchange="validNumber(this);">
       </div>
       <input type="radio" id="hideColor2" name="gradient" checked onclick="hideColor2();" style="margin-left: 0;"><label for="hideColor2">Single color</label>
       <input type="radio" id="showColor2" name="gradient" style="margin-left: 8px;" onclick="showColor2();"><label for="showColor2">Gradient</label>
@@ -363,8 +308,8 @@
     Name: <a id="name"></a><span id="excluded"></span><br>
     <button class="inline popOut" onclick="window.location = '/login';">Log out</button><br>
     <button class="inline popOut" onclick="window.open('https://github.com/csmith1188/formbar/issues/new');">Send feedback</button><br>
-    <button class="inline popOut" onclick="window.location = '/basic';">Basic mode</button><br>
-    <button class="inline popOut" onclick="window.location = '/setdefault';">Set default</button>
+    <button class="inline popOut" onclick="window.location = '/basic';">Switch to basic mode</button><br>
+    <button class="inline popOut" onclick="window.location = '/setdefault';">Set default mode</button>
   </div>
 </div>
 
@@ -431,6 +376,8 @@
     showEnabled();
     grayOutTabs();
     updateVotes();
+    listSounds("{{ sfx }}");
+    listMusic("{{ bgm }}");
 
     barpix = eval(pixRes.pixels);
     document.getElementById("segmentStart").max = barpix.length;
@@ -552,184 +499,6 @@
     else nameBox.removeAttribute("title");
   }
 
-  function shorten(container, maxHeight, text) {
-    //Set title to original string
-    let original = text.innerText;
-    //Remove characters while string is too long
-    while (container.clientHeight > maxHeight) text.innerText = text.innerText.substring(0, text.innerText.length - 2) + "…";
-    text.title = original;
-    text.style.cursor = "help";
-  }
-
-  let sfx = eval("{{ sfx }}".replaceAll("&#39;", "'"));
-  sfx = sfx.filter(file => !file.startsWith("sfx_"));
-
-  sfx.forEach(sound => document.getElementById("sfxFiles").innerHTML += "<option value='" + sound + "'></option>");
-
-  function sendSound() {
-    let soundFile = document.getElementById("sound").value;
-    request.open("GET", "/sfx?file=" + soundFile);
-    request.send();
-    if (sfx.includes(soundFile)) document.getElementById("sound").value = null;
-    else alert("File does not exist");
-  }
-
-  document.getElementById("sound").addEventListener("keydown", event => {
-    if (event.code == "Enter") sendSound();
-  });
-
-  document.getElementById("volume").addEventListener("input", () => {
-    let volume = document.getElementById("volume").value;
-    if (volume == 1) volume += ".0";
-    document.getElementById("volNumber").innerText = volume;
-  });
-
-  document.getElementById("volume").addEventListener("change", () => {
-    let volume = document.getElementById("volume").value;
-    if (volume == 1) volume += ".0";
-    request.open("GET", "/bgm?voladj=" + volume);
-    request.send();
-  });
-
-  let bgm = eval("{{ bgm }}".replaceAll("&#39;", "'"));
-
-  bgm.forEach(song => document.getElementById("bgmFiles").innerHTML += "<option value='" + song + "'></option>");
-
-  function randomBGM() {
-    document.getElementById("music").value = bgm[Math.floor(Math.random() * bgm.length)];
-  }
-
-  async function sendMusic() {
-    let musicFile = document.getElementById("music").value;
-    let volume = document.getElementById("volume").value;
-    if (volume == 1) volume = "1.0";
-    let res = await getResponse("/bgm?file=" + musicFile + "&volume=" + volume, false);
-    if (bgm.includes(musicFile)) {
-      (res.startsWith("It has only been")) ? alert(res) : document.getElementById("music").value = null;
-    } else {
-      alert("File does not exist");
-    }
-  }
-
-  document.getElementById("music").addEventListener("keydown", event => {
-    if (event.code == "Enter") sendMusic();
-  });
-
-  function nowPlaying() {
-    //Get current song from server
-    let songName = bgmRes.bgm;
-    let paused = bgmRes.paused;
-
-    let controls = document.getElementById("musicControls");
-    let np = document.getElementById("nowPlaying");
-    let npTitle = document.getElementById("nowPlayingTitle");
-    let playPause = document.getElementById("playPauseMusic");
-
-    //If a song is currently playing
-    if (songName) {
-      //Show "Now Playing"
-      if (songName != npTitle.innerText) {
-        np.classList.remove("hidden");
-        npTitle.innerText = songName;
-        if (np.clientHeight > 21) shorten(np, 21, npTitle);
-        else np.removeAttribute("title");
-        controls.classList.remove("hidden");
-      }
-    } else {
-      //If no song is playing, hide
-      np.classList.add("hidden");
-      controls.classList.add("hidden");
-    }
-
-    if (paused) {
-      playPause.title = "Play";
-    } else {
-      playPause.title = "Pause";
-    }
-  }
-
-  function updateVolume() {
-    let volume = bgmRes.volume;
-    document.getElementById("volume").value = volume;
-    document.getElementById("volNumber").innerText = volume;
-  }
-
-  function playPauseMusic() {
-    request.open("GET", "/bgm?playpause=true");
-    request.send();
-  }
-
-  function restartMusic() {
-    request.open("GET", "/bgm?rewind=true");
-    request.send();
-  }
-
-  function stopMusic() {
-    request.open("GET", "/bgmstop");
-    request.send();
-  }
-
-  function sendText() {
-    let text = document.getElementById("text").value;
-    let fg = document.getElementById("fgColor").value.slice(1);
-    let bg = document.getElementById("bgColor").value.slice(1);
-    //If input is blank, replace with underscore
-    text ||= "_";
-    request.open("GET", "/say?phrase=" + text + "&fg=" + fg + "&bg=" + bg);
-    request.send();
-    document.getElementById("text").value = null;
-  }
-
-  document.getElementById("text").addEventListener("keydown", event => {
-    if (event.code == "Enter") sendText();
-  });
-
-  function hideSegment() {
-    segment = false;
-    document.getElementById("segment").classList.add("hidden");
-  }
-
-  function showSegment() {
-    segment = true;
-    document.getElementById("segment").classList.remove("hidden");
-  }
-
-  function validNumber(el) {
-    //Convert value to integer within range
-    let number = parseInt(el.value);
-    if (number < el.min || isNaN(number)) el.value = el.min;
-    else if (number > el.max) el.value = el.max;
-    else el.value = number;
-  }
-
-  function hideColor2() {
-    gradient = false;
-    document.getElementById("color1Heading").classList.add("hidden");
-    document.getElementById("color2Div").classList.add("hidden");
-  }
-
-  function showColor2() {
-    gradient = true;
-    document.getElementById("color1Heading").classList.remove("hidden");
-    document.getElementById("color2Div").classList.remove("hidden");
-  }
-
-  function sendColor() {
-    let start = document.getElementById("segmentStart").value;
-    let end = document.getElementById("segmentEnd").value;
-    let hex1 = document.getElementById("color1").value.slice(1);
-    let hex2 = document.getElementById("color2").value.slice(1);
-    if (!segment) {
-      start = 0;
-      end = barpix.length;
-    }
-    if (!gradient) hex2 = hex1;
-    request.open("GET", "/segment?start=" + start + "&end=" + end + "&hex=" + hex1 + "&hex2=" + hex2);
-    request.send();
-    document.getElementById("segmentStart").value = 0;
-    document.getElementById("segmentEnd").value = barpix.length;
-  }
-
   function openPage(page) {
     innerPage.contentWindow.location = "/" + page;
     menus.forEach(menu => {
@@ -757,7 +526,6 @@
       document.getElementById("newMessages").innerText = null;
       menuPositions();
     }
-    /*Change page title here*/
   }
 
   function showMenu(name) {

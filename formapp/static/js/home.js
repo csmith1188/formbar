@@ -6,6 +6,8 @@ let thumbButtons = Array.from(document.querySelectorAll(".thumbButton"));
 let letterButtons = Array.from(document.querySelectorAll(".letterButton"));
 let chosenThumb = false;
 let chosenLetter = false;
+let bgm;
+let sfx;
 let meRes;
 let bgmRes;
 let modeRes;
@@ -124,4 +126,185 @@ function removeHighlight(image) {
       button.title = "Vote D";
       break;
   }
+}
+
+function shorten(container, maxHeight, text) {
+  //Set title to original string
+  let original = text.innerText;
+  //Remove characters while string is too long
+  while (container.clientHeight > maxHeight) text.innerText = text.innerText.substring(0, text.innerText.length - 2) + "…";
+  text.title = original;
+  text.style.cursor = "help";
+}
+
+function listSounds(files) {
+  sfx = eval(files.replaceAll("&#39;", "'"));
+  sfx = sfx.filter(file => !file.startsWith("sfx_"));
+  sfx.forEach(sound => document.getElementById("sfxFiles").innerHTML += "<option value='" + sound + "'></option>");
+}
+
+function sendSound() {
+  let soundFile = document.getElementById("sound").value;
+  request.open("GET", "/sfx?file=" + soundFile);
+  request.send();
+  if (sfx.includes(soundFile)) document.getElementById("sound").value = null;
+  else alert("File does not exist");
+}
+
+document.getElementById("sound").addEventListener("keydown", event => {
+  if (event.code == "Enter") sendSound();
+});
+
+document.getElementById("volume").addEventListener("input", () => {
+  let volume = document.getElementById("volume").value;
+  if (volume == 1) volume += ".0";
+  document.getElementById("volNumber").innerText = volume;
+});
+
+document.getElementById("volume").addEventListener("change", () => {
+  let volume = document.getElementById("volume").value;
+  if (volume == 1) volume += ".0";
+  request.open("GET", "/bgm?voladj=" + volume);
+  request.send();
+});
+
+function listMusic(files) {
+  bgm = eval(files.replaceAll("&#39;", "'"));
+  bgm.forEach(song => document.getElementById("bgmFiles").innerHTML += "<option value='" + song + "'></option>");
+}
+
+function randomBGM() {
+  document.getElementById("music").value = bgm[Math.floor(Math.random() * bgm.length)];
+}
+
+async function sendMusic() {
+  let musicFile = document.getElementById("music").value;
+  let volume = document.getElementById("volume").value;
+  if (volume == 1) volume = "1.0";
+  let res = await getResponse("/bgm?file=" + musicFile + "&volume=" + volume, false);
+  if (bgm.includes(musicFile)) {
+    (res.startsWith("It has only been")) ? alert(res) : document.getElementById("music").value = null;
+  } else {
+    alert("File does not exist");
+  }
+}
+
+document.getElementById("music").addEventListener("keydown", event => {
+  if (event.code == "Enter") sendMusic();
+});
+
+function nowPlaying() {
+  //Get current song from server
+  let songName = bgmRes.bgm;
+  let paused = bgmRes.paused;
+
+  let controls = document.getElementById("musicControls");
+  let np = document.getElementById("nowPlaying");
+  let npTitle = document.getElementById("nowPlayingTitle");
+  let playPause = document.getElementById("playPauseMusic");
+
+  //If a song is currently playing
+  if (songName) {
+    //Show "Now Playing"
+    if (songName != npTitle.innerText) {
+      np.classList.remove("hidden");
+      let oldHeight = np.clientHeight;
+      npTitle.innerText = songName;
+      if (np.clientHeight > oldHeight) shorten(np, oldHeight, npTitle);
+      else np.removeAttribute("title");
+      controls.classList.remove("hidden");
+    }
+  } else {
+    //If no song is playing, hide
+    np.classList.add("hidden");
+    controls.classList.add("hidden");
+  }
+
+  if (paused) {
+    playPause.title = "Play";
+  } else {
+    playPause.title = "Pause";
+  }
+}
+
+function updateVolume() {
+  let volume = bgmRes.volume;
+  document.getElementById("volume").value = volume;
+  document.getElementById("volNumber").innerText = volume;
+}
+
+function playPauseMusic() {
+  request.open("GET", "/bgm?playpause=true");
+  request.send();
+}
+
+function restartMusic() {
+  request.open("GET", "/bgm?rewind=true");
+  request.send();
+}
+
+function stopMusic() {
+  request.open("GET", "/bgmstop");
+  request.send();
+}
+
+function sendText() {
+  let text = document.getElementById("text").value;
+  let fg = document.getElementById("fgColor").value.slice(1);
+  let bg = document.getElementById("bgColor").value.slice(1);
+  //If input is blank, replace with underscore
+  text ||= "_";
+  request.open("GET", "/say?phrase=" + text + "&fg=" + fg + "&bg=" + bg);
+  request.send();
+  document.getElementById("text").value = null;
+}
+
+document.getElementById("text").addEventListener("keydown", event => {
+  if (event.code == "Enter") sendText();
+});
+
+function hideSegment() {
+  segment = false;
+  document.getElementById("segment").classList.add("hidden");
+}
+
+function showSegment() {
+  segment = true;
+  document.getElementById("segment").classList.remove("hidden");
+}
+
+function validNumber(el) {
+  //Convert value to integer within range
+  let number = parseInt(el.value);
+  if (number < el.min || isNaN(number)) el.value = el.min;
+  else if (number > el.max) el.value = el.max;
+  else el.value = number;
+}
+
+function hideColor2() {
+  gradient = false;
+  document.getElementById("color1Heading").classList.add("hidden");
+  document.getElementById("color2Div").classList.add("hidden");
+}
+
+function showColor2() {
+  gradient = true;
+  document.getElementById("color1Heading").classList.remove("hidden");
+  document.getElementById("color2Div").classList.remove("hidden");
+}
+
+function sendColor() {
+  let start = document.getElementById("segmentStart").value;
+  let end = document.getElementById("segmentEnd").value;
+  let hex1 = document.getElementById("color1").value.slice(1);
+  let hex2 = document.getElementById("color2").value.slice(1);
+  if (!segment) {
+    start = 0;
+    end = barpix.length;
+  }
+  if (!gradient) hex2 = hex1;
+  request.open("GET", "/segment?start=" + start + "&end=" + end + "&hex=" + hex1 + "&hex2=" + hex2);
+  request.send();
+  document.getElementById("segmentStart").value = 0;
+  document.getElementById("segmentEnd").value = barpix.length;
 }

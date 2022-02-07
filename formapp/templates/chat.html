@@ -402,7 +402,7 @@
           var usernameTitle = "Send a private message";
         }
 
-        //Use this if you want to allow HTML\
+        //Use this if you want to allow HTML
         newMSG.innerHTML = `
           <b class="username" onclick="${usernameOnclick}" title="${usernameTitle}">${message.from}</b>
           <span style="color: var(--gray-color);">${getDate()} ${message.to != "all" ? (message.from ? "· Private message" : "· From server") : ""}</span>

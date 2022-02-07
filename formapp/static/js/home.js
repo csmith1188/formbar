@@ -13,6 +13,7 @@ let bgmRes;
 let modeRes;
 let permsRes;
 let pixRes;
+let studentsRes;
 
 async function getApiData(first) {
   let apiData = await Promise.all([
@@ -20,13 +21,17 @@ async function getApiData(first) {
     getResponse("/getbgm"),
     getResponse("/getmode"),
     getResponse("/getpermissions"),
-    getResponse("/getpix")
+    getResponse("/getpix"),
+    getResponse("/getstudents")
   ]);
+  //Save every response to a variable
   meRes = apiData[0];
   bgmRes = apiData[1];
   modeRes = apiData[2];
   permsRes = apiData[3];
   pixRes = apiData[4];
+  studentsRes = apiData[5];
+  //Basic and advanced mode have different init and update functions
   if (first) init();
   else update();
 }
@@ -234,9 +239,11 @@ function nowPlaying() {
 }
 
 function updateVolume() {
-  let volume = bgmRes.volume;
-  document.getElementById("volume").value = volume;
-  document.getElementById("volNumber").innerText = volume;
+  if (document.getElementById("volume") != document.activeElement) {
+    let volume = bgmRes.volume;
+    document.getElementById("volume").value = volume;
+    document.getElementById("volNumber").innerText = volume;
+  }
 }
 
 function playPauseMusic() {

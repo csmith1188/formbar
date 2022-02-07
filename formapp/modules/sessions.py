@@ -42,7 +42,7 @@ class Session():
             'wigglecolor': 'blue',
             'downcolor': 'red',
             'barmode': 'playtime',
-            'modes': ['tutd', 'abcd', 'quiz', 'essay', 'progress', 'playtime'],
+            'modes': ['survey', 'tutd', 'abcd', 'quiz', 'essay', 'progress', 'playtime'],
             'whitelist': [
                 '127.0.0.1',
                 '172.21.3.5'
@@ -66,6 +66,7 @@ class Student():
     def __init__(self, username):
         self.name = username
         self.help = False
+        self.breakReq = False
         self.thumb = ''
         self.letter = ''
         self.progress = []

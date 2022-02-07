@@ -392,7 +392,7 @@
     showEnabled();
     grayOutTabs();
     nowPlaying();
-    if (document.getElementById("volume") != document.activeElement) updateVolume();
+    updateVolume();
     checkIfExcluded();
   };
   setInterval(getApiData, 1000);

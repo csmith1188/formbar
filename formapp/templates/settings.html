@@ -73,6 +73,8 @@
 
     function changeMode() {
       if (document.getElementById("survey").checked) {
+        request.open('GET', '/settings?barmode=survey');
+        request.send();
         document.getElementById("surveyType").classList.remove("hidden");
       } else {
         document.getElementById("surveyType").classList.add("hidden");
@@ -124,7 +126,7 @@
     (async () => {
       let modeRes = await getResponse("/getmode");
       let mode = modeRes.mode;
-      if (mode == "tutd") {
+      if (mode == "tutd" || mode == "survey") {
         document.getElementById("survey").checked = true;
         document.getElementById("surveyType").classList.remove("hidden");
         document.getElementById("thumbs").checked = true;

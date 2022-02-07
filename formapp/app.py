@@ -170,6 +170,8 @@ def newStudent(remote, username, bot=False):
             'quizRes': [],
             'essayRes': '',
             'bot': bot,
+            'help': False,
+            'breakReq': False,
             'excluded': False,
             'preferredMode': None
         }
@@ -946,6 +948,8 @@ def endpoint_break():
                 return redirect(request.path + "?alert=You already have a help ticket or break request in." )
             else:
                 helpList[name] = '<i>Requested a bathroom break</i>'
+                sD.studentDict[request.remote_addr]['help'] = True
+                sD.studentDict[request.remote_addr]['breakReq'] = True
                 playSFX("sfx_pickup02")
                 return redirect(request.path + "?alert=Your request was sent. The teacher still needs to approve it.")
         elif request.args.get('action') == 'end':

@@ -486,8 +486,12 @@
     nameBox.innerText = username;
     nameBox.onclick = () => openPage("profile");
     let myPerms = meRes.perms;
-    if (other.clientHeight > oldHeight) shorten(other, oldHeight, nameBox);
-    else nameBox.removeAttribute("title");
+    if (other.clientHeight > oldHeight) {
+      shorten(other, oldHeight, nameBox);
+    } else {
+      nameBox.removeAttribute("title");
+      nameBox.style.cursor = null;
+    }
   }
 
   function checkIfExcluded() {
@@ -495,8 +499,12 @@
     let nameBox = document.getElementById("name");
     let oldHeight = other.clientHeight;
     if (meRes.excluded) exclBox.innerText = " (excluded)";
-    if (other.clientHeight > oldHeight) shorten(other, oldHeight, nameBox);
-    else nameBox.removeAttribute("title");
+    if (other.clientHeight > oldHeight) {
+      shorten(other, oldHeight, nameBox);
+    } else {
+      nameBox.removeAttribute("title");
+      nameBox.style.cursor = null;
+    }
   }
 
   function openPage(page) {

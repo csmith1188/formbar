@@ -56,6 +56,14 @@
     background: var(--color-cyan);
   }
 
+  #surveyPanel {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    top: 25%;
+    text-align: center;
+  }
+
   #thumbs, #letters {
     width: 480px;
     display: flex;
@@ -104,7 +112,7 @@
     position: absolute;
     width: 100%;
     left: 0;
-    top: 30%;
+    top: 25%;
     display: flex;
     justify-content: center;
     font-size: 22px;
@@ -140,6 +148,10 @@
     margin: 0 4px 0 0;
   }
 
+  #nowPlaying {
+    font-size: 18px;
+  }
+
   #playPauseMusic, #restartMusic, #stopMusic {
     margin: 0;
   }
@@ -160,7 +172,7 @@
     <button id="moreButton">More</button>
   </div>
 
-  <div id="surveyPanel" class="centered">
+  <div id="surveyPanel">
     <h1>Thumbs</h1>
     <h2 id="noTUTD">There is no thumbs survey right now.</h2>
     <div id="thumbs" class="hidden">

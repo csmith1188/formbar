@@ -128,11 +128,11 @@ function removeHighlight(image) {
   }
 }
 
-function shorten(container, maxHeight, text) {
+function shorten(container, maxHeight, text, maxWidth) {
   //Set title to original string
   let original = text.innerText;
   //Remove characters while string is too long
-  while (container.clientHeight > maxHeight) text.innerText = text.innerText.substring(0, text.innerText.length - 2) + "…";
+  while (container.clientHeight > maxHeight || container.clientWidth > maxWidth) text.innerText = text.innerText.substring(0, text.innerText.length - 2) + "…";
   text.title = original;
   text.style.cursor = "help";
 }
@@ -198,9 +198,10 @@ function nowPlaying() {
   let songName = bgmRes.bgm;
   let paused = bgmRes.paused;
 
-  let controls = document.getElementById("musicControls");
+  let md = document.getElementById("musicDiv");
   let np = document.getElementById("nowPlaying");
   let npTitle = document.getElementById("nowPlayingTitle");
+  let controls = document.getElementById("musicControls");
   let playPause = document.getElementById("playPauseMusic");
 
   //If a song is currently playing
@@ -209,9 +210,14 @@ function nowPlaying() {
     if (songName != npTitle.innerText) {
       np.classList.remove("hidden");
       let oldHeight = np.clientHeight;
+      let oldWidth = md.clientWidth;
       npTitle.innerText = songName;
-      if (np.clientHeight > oldHeight) shorten(np, oldHeight, npTitle);
-      else np.removeAttribute("title");
+      if (np.clientHeight > oldHeight || md.clientWidth > oldWidth) {
+        shorten(np, oldHeight, npTitle, oldWidth);
+      } else {
+        np.removeAttribute("title");
+        np.cursor = null;
+      }
       controls.classList.remove("hidden");
     }
   } else {

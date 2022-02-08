@@ -408,15 +408,23 @@
       let letters = document.getElementById("letters");
       let noABCD = document.getElementById("noABCD");
       if (mode == "tutd") {
-        thumbs.classList.remove("hidden");
-        noTUTD.classList.add("hidden");
+        if (myPerms == studentPerms) {
+          thumbs.classList.remove("hidden");
+          noTUTD.classList.add("hidden");
+        } else {
+          noTUTD.innerText = "Only students can vote in surveys."; ////
+        }
       } else {
         thumbs.classList.add("hidden");
         noTUTD.classList.remove("hidden");
       }
       if (mode == "abcd") {
-        letters.classList.remove("hidden");
-        noABCD.classList.add("hidden");
+        if (myPerms == studentPerms) {
+          letters.classList.remove("hidden");
+          noABCD.classList.add("hidden");
+        } else {
+          noABCD.innerText = "Only students can vote in surveys.";
+        }
       } else {
         letters.classList.add("hidden");
         noABCD.classList.remove("hidden");
@@ -495,7 +503,6 @@
 
     function changeMode() {
       let newMode = document.getElementById("mode").value;
-      console.log(newMode);
       switch (newMode) {
         case "Survey":
           request.open("GET", "/settings?barmode=survey");

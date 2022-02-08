@@ -47,20 +47,23 @@
     font-size: 24px;
     font-weight: bold;
     border-width: 2px !important;
+  }
+
+  .light #topButtons * {
     color: var(--color-purple);
   }
 
-  #topButtons.teacher * {
-    color: var(--color-orange);
-  }
-
-  #topButtons .pressed {
+  .light #topButtons .pressed {
     background: var(--color-purple);
     border-color: var(--color-purple);
     color: white;
   }
 
-  #topButtons.teacher .pressed {
+  .light #topButtons.teacher * {
+    color: var(--color-orange);
+  }
+
+  .light #topButtons.teacher .pressed {
     background: var(--color-orange);
     border-color: var(--color-orange);
     color: white;
@@ -78,6 +81,7 @@
     width: 480px;
     display: flex;
     justify-content: space-between;
+    margin: auto;
   }
 
   #other {
@@ -173,6 +177,17 @@
   #color2Div:not(.hidden) {
     display: inline-block;
   }
+
+  #chat {
+    position: fixed;
+    left: 0;
+    top: 74px;
+    width: 100%;
+    height: calc(100% - 74px);
+    border: 1px solid var(--light-blue);
+    border-style: solid none none;
+    z-index: 999;
+  }
 </style>
 {% endblock %}
 
@@ -184,6 +199,7 @@
   <div id="topButtons" class="hidden">
     <button id="panelButton"></button>
     <button id="moreButton">More</button>
+    <button id="chatButton">Chat</button>
   </div>
 
   <div id="studentPanel" class="hidden">
@@ -294,6 +310,8 @@
     </div>
   </div>
 
+  <iframe src="/chat" id="chat" class="hidden"></iframe>
+
   <div id="banner">
     <div id="bannerLeft" onclick="window.location = '/advanced';">Go to advanced mode to use all features</div>
     <div id="bannerRight" onclick="window.location = '/setdefault';">Set default mode</div>
@@ -339,39 +357,44 @@
       if (meRes.perms == permsRes.teacher) {
         container.classList.add("teacher");
         button.innerText = "Teacher panel";
-        button.onclick = showTeacherPanel;
-        showTeacherPanel();
+        button.onclick = () => showSection("teacherPanel");
+        showSection("teacherPanel");
       } else {
         button.innerText = "Student panel";
-        button.onclick = showStudentPanel;
-        showStudentPanel();
+        button.onclick = () => showSection("studentPanel");
+        showSection("studentPanel");
       }
       container.classList.remove("hidden");
     }
 
-    document.getElementById("moreButton").onclick = showMore;
+    function showSection(toShow) {
+      ["studentPanel", "teacherPanel", "more", "chat"].forEach(section => {
+        let cl = document.getElementById(section).classList;
+        section == toShow ? cl.remove("hidden") : cl.add("hidden");
+      });
 
-    function showStudentPanel() {
-      document.getElementById("more").classList.add("hidden");
-      document.getElementById("studentPanel").classList.remove("hidden");
-      document.getElementById("moreButton").classList.remove("pressed");
-      document.getElementById("panelButton").classList.add("pressed");
+      if (toShow == "studentPanel" || toShow == "teacherPanel") {
+        document.getElementById("panelButton").classList.add("pressed");
+        document.getElementById("moreButton").classList.remove("pressed");
+        document.getElementById("chatButton").classList.remove("pressed");
+      } else {
+        document.getElementById("panelButton").classList.remove("pressed");
+        document.getElementById("moreButton").classList.remove("pressed");
+        document.getElementById("chatButton").classList.remove("pressed");
+        document.getElementById(toShow + "Button").classList.add("pressed");
+      }
+
+      if (toShow == "chat") {
+        document.body.classList.remove("light");
+        document.body.classList.add("blue");
+      } else {
+        document.body.classList.remove("blue");
+        document.body.classList.add("light");
+      }
     }
 
-    function showTeacherPanel() {
-      document.getElementById("more").classList.add("hidden");
-      document.getElementById("teacherPanel").classList.remove("hidden");
-      document.getElementById("moreButton").classList.remove("pressed");
-      document.getElementById("panelButton").classList.add("pressed");
-    }
-
-    function showMore() {
-      document.getElementById("studentPanel").classList.add("hidden");
-      document.getElementById("teacherPanel").classList.add("hidden");
-      document.getElementById("more").classList.remove("hidden");
-      document.getElementById("panelButton").classList.remove("pressed");
-      document.getElementById("moreButton").classList.add("pressed");
-    }
+    document.getElementById("moreButton").onclick = () => showSection("more");
+    document.getElementById("chatButton").onclick = () => showSection("chat");
 
     document.getElementById("help").onclick = requestHelp;
     document.getElementById("break").onclick = requestBreak;

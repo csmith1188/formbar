@@ -11,15 +11,29 @@
 <!-- Change theme color here -->
 {% block color %}purple{% endblock %}
 
-<!-- Extra javascript here -->
-{% block script %}{% endblock %}
-
 <!-- Main content here -->
 {% block main %}
 <h1>{{ username }}'s profile</h1>
 <ul>
-    <li>Permissions: {{ perms }}</li>
-    <li>Bot: {{ bot }}</li>
+    <li><b>Permissions:</b> {{ perms }}</li>
+    <li><b>Bot:</b> {{ bot }}</li>
 </ul>
+{% endblock %}
 
+<!-- Extra javascript here -->
+{% block script %}
+  <script>
+    window.onload = async () => {
+      let me = await getResponse("/getme");
+      if ("{{ username }}" == me.name) {
+        document.body.innerHTML += `
+          <h2>High scores</h2>
+          <ul>
+              <li><b>2048:</b> ${localStorage.getItem("2048HighScore") || 0}</li>
+              <li><b>Hangman:</b> ${localStorage.getItem("hangmanHighScore") || 0}</li>
+          </ul>
+        `;
+      }
+    };
+  </script>
 {% endblock %}

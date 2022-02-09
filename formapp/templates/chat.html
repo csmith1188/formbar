@@ -446,7 +446,7 @@
       } else {
         this.checked = false;
         localStorage.setItem("chatNotifications", "");
-        alert("You need to reset this sites's permissions to allow notifications.");
+        if (Notification.permission == "denied") alert("You need to reset this sites's permissions to allow notifications.");
       }
     };
 

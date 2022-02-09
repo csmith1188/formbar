@@ -1516,6 +1516,22 @@ def endpoint_minesweeper():
             dense = request.args.get('dense')
         return render_template("mnsw.html", cols=cols, rows=rows, dense=dense)
 
+'''
+    /basic
+    Homepage for mobile devices
+'''
+@app.route('/mobile')
+def endpoint_mobile():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    sounds = []
+    music = []
+    for key, value in sfx.sound.items():
+        sounds.append(key)
+    for key, value in bgm.bgm.items():
+        music.append(key)
+    return render_template("mobile.html", sfx = sounds, bgm = music)
+
 # ███    ██
 # ████   ██
 # ██ ██  ██

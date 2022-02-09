@@ -39,6 +39,9 @@
       ////To do: only remove alert, keep other params
       window.location = window.location.pathname; //Remove message so it doesn't appear again if page is reloaded
     }
+
+    //If the user is on a mobile device, take them to /mobile
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && window.location.pathname != "/mobile" && !(window.location.pathname == "/login" && urlParams.get("forward") == "/mobile")) window.location = "/mobile";
   </script>
   {% block script %}{% endblock %}
 </html>

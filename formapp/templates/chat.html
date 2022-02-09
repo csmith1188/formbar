@@ -175,7 +175,7 @@
     height: calc(100% - 116px);
   }
 
-  .sidebar #outputBox {
+  .small #outputBox {
     width: 100%;
     height: calc(100% - 140px);
   }
@@ -184,7 +184,9 @@
     background-color: initial;
   }
 
-  .game #userlist, .game #recContainer, .sidebar #userlist {
+  .game #userlist,
+  .game #recContainer,
+  .small #userlist {
     display: none;
   }
 
@@ -192,25 +194,34 @@
     height: 75px;
   }
 
-  .sidebar #controlChat {
+  .small #controlChat {
     height: 99px;
+  }
+
+  .light #controlChat {
     background: #dfefff;
   }
 
-  .game #input, .game #sendButton, .sidebar #input, .sidebar #sendButton {
+  .game #input,
+  .game #sendButton,
+  .small #input,
+  .small #sendButton {
     width: calc(100% - 40px);
   }
 
-  .game #sendButton, .sidebar #sendButton {
+  .game #sendButton,
+  .small #sendButton {
     display: block;
     margin: 10px 0 0 0;
   }
 
-  .game #sendButton:active, .sidebar #sendButton:active {
+  .game #sendButton:active,
+  .small #sendButton:active {
     transform: none;
   }
 
-  .game #notifications, .sidebar #notifications {
+  .game #notifications,
+  .small #notifications {
     display: none;
   }
 </style>
@@ -459,8 +470,11 @@
 
     let sidebar = urlParams.get("sidebar");
     if (sidebar) {
-      document.body.classList.add("sidebar", "light");
+      document.body.classList.add("small", "light");
       document.body.classList.remove("blue");
     }
+
+    let mobile = urlParams.get("mobile");
+    if (mobile) document.body.classList.add("small");
 </script>
 {% endblock %}

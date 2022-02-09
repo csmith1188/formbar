@@ -428,7 +428,7 @@
     if (mode == "tutd" && myPerms == permsRes.student) tutdDiv.classList.remove("hidden");
     else tutdDiv.classList.add("hidden");
 
-    if (mode == "abcd" == permsRes.student) abcdDiv.classList.remove("hidden");
+    if (mode == "abcd" && permsRes.student) abcdDiv.classList.remove("hidden");
     else abcdDiv.classList.add("hidden");
 
     let sfxPerm = permsRes.sfx;
@@ -526,9 +526,9 @@
     Array.from(tabs).forEach(tab => tab.classList.remove("open"));
     if (["/help", "/break"].includes(path)) document.getElementById("studentsTab").classList.add("open");
     if (["/2048", "/bitshifter", "/hangman", "/minesweeper", "/speedtype", "/ttt", "/fighter"].includes(path)) document.getElementById("gamesTab").classList.add("open");
-    else if (["/needshelp", "/settings", "/users", "/lesson", "/virtualbar"].includes(path)) document.getElementById("teacherTab").classList.add("open");
+    if (["/needshelp", "/settings", "/users", "/lesson", "/virtualbar"].includes(path)) document.getElementById("teacherTab").classList.add("open");
     if (tabEl) tabEl.classList.add("open");
-    if (path == "/advanced" || path == "/basic") openPage("{{ mainPage }}");
+    if (["/advanced", "/basic", "/mobile"].includes(path)) openPage("{{ mainPage }}");
     if (path == "/chat") {
       newMessages = 0;
       document.getElementById("newMessages").innerText = null;

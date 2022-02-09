@@ -323,7 +323,7 @@
 <script src="{{ url_for('static', filename='js/home.js') }}"></script>
   <script>
     ////Check for break, fix buttons
-    let init = () => {
+    function init() {
       showPanel();
       updateVotes();
       checkForSurvey();
@@ -338,7 +338,7 @@
     };
     getApiData(true);
 
-    let update = () => {
+    function update() {
       checkIfRemoved();
       updateVotes();
       checkForSurvey();
@@ -412,7 +412,7 @@
           thumbs.classList.remove("hidden");
           noTUTD.classList.add("hidden");
         } else {
-          noTUTD.innerText = "Only students can vote in surveys."; ////
+          noTUTD.innerText = "Only students can vote in surveys.";
         }
       } else {
         thumbs.classList.add("hidden");
@@ -432,10 +432,10 @@
     }
 
     function checkForHelpTicket() {
-      ////Don't use param
-      if ("{{ helpTicket }}") {
-        if ("{{ helpTicket }}" == "&lt;i&gt;Requested a bathroom break&lt;/i&gt;") ticketSent("break");
-        else ticketSent("help");
+      if (meRes.help) {
+        ticketSent("help");
+      } else if (meRes.breakReq) {
+        ticketSent("break");
       } else {
         document.getElementById("help").onclick = requestHelp;
         document.getElementById("break").onclick = requestBreak;

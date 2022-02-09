@@ -367,7 +367,7 @@
   let newMessages = 0;
   let username = "{{ username }}";
 
-  let init = () => {
+  function init() {
     menuPositions();
     minimizeTabs();
     nowPlaying();
@@ -386,7 +386,7 @@
   }
   getApiData(true);
 
-  let update = () => {
+  function update() {
     checkIfRemoved();
     updateVotes();
     showEnabled();

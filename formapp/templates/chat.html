@@ -426,6 +426,9 @@
         // newMSG.appendChild(document.createTextNode(message.from + ": " + message.content))
         boxes.outputBox.appendChild(newMSG);
         if (lockBottom) boxes.outputBox.scrollTo(0, boxes.outputBox.scrollHeight);
+
+        let notification;
+        if (localStorage.getItem("chatNotifications")) notification = new Notification(message.from, {body: message.content, icon: "{{ url_for('static', filename='img/favicon.ico') }}"});
     }
 
     function enterCommand(command) {

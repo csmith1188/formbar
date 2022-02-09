@@ -142,6 +142,12 @@
     color: var(--bg-color);
   }
 
+  #notifications {
+    position: fixed;
+    right: 16px;
+    bottom: 8px;
+  }
+
   a {
     color: var(--theme-color);
   }
@@ -203,6 +209,10 @@
   .game #sendButton:active, .sidebar #sendButton:active {
     transform: none;
   }
+
+  .game #notifications, .sidebar #notifications {
+    display: none;
+  }
 </style>
 {% endblock %}
 
@@ -223,6 +233,9 @@
         <input id="input" class="box" placeholder="Enter a message" autocomplete="off">
         <input type="submit" value="Send" id="sendButton" class="button">
     </form>
+    <div id="notifications">
+      <input type="checkbox" id="notificationsCheckbox"><label for="notificationsCheckbox">Desktop notifications</label>
+    </div>
 </div>
 {% endblock %}
 
@@ -300,7 +313,8 @@
         inputBox: document.getElementById("input"),
         userlist: document.getElementById("userlist"),
         sendButton: document.getElementById("sendButton"),
-        recBox: document.getElementById("recipient")
+        recBox: document.getElementById("recipient"),
+        ncb: document.getElementById("notificationsCheckbox")
     }
 
     function packMSG(type, rx, tx, content) {
@@ -418,6 +432,20 @@
       boxes.inputBox.value = command;
       boxes.inputBox.focus();
     }
+
+    boxes.ncb.checked = localStorage.getItem("chatNotifications") && Notification.permission == "granted";
+
+    boxes.ncb.onchange = async function() {
+      await Notification.requestPermission();
+      if (this.checked && Notification.permission == "granted") {
+        this.checked = true;
+        localStorage.setItem("chatNotifications", "true");
+      } else {
+        this.checked = false;
+        localStorage.setItem("chatNotifications", "");
+        alert("You need to reset this sites's permissions to allow notifications.");
+      }
+    };
 
     let gamePlayer = urlParams.get("game");
     if (gamePlayer) {

@@ -1517,7 +1517,7 @@ def endpoint_minesweeper():
         return render_template("mnsw.html", cols=cols, rows=rows, dense=dense)
 
 '''
-    /basic
+    /mobile
     Homepage for mobile devices
 '''
 @app.route('/mobile')

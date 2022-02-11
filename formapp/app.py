@@ -532,7 +532,7 @@ def tutdBar():
         global pixels
     if sD.settings['autocount']:
         autoStudentCount()
-    upFill = upCount = downFill = wiggleFill = 0
+    upFill = upCount = downFill = downCount = wiggleFill = wiggleCount = 0
     complete = 0
     for x in sD.studentDict:
         if sD.studentDict[x]['perms'] == sD.settings['perms']['student'] and sD.studentDict[x]['thumb']:
@@ -541,8 +541,10 @@ def tutdBar():
                 upCount += 1
             elif sD.studentDict[x]['thumb'] == 'down':
                 downFill += 1
+                downCount += 1
             elif sD.studentDict[x]['thumb'] == 'wiggle':
                 wiggleFill += 1
+                wiggleCount += 1
             complete += 1
     for pix in range(0, BARPIX):
         pixels[pix] = colors['default']
@@ -598,6 +600,10 @@ def tutdBar():
         if sD.settings['captions']:
             clearString()
             showString("MAX GAMER!", 0, colors['purple'])
+    elif downCount >= sD.settings['numStudents']:
+        playSFX("wompwomp")
+    elif wiggleCount >= sD.settings['numStudents']:
+        playSFX("bruh")
     #The Funny Number
     if sD.settings['numStudents'] == 9 and complete == 6:
         playSFX("clicknice")

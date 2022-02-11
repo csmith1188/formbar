@@ -3,16 +3,20 @@
 <!-- This is where the title, top buttons, and stylesheet is located -->
 
 <!-- Change title here -->
-{% block title %}Choose Formbar Mode{% endblock %}
+{% block title %}Choose Formbar Homepage{% endblock %}
 
 <!-- Extra style declarations here -->
 {% block style %}
 <style>
   body {
     width: fit-content;
-    max-width: 400px;
     margin: auto;
     text-align: center;
+  }
+
+  form {
+    max-width: 400px;
+    margin: auto;
   }
 
   h1 {
@@ -39,19 +43,19 @@
 
 <!-- Main content here -->
 {% block main %}
-  <h1>Choose your default mode</h1>
+  <h1>Choose your default homepage</h1>
   You can change this at any time.<br>
   <br>
   <form method="post">
     <label>
       <div>
-        <input type="radio" id="basic" name="mode" value="basic"><h3>Basic mode</h3><br>
+        <input type="radio" id="basic" name="mode" value="basic"><h3>Basic</h3><br>
         <span>A simple page with the main features. This is the best for new users.</span><br>
       </div>
     </label><br>
     <label>
       <div>
-        <input type="radio" id="advanced" name="mode" value="advanced"><h3>Advanced mode</h3><br>
+        <input type="radio" id="advanced" name="mode" value="advanced"><h3>Advanced</h3><br>
         <span>A compact page with all features.</span><br>
       </div>
     </label><br>

@@ -111,6 +111,7 @@
                 newStudent.innerHTML = icons + studentList[student].name;
                 let newDetails = document.createElement('span');
                 newDetails.classList.add('user');
+                if (collapsed) newDetails.classList.add("hidden");
                 if (studentList[student].excluded) {
                     newStudent.style.background = "var(--highlight-color)";
                     newDetails.innerHTML += "Taking a bathroom break <button class='inline popOut' onclick='request.open(\"GET\", \"/break?action=end&name=" + studentList[student].name + "\");  request.send();'>End break</button><br>";

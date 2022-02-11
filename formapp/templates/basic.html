@@ -439,49 +439,6 @@
       }
     }
 
-    function checkForHelpTicket() {
-      if (meRes.help) {
-        ticketSent("help");
-      } else if (meRes.breakReq) {
-        ticketSent("break");
-      } else {
-        document.getElementById("help").onclick = requestHelp;
-        document.getElementById("break").onclick = requestBreak;
-      }
-    }
-
-    function ticketSent(type) {
-      let sentEl;
-      let otherEl;
-      if (type == "help") {
-        sentEl = document.getElementById("help");
-        otherEl = document.getElementById("break");
-      } else if (type == "break") {
-        sentEl = document.getElementById("break");
-        otherEl = document.getElementById("help");
-      }
-      sentEl.onclick = null;
-      otherEl.onclick = null;
-      sentEl.classList.add("pressed");
-      sentEl.classList.add("unselectable");
-      sentEl.innerText = "Ticket sent";
-      otherEl.classList.add("unselectable");
-    }
-
-    function requestHelp() {
-      let el = document.getElementById("help");
-      request.open("GET", "/help?action=send");
-      request.send();
-      ticketSent("help");
-    }
-
-    function requestBreak() {
-      let el = document.getElementById("break");
-      request.open("GET", "/break?action=request");
-      request.send();
-      ticketSent("break");
-    }
-
     function updateMode() {
       let mode = modeRes.mode;
       let el = document.getElementById("mode");
@@ -528,23 +485,6 @@
     function startSurvey(type) {
       request.open("GET", "/startsurvey?type=" + type);
       request.send();
-    }
-
-    function ticketsText() {
-      let users = Object.values(studentsRes);
-      let helpTickets = users.filter(user => user.help);
-      let breakRequests = users.filter(user => user.breakReq);
-      let el = document.getElementById("ticketsText");
-      let helpText = helpTickets.length == 1 ? "There is currently 1 help ticket in." : `There are currently ${helpTickets.length} tickets in.`
-      let breakText = breakRequests.length == 1 ? "1 student has requested a bathroom break." : `${breakRequests.length} students have requested bathroom breaks.`;
-      el.innerHTML = helpText + "<br>" + breakText;
-    }
-
-    function usersText() {
-      let users = Object.values(studentsRes);
-      let students = users.filter(user => user.perms == permsRes.student);
-      let el = document.getElementById("usersText");
-      el.innerText = users.length == 1 ? "You are the only one logged in right now." : `${users.length} people are logged in, including ${students.length} students.`;
     }
   </script>
 {% endblock %}

@@ -3,12 +3,14 @@ import requests
 import time
 
 #Wait a minute before logging in.
-time.sleep(60)
+time.sleep(1)
 #This will be changed once there is a better login method in the main app.py
 
 #Send a login POST request
-requests.post(url="http://localhost:5000/login", data={"username":"Formbar Aux","forward":"/"})
+print(requests.post(url="http://localhost:5000/login", data={"username":"Formbar Aux", "password":"yes", "bot":"true", "forward":"/"}).text)
 #This should instead constantly poll to see if it is already logged in or not
+
+print(requests.get('http://localhost:5000/sfx?file=sfx_up03').text)
 
 #Handle the buttons forever
 print("Scanning for button presses...")
@@ -25,7 +27,7 @@ while True:
                 #changeMode()
             elif ir.ButtonsNames[button] == 'repeat':
                 pass
-                #repeatMode()
+                requests.post(url="http://localhost:5000/settings", data={})
             elif ir.ButtonsNames[button] == 'rewind':
                 pass
                 #rewindBGM()

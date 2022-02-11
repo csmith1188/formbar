@@ -1,4 +1,4 @@
-//This code is used in both advanced.html and basic.html
+//This code is used in advanced.html, basic.html, and mobile.html
 
 let thumbs = ["up", "wiggle", "down"];
 let letters = ["a", "b", "c", "d"];
@@ -6,14 +6,19 @@ let thumbButtons = Array.from(document.querySelectorAll(".thumbButton"));
 let letterButtons = Array.from(document.querySelectorAll(".letterButton"));
 let chosenThumb = false;
 let chosenLetter = false;
+let permsError = "You do not have high enough permissions to do this right now.";
 let bgm;
 let sfx;
+let segment;
+let gradient;
+let barpix;
 let meRes;
 let bgmRes;
 let modeRes;
 let permsRes;
 let pixRes;
 let studentsRes;
+let removeFocus;
 
 async function getApiData(first) {
   let apiData = await Promise.all([
@@ -31,7 +36,7 @@ async function getApiData(first) {
   permsRes = apiData[3];
   pixRes = apiData[4];
   studentsRes = apiData[5];
-  //Basic and advanced mode have different init and update functions
+  //Each homepage has its own init and update functions
   if (first) init();
   else update();
 }
@@ -54,6 +59,15 @@ function checkIfRemoved() {
   //If the user is removed by the teacher, send them back to the login page
   if (meRes.error == "You are not logged in.") window.location = "/login?alert=You have been logged out.";
 }
+
+thumbButtons.concat(letterButtons).forEach(el => {
+  el.onfocus = () => {
+    clearTimeout(removeFocus);
+    //Remove focus from the button after 1 second so votes can be updated again
+    removeFocus = setTimeout(() => document.activeElement.blur(), 1000);
+  }
+});
+
 
 function thumbsVote(thumb) {
   if (chosenThumb === thumb) {
@@ -88,20 +102,23 @@ function letterVote(letter) {
 }
 
 function updateVotes() {
-  //Make sure displayed vote matches actual vote, for example if new poll is started or user reloads
-  let thumb = meRes.thumb ? thumbs.indexOf(meRes.thumb) : false;
-  let letter = meRes.letter ? letters.indexOf(meRes.letter) : false;
-  if (thumb === false && chosenThumb !== false) thumbsVote(chosenThumb); //Remove the vote
-  else if (thumb !== chosenThumb) thumbsVote(thumb);
-  if (letter === false && chosenLetter !== false) thumbsVote(chosenLetter); //Remove the vote
-  else if (letter !== chosenLetter) letterVote(letter);
+  //Make sure a thumb/letter button is not currently active (to prevent immediately reverting a vote)
+  if (!thumbButtons.includes(document.activeElement) && !thumbButtons.includes(document.activeElement)) {
+    //Make sure displayed vote matches actual vote, for example if new poll is started or user reloads
+    let thumb = meRes.thumb ? thumbs.indexOf(meRes.thumb) : false;
+    let letter = meRes.letter ? letters.indexOf(meRes.letter) : false;
+    if (thumb === false && chosenThumb !== false) thumbsVote(chosenThumb); //Remove the vote
+    else if (thumb !== chosenThumb) thumbsVote(thumb);
+    if (letter === false && chosenLetter !== false) thumbsVote(chosenLetter); //Remove the vote
+    else if (letter !== chosenLetter) letterVote(letter);
+  }
 }
 
 function highlight(image) {
   let button = document.getElementById(image);
   button.src = button.src.replace(".png", "-highlight.png");
   button.classList.add("highlight");
-  button.title = "Cancel";
+  button.title = "Remove";
 }
 
 function removeHighlight(image) {
@@ -148,11 +165,10 @@ function listSounds(files) {
   sfx.forEach(sound => document.getElementById("sfxFiles").innerHTML += "<option value='" + sound + "'></option>");
 }
 
-function sendSound() {
+async function sendSound() {
   let soundFile = document.getElementById("sound").value;
-  request.open("GET", "/sfx?file=" + soundFile);
-  request.send();
-  if (sfx.includes(soundFile)) document.getElementById("sound").value = null;
+  let res = await getResponse("/sfx?file=" + soundFile, false);
+  if (sfx.includes(soundFile)) res == permsError ? alert(res) : document.getElementById("sound").value = null;
   else alert("File does not exist");
 }
 
@@ -173,6 +189,11 @@ document.getElementById("volume").addEventListener("change", () => {
   request.send();
 });
 
+function disableVolume() {
+  let el = document.getElementById("volume");
+  meRes.perms > permsRes.bgm ? el.disabled = true : el.disabled = false;
+}
+
 function listMusic(files) {
   bgm = eval(files.replaceAll("&#39;", "'"));
   bgm.forEach(song => document.getElementById("bgmFiles").innerHTML += "<option value='" + song + "'></option>");
@@ -188,7 +209,7 @@ async function sendMusic() {
   if (volume == 1) volume = "1.0";
   let res = await getResponse("/bgm?file=" + musicFile + "&volume=" + volume, false);
   if (bgm.includes(musicFile)) {
-    (res.startsWith("It has only been")) ? alert(res) : document.getElementById("music").value = null;
+    (res.startsWith("It has only been") || res == permsError) ? alert(res) : document.getElementById("music").value = null;
   } else {
     alert("File does not exist");
   }
@@ -246,35 +267,41 @@ function updateVolume() {
   }
 }
 
-function playPauseMusic() {
-  request.open("GET", "/bgm?playpause=true");
-  request.send();
+async function playPauseMusic() {
+  let res = await getResponse("/bgm?playpause=true", false);
+  if (res == permsError) alert(res);
 }
 
-function restartMusic() {
-  request.open("GET", "/bgm?rewind=true");
-  request.send();
+async function restartMusic() {
+  let res = await getResponse("/bgm?rewind=true", false);
+  if (res == permsError) alert(res);
 }
 
-function stopMusic() {
-  request.open("GET", "/bgmstop");
-  request.send();
+async function stopMusic() {
+  let res = await getResponse("/bgmstop", false);
+  if (res == permsError) alert(res);
 }
 
-function sendText() {
+async function sendText() {
   let text = document.getElementById("text").value;
   let fg = document.getElementById("fgColor").value.slice(1);
   let bg = document.getElementById("bgColor").value.slice(1);
   //If input is blank, replace with underscore
   text ||= "_";
-  request.open("GET", "/say?phrase=" + text + "&fg=" + fg + "&bg=" + bg);
-  request.send();
-  document.getElementById("text").value = null;
+  let res = await getResponse("/say?phrase=" + text + "&fg=" + fg + "&bg=" + bg, false);
+  res == permsError ? alert(res) : document.getElementById("text").value = null;
 }
 
 document.getElementById("text").addEventListener("keydown", event => {
   if (event.code == "Enter") sendText();
 });
+
+function segmentNumbers() {
+  barpix = eval(pixRes.pixels);
+  document.getElementById("segmentStart").max = barpix.length;
+  document.getElementById("segmentEnd").max = barpix.length;
+  document.getElementById("segmentEnd").value = barpix.length;
+}
 
 function hideSegment() {
   segment = false;
@@ -306,7 +333,7 @@ function showColor2() {
   document.getElementById("color2Div").classList.remove("hidden");
 }
 
-function sendColor() {
+async function sendColor() {
   let start = document.getElementById("segmentStart").value;
   let end = document.getElementById("segmentEnd").value;
   let hex1 = document.getElementById("color1").value.slice(1);
@@ -316,8 +343,6 @@ function sendColor() {
     end = barpix.length;
   }
   if (!gradient) hex2 = hex1;
-  request.open("GET", "/segment?start=" + start + "&end=" + end + "&hex=" + hex1 + "&hex2=" + hex2);
-  request.send();
-  document.getElementById("segmentStart").value = 0;
-  document.getElementById("segmentEnd").value = barpix.length;
+  let res = await getResponse("/segment?start=" + start + "&end=" + end + "&hex=" + hex1 + "&hex2=" + hex2, false);
+  if (res == permsError) alert(res);
 }

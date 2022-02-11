@@ -360,10 +360,7 @@
   let menus = ["students", "games", "teacher"];
   let innerPage = document.getElementById("innerPage");
   let innerPageTitle;
-  let segment;
-  let gradient;
   let urlOpen;
-  let barpix;
   let newMessages = 0;
   let username = "{{ username }}";
 
@@ -378,11 +375,7 @@
     updateVotes();
     listSounds("{{ sfx }}");
     listMusic("{{ bgm }}");
-
-    barpix = eval(pixRes.pixels);
-    document.getElementById("segmentStart").max = barpix.length;
-    document.getElementById("segmentEnd").max = barpix.length;
-    document.getElementById("segmentEnd").value = barpix.length;
+    segmentNumbers();
   }
   getApiData(true);
 

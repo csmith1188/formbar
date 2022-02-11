@@ -50,8 +50,9 @@
   }
 
   h1 {
-    margin-top: 0;
     color: var(--theme-color);
+    font-size: 32px;
+    margin: 0 0 4px;
   }
 
   h2 {
@@ -103,6 +104,11 @@
 
   #playPauseMusic, #restartMusic, #stopMusic {
     margin: 0;
+  }
+
+  #text {
+    text-transform: uppercase;
+    font-family: monospace;
   }
 
   #color2Div:not(.hidden) {
@@ -220,8 +226,10 @@
       checkForHelpTicket();
       nowPlaying();
       updateVolume();
+      disableVolume();
       listSounds("{{ sfx }}");
       listMusic("{{ bgm }}");
+      segmentNumbers();
     };
     getApiData(true);
 
@@ -232,6 +240,7 @@
       checkForHelpTicket();
       nowPlaying();
       updateVolume();
+      disableVolume();
     };
     setInterval(getApiData, 1000);
 

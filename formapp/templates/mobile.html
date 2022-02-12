@@ -152,6 +152,11 @@
       <img src="{{ url_for('static', filename='img/advanced/letterButton3.png') }}" id="letterButton3" class="letterButton button inline popOut moreDepth greenColor" title="Vote D" onclick="letterVote(3);" tabindex="0">
       <br><br>
     </div>
+    <div id="responseDiv" class="hidden">
+      <textarea id="response" rows="6" cols="25" placeholder="Type your response here" oninput="checkResponse();"></textarea><br>
+      <button id="submitResponse" class="inline popOut unselectable">Submit</button>
+      <br><br>
+    </div>
     <div id="otherDiv" class="hidden">
       <button id="help" class="inline popOut moreDepth" title="Send the teacher a help ticket">Help!</button><br>
       <button id="break" class="inline popOut moreDepth" title="Request a bathroom break">Bathroom!</button>
@@ -271,6 +276,7 @@
     function showEnabled() {
       let tutdDiv = document.getElementById("tutdDiv");
       let abcdDiv = document.getElementById("abcdDiv");
+      let responseDiv = document.getElementById("responseDiv");
       let otherDiv = document.getElementById("otherDiv");
       let soundDiv = document.getElementById("soundDiv");
       let musicDiv = document.getElementById("musicDiv");
@@ -286,6 +292,9 @@
 
       if (mode == "abcd" && myPerms == permsRes.student) abcdDiv.classList.remove("hidden");
       else abcdDiv.classList.add("hidden");
+
+      if (mode == "text" && permsRes.student) responseDiv.classList.remove("hidden");
+      else responseDiv.classList.add("hidden");
 
       if (myPerms == permsRes.student) otherDiv.classList.remove("hidden");
       else otherDiv.classList.add("hidden");

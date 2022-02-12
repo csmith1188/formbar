@@ -162,6 +162,7 @@ def newStudent(remote, username, bot=False):
             'name': username,
             'thumb': '',
             'letter': '',
+            'textRes': '',
             'perms': 3,
             'oldPerms': 3,
             'progress': [],
@@ -263,6 +264,8 @@ def changeMode(newMode='', direction='next'):
         tutdBar()
     elif sD.settings['barmode'] == 'abcd':
         abcdBar()
+    elif sD.settings['barmode'] == 'text':
+        textBar()
     elif sD.settings['barmode'] == 'essay' or sD.settings['barmode'] == 'quiz':
         completeBar()
     elif sD.settings['barmode'] == 'progress':
@@ -409,10 +412,15 @@ def repeatMode():
             sD.studentDict[student]['thumb'] = ''
         tutdBar()
     elif sD.settings['barmode'] == 'abcd':
-        # Clear thumbs
+        # Clear answers
         for student in sD.studentDict:
             sD.studentDict[student]['letter'] = ''
         abcdBar()
+    elif sD.settings['barmode'] == 'text':
+        # Clear bar
+        for student in sD.studentDict:
+            sD.studentDict[student]['textRes'] = ''
+        textBar()
     elif sD.settings['barmode'] == 'essay' or sD.settings['barmode'] == 'quiz' :
         # Clear thumbs
         for student in sD.studentDict:
@@ -605,7 +613,57 @@ def tutdBar():
     elif wiggleCount >= sD.settings['numStudents']:
         playSFX("bruh")
     #The Funny Number
-    if sD.settings['numStudents'] == 9 and complete == 6:
+    elif sD.settings['numStudents'] == 9 and complete == 6:
+        playSFX("clicknice")
+    elif complete:
+        playSFX("sfx_blip01")
+    if ONRPi:
+        pixels.show()
+
+#Show how many students have submitted text responses
+def textBar():
+    if not ONRPi:
+        global pixels
+    if sD.settings['autocount']:
+        autoStudentCount()
+    complete = fill = 0
+    for x in sD.studentDict:
+        if sD.studentDict[x]['perms'] == sD.settings['perms']['student'] and sD.studentDict[x]['textRes']:
+            complete += 1
+            fill += 1
+    for pix in range(0, BARPIX):
+        pixels[pix] = colors['default']
+    if sD.settings['showinc']:
+        chunkLength = math.floor(BARPIX / sD.settings['numStudents'])
+    else:
+        chunkLength = math.floor(BARPIX / complete)
+    for index, ip in enumerate(sD.studentDict):
+        pixRange = range((chunkLength * index), (chunkLength * index) + chunkLength)
+        if fill > 0:
+            for i, pix in enumerate(pixRange):
+                if i == 0:
+                    pixels[pix] = colors['student']
+                else:
+                    pixels[pix] = fadein(pixRange, i, colors['white'])
+            fill -= 1
+    if sD.settings['captions']:
+        clearString()
+        showString("TEXT " + str(complete) + "/" + str(sD.settings['numStudents']))
+        if ONRPi:
+            pixels.show()
+    if complete >= sD.settings['numStudents']:
+        if ONRPi:
+            pixels.fill((0,0,0))
+        else:
+            pixels = [(0,0,0)] * MAXPIX
+        playSFX("sfx_success01")
+        for i, pix in enumerate(range(0, BARPIX)):
+                pixels[pix] = blend(range(0, BARPIX), i, colors['blue'], colors['red'])
+        if sD.settings['captions']:
+            clearString()
+            showString("MAX GAMER!", 0, colors['purple'])
+    #The Funny Number
+    elif sD.settings['numStudents'] == 9 and complete == 6:
         playSFX("clicknice")
     elif complete:
         playSFX("sfx_blip01")
@@ -1935,7 +1993,7 @@ def endpoint_startsurvey():
         if not request.args.get('type'):
             return "You need a survey type."
         type = request.args.get('type')
-        if not (type == 'tutd' or type == 'abcd'):
+        if not (type == 'tutd' or type == 'abcd' or type == 'text'):
             return "Invalid survey type."
         changeMode(type)
         repeatMode()
@@ -1946,6 +2004,22 @@ def endpoint_startsurvey():
 #    ██
 #    ██
 #    ██
+
+'''
+/textresponse
+'''
+@app.route('/textresponse')
+def endpoint_textresponse():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    else:
+        response = request.args.get('response')
+        if sD.settings['barmode'] == 'text':
+            sD.studentDict[request.remote_addr]['textRes'] = response
+            textBar()
+            return "Response submitted."
+        else:
+            return "Not in text response mode."
 
 
 #Tic Tac Toe

@@ -17,6 +17,7 @@
     box-sizing: border-box;
     padding: 0 10px;
     overflow: auto;
+    overflow-wrap: break-word;
   }
 
   .msg {
@@ -145,7 +146,7 @@
   #notifications {
     position: fixed;
     right: 16px;
-    bottom: 8px;
+    bottom: 71px;
   }
 
   a {
@@ -352,7 +353,7 @@
         receiver = 'all';
         boxes.recBox.innerHTML = "all";
         boxes.recBox.style.color = "white";
-        boxes.sendButton.style.color = "var(--theme-color)";
+        boxes.sendButton.classList.remove("rec");
         //sendButton.value = "Send";
         //el.classList.remove('whisper');
         document.getElementById("removeRec").style.display = "none";

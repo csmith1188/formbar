@@ -8,9 +8,18 @@
 <!-- Extra style declarations here -->
 {% block style %}
 <style>
+  body {
+    overflow: hidden;
+  }
+
   .user {
     position: relative;
     left: 21px;
+  }
+
+  .user > * {
+    max-width: calc(100% - 21px);
+    overflow-wrap: break-word;
   }
 
   h3 {
@@ -91,10 +100,6 @@
                 let newStudent = document.createElement('h3');
                 let icons = "";
 
-                if (studentList[student]['complete']) icons += `<img src="{{ url_for('static', filename='img/users/complete.png') }}" class="icon" title="Complete">`;
-
-                if (studentList[student]['help'] == true) icons += `<img src="{{ url_for('static', filename='img/users/help.png') }}" class="icon" title="Help ticket">`;
-
                 //Change student color according to thumb response
                 let thumb = studentList[student]['thumb'];
                 if (thumb) var thumbIcon = document.createElement("img");
@@ -102,16 +107,25 @@
                 if (thumb == "wiggle") icons += `<img src="{{ url_for('static', filename='img/users/wiggle.png') }}" class="icon" title="Wiggle">`;
                 if (thumb == "down") icons += `<img src="{{ url_for('static', filename='img/users/down.png') }}" class="icon" title="Down">`;
 
-                //Change student letter according to survey response
+                //Change student letter according to letter response
                 let letter = studentList[student]['letter']
                 if (letter == "a") icons += `<img src="{{ url_for('static', filename='img/users/a.png') }}" class="icon" title="A">`;
                 if (letter == "b") icons += `<img src="{{ url_for('static', filename='img/users/b.png') }}" class="icon" title="B">`;
                 if (letter == "c") icons += `<img src="{{ url_for('static', filename='img/users/c.png') }}" class="icon" title="C">`;
                 if (letter == "d") icons += `<img src="{{ url_for('static', filename='img/users/d.png') }}" class="icon" title="D">`;
+
+                //Show icon if student has submitted text response
+                if (studentList[student].textRes) icons += `<img src="{{ url_for('static', filename='img/users/text.png') }}" class="icon" title="Response submitted">`;
+
+                if (studentList[student]['help'] == true) icons += `<img src="{{ url_for('static', filename='img/users/help.png') }}" class="icon" title="Help ticket">`;
+
+                if (studentList[student]['complete']) icons += `<img src="{{ url_for('static', filename='img/users/complete.png') }}" class="icon" title="Complete">`;
+
                 newStudent.innerHTML = icons + studentList[student].name;
                 let newDetails = document.createElement('span');
                 newDetails.classList.add('user');
                 if (collapsed) newDetails.classList.add("hidden");
+                if (studentList[student].textRes) newDetails.innerHTML += "<div style='margin-bottom: 8px;'><b>Response: </b>" + studentList[student].textRes + "</div>";
                 if (studentList[student].excluded) {
                     newStudent.style.background = "var(--highlight-color)";
                     newDetails.innerHTML += "Taking a bathroom break <button class='inline popOut' onclick='request.open(\"GET\", \"/break?action=end&name=" + studentList[student].name + "\");  request.send();'>End break</button><br>";

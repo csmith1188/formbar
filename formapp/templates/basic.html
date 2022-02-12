@@ -73,7 +73,7 @@
     position: absolute;
     width: 100%;
     left: 0;
-    top: 15%;
+    top: 20%;
     text-align: center;
   }
 
@@ -82,6 +82,12 @@
     display: flex;
     justify-content: space-between;
     margin: auto;
+  }
+
+  #response {
+    width: 360px;
+    height: 108px;
+    margin-bottom: 8px;
   }
 
   #other {
@@ -114,7 +120,7 @@
     box-shadow: none !important;
   }
 
-  #other button {
+  #studentPanel button {
     width: 180px;
     font-size: 28px;
     font-weight: bold;
@@ -208,22 +214,23 @@
   </div>
 
   <div id="studentPanel" class="hidden">
-    <h1>Thumbs</h1>
-    <h2 id="noTUTD">There is no thumbs survey right now.</h2>
+    <h1 id="surveyName"></h1>
     <div id="thumbs" class="hidden">
       <img src="{{ url_for('static', filename='img/basic/thumbButton0.png') }}" id="thumbButton0" class="thumbButton button inline popOut moreDepth greenColor" title="Up" onclick="thumbsVote(0);" tabindex="0">
       <img src="{{ url_for('static', filename='img/basic/thumbButton1.png') }}" id="thumbButton1" class="thumbButton button inline popOut moreDepth cyanColor" title="Wiggle" onclick="thumbsVote(1);" tabindex="0">
       <img src="{{ url_for('static', filename='img/basic/thumbButton2.png') }}" id="thumbButton2" class="thumbButton button inline popOut moreDepth redColor" title="Down" onclick="thumbsVote(2);" tabindex="0">
     </div>
-    <br><br>
-    <h1>Letters</h1>
-    <h2 id="noABCD">There is no letter survey right now.</h2>
     <div id="letters" class="hidden">
       <img src="{{ url_for('static', filename='img/basic/letterButton0.png') }}" id="letterButton0" class="letterButton button inline popOut moreDepth redColor" title="Vote A" onclick="letterVote(0);" tabindex="0">
       <img src="{{ url_for('static', filename='img/basic/letterButton1.png') }}" id="letterButton1" class="letterButton button inline popOut moreDepth blueColor" title="Vote B" onclick="letterVote(1);" tabindex="0">
       <img src="{{ url_for('static', filename='img/basic/letterButton2.png') }}" id="letterButton2" class="letterButton button inline popOut moreDepth yellowColor" title="Vote C" onclick="letterVote(2);" tabindex="0">
       <img src="{{ url_for('static', filename='img/basic/letterButton3.png') }}" id="letterButton3" class="letterButton button inline popOut moreDepth greenColor" title="Vote D" onclick="letterVote(3);" tabindex="0">
     </div>
+    <div id="textBox" class="hidden">
+      <textarea id="response" placeholder="Type your response here" oninput="checkResponse();"></textarea><br>
+      <button id="submitResponse" class="inline popOut unselectable">Submit</button>
+    </div>
+    <h2 id="noSurvey">There is no survey right now.</h2>
     <br><br>
     <h1>Other</h1>
     <div id="other">
@@ -243,6 +250,8 @@
       <div id="newSurvey" class="hidden">New survey:
         <button class="inline popOut" onclick="startSurvey('tutd')">Thumbs</button>
         <button class="inline popOut" onclick="startSurvey('abcd')">Letters</button>
+        <button class="inline popOut" onclick="startSurvey('text')">Text response</button><br>
+        <span id="textLink" class="hidden">Click <a onclick="window.open('/advanced?page=users')">here</a> to see responses</span>
       </div>
       <button class="inline popOut" onclick="window.open('/advanced?page=settings');">All settings 🡆</button>
     </div>
@@ -411,31 +420,40 @@
       let mode = modeRes.mode;
       let myPerms = meRes.perms;
       let studentPerms = permsRes.student;
+      let surveyName = document.getElementById("surveyName");
       let thumbs = document.getElementById("thumbs");
-      let noTUTD = document.getElementById("noTUTD");
       let letters = document.getElementById("letters");
-      let noABCD = document.getElementById("noABCD");
-      if (mode == "tutd") {
+      let textBox = document.getElementById("textBox");
+      let noSurvey = document.getElementById("noSurvey");
+      if (mode == "tutd" || mode == "abcd" || mode == "text") {
         if (myPerms == studentPerms) {
-          thumbs.classList.remove("hidden");
-          noTUTD.classList.add("hidden");
+          noSurvey.classList.add("hidden");
+          if (mode == "tutd") {
+            thumbs.classList.remove("hidden");
+            surveyName.innerText = "Survey: thumbs";
+          } else {
+            thumbs.classList.add("hidden");
+          }
+          if (mode == "abcd") {
+            letters.classList.remove("hidden");
+            surveyName.innerText = "Survey: letters";
+          } else {
+            letters.classList.add("hidden");
+          }
+          if (mode == "text") {
+            textBox.classList.remove("hidden");
+            surveyName.innerText = "Survey: text response";
+          } else {
+            textBox.classList.add("hidden");
+          }
         } else {
-          noTUTD.innerText = "Only students can vote in surveys.";
+          surveyName.innerText = "Survey";
+          noSurvey.innerText = "Only students can vote in surveys.";
+          noSurvey.classList.remove("hidden");
         }
       } else {
-        thumbs.classList.add("hidden");
-        noTUTD.classList.remove("hidden");
-      }
-      if (mode == "abcd") {
-        if (myPerms == studentPerms) {
-          letters.classList.remove("hidden");
-          noABCD.classList.add("hidden");
-        } else {
-          noABCD.innerText = "Only students can vote in surveys.";
-        }
-      } else {
-        letters.classList.add("hidden");
-        noABCD.classList.remove("hidden");
+        surveyName.innerText = "Survey";
+        noSurvey.classList.remove("hidden");
       }
     }
 
@@ -443,8 +461,13 @@
       let mode = modeRes.mode;
       let el = document.getElementById("mode");
       let ns = document.getElementById("newSurvey").classList;
+      let tl = document.getElementById("textLink").classList;
       if (el != document.activeElement) {
+        ns.add("hidden");
+        tl.add("hidden");
         switch (mode) {
+          case "text":
+            tl.remove("hidden");
           case "survey":
           case "tutd":
           case "abcd":
@@ -453,11 +476,9 @@
             break;
           case "progress":
             el.value = "Progress";
-            ns.add("hidden");
             break;
           case "playtime":
             el.value = "Playtime";
-            ns.add("hidden");
         }
       } else if (el.value == "Survey") {
         ns.remove("hidden");

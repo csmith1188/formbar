@@ -97,8 +97,9 @@
     }
 
     function changeSurveyType() {
-      if (document.getElementById("thumbs").checked) document.getElementById("surveyDescription").innerText = "thumbs up, thumbs down, and wiggle";
-      else if (document.getElementById("letters").checked) document.getElementById("surveyDescription").innerText = "four options";
+      if (document.getElementById("thumbs").checked) document.getElementById("surveyDescription").innerText = "Students can choose between thumbs up, thumbs down, and wiggle.";
+      else if (document.getElementById("letters").checked) document.getElementById("surveyDescription").innerText = "Students can choose between A, B, C, and D.";
+      else if (document.getElementById("textResponse").checked) document.getElementById("surveyDescription").innerHTML = "Students will type out short answers. View responses <a href='/users'>here</a>.";
     }
 
     function startSurvey() {
@@ -107,6 +108,9 @@
         request.send();
       } else if (document.getElementById("letters").checked) {
         request.open('GET', '/startsurvey?type=abcd');
+        request.send();
+      } else if (document.getElementById("textResponse").checked) {
+        request.open('GET', '/startsurvey?type=text');
         request.send();
       }
     }
@@ -135,6 +139,11 @@
         document.getElementById("survey").checked = true;
         document.getElementById("surveyType").classList.remove("hidden");
         document.getElementById("letters").checked = true;
+        changeSurveyType();
+      } else if (mode == "text") {
+        document.getElementById("survey").checked = true;
+        document.getElementById("surveyType").classList.remove("hidden");
+        document.getElementById("textResponse").checked = true;
         changeSurveyType();
       } else if (mode == "progress") {
         document.getElementById("progress").checked = true;
@@ -167,8 +176,9 @@
     <form id="surveyType" class="hidden" style="margin: 8px 0 0 21px;" onchange="changeSurveyType();">
       Type:
       <input type="radio" id="thumbs" name="type" checked style="margin-left: 8px;"><label for="thumbs">Thumbs</label>
-      <input type="radio" id="letters" name="type" style="margin-left: 8px;"><label for="letters">Letters</label><br>
-      Students can choose between <span id="surveyDescription">thumbs up, thumbs down, and wiggle</span>.<br>
+      <input type="radio" id="letters" name="type" style="margin-left: 8px;"><label for="letters">Letters</label>
+      <input type="radio" id="textResponse" name="type" style="margin-left: 8px;"><label for="textResponse">Text response</label><br>
+      <span id="surveyDescription">Students can choose between thumbs up, thumbs down, and wiggle</span><br>
       <input type="button" class="button inline popOut" value="Start new survey" style="margin-top: 8px;" onclick="startSurvey();">
     </form>
     <br>

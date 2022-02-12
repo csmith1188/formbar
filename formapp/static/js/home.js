@@ -103,8 +103,8 @@ function letterVote(letter) {
 
 function updateVotes() {
   //Make sure a thumb/letter button is not currently active (to prevent immediately reverting a vote)
-  if (!thumbButtons.includes(document.activeElement) && !thumbButtons.includes(document.activeElement)) {
-    //Make sure displayed vote matches actual vote, for example if new poll is started or user reloads
+  if (!thumbButtons.includes(document.activeElement) && !letterButtons.includes(document.activeElement)) {
+    //Make sure displayed vote matches actual vote, for example if new poll is started or page is reloaded
     let thumb = meRes.thumb ? thumbs.indexOf(meRes.thumb) : false;
     let letter = meRes.letter ? letters.indexOf(meRes.letter) : false;
     if (thumb === false && chosenThumb !== false) thumbsVote(chosenThumb); //Remove the vote
@@ -112,6 +112,15 @@ function updateVotes() {
     if (letter === false && chosenLetter !== false) thumbsVote(chosenLetter); //Remove the vote
     else if (letter !== chosenLetter) letterVote(letter);
   }
+
+  let textResEl = document.getElementById("response");
+  let response = meRes.textRes;
+  if (response && !textResEl.value) {
+    textResEl.value = response;
+    checkResponse();
+    responseSubmitted();
+  }
+  if (!response && textResEl.value) responseUnsubmitted();
 }
 
 function highlight(image) {
@@ -148,6 +157,50 @@ function removeHighlight(image) {
       button.title = "Vote D";
       break;
   }
+}
+
+function checkResponse() {
+  let box = document.getElementById("response");
+  let button = document.getElementById("submitResponse");
+  if (box.value) {
+    button.classList.remove("unselectable");
+    button.onclick = submitResponse;
+  } else {
+    button.classList.add("unselectable");
+    button.onclick = null;
+  }
+}
+
+function submitResponse() {
+  let box = document.getElementById("response");
+  request.open("GET", "/textresponse?response=" + box.value);
+  request.send();
+  responseSubmitted();
+}
+
+function responseSubmitted() {
+  let box = document.getElementById("response");
+  let button = document.getElementById("submitResponse");
+  box.disabled = true;
+  box.classList.add("unselectable");
+  button.innerText = "Unsubmit";
+  button.onclick = unsubmitResponse;
+}
+
+function unsubmitResponse() {
+  let box = document.getElementById("response");
+  request.open("GET", "/textresponse?response=");
+  request.send();
+  responseUnsubmitted();
+}
+
+function responseUnsubmitted() {
+  let box = document.getElementById("response");
+  let button = document.getElementById("submitResponse");
+  box.disabled = false;
+  box.classList.remove("unselectable");
+  button.innerText = "Submit";
+  button.onclick = submitResponse;
 }
 
 function shorten(container, maxHeight, text, maxWidth) {

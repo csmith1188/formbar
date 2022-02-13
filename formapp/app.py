@@ -2136,6 +2136,9 @@ def endpoint_textresponse():
     else:
         response = request.args.get('response')
         if sD.settings['barmode'] == 'text':
+            if not response and sD.studentDict[request.remote_addr]['textRes']:
+                #Response unsubmitted
+                playSFX("sfx_hit01")
             sD.studentDict[request.remote_addr]['textRes'] = response
             textBar()
             return "Response submitted."

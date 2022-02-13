@@ -798,7 +798,7 @@ def endpoint_2048():
             highScore = highScore[3]
         else:
             highScore = 0
-        return render_template('2048.html', highScore = highScore or 0)
+        return render_template('2048.html', highScore = highScore)
 
 #  █████
 # ██   ██
@@ -1002,7 +1002,16 @@ def endpoint_bitshifter():
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
         return redirect(sD.mainPage + "?alert=You do not have high enough permissions to do this right now.")
     else:
-        return render_template('bitshifter.html')
+        username = sD.studentDict[request.remote_addr]['name']
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        highScore = dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='bitshifter' ORDER BY score DESC", {"uname": username}).fetchone()
+        db.close()
+        if highScore:
+            highScore = highScore[3]
+        else:
+            highScore = 0
+        return render_template('bitshifter.html', highScore = highScore)
 
 '''
     /break

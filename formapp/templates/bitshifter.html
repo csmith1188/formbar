@@ -62,19 +62,31 @@
 {% block main %}
   <div id="gamebox">
     <div>Make your byte match the target by shifting the bits left or right, then submiting with "=="</div>
-    <div id="scores">
+    <div id="scores" class="hidden">
       <h3>Score: <span id="scorebox">0</span></h3>
-      Highest: <span id="hiscorebox">0</span>
+      Highest: <span id="hiscorebox"></span>
     </div>
-    <div id="targets">
+    <br>
+    <div id="setDifficulty">
+      Difficulty:
+      <select id="difficulty">
+        <option>Easy</option>
+        <option>Hard</option>
+        <option>Extreme</option>
+      </select>
+    </div>
+    <div id="timeLimit" class="hidden">
+      <h3>Time left: <span id="timeLeft">60</span></h3>
+    </div>
+    <div id="targets" class="hidden">
       <h3>Target: <span id="targetbox"></span></h3>
       Character: <span id="charabox"></span>
     </div>
-    <div>
+    <div id="byte" class="hidden">
       Your byte:<br>
       <span id="bitbox"></span>
     </div>
-    <div id="controlsbox">
+    <div id="controlsbox" class="hidden">
       <button type="button" name="leftbutt" onclick="left()">&lt;&lt;</button>
       <button type="button" name="ritebutt" onclick="right()">&gt;&gt;</button>
     </div>
@@ -82,7 +94,7 @@
       <h3 id="answerbox"></h3>
     </div>
     <div>
-      <button type="button" id="checkbutt" name="checkbutt" onclick="check()">==</button>
+      <button type="button" id="checkbutt" name="checkbutt">Start</button>
     </div>
 </div>
 {% endblock %}
@@ -91,19 +103,21 @@
 {% block script %}
   <script type="text/javascript">
     var score = 0;
-    var hiscore = 0;
+    var hiscore = {{ highScore }};
     var hexChar = ["0", "1", "2", "3", "4", "5", "6", "7","8", "9", "A", "B", "C", "D", "E", "F"];
     document.getElementById('answerboxcontainer').classList.add("hidden");
+    document.getElementById('checkbutt').onclick = check;
     function byteToHex(b) {
       return hexChar[(b >> 4) & 0x0f] + hexChar[b & 0x0f];
     }
-    window.onload = draw;
     function newTarget() {
       let target = Math.floor(Math.random() * 256);
       let targetHex = byteToHex(target)
       let targetString = []
       let targetChar = String.fromCharCode(target)
       let tempTarget = target;
+      let timer;
+      let timeLeft = 60;
       for (var i = 0; i < 8; i++) {
         targetString.splice(0,0,1&tempTarget);
         tempTarget = tempTarget >> 1
@@ -154,24 +168,63 @@
       let container = document.getElementById('answerboxcontainer');
       let controlsBox = document.getElementById('controlsbox');
       let checkButton = document.getElementById("checkbutt");
+      let difficulty = document.getElementById("difficulty").value;
+      document.getElementById("scores").classList.remove("hidden");
+      document.getElementById("timeLimit").classList.remove("hidden");
+      document.getElementById("targets").classList.remove("hidden");
+      document.getElementById("byte").classList.remove("hidden");
+      document.getElementById("setDifficulty").classList.add("hidden");
       if (controlsBox.classList.contains("hidden")) {
+        draw();
+        switch (difficulty) {
+          case "Easy":
+            timeLeft = 59
+            break;
+          case "Hard":
+            timeLeft = 29
+            break;
+          case "Extreme":
+            timeLeft = 14
+        }
+        document.getElementById("timeLeft").innerText = timeLeft;
+        timer = setInterval(() => {
+          if (timeLeft) {
+            document.getElementById("timeLeft").innerText = --timeLeft;
+          } else {
+            container.classList.remove("hidden");
+            answerBox.innerHTML = "You winn't!";
+          }
+        }, 1000);
         container.classList.add("hidden");
         controlsBox.classList.remove("hidden");
         checkButton.innerText = "==";
         gameData = newTarget();
         draw();
       } else {
+        clearInterval(timer);
         controlsBox.classList.add("hidden");
         container.classList.remove("hidden");
         checkButton.innerText = "OK";
         if (gameData.arr == gameData.guess) {
           answerBox.innerHTML = "You win!";
-          score++;
+          switch (difficulty) {
+            case "Easy":
+              score++;
+              break;
+            case "Hard":
+              score += 2;
+              break;
+            case "Extreme":
+              score += 4;
+          }
           if (score > hiscore) hiscore = score;
           draw();
         } else {
           answerBox.innerHTML = "You winn't!";
-          score = 0;
+          request.open("POST", "/savescore?game=bitshifter&score=" + score);
+          request.send();
+          checkButton.innerText = "Restart";
+          checkButton.onclick = () => window.location.reload();
         }
       }
     }

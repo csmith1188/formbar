@@ -175,7 +175,7 @@
       <h3>Score</h3>
 			<div id="score">0</div>
       <h3>High score</h3>
-			<div id="highscore">0</div>
+			<div id="highscore"></div>
       <h3>Lives</h3>
 			<div id="lives">10</div>
       <h3>Previous word</h3>
@@ -211,7 +211,7 @@
     divKeys.innerHTML += `<div id="${letterList[i]}" class="key" onclick="guess('${letterList[i]}')">${letterList[i]}</div>`
   }
   var score = 0;
-  var highscore = localStorage.getItem("hangmanHighScore") || 0;
+  var highscore = {{ highScore }};
   var lives = 10;
   var word;
   var letters;
@@ -348,7 +348,6 @@
         document.getElementById("last").innerHTML = lastword;
         score += lives;
         if (score > highscore) {
-          localStorage.setItem("hangmanHighScore", score);
           highscore = score;
           document.getElementById("highscore").style.color = "var(--light-purple)";
         }
@@ -368,6 +367,8 @@
       if (lives < 1) {
         //they lost
         if (lives == 0) {
+          request.open("POST", "/savescore?game=hangman&score=" + score);
+          request.send();
           score = 0;
           randomize();
           resetLetters();

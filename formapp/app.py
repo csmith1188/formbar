@@ -174,7 +174,7 @@ def newStudent(remote, username, bot=False):
             'help': False,
             'breakReq': False,
             'excluded': False,
-            'preferredMode': None
+            'preferredHomepage': None
         }
         #Track if the teacher is logged in
         teacher = False
@@ -766,9 +766,19 @@ def endpoint_root():
     ##Also check database
     if not request.remote_addr in sD.studentDict:
         return redirect('/login')
-    if sD.studentDict[request.remote_addr]['preferredMode'] == 'advanced':
+    username = sD.studentDict[request.remote_addr]['name']
+    #If no preferred homepage is set, check the database
+    if not sD.studentDict[request.remote_addr]['preferredHomepage']:
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        dbData = dbcmd.execute("SELECT * FROM users WHERE username=:uname", {"uname": username}).fetchall()
+        db.close()
+        if len(dbData):
+            pm = dbData[0][6]
+            sD.studentDict[request.remote_addr]['preferredHomepage'] = pm
+    if sD.studentDict[request.remote_addr]['preferredHomepage'] == 'advanced':
         return redirect('/advanced')
-    if sD.studentDict[request.remote_addr]['preferredMode'] == 'basic':
+    if sD.studentDict[request.remote_addr]['preferredHomepage'] == 'basic':
         return redirect('/basic')
     return redirect('/setdefault')
 
@@ -779,7 +789,16 @@ def endpoint_2048():
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
         return redirect(sD.mainPage + "?alert=You do not have high enough permissions to do this right now.")
     else:
-        return render_template('2048.html')
+        username = sD.studentDict[request.remote_addr]['name']
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        highScore = dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='2048' ORDER BY score DESC", {"uname": username}).fetchone()
+        db.close()
+        if highScore:
+            highScore = highScore[3]
+        else:
+            highScore = 0
+        return render_template('2048.html', highScore = highScore or 0)
 
 #  █████
 # ██   ██
@@ -1050,7 +1069,29 @@ def endpoint_changemode():
 def endpoint_chat():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
-    return render_template("chat.html", username = sD.studentDict[request.remote_addr]['name'])
+    db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+    dbcmd = db.cursor()
+    messages = dbcmd.execute("SELECT * FROM messages").fetchall()
+    db.close()
+    return render_template("chat.html", username = sD.studentDict[request.remote_addr]['name'], messages = json.dumps(messages))
+
+@app.route('/cleartable')
+def endpoint_cleartable():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['teacher']:
+        return "You do not have high enough permissions to do this right now."
+    table = request.args.get('table')
+    if table:
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        dbcmd.execute("DELETE FROM " + table)
+        db.commit()
+        db.close()
+        playSFX("sfx_explode01")
+        return "Data in " + table + " deleted."
+    else:
+        return "Missing table argument."
 
 '''
     /color
@@ -1090,13 +1131,29 @@ def endpoint_color():
 def endpoint_countdown():
     return 'This feature is not available yet.'
 
+@app.route('/createaccount', methods = ['POST'])
+def endpoint_createaccount():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['teacher']:
+        return "You do not have high enough permissions to do this right now."
+    name = request.args.get('name')
+    password = request.args.get('password')
+    passwordCrypt = cipher.encrypt(password.encode())
+    db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+    dbcmd = db.cursor()
+    dbcmd.execute("INSERT INTO users (username, password, permissions, bot) VALUES (?, ?, ?, ?)", (name, passwordCrypt, sD.settings['perms']['anyone'], "False"))
+    db.commit()
+    db.close()
+    return 'Account created.'
+
 @app.route('/createfightermatch')
 def endpoint_createfightermatch():
     code = request.args.get('code')
     name = request.args.get('name')
     sD.fighter['match' + code] = {} #Create new object for match
     sD.fighter['match' + code]['creator'] = name #Set "creator" of object to arg "name"
-    return 'Match ' + code + ' created by ' + name
+    return 'Match ' + code + ' created by ' + name + '.'
 
 # ██████
 # ██   ██
@@ -1313,7 +1370,16 @@ def endpoint_hangman():
                 'place': 'your',
                 'words': 'here'
             }
-        return render_template("hangman.html", wordObj=wordObj)
+        username = sD.studentDict[request.remote_addr]['name']
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        highScore = dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='hangman' ORDER BY score DESC", {"uname": username}).fetchone()
+        db.close()
+        if highScore:
+            highScore = highScore[3]
+        else:
+            highScore = 0
+        return render_template("hangman.html", wordObj=wordObj, highScore = highScore)
 
 @app.route('/help')
 def endpoint_help():
@@ -1341,6 +1407,16 @@ def endpoint_help():
 # ██
 # ███████
 
+@app.route('/leaderboards')
+def endpoint_leaderboards():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    game = request.args.get('game') or ''
+    db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+    dbcmd = db.cursor()
+    data = dbcmd.execute("SELECT * FROM scores ORDER BY score DESC").fetchall()
+    db.close()
+    return render_template("leaderboards.html", game = game, data = json.dumps(data))
 
 '''
     /lesson
@@ -1578,7 +1654,16 @@ def endpoint_minesweeper():
             rows = request.args.get('rows')
         if request.args.get('dense'):
             dense = request.args.get('dense')
-        return render_template("mnsw.html", cols=cols, rows=rows, dense=dense)
+        username = sD.studentDict[request.remote_addr]['name']
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        bestTime = dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='minesweeper' ORDER BY score ASC", {"uname": username}).fetchone()
+        db.close()
+        if bestTime:
+            bestTime = bestTime[3]
+        else:
+            bestTime = 0
+        return render_template("mnsw.html", cols=cols, rows=rows, dense=dense, bestTime=bestTime)
 
 '''
     /mobile
@@ -1693,19 +1778,21 @@ def endpoint_profile():
     elif sD.studentDict[request.remote_addr]['perms'] >= sD.settings['perms']['banned']:
         return redirect(sD.mainPage + "?alert=You do not have high enough permissions to do this right now.")
     else:
-        if request.args.get('user'):
-            nameArg = request.args.get('user')
-            for x in sD.studentDict:
-                user = sD.studentDict[x]
-                name = user['name'].strip()
-                if name == nameArg:
-                    return render_template("profile.html", username = user['name'], perms = sD.settings['permname'][user['perms']], bot = user['bot'])
-            #If there are no matches
-            return "There are no users with that name."
-
-        else:
-            user = sD.studentDict[request.remote_addr]
-            return render_template("profile.html", username = user['name'], perms = sD.settings['permname'][user['perms']], bot = user['bot'])
+        name = request.args.get('user') or sD.studentDict[request.remote_addr]['name']
+        for x in sD.studentDict:
+            user = sD.studentDict[x]
+            if user['name'].strip() == name:
+                username = sD.studentDict[request.remote_addr]['name']
+                db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+                dbcmd = db.cursor()
+                highScores = {
+                    "2048": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='2048' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
+                    "hangman": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='hangamn' ORDER BY score DESC", {"uname": user['name']}).fetchone()
+                }
+                db.close()
+                return render_template("profile.html", username = user['name'], perms = sD.settings['permname'][user['perms']], bot = user['bot'], highScores = json.dumps(highScores))
+        #If there are no matches
+        return "There are no users with that name."
 
 '''
     /progress
@@ -1775,6 +1862,23 @@ def endpoint_quiz():
 # ███████
 #      ██
 # ███████
+
+@app.route('/savescore', methods = ['POST'])
+def endpoint_savescore():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    game = request.args.get("game")
+    score = request.args.get("score")
+    if game and score:
+        username = sD.studentDict[request.remote_addr]['name']
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        dbcmd.execute("INSERT INTO scores (game, username, score) VALUES (?, ?, ?)", (game, username, score))
+        db.commit()
+        db.close()
+        return "Score saved to database."
+    else:
+        return "Missing arguments."
 
 
 @app.route('/say')
@@ -1881,18 +1985,17 @@ def endpoint_setdefault():
         return redirect('/login?forward=' + request.path)
     if request.method == 'POST':
         if request.form['mode'] == 'basic' or request.form['mode'] == 'advanced':
-            sD.studentDict[request.remote_addr]['preferredMode'] = request.form['mode']
+            sD.studentDict[request.remote_addr]['preferredHomepage'] = request.form['mode']
             db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
             dbcmd = db.cursor()
-            ##Test this
-            dbcmd.execute("UPDATE users SET preferredMode=:mode WHERE username=:uname", {"uname": sD.studentDict[request.remote_addr]['name'], "mode": request.form['mode']})
+            dbcmd.execute("UPDATE users SET preferredHomepage=:mode WHERE username=:uname", {"uname": sD.studentDict[request.remote_addr]['name'], "mode": request.form['mode']})
             db.commit()
             db.close()
         else:
             return 'Invalid mode.'
         return redirect('/')
     else:
-        return render_template('setdefault.html', pm = sD.studentDict[request.remote_addr]['preferredMode'])
+        return render_template('setdefault.html', pm = sD.studentDict[request.remote_addr]['preferredHomepage'])
 
 #This endpoint is exclusive only to the teacher.
 @app.route('/settings', methods = ['POST', 'GET'])
@@ -1980,7 +2083,16 @@ def endpoint_speedtype():
     elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
         return redirect(sD.mainPage + "?alert=You do not have high enough permissions to do this right now.")
     else:
-        return render_template("speedtype.html")
+        username = sD.studentDict[request.remote_addr]['name']
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        highScore = dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='speedtype' ORDER BY score DESC", {"uname": username}).fetchone()
+        db.close()
+        if highScore:
+            highScore = highScore[3]
+        else:
+            highScore = 0
+        return render_template("speedtype.html", highScore = highScore)
 
 #Start a thumbs survey
 @app.route('/startsurvey')
@@ -2143,7 +2255,7 @@ def endpoint_users():
                                     #Open and connect to database
                                     db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
                                     dbcmd = db.cursor()
-                                    userFound = dbcmd.execute("UPDATE users SET permissions=:perms WHERE username=:uname", {"uname": sD.studentDict[user]['name'], "perms": sD.studentDict[user]['perms']})
+                                    dbcmd.execute("UPDATE users SET permissions=:perms WHERE username=:uname", {"uname": sD.studentDict[user]['name'], "perms": sD.studentDict[user]['perms']})
                                     db.commit()
                                     db.close()
                                     print("[info] " + "")
@@ -2152,6 +2264,27 @@ def endpoint_users():
                                 return "User not in list."
                         except:
                             return "Perm was not an integer."
+                if action == 'changePw':
+                    password = request.args.get('password')
+                    if password:
+                        passwordCrypt = cipher.encrypt(password.encode())
+                        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+                        dbcmd = db.cursor()
+                        dbcmd.execute("UPDATE users SET password=:pw WHERE username=:uname", {"uname": sD.studentDict[user]['name'], "pw": passwordCrypt})
+                        db.commit()
+                        db.close()
+                        return "Password reset."
+                    else:
+                        return "New password reqired."
+                if action == 'delete':
+                    db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+                    dbcmd = db.cursor()
+                    dbcmd.execute("DELETE FROM users WHERE username=:uname", {"uname": sD.studentDict[user]['name']})
+                    db.commit()
+                    db.close()
+                    if user in sD.studentDict:
+                        del sD.studentDict[user]
+                    return "User deleted."
             if request.args.get('refresh'):
                 refresh = request.args.get('refresh')
                 if refresh == 'all':

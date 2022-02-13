@@ -663,7 +663,7 @@
 <!-- Extra javascript here -->
 {% block script %}
 <script>
-  if (localStorage.getItem("2048HighScore")) document.getElementById("highScore").innerHTML = localStorage.getItem("2048HighScore");
+  document.getElementById("highScore").innerHTML = {{ highScore }};
 
   var gameObj = {
     points: {
@@ -764,6 +764,9 @@
       document.getElementById("gameOver").style.display = "block";
       document.getElementById("cover").style.cursor = "not-allowed";
       document.getElementById("newGameButton").classList.add("newButtonAnimation");
+      document.onkeydown = null;
+      request.open("POST", "/savescore?game=2048&score=" + this.points.score);
+      request.send();
     },
     moveTo: function(obj1, obj2) {
       obj2.boxObj = obj1.boxObj;
@@ -785,14 +788,12 @@
       scoreBar.textContent = this.points.score;
       var highScoreBar = document.getElementById('highScore');
       var newBest = document.getElementById('newBest');
-      var highScore = localStorage.getItem("2048HighScore");
-      if (this.points.score > highScore) {
+      if (this.points.score > {{ highScore }}) {
         highScoreBar.innerText = this.points.score;
         highScoreBar.textContent = this.points.score;
         highScoreBar.style.color = "var(--light-red)";
         newBest.innerText = "New best!";
         newBest.textContent = "New best!";
-        localStorage.setItem("2048HighScore", this.points.score);
       }
       return obj2.boxObj.value;
 

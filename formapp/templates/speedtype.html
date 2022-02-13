@@ -172,6 +172,7 @@
     let total_errors = 0;
     let errors = 0;
     let accuracy = 0;
+    let accuracyVal = 0;
     let characterTyped = 0;
     let current_quote = "";
     let quoteNo = 0;
@@ -243,7 +244,7 @@
 
       // update accuracy text
       let correctCharacters = (characterTyped - (total_errors + errors));
-      let accuracyVal = ((correctCharacters / characterTyped) * 100);
+      accuracyVal = ((correctCharacters / characterTyped) * 100);
       accuracy_text.textContent = Math.round(accuracyVal) + "%";
 
       // if current text is completely typed
@@ -269,6 +270,7 @@
       // clear old and start a new timer
       clearInterval(timer);
       timer = setInterval(updateTimer, 1000);
+      timer_group.style.display = "block";
     }
 
     function resetValues() {
@@ -277,6 +279,7 @@
       errors = 0;
       total_errors = 0;
       accuracy = 0;
+      accuracyVal = 0;
       characterTyped = 0;
       quoteNo = 0;
       input_area.disabled = false;
@@ -320,12 +323,12 @@
       input_area.disabled = true;
       input_area.classList.add("unselectable");
 
-      // show finishing text
-      quote_text.textContent = "Click on restart to start a new game.";
-
       // calculate cpm and wpm
       cpm = Math.round(((characterTyped / timeElapsed) * 60));
       wpm = Math.round((((characterTyped / 5) / timeElapsed) * 60));
+
+      // calculate total score
+      score = Math.round(cpm * accuracyVal ** 1.5);
 
       // update cpm and wpm text
       cpm_text.textContent = cpm;
@@ -337,7 +340,16 @@
       // hide the timer
       timer_group.style.display = "none";
 
+      // show final score
+      quote_text.innerHTML = `
+        Final score: ${score}<br>
+        <span style="font-size: 80%;">Best: ${Math.max({{ highScore }}, score)}</span>
+      `;
+
       activeGame = false;
+
+      request.open("POST", "/savescore?game=speedtype&score=" + score);
+      request.send();
     }
   </script>
 {% endblock %}

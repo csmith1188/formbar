@@ -32,6 +32,10 @@
     margin-bottom: 8px;
   }
 
+  #students {
+    margin-bottom: 8px;
+  }
+
   .icon {
     height: 1.2em;
     display: inline-block;
@@ -50,6 +54,7 @@
 <button id="collapseButton" class="inline popOut">Collapse all</button>
 <div id="students">
 </div>
+<button id="addUser" class="inline popOut">Add user</button>
 {% endblock %}
 
 <!-- Extra javascript here -->
@@ -73,17 +78,41 @@
     }
 
     function checkUpdates(url) {
-        request.open('GET', url);
-        request.onload = function() {
-            studentData = request.response;
+        let newRequest = new XMLHttpRequest();
+        newRequest.open('GET', url);
+        newRequest.onload = function() {
+            studentData = newRequest.response;
         };
-        request.send();
+        newRequest.send();
+    }
+
+    function remove(name) {
+      request.open("GET", "users?name=" + name + "&action=kick");
+      request.send();
     }
 
     function banip(name) {
       if (confirm("Are you sure you want to ban this user's DEVICE?")) {
-        window.location.href = "/users?name=" + name + "&action=ban";
+        request.open("GET", "/users?name=" + name + "&action=ban");
+        request.send();
       }
+    }
+
+    function changePw(name) {
+      let password;
+      do {password = prompt("New password:")} while (password === "");
+      request.open("GET", "/users?name=" + name + "&action=changePw&password=" + password);
+      request.send();
+    }
+
+    function deleteAcc(name) {
+      request.open("GET", "/users?name=" + name + "&action=delete");
+      request.send();
+    }
+
+    function removeHelp(name) {
+      request.open("GET", "/needshelp?remove=" + name);
+      request.send();
     }
 
     setInterval(function() {
@@ -189,13 +218,18 @@
                 }
                 studentBox.appendChild(newStudent)
                 studentBox.appendChild(newDetails)
+                let name = studentList[student]['name'];
                 newDetails.innerHTML += "	&nbsp; ";
-                newDetails.innerHTML += `<a href="users?name=${studentList[student]['name']}&action=kick">Remove</a>`;
+                newDetails.innerHTML += `<a onclick="remove('${name}')">Remove</a>`;
                 newDetails.innerHTML += "	&nbsp; ";
-                newDetails.innerHTML += `<a href="#" onclick="banip('${studentList[student]['name']}')">Ban Device</a>`;
+                newDetails.innerHTML += `<a onclick="banip('${name}')">Ban Device</a>`;
+                newDetails.innerHTML += "	&nbsp; ";
+                newDetails.innerHTML += `<a onclick="changePw('${name}')">Change password</a>`;
+                newDetails.innerHTML += "	&nbsp; ";
+                newDetails.innerHTML += `<a onclick="deleteAcc('${name}')">Delete account</a>`;
                 if (studentList[student]['help'] == true) {
                   newDetails.innerHTML += "	&nbsp; ";
-                  newDetails.innerHTML += `<a href=\'/needshelp?remove=${studentList[student]['name']}\'>Clear Help</a>`;
+                  newDetails.innerHTML += `<a onclick="removeHelp('${name}')">Remove help ticket</a>`;
                 }
                 newDetails.innerHTML += "<br><br>";
             }
@@ -210,5 +244,16 @@
         };
         request.send();
     }
+
+    document.getElementById("addUser").addEventListener("click", () => {
+      let username;
+      let password;
+      do {username = prompt("New user's name:")} while (username === "");
+      do {password = prompt("New user's password:")} while (password === "");
+      if (username && password) {
+        request.open("POST", `/createaccount?name=${username}&password=${password}`);
+        request.send();
+      }
+    });
 </script>
 {% endblock %}

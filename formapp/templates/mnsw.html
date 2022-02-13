@@ -34,11 +34,18 @@
       top: 32px;
     }
 
+    #best {
+      position: fixed;
+      right: calc(50% - 300px);
+      top: 75px;
+      font-size: 24px;
+    }
+
     #button {
       position: fixed;
       left: 50%;
       transform: translateX(-50%);
-      top: 108px;
+      top: 124px;
       font-size: 24px;
     }
 
@@ -58,6 +65,7 @@
 {% block main %}
   <label id='status'></label><br>
   <div id="timer" class="hidden">0:00</div>
+  <div id="best" class="hidden">0:00</div>
   <button id="button" class="hidden">Restart</button>
   <br>
   <div id="minebox"></div>
@@ -75,7 +83,10 @@
       var minebox = document.getElementById('minebox')
       minebox.setAttribute("oncontextmenu", "return false;")
       button.addEventListener('click', init)
+      let bestSeconds = {{ bestTime }};
       let startingSeconds;
+      let seconds;
+      let time;
       let timer;
 
       let board = new Array(rows);
@@ -101,6 +112,7 @@
           clearInterval(timer);
           document.getElementById("timer").classList.add("hidden");
           document.getElementById("timer").innerText = "0:00";
+          document.getElementById("best").classList.add("hidden");
           startingSeconds = undefined;
           status.innerHTML = 'Click on the tiles to reveal them';
           document.body.style.background = null;
@@ -159,9 +171,12 @@
           if (!startingSeconds) {
             startingSeconds = Date.now();
             document.getElementById("timer").classList.remove("hidden");
+            let best = bestSeconds ? `${Math.floor(bestSeconds / 60)}:${bestSeconds % 60 < 10 ? "0" + bestSeconds % 60 : bestSeconds % 60}` : "none";
+            document.getElementById("best").innerText = "Best: " + best;
+            document.getElementById("best").classList.remove("hidden");
             timer = setInterval(() => {
-              let seconds = Math.floor((Date.now() - startingSeconds) / 1000);
-              let time = `${Math.floor(seconds / 60)}:${seconds % 60 < 10 ? "0" + seconds % 60 : seconds % 60}`; //Show minutes and seconds since the game started
+              seconds = Math.floor((Date.now() - startingSeconds) / 1000);
+              time = `${Math.floor(seconds / 60)}:${seconds % 60 < 10 ? "0" + seconds % 60 : seconds % 60}`; //Show minutes and seconds since the game started
               document.getElementById("timer").innerText = time;
             }, 1000);
           }
@@ -211,6 +226,9 @@
               clearInterval(timer);
               status.innerHTML = 'YOU WIN!';
               document.body.style.background = "var(--bg-dark-blue)";
+              if (seconds < bestSeconds || !bestSeconds) document.getElementById("best").innerText = "Best: " + time;
+              request.open("POST", "/savescore?game=minesweeper&score=" + seconds);
+              request.send();
           }
       }
 

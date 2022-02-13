@@ -73,7 +73,7 @@ class Student():
         self.progress = []
         self.perms = 2
         self.quizResults = {}
-        self.preferredMode = None
+        self.preferredHomepage = None
 
 
 class TTTGame():

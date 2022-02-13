@@ -18,6 +18,10 @@
   h2 {
     margin: 40px 0 8px;
   }
+
+  button {
+    margin-right: 4px;
+  }
 </style>
 {% endblock %}
 
@@ -287,4 +291,10 @@ When votes are missing, there will be empty spaces on the bar.<br>
 
 <h2>Restart session</h2>
 <button class="inline popOut" onclick="request.open('GET', '/flush'); request.send();">Remove all students and restart</button><br>
+
+<h2>Clear data</h2>
+<b>Warning: Deleting this data is permanent.</b><br>
+<button class="inline popOut" style="margin-top: 12px;" onclick="request.open('GET', '/cleartable?table=messages'); request.send();">Clear all chat messages</button>
+<button class="inline popOut" style="margin-top: 12px;" onclick="request.open('GET', '/cleartable?table=scores'); request.send();">Clear all game scores</button>
+<button class="inline popOut" style="margin-top: 12px;" onclick="request.open('GET', '/cleartable?table=users'); request.send();">Clear all user accounts</button>
 {% endblock %}

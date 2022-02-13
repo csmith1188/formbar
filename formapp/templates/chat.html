@@ -257,6 +257,19 @@
     var username = "{{ username }}";
     var receiver = 'all';
 
+    //Get old messages from the database
+    let messages = "{{ messages }}".replaceAll("&#34;", "\"");
+    messages = JSON.parse(messages);
+
+    var boxes = {
+        outputBox: document.getElementById('outputBox'),
+        inputBox: document.getElementById("input"),
+        userlist: document.getElementById("userlist"),
+        sendButton: document.getElementById("sendButton"),
+        recBox: document.getElementById("recipient"),
+        ncb: document.getElementById("notificationsCheckbox")
+    }
+
     //Get user's permissions from server
     request.open("GET", '/getme', false);
     request.send(null);
@@ -277,6 +290,18 @@
       cc.style.lineHeight = "60px";
       cc.style.fontSize = "32px";
     }
+
+    messages.forEach(message => {
+      if (message[2] == "all" || message[2] == username || message[1] == username) {
+        output({
+          from: message[1],
+          to: message[2],
+          time: message[3],
+          content: message[4]
+        });
+      }
+    });
+
 
     //When the connection opens.
     ws.onopen = function() {};
@@ -319,15 +344,6 @@
         });
         console.log(e)
     };
-
-    var boxes = {
-        outputBox: document.getElementById('outputBox'),
-        inputBox: document.getElementById("input"),
-        userlist: document.getElementById("userlist"),
-        sendButton: document.getElementById("sendButton"),
-        recBox: document.getElementById("recipient"),
-        ncb: document.getElementById("notificationsCheckbox")
-    }
 
     function packMSG(type, rx, tx, content) {
         let msgOUT = {
@@ -393,8 +409,8 @@
         ws.close();
     }
 
-    function getDate() {
-      let date = new Date();
+    function getDate(time) {
+      let date = time ? new Date(time) : new Date(); //If the message does not have a time property, use the current time
       let month = date.getMonth() + 1;
       let day = date.getDate();
       let year = date.getFullYear().toString().slice(2);
@@ -431,7 +447,7 @@
         //Use this if you want to allow HTML
         newMSG.innerHTML = `
           <b class="username" onclick="${usernameOnclick}" title="${usernameTitle}">${message.from}</b>
-          <span style="color: var(--gray-color);">${getDate()} ${message.to != "all" ? (message.from ? "· Private message" : "· From server") : ""}</span>
+          <span style="color: var(--gray-color);">${getDate(message.time)} ${message.to != "all" ? (message.from ? "· Private message" : "· From server") : ""}</span>
           <div class="content">${message.content}</div>
         `;
         //Use this if you want to convert HTML into text

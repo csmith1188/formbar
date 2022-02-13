@@ -337,6 +337,7 @@
       <div id="speedtypeTab" class="tab" onclick="openPage('speedtype');">Speed Typer</div>
       <div id="tttTab" class="tab hidden" onclick="openPage('ttt');">Tic-tac-toe</div>
       <div id="fighterTab" class="tab hidden" onclick="openPage('fighter');">Turn-Based Fighter</div>
+      <div id="leaderboardsTab" class="tab" onclick="openPage('leaderboards');">Leaderboards</div>
     </div>
     <div id="teacherTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/advanced/teacher.png') }}" class="icon"> <span class="tabText">Teacher</span></div>
     <div id="teacherMenu" class="menu hidden" tabindex="-1">
@@ -527,7 +528,7 @@
     if (!content) openPage("{{ mainPage }}?alert='Page does not exist.'");
     Array.from(tabs).forEach(tab => tab.classList.remove("open"));
     if (["/help", "/break"].includes(path)) document.getElementById("studentsTab").classList.add("open");
-    if (["/2048", "/bitshifter", "/hangman", "/minesweeper", "/speedtype", "/ttt", "/fighter"].includes(path)) document.getElementById("gamesTab").classList.add("open");
+    if (["/2048", "/bitshifter", "/hangman", "/minesweeper", "/speedtype", "/ttt", "/fighter", "/leaderboards"].includes(path)) document.getElementById("gamesTab").classList.add("open");
     if (["/needshelp", "/settings", "/users", "/lesson", "/virtualbar"].includes(path)) document.getElementById("teacherTab").classList.add("open");
     if (tabEl) tabEl.classList.add("open");
     if (["/advanced", "/basic", "/mobile"].includes(path)) openPage("{{ mainPage }}");

@@ -49,7 +49,7 @@
       height: 32px;
     }
 
-    #checkbutt {
+    #checkbutt, #reload {
       width: 75px;
     }
   </style>
@@ -94,7 +94,8 @@
       <h3 id="answerbox"></h3>
     </div>
     <div>
-      <button type="button" id="checkbutt" name="checkbutt">Start</button>
+      <button type="button" id="checkbutt" name="checkbutt" onclick="check();">Start</button>
+      <button type="button" id="reload" class="hidden" onclick="window.location.reload();">Reload</button>
     </div>
 </div>
 {% endblock %}
@@ -106,7 +107,6 @@
     var hiscore = {{ highScore }};
     var hexChar = ["0", "1", "2", "3", "4", "5", "6", "7","8", "9", "A", "B", "C", "D", "E", "F"];
     document.getElementById('answerboxcontainer').classList.add("hidden");
-    document.getElementById('checkbutt').onclick = check;
     function byteToHex(b) {
       return hexChar[(b >> 4) & 0x0f] + hexChar[b & 0x0f];
     }
@@ -191,8 +191,7 @@
           if (timeLeft) {
             document.getElementById("timeLeft").innerText = --timeLeft;
           } else {
-            container.classList.remove("hidden");
-            answerBox.innerHTML = "You winn't!";
+            gameOver();
           }
         }, 1000);
         container.classList.add("hidden");
@@ -201,11 +200,11 @@
         gameData = newTarget();
         draw();
       } else {
-        clearInterval(timer);
-        controlsBox.classList.add("hidden");
-        container.classList.remove("hidden");
-        checkButton.innerText = "OK";
         if (gameData.arr == gameData.guess) {
+          clearInterval(timer);
+          controlsBox.classList.add("hidden");
+          container.classList.remove("hidden");
+          checkButton.innerText = "OK";
           answerBox.innerHTML = "You win!";
           switch (difficulty) {
             case "Easy":
@@ -220,13 +219,19 @@
           if (score > hiscore) hiscore = score;
           draw();
         } else {
-          answerBox.innerHTML = "You winn't!";
-          request.open("POST", "/savescore?game=bitshifter&score=" + score);
-          request.send();
-          checkButton.innerText = "Restart";
-          checkButton.onclick = () => window.location.reload();
+          gameOver();
         }
       }
+    }
+    function gameOver() {
+      clearInterval(timer);
+      document.getElementById('controlsbox').classList.add("hidden");
+      document.getElementById('answerboxcontainer').classList.remove("hidden");
+      document.getElementById("answerbox").innerHTML = "You winn't!";
+      request.open("POST", "/savescore?game=bitshifter&score=" + score);
+      request.send();
+      document.getElementById("checkbutt").innerText = "OK";
+      document.getElementById("reload").classList.remove("hidden");
     }
   </script>
 {% endblock %}

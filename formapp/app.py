@@ -763,7 +763,6 @@ def updateStep():
 '''
 @app.route('/')
 def endpoint_root():
-    ##Also check database
     if not request.remote_addr in sD.studentDict:
         return redirect('/login')
     username = sD.studentDict[request.remote_addr]['name']
@@ -1597,6 +1596,10 @@ def endpoint_login():
                 dbcmd = db.cursor()
                 userFound = dbcmd.execute("SELECT * FROM users WHERE username=:uname", {"uname": username}).fetchall()
                 db.close()
+                #Search everyone currently logged in for same username
+                for user in sD.studentDict:
+                    if sD.studentDict[user]['name'].strip() == username:
+                        userFound = True
                 if userFound:
                     return redirect("/login?alert=There is already a user with that name.")
                 else:
@@ -1618,6 +1621,9 @@ def endpoint_login():
                 dbcmd = db.cursor()
                 userFound = dbcmd.execute("SELECT * FROM users WHERE username=:uname", {"uname": username}).fetchall()
                 db.close()
+                for user in sD.studentDict:
+                    if sD.studentDict[user]['name'].strip() == username:
+                        userFound = True
                 if userFound:
                     return redirect("/login?alert=There is already a user with that name.")
                 else:

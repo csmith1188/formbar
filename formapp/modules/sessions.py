@@ -41,13 +41,8 @@ class Session():
             'upcolor': 'green',
             'wigglecolor': 'blue',
             'downcolor': 'red',
-<<<<<<< HEAD
             'barmode': 'playtime',
             'modes': ['survey', 'tutd', 'abcd', 'text', 'quiz', 'essay', 'progress', 'playtime'],
-=======
-            'barmode': 'tutd',
-            'modes': ['tutd', 'abcd', 'quiz', 'essay', 'progress', 'playtime'],
->>>>>>> parent of 2f817e0 (Last Working RC)
             'whitelist': [
                 '127.0.0.1',
                 '172.21.3.5'
@@ -74,18 +69,11 @@ class Student():
         self.breakReq = False
         self.thumb = ''
         self.letter = ''
-<<<<<<< HEAD
         self.textRes = ''
         self.progress = []
         self.perms = 2
         self.quizResults = {}
         self.preferredHomepage = None
-=======
-        self.progress = []
-        self.perms = 2
-        self.quizResults = {}
-        self.preferredMode = None
->>>>>>> parent of 2f817e0 (Last Working RC)
 
 
 class TTTGame():

@@ -40,10 +40,7 @@
   --bg-color: white;
   --theme-color: var(--color-blue);
   --main-color: black;
-<<<<<<< HEAD
   --gray-color: var(--dark-gray);
-=======
->>>>>>> parent of 2f817e0 (Last Working RC)
   --emphasis-color: white;
   --highlight-color: var(--light-gray);
 }
@@ -52,10 +49,7 @@
 .dark, body:not(.light) {
   --bg-color: var(--bg-dark);
   --main-color: white;
-<<<<<<< HEAD
   --gray-color: var(--light-gray);
-=======
->>>>>>> parent of 2f817e0 (Last Working RC)
   --emphasis-color: var(--bg-darker);
   --highlight-color: var(--bg-dark-highlight);
 }
@@ -96,21 +90,12 @@ body {
 body, .light, .dark {
   background: var(--bg-color);
   color: var(--main-color);
-<<<<<<< HEAD
 }
 
 .hidden {
   display: none !important;
 }
 
-=======
-}
-
-.hidden {
-  display: none !important;
-}
-
->>>>>>> parent of 2f817e0 (Last Working RC)
 .fullScreen {
   position: fixed;
   top: 0;
@@ -125,7 +110,6 @@ body, .light, .dark {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-<<<<<<< HEAD
   text-align: center;
 }
 
@@ -136,18 +120,6 @@ body, .light, .dark {
   text-align: center;
 }
 
-=======
-  text-align: center;
-}
-
-.hCentered {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  text-align: center;
-}
-
->>>>>>> parent of 2f817e0 (Last Working RC)
 .vCentered {
   position: absolute;
   top: 50%;
@@ -200,7 +172,6 @@ body, .light, .dark {
 * {
   font-family: inherit;
   color: inherit;
-<<<<<<< HEAD
 }
 
 input, button, textarea, select {
@@ -420,180 +391,4 @@ table, th, td {
   margin-left: 4px;
   vertical-align: middle;
   cursor: pointer;
-=======
-}
-
-input, button, textarea, select {
-  font-size: inherit;
-}
-
-/*Text inputs should be given class "line" or "box"*/
-
-.line {
-  width: 144px;
-  background: transparent;
-  border-color: var(--main-color);
-  border-style: none none solid;
-  outline: none;
-}
-
-textarea, .box {
-  background: var(--emphasis-color);
-  color: var(--main-color);
-  border: 1px solid;
-}
-
-textarea:focus, .box:focus {
-  border: 1px solid;
-  outline: 1px solid;
-}
-
-/*Use class "button" for button-like inputs, such as submit and file*/
-
-button:not(.inline), .button:not(.inline) {
-  padding: 3px 9px;
-  border-radius: 9999px;
-  background: var(--emphasis-color);
-  color: var(--theme-color);
-  border: 1px solid;
-  font-size: 18px;
-  cursor: pointer;
-  user-select: none;
-}
-
-button:not(.popOut):not(.unselectable):not(.pressed):hover,
-.button:not(.popOut):not(.unselectable):not(.pressed):hover {
-  background: var(--highlight-color);
-}
-
-/*Use class "inline" for buttons that are within the flow of text. "inline" should always be used with "popOut" (but not vice versa)*/
-
-button.inline, .button.inline {
-  background: var(--emphasis-color);
-  border: 1px solid;
-  border-radius: 6px;
-  color: var(--theme-color);
-  font-weight: bold;
-  cursor: pointer;
-  user-select: none;
-}
-
-img.button.inline {
-  border: none;
-}
-
-.popOut {
-  transition-duration: 0.2s;
-}
-
-.popOut:hover:not(.unselectable):not(.pressed) {
-  transform: translate(2px, -2px);
-  box-shadow: -1px 1px, -2px 2px;
-}
-
-.popOut.moreDepth:not(.unselectable):not(.pressed):hover:not(:active) {
-  transform: translate(4px, -4px);
-  box-shadow: -1px 1px, -2px 2px, -3px 3px, -4px 4px;
-}
-
-.popOut:not(.unselectable):not(.pressed):active {
-  transform: initial;
-  box-shadow: initial;
-  background: var(--highlight-color);
-}
-
-button.pressed, .button.pressed {
-  background: var(--theme-color);
-  border-color: var(--theme-color);
-  color: var(--bg-color);
-  cursor: default;
-}
-
-button.unselectable, .button.unselectable {
-  opacity: 50%;
-  cursor: not-allowed;
-}
-
-input[type="number"] {
-  width: 48px;
-}
-
-input[type="radio"] {
-  -webkit-appearance: none;
-  width: 14px;
-  height: 14px;
-  margin: 3px 6px 3px 0;
-  background: var(--emphasis-color);
-  color: var(--main-color);
-  border: 1px solid;
-  border-radius: 50%;
-  vertical-align: text-bottom;
-}
-
-input[type="radio"]:checked {
-  background: var(--theme-color);
-  box-shadow: 0 0 0 2px var(--emphasis-color) inset;
-  color: var(--theme-color);
-}
-
-input[type="checkbox"] {
-  -webkit-appearance: none;
-  width: 14px;
-  height: 14px;
-  margin: 3px 6px 3px 0;
-  background: var(--emphasis-color);
-  color: var(--main-color);
-  border: 1px solid;
-  border-radius: 0%;
-  vertical-align: text-bottom;
-}
-
-input[type="checkbox"]:checked {
-  background: var(--theme-color) url("{{ url_for('static', filename='img/checkMark.png') }}") no-repeat;
-  background-size: 100%;
-  color: var(--theme-color);
-}
-
-.light input[type="checkbox"]:checked {
-  background: var(--theme-color) url("{{ url_for('static', filename='img/checkMarkLight.png') }}") no-repeat;
-}
-
-input[type="radio"]:hover:not([disabled]), input[type="checkbox"]:hover:not([disabled]) {
-  box-shadow: 0 0 4px;
-}
-
-input[type="radio"]:checked:hover:not([disabled]) {
-  box-shadow: 0 0 0 2px var(--emphasis-color) inset, 0 0 4px;
-}
-
-input[type="radio"][disabled], input[type="checkbox"]:not([checked])[disabled] {
-  background-color: var(--highlight-color);
-  opacity: 50%;
-}
-
-input[type="checkbox"][checked][disabled] {
-  opacity: 50%;
-}
-
-textarea {
-  resize: none;
-}
-
-select {
-  background: var(--emphasis-color);
-  border: 1px var(--theme-color) solid;
-}
-
-select:focus {
-  outline: 1px var(--theme-color) solid;
-}
-
-a {
-  color: var(--theme-color);
-}
-
-table, th, td {
-  border: 1px solid;
-  border-collapse: collapse;
->>>>>>> parent of 2f817e0 (Last Working RC)
 }

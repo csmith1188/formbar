@@ -663,11 +663,7 @@
 <!-- Extra javascript here -->
 {% block script %}
 <script>
-<<<<<<< HEAD
   document.getElementById("highScore").innerHTML = {{ highScore }};
-=======
-  if (localStorage.getItem("2048HighScore")) document.getElementById("highScore").innerHTML = localStorage.getItem("2048HighScore");
->>>>>>> parent of 2f817e0 (Last Working RC)
 
   var gameObj = {
     points: {
@@ -768,12 +764,9 @@
       document.getElementById("gameOver").style.display = "block";
       document.getElementById("cover").style.cursor = "not-allowed";
       document.getElementById("newGameButton").classList.add("newButtonAnimation");
-<<<<<<< HEAD
       document.onkeydown = null;
       request.open("POST", "/savescore?game=2048&score=" + this.points.score);
       request.send();
-=======
->>>>>>> parent of 2f817e0 (Last Working RC)
     },
     moveTo: function(obj1, obj2) {
       obj2.boxObj = obj1.boxObj;
@@ -795,21 +788,12 @@
       scoreBar.textContent = this.points.score;
       var highScoreBar = document.getElementById('highScore');
       var newBest = document.getElementById('newBest');
-<<<<<<< HEAD
       if (this.points.score > {{ highScore }}) {
-=======
-      var highScore = localStorage.getItem("2048HighScore");
-      if (this.points.score > highScore) {
->>>>>>> parent of 2f817e0 (Last Working RC)
         highScoreBar.innerText = this.points.score;
         highScoreBar.textContent = this.points.score;
         highScoreBar.style.color = "var(--light-red)";
         newBest.innerText = "New best!";
         newBest.textContent = "New best!";
-<<<<<<< HEAD
-=======
-        localStorage.setItem("2048HighScore", this.points.score);
->>>>>>> parent of 2f817e0 (Last Working RC)
       }
       return obj2.boxObj.value;
 

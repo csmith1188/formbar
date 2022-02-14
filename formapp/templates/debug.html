@@ -1,45 +1,8 @@
 {% extends 'header.html' %}
 
-<<<<<<< HEAD
 {% block title %}API Data for Debugging{% endblock %}
 {% block style %}
 <style>
-=======
-{% block title %}API Debugging{% endblock %}
-{% block style %}
-<style>
-  #virtualBar {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    box-sizing: border-box;
-    padding: 8px;
-    background: black;
-  }
-
-  #vbText {
-    height: 24px;
-    width: 10ch;
-    padding: 0 4px;
-    box-sizing:
-    border-box; border: 1px white;
-    border-style: solid solid none;
-    font: 20px monospace;
-    text-transform: uppercase;
-  }
-
-  #pixBox {
-    width: 100%;
-    height: 16px;
-    box-sizing: border-box;
-    border: 1px solid white;
-    display: flex;
-    justify-content: space-around;
-    user-select: none;
-  }
-
->>>>>>> parent of 2f817e0 (Last Working RC)
   #buttonContainer {
     position: fixed;
     left: 0;
@@ -94,18 +57,8 @@
 
 <!-- Change theme color here -->
 {% block color %}red{% endblock %}
-<<<<<<< HEAD
 
 {% block main %}
-=======
-
-{% block main %}
-  <div id="virtualBar">
-    <div id="vbText"><!--Text goes here--></div>
-    <span id="pixBox"></span>
-  </div>
-
->>>>>>> parent of 2f817e0 (Last Working RC)
   <div id="buttonContainer"></div>
 
   <div id="data"></div>
@@ -130,44 +83,12 @@
   let timeLeft = 3;
   let dataURL = "/getpix";
 
-<<<<<<< HEAD
   urls.forEach(url => document.getElementById("buttonContainer").innerHTML += `<button id="${url}" onclick="update('${url}')">${url}</button>`);
-=======
-  urls.forEach(url => document.getElementById("buttonContainer").innerHTML += `<button id="${url}" onclick="getData('${url}')">${url}</button>`);
-
-  function updateBar() {
-    request.open("GET", '/getphrase', false);
-    request.send(null);
-    let phraseRes = JSON.parse(request.responseText);
-    let phrase = phraseRes.phrase;
-    let vbText = document.getElementById("vbText");
-    vbText.innerText = phrase;
-    //To do: update color
-
-    request.open("GET", '/getpix', false);
-    request.send(null);
-    let pixRes = JSON.parse(request.responseText);
-    let pix = eval(pixRes.pixels);
-    let pixBox = document.getElementById("pixBox");
-    pixBox.innerHTML = '';
-    for (let i = pix.length - 1; i >= 0; i--) {
-        for (let color = 0; color < pix[i].length; color++) {
-            pix[i][color] = pix[i][color].toString(16);
-            if (pix[i][color].length < 2)
-                pix[i][color] = "0" + pix[i][color];
-        }
-        pixBox.innerHTML += "<div style='display: inline; flex-grow: 1; overflow: hidden; background-color: #" + pix[i][0] + "" + pix[i][1] + "" + pix[i][2] + ";'>&nbsp;</div>";
-    }
-
-    timeLeft = 3;
-  }
->>>>>>> parent of 2f817e0 (Last Working RC)
 
   function countdown() {
     document.getElementById("timeLeft").innerHTML = timeLeft--;
   }
 
-<<<<<<< HEAD
   function update(newURL = dataURL) {
     urls.forEach(url => {
       let el = document.getElementById(url);
@@ -191,31 +112,4 @@
   setInterval(update, 3000);
   setInterval(countdown, 1000);
   </script>
-=======
-  setInterval(updateBar, 3000);
-  setInterval(countdown, 1000);
-  updateBar();
-  countdown();
-
-  function getData(newURL) {
-    dataURL = newURL;
-    request.open('GET', newURL);
-    request.onload = function() {
-        data = request.response;
-        if (newURL) {
-          urls.forEach(url => {
-            let el = document.getElementById(url);
-            if (url == newURL) el.classList.add("pressed");
-            else el.classList.remove("pressed");
-          });
-          document.getElementById("data").innerText = data;
-        }
-    };
-    request.send();
-  }
-
-  getData(dataURL);
-  setInterval(() => getData(dataURL), 3000);
-</script>
->>>>>>> parent of 2f817e0 (Last Working RC)
 {% endblock %}

@@ -17,7 +17,6 @@
 
 <!-- Extra style declarations here -->
 {% block style %}
-<<<<<<< HEAD
   <style>
     body {
       font-size: 32px;
@@ -70,20 +69,6 @@
   <button id="button" class="hidden">Restart</button>
   <br>
   <div id="minebox"></div>
-=======
-{% endblock %}
-
-<!-- Change theme color here -->
-{% block color %}purple{% endblock %}
-
-<!-- Main content here -->
-{% block main %}
-  <label id='status'></label>
-  <br>
-  <div id="minebox">
-
-  </div>
->>>>>>> parent of 2f817e0 (Last Working RC)
 {% endblock %}
 
 <!-- Extra JavaScript here -->
@@ -94,7 +79,6 @@
       const dense = {{ dense }};
       let mines, remaining, revealed;
       let status = document.getElementById('status');
-<<<<<<< HEAD
       let button = document.getElementById('button');
       var minebox = document.getElementById('minebox')
       minebox.setAttribute("oncontextmenu", "return false;")
@@ -104,11 +88,6 @@
       let seconds;
       let time;
       let timer;
-=======
-      var minebox = document.getElementById('minebox')
-      minebox.setAttribute("oncontextmenu", "return false;")
-      status.addEventListener('click', init)
->>>>>>> parent of 2f817e0 (Last Working RC)
 
       let board = new Array(rows);
       let picture = new Array(rows);
@@ -130,7 +109,6 @@
           mines = (rows*columns)/dense;
           remaining = mines;
           revealed = 0;
-<<<<<<< HEAD
           clearInterval(timer);
           document.getElementById("timer").classList.add("hidden");
           document.getElementById("timer").innerText = "0:00";
@@ -139,20 +117,13 @@
           status.innerHTML = 'Click on the tiles to reveal them';
           document.body.style.background = null;
           button.classList.add('hidden');
-=======
-          status.innerHTML = 'Click on the tiles to reveal them';
->>>>>>> parent of 2f817e0 (Last Working RC)
           for (let row = 0; row < rows; row++)
               for (let column = 0; column < columns; column++) {
                   let index = row * columns + column;
                   tile[row][column] = document.createElement('img');
                   tile[row][column].src = '../static/img/mnsw/hidden.png';
-<<<<<<< HEAD
                   tile[row][column].style = 'position:absolute;height:30px;width:30px;top:'+(row*30)+'px;left:'+(column*30)+'px;';
                   tile[row][column].draggable = false;
-=======
-                  tile[row][column].style = 'position:absolute;height:30px;width:30px;top:'+(150+row*30)+'px;left:'+(50+column*30)+'px;';
->>>>>>> parent of 2f817e0 (Last Working RC)
                   // tile[row][column].style.top = 150 + row * 30;
                   // tile[row][column].style.left = 50 + column * 30;
                   tile[row][column].addEventListener('mousedown', click);
@@ -195,7 +166,6 @@
           let row = Math.floor(id / columns);
           let column = id % columns;
 
-<<<<<<< HEAD
           button.classList.remove('hidden');
 
           if (!startingSeconds) {
@@ -211,8 +181,6 @@
             }, 1000);
           }
 
-=======
->>>>>>> parent of 2f817e0 (Last Working RC)
           if (event.which == 3) {
               switch (picture[row][column]) {
                   case 'hidden':
@@ -245,7 +213,6 @@
                               tile[row][column].src = '../static/img/mnsw/misplaced.png';
                           }
                       }
-<<<<<<< HEAD
                   clearInterval(timer);
                   status.innerHTML = 'GAME OVER';
                   document.body.style.background = "var(--bg-dark-red)";
@@ -263,15 +230,6 @@
               request.open("POST", "/savescore?game=minesweeper&score=" + seconds);
               request.send();
           }
-=======
-                  status.innerHTML = 'GAME OVER<br><br>Click here to restart';
-              } else
-              if (picture[row][column] == 'hidden') reveal(row, column);
-          }
-
-          if (revealed == rows * columns - mines)
-              status.innerHTML = 'YOU WIN!<br><br>Click here to restart';
->>>>>>> parent of 2f817e0 (Last Working RC)
       }
 
       function reveal(row, column) {

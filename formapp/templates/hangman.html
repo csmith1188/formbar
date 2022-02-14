@@ -175,7 +175,11 @@
       <h3>Score</h3>
 			<div id="score">0</div>
       <h3>High score</h3>
+<<<<<<< HEAD
 			<div id="highscore"></div>
+=======
+			<div id="highscore">0</div>
+>>>>>>> parent of 2f817e0 (Last Working RC)
       <h3>Lives</h3>
 			<div id="lives">10</div>
       <h3>Previous word</h3>
@@ -211,7 +215,11 @@
     divKeys.innerHTML += `<div id="${letterList[i]}" class="key" onclick="guess('${letterList[i]}')">${letterList[i]}</div>`
   }
   var score = 0;
+<<<<<<< HEAD
   var highscore = {{ highScore }};
+=======
+  var highscore = localStorage.getItem("hangmanHighScore") || 0;
+>>>>>>> parent of 2f817e0 (Last Working RC)
   var lives = 10;
   var word;
   var letters;
@@ -260,7 +268,11 @@
       definitionRequest.open('GET', "https://api.dictionaryapi.dev/api/v2/entries/en_US/" + newWord);
       definitionRequest.onload = function() {
         newDefinition = JSON.parse(definitionRequest.response);
+<<<<<<< HEAD
         if (newDefinition.title == "No Definitions Found" || newDefinition[0].word != newWord) {
+=======
+        if (newDefinition.title == "No Definitions Found") {
+>>>>>>> parent of 2f817e0 (Last Working RC)
           getNewWord();
         } else {
           newDefinition = newDefinition[0].meanings[0].definitions[0].definition;
@@ -348,8 +360,14 @@
         document.getElementById("last").innerHTML = lastword;
         score += lives;
         if (score > highscore) {
+<<<<<<< HEAD
           highscore = score;
           document.getElementById("highscore").style.color = "var(--light-purple)";
+=======
+          localStorage.setItem("hangmanHighScore", score);
+          highscore = score;
+          document.getElementById("highscore").style.color = "var(--light-red)";
+>>>>>>> parent of 2f817e0 (Last Working RC)
         }
         randomize();
         resetLetters();
@@ -367,8 +385,11 @@
       if (lives < 1) {
         //they lost
         if (lives == 0) {
+<<<<<<< HEAD
           request.open("POST", "/savescore?game=hangman&score=" + score);
           request.send();
+=======
+>>>>>>> parent of 2f817e0 (Last Working RC)
           score = 0;
           randomize();
           resetLetters();

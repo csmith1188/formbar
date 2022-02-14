@@ -244,7 +244,11 @@
 
       // update accuracy text
       let correctCharacters = (characterTyped - (total_errors + errors));
+<<<<<<< HEAD
       accuracyVal = ((correctCharacters / characterTyped) * 100);
+=======
+      let accuracyVal = ((correctCharacters / characterTyped) * 100);
+>>>>>>> parent of 2f817e0 (Last Working RC)
       accuracy_text.textContent = Math.round(accuracyVal) + "%";
 
       // if current text is completely typed
@@ -323,6 +327,12 @@
       input_area.disabled = true;
       input_area.classList.add("unselectable");
 
+<<<<<<< HEAD
+=======
+      // show finishing text
+      quote_text.textContent = "Click on restart to start a new game.";
+
+>>>>>>> parent of 2f817e0 (Last Working RC)
       // calculate cpm and wpm
       cpm = Math.round(((characterTyped / timeElapsed) * 60));
       wpm = Math.round((((characterTyped / 5) / timeElapsed) * 60));
@@ -340,6 +350,7 @@
       // hide the timer
       timer_group.style.display = "none";
 
+<<<<<<< HEAD
       // show final score
       quote_text.innerHTML = `
         Final score: ${score}<br>
@@ -350,6 +361,9 @@
 
       request.open("POST", "/savescore?game=speedtype&score=" + score);
       request.send();
+=======
+      activeGame = false;
+>>>>>>> parent of 2f817e0 (Last Working RC)
     }
   </script>
 {% endblock %}

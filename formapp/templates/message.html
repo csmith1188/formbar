@@ -3,37 +3,34 @@
 <!-- This is where the title, top buttons, and stylesheet is located -->
 
 <!-- Change title here -->
-{% block title %}Help Tickets{% endblock %}
+{% block title %}Formbar Alert{% endblock %}
 
 <!-- Extra style declarations here -->
 {% block style %}
-<meta http-equiv="refresh" content="5">
 <style>
   body {
     text-align: center;
-  }
-
-  button {
-    margin-left: 4px;
-  }
-
-  .ticket {
-    display: block;
-    margin: -4px auto;
   }
 </style>
 {% endblock %}
 
 <!-- Change theme color here -->
-{% block color %}orange{% endblock %}
+{% block color %}purple{% endblock %}
 
 <!-- Main content here -->
 {% block main %}
-  <h1>Help tickets</h1>
-  <div id="list">
-    {{ list|safe }}
-  </div>
+{{ message|safe }}
+<br><br><button onclick='goBack()'>Go Back</button>
 {% endblock %}
 
 <!-- Extra javascript here -->
-{% block script %}{% endblock %}
+{% block script %}
+<script language='JavaScript' type='text/javascript'>
+    var forward = '{{ forward }}'
+    function goBack() {
+        if (forward) location.href = forward;
+        else window.history.back()
+    }
+    setTimeout(function () {goBack()}, 5000);
+</script>
+{% endblock %}

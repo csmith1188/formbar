@@ -78,7 +78,11 @@
     border-top: 1px solid var(--theme-color);
     position: fixed;
     width: 100%;
+<<<<<<< HEAD
     height: 60px;
+=======
+    height: 90px;
+>>>>>>> parent of 2f817e0 (Last Working RC)
     bottom: 0;
     left: 0;
     padding: 20px;
@@ -141,12 +145,15 @@
     background-color: white;
     border-color: white;
     color: var(--bg-color);
+<<<<<<< HEAD
   }
 
   #notifications {
     position: fixed;
     right: 16px;
     bottom: 71px;
+=======
+>>>>>>> parent of 2f817e0 (Last Working RC)
   }
 
   a {
@@ -169,11 +176,14 @@
 
   h2 {
     margin: 0;
+<<<<<<< HEAD
   }
 
   .game #outputBox {
     width: 100%;
     height: calc(100% - 116px);
+=======
+>>>>>>> parent of 2f817e0 (Last Working RC)
   }
 
   .small #outputBox {
@@ -185,9 +195,13 @@
     background-color: initial;
   }
 
+<<<<<<< HEAD
   .game #userlist,
   .game #recContainer,
   .small #userlist {
+=======
+  .game #userlist, .game #recContainer {
+>>>>>>> parent of 2f817e0 (Last Working RC)
     display: none;
   }
 
@@ -246,9 +260,12 @@
         <input type="submit" value="Send" id="sendButton" class="button">
     </form>
 </div>
+<<<<<<< HEAD
 <div id="notifications">
   <input type="checkbox" id="notificationsCheckbox"><label for="notificationsCheckbox">Desktop notifications</label>
 </div>
+=======
+>>>>>>> parent of 2f817e0 (Last Working RC)
 {% endblock %}
 
 <!-- Extra javascript here -->
@@ -257,6 +274,7 @@
     var username = "{{ username }}";
     var receiver = 'all';
 
+<<<<<<< HEAD
     //Get old messages from the database
     let messages = "{{ messages }}".replaceAll("&#34;", "\"");
     messages = JSON.parse(messages);
@@ -270,6 +288,8 @@
         ncb: document.getElementById("notificationsCheckbox")
     }
 
+=======
+>>>>>>> parent of 2f817e0 (Last Working RC)
     //Get user's permissions from server
     request.open("GET", '/getme', false);
     request.send(null);
@@ -287,6 +307,7 @@
       let cc = document.getElementById("controlChat");
       cc.innerText = "You don't have high enough permissions to send chat messages.";
       cc.style.textAlign = "center";
+<<<<<<< HEAD
       cc.style.lineHeight = "60px";
       cc.style.fontSize = "32px";
     }
@@ -303,6 +324,12 @@
     });
 
 
+=======
+      cc.style.lineHeight = "90px";
+      cc.style.fontSize = "32px";
+    }
+
+>>>>>>> parent of 2f817e0 (Last Working RC)
     //When the connection opens.
     ws.onopen = function() {};
 
@@ -369,7 +396,11 @@
         receiver = 'all';
         boxes.recBox.innerHTML = "all";
         boxes.recBox.style.color = "white";
+<<<<<<< HEAD
         boxes.sendButton.classList.remove("rec");
+=======
+        boxes.sendButton.style.color = "var(--theme-color)";
+>>>>>>> parent of 2f817e0 (Last Working RC)
         //sendButton.value = "Send";
         //el.classList.remove('whisper');
         document.getElementById("removeRec").style.display = "none";
@@ -409,8 +440,13 @@
         ws.close();
     }
 
+<<<<<<< HEAD
     function getDate(time) {
       let date = time ? new Date(time) : new Date(); //If the message does not have a time property, use the current time
+=======
+    function getDate() {
+      let date = new Date();
+>>>>>>> parent of 2f817e0 (Last Working RC)
       let month = date.getMonth() + 1;
       let day = date.getDate();
       let year = date.getFullYear().toString().slice(2);
@@ -447,7 +483,11 @@
         //Use this if you want to allow HTML
         newMSG.innerHTML = `
           <b class="username" onclick="${usernameOnclick}" title="${usernameTitle}">${message.from}</b>
+<<<<<<< HEAD
           <span style="color: var(--gray-color);">${getDate(message.time)} ${message.to != "all" ? (message.from ? "· Private message" : "· From server") : ""}</span>
+=======
+          <span style="color: var(--light-gray);">${getDate()} ${message.to != "all" ? "· Private message" : ""}</span>
+>>>>>>> parent of 2f817e0 (Last Working RC)
           <div class="content">${message.content}</div>
         `;
         //Use this if you want to convert HTML into text
@@ -464,6 +504,7 @@
       boxes.inputBox.focus();
     }
 
+<<<<<<< HEAD
     boxes.ncb.checked = localStorage.getItem("chatNotifications") && Notification.permission == "granted";
 
     boxes.ncb.onchange = async function() {
@@ -478,6 +519,8 @@
       }
     };
 
+=======
+>>>>>>> parent of 2f817e0 (Last Working RC)
     let gamePlayer = urlParams.get("game");
     if (gamePlayer) {
       document.body.classList.add("game");

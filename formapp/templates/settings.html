@@ -18,10 +18,13 @@
   h2 {
     margin: 40px 0 8px;
   }
+<<<<<<< HEAD
 
   button {
     margin-right: 4px;
   }
+=======
+>>>>>>> parent of 2f817e0 (Last Working RC)
 </style>
 {% endblock %}
 
@@ -35,6 +38,7 @@
 
     }
 
+<<<<<<< HEAD
     function sendStudents() {
         let input = document.getElementById('studentNum');
         if (document.getElementById("autoStudents").checked) {
@@ -48,6 +52,9 @@
           input.value = studentNum;
           input.removeAttribute("readonly");
         }
+=======
+    function sendStudents(studentNum = document.getElementById('studentNum').value) {
+>>>>>>> parent of 2f817e0 (Last Working RC)
         request.open("GET", "/settings?students=" + studentNum);
         // request.onload = function() {
         // console.log(request.response);
@@ -58,6 +65,10 @@
     sendStudents();
 
     function updatePerm(el) {
+<<<<<<< HEAD
+=======
+        console.log("GET", el.value);
+>>>>>>> parent of 2f817e0 (Last Working RC)
         request.open("GET", el.value);
         request.onload = function() {
             // console.log(request.response);
@@ -65,6 +76,7 @@
         request.send();
     }
 
+<<<<<<< HEAD
     async function updateStudents() {
         if (document.getElementById("autoStudents").checked) {
           let res = await getResponse("/getstudents");
@@ -79,11 +91,28 @@
       if (document.getElementById("survey").checked) {
         request.open('GET', '/settings?barmode=survey');
         request.send();
+=======
+    setInterval(function() {
+        let modeRes = getResponse("/getmode");
+        let mode = modeRes.mode;
+        document.getElementById("survey").checked = mode == "tutd" || mode == "survey";
+        document.getElementById("progress").checked = mode == "progress";
+        document.getElementById("countdown").checked = mode == "countdown";
+        document.getElementById("playtime").checked = mode == "playtime";
+
+        let studentsRes = getResponse("/getstudents");
+        let students;
+    }, 1000);
+
+    function changeMode() {
+      if (document.getElementById("survey").checked) {
+>>>>>>> parent of 2f817e0 (Last Working RC)
         document.getElementById("surveyType").classList.remove("hidden");
       } else {
         document.getElementById("surveyType").classList.add("hidden");
       }
       if (document.getElementById("progress").checked) {
+<<<<<<< HEAD
         request.open('GET', '/settings?barmode=progress');
         request.send();
       }
@@ -91,10 +120,18 @@
         alert("This feature is not available yet.");
         document.getElementById("playtime").checked = true;
         ////document.getElementById("countdownTime").classList.remove("hidden");
+=======
+        request.open('GET', `/settings?barmode=progress`);
+        request.send();
+      }
+      if (document.getElementById("countdown").checked) {
+        document.getElementById("countdownTime").classList.remove("hidden");
+>>>>>>> parent of 2f817e0 (Last Working RC)
       } else {
         document.getElementById("countdownTime").classList.add("hidden");
       }
       if (document.getElementById("playtime").checked) {
+<<<<<<< HEAD
         request.open('GET', '/settings?barmode=playtime');
         request.send();
       }
@@ -116,15 +153,35 @@
       } else if (document.getElementById("textResponse").checked) {
         request.open('GET', '/startsurvey?type=text');
         request.send();
+=======
+        request.open('GET', `/settings?barmode=playtime`);
+        request.send();
+      }
+    }
+
+    function changeSurveyType() {
+      if (document.getElementById("thumbs").checked) {
+        document.getElementById("surveyType").action = "/starttutd";
+        document.getElementById("surveyDescription").innerText = "thumbs up, thumbs down, and wiggle";
+      } else if (document.getElementById("letters").checked) {
+        document.getElementById("surveyType").action = "/startsurvey";
+        document.getElementById("surveyDescription").innerText = "four options";
+>>>>>>> parent of 2f817e0 (Last Working RC)
       }
     }
 
     function resetPerms() {
+<<<<<<< HEAD
         document.getElementById("saypermsDrop").value = "/settings?say=2";
+=======
+        document.getElementById("saypermsDrop").value = "/settings?say=3";
+        document.getElementById("apipermsDrop").value = "/settings?api=3";
+>>>>>>> parent of 2f817e0 (Last Working RC)
         document.getElementById("gamespermsDrop").value = "/settings?games=2";
         document.getElementById("barpermsDrop").value = "/settings?bar=0";
         document.getElementById("sfxpermsDrop").value = "/settings?sfx=0";
         document.getElementById("bgmpermsDrop").value = "/settings?bgm=0";
+<<<<<<< HEAD
         document.getElementById("apipermsDrop").value = "/settings?api=3";
         let dropdowns = ["saypermsDrop", "barpermsDrop", "sfxpermsDrop", "bgmpermsDrop", "gamespermsDrop", "apipermsDrop"];
         dropdowns.forEach(id => updatePerm(document.getElementById(id)));
@@ -158,12 +215,18 @@
         document.getElementById("playtime").checked = true;
       }
     })();
+=======
+        let dropdowns = ["saypermsDrop", "apipermsDrop", "barpermsDrop", "sfxpermsDrop", "bgmpermsDrop", "gamespermsDrop"];
+        dropdowns.forEach(id => updatePerm(document.getElementById(id)));
+    }
+>>>>>>> parent of 2f817e0 (Last Working RC)
 </script>
 {% endblock %}
 
 <!-- Main content here -->
 {% block main %}
 <h1>Settings</h1>
+<<<<<<< HEAD
 
 <h2>Number of students</h2>
 <input type="number" id="studentNum" class="line" onchange="sendStudents();" name="studentNum" min="1" max="30">&nbsp;&nbsp;
@@ -297,4 +360,131 @@ When votes are missing, there will be empty spaces on the bar.<br>
 <button class="inline popOut" style="margin-top: 12px;" onclick="request.open('GET', '/cleartable?table=messages'); request.send();">Clear all chat messages</button>
 <button class="inline popOut" style="margin-top: 12px;" onclick="request.open('GET', '/cleartable?table=scores'); request.send();">Clear all game scores</button>
 <button class="inline popOut" style="margin-top: 12px;" onclick="request.open('GET', '/cleartable?table=users'); request.send();">Clear all user accounts</button>
+=======
+
+<h2>Number of students</h2>
+<input type="number" id="studentNum" class="line" onchange="sendStudents()" name="studentNum" min="1" max="30">&nbsp;&nbsp;
+<input type="checkBox" id="autoStudents" checked onchange=""><label for="autoStudents">Auto</label><br>
+
+<div onchange="changeMode();">
+    <h2>Bar mode</h2>
+    <label>
+      <div>
+        <input type="radio" id="survey" name="mode"><h3 style="display: inline;">Survey</h3><br>
+        <span style="margin-left: 21px;">Students' votes are displayed on the bar.</span><br>
+      </div>
+    </label>
+    <form action="" id="surveyType" class="hidden" style="margin: 8px 0 0 21px;" onchange="changeSurveyType();">
+      Type:
+      <input type="radio" id="thumbs" name="type" checked style="margin-left: 8px;"><label for="thumbs">Thumbs</label>
+      <input type="radio" id="letters" name="type" style="margin-left: 8px;"><label for="letters">Letters</label><br>
+      Students can choose between <span id="surveyDescription">thumbs up, thumbs down, and wiggle</span>.<br>
+      <input type="submit" class="button inline popOut" value="Start new survey" style="margin-top: 8px;">
+    </form>
+    <br>
+
+    <label>
+      <div>
+        <input type="radio" id="progress" name="mode"><h3 style="display: inline;">Progess</h3><br>
+        <span style="margin-left: 21px;">Description</span><br>
+      </div>
+    </label>
+    <br>
+
+    <label>
+      <div>
+        <input type="radio" id="countdown" name="mode"><h3 style="display: inline;">Countdown</h3><br>
+        <span style="margin-left: 21px;">Set a countdown timer.</span><br>
+      </div>
+    </label>
+    <form action="/countdown" method="post" id="countdownTime" class="hidden" style="margin: 8px 0 0 21px;">
+      Time:
+      <input type="number" class="line" value="5" min="0" max="59"> minutes
+      <input type="number" class="line" value="0" min="0" max="59"> seconds<br>
+      <input type="submit" class="button inline popOut" value="Start timer" style="margin-top: 8px;">
+    </form>
+    <br>
+
+    <label>
+      <div>
+        <input type="radio" id="playtime" name="mode" checked><h3 style="display: inline;">Playtime</h3><br>
+        <span style="margin-left: 21px;">Students can change the colors of the bar.</span><br>
+      </div>
+    </label>
+</div>
+
+<div id="perms">
+    <h2>Permissions</h2>
+    <h3>Chat</h3>
+    The ability to send chat messages. All users will still be able to read others' messages.<br>
+    <select onchange="updatePerm(this)" id="saypermsDrop" name="saypermsDrop" style="margin-top: 8px;">
+        <option value="/settings?say=0">Teacher</option>
+        <option value="/settings?say=1">Assistant</option>
+        <option value="/settings?say=2">Student</option>
+        <option value="/settings?say=3" selected>Anyone</option>
+    </select><br>
+    <br>
+    <h3>API</h3>
+    The ability to access data from the server<br>
+    <select onchange="updatePerm(this)" id="apipermsDrop" name="apipermsDrop" style="margin-top: 8px;">
+        <option value="/settings?api=0">Teacher</option>
+        <option value="/settings?api=1">Assistant</option>
+        <option value="/settings?api=2">Student</option>
+        <option value="/settings?api=3" selected>Anyone</option>
+    </select><br>
+    <br>
+    <h3>Games</h3>
+    The ability to play any games<br>
+    <select onchange="updatePerm(this)" id="gamespermsDrop" name="gamespermsDrop" style="margin-top: 8px;">
+        <option value="/settings?games=0">Teacher</option>
+        <option value="/settings?games=1">Assistant</option>
+        <option value="/settings?games=2" selected>Student</option>
+        <option value="/settings?games=3">Anyone</option>
+    </select><br>
+    <br>
+    <h3>LED bar</h3>
+    The ability to change the appearance of the Formbar. Does not affect surveys.<br>
+    <select onchange="updatePerm(this)" id="barpermsDrop" name="barpermsDrop" style="margin-top: 8px;">
+        <option value="/settings?bar=0" selected>Teacher</option>
+        <option value="/settings?bar=1">Assistant</option>
+        <option value="/settings?bar=2">Student</option>
+        <option value="/settings?bar=3">Anyone</option>
+    </select><br>
+    <br>
+    <h3>Sounds</h3>
+    The ability to play short audio clips<br>
+    <select onchange="updatePerm(this)" id="sfxpermsDrop" name="sfxpermsDrop" style="margin-top: 8px;">
+        <option value="/settings?sfx=0" selected>Teacher</option>
+        <option value="/settings?sfx=1">Assistant</option>
+        <option value="/settings?sfx=2">Student</option>
+        <option value="/settings?sfx=3">Anyone</option>
+    </select><br>
+    <br>
+    <h3>Music</h3>
+    The ability to play background music<br>
+    <select onchange="updatePerm(this)" id="bgmpermsDrop" name="bgmpermsDrop" style="margin-top: 8px;">
+        <option value="/settings?bgm=0" selected>Teacher</option>
+        <option value="/settings?bgm=1">Assistant</option>
+        <option value="/settings?bgm=2">Student</option>
+        <option value="/settings?bgm=3">Anyone</option>
+    </select><br>
+    <br>
+    <button class="inline popOut" onclick="resetPerms();">Reset permissions</button>
+</div>
+
+<h2>Lock Formbar</h2>
+Only whitelisted users will be able to make changes.<br>
+<input type="checkBox" id="lock" onchange="request.open('GET', `/settings?locked=${this.value}`); request.send();"><label for="lock">Lock</label><br>
+
+<h2>Blind results</h2>
+Results won't be shown until the survey is complete.<br>
+<input type="checkBox" id="blind" onchange="request.open('GET', `/settings?blind=${this.value}`); request.send();"><label for="blind">Hide results</label><br>
+
+<h2>Show missing votes</h2>
+When votes are missing, there will be empty spaces on the bar.<br>
+<input type="checkBox" id="showMissing" checked onchange="request.open('GET', `/settings?showinc=${this.value}`); request.send();"><label for="showMissing">Show</label><br>
+
+<h2>Remove all students</h2>
+<button class="inline popOut" onclick="request.open('GET', '/flush'); request.send();">Clear</button><br>
+>>>>>>> parent of 2f817e0 (Last Working RC)
 {% endblock %}

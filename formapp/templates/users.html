@@ -8,20 +8,26 @@
 <!-- Extra style declarations here -->
 {% block style %}
 <style>
+<<<<<<< HEAD
   body {
     overflow: hidden;
   }
 
+=======
+>>>>>>> parent of 2f817e0 (Last Working RC)
   .user {
     position: relative;
     left: 21px;
   }
 
+<<<<<<< HEAD
   .user > * {
     max-width: calc(100% - 21px);
     overflow-wrap: break-word;
   }
 
+=======
+>>>>>>> parent of 2f817e0 (Last Working RC)
   h3 {
     margin: 0 0 8px 0;
     padding: 4px;
@@ -32,10 +38,13 @@
     margin-bottom: 8px;
   }
 
+<<<<<<< HEAD
   #students {
     margin-bottom: 8px;
   }
 
+=======
+>>>>>>> parent of 2f817e0 (Last Working RC)
   .icon {
     height: 1.2em;
     display: inline-block;
@@ -54,7 +63,10 @@
 <button id="collapseButton" class="inline popOut">Collapse all</button>
 <div id="students">
 </div>
+<<<<<<< HEAD
 <button id="addUser" class="inline popOut">Add user</button>
+=======
+>>>>>>> parent of 2f817e0 (Last Working RC)
 {% endblock %}
 
 <!-- Extra javascript here -->
@@ -62,7 +74,11 @@
 <script type="text/javascript">
     let studentData = null;
     let oldStudentData;
+<<<<<<< HEAD
     let permNames = ['Teacher', 'Mod', 'Student', 'Guest']
+=======
+    let permNames = ['Teacher', 'Assistant', 'Student', 'Guest']
+>>>>>>> parent of 2f817e0 (Last Working RC)
     let collapsed = false;
 
     collapseButton.onclick = function() {
@@ -78,6 +94,7 @@
     }
 
     function checkUpdates(url) {
+<<<<<<< HEAD
         let newRequest = new XMLHttpRequest();
         newRequest.open('GET', url);
         newRequest.onload = function() {
@@ -113,6 +130,19 @@
     function removeHelp(name) {
       request.open("GET", "/needshelp?remove=" + name);
       request.send();
+=======
+        request.open('GET', url);
+        request.onload = function() {
+            studentData = request.response;
+        };
+        request.send();
+    }
+
+    function banip(name) {
+      if (confirm("Are you sure you want to ban this user's DEVICE?")) {
+        window.location.href = "/users?name=" + name + "&action=ban";
+      }
+>>>>>>> parent of 2f817e0 (Last Working RC)
     }
 
     setInterval(function() {
@@ -129,6 +159,13 @@
                 let newStudent = document.createElement('h3');
                 let icons = "";
 
+<<<<<<< HEAD
+=======
+                if (studentList[student]['complete']) icons += `<img src="{{ url_for('static', filename='img/users/complete.png') }}" class="icon" title="Complete">`;
+
+                if (studentList[student]['help'] == true) icons += `<img src="{{ url_for('static', filename='img/users/help.png') }}" class="icon" title="Help ticket">`;
+
+>>>>>>> parent of 2f817e0 (Last Working RC)
                 //Change student color according to thumb response
                 let thumb = studentList[student]['thumb'];
                 if (thumb) var thumbIcon = document.createElement("img");
@@ -136,12 +173,17 @@
                 if (thumb == "wiggle") icons += `<img src="{{ url_for('static', filename='img/users/wiggle.png') }}" class="icon" title="Wiggle">`;
                 if (thumb == "down") icons += `<img src="{{ url_for('static', filename='img/users/down.png') }}" class="icon" title="Down">`;
 
+<<<<<<< HEAD
                 //Change student letter according to letter response
+=======
+                //Change student letter according to survey response
+>>>>>>> parent of 2f817e0 (Last Working RC)
                 let letter = studentList[student]['letter']
                 if (letter == "a") icons += `<img src="{{ url_for('static', filename='img/users/a.png') }}" class="icon" title="A">`;
                 if (letter == "b") icons += `<img src="{{ url_for('static', filename='img/users/b.png') }}" class="icon" title="B">`;
                 if (letter == "c") icons += `<img src="{{ url_for('static', filename='img/users/c.png') }}" class="icon" title="C">`;
                 if (letter == "d") icons += `<img src="{{ url_for('static', filename='img/users/d.png') }}" class="icon" title="D">`;
+<<<<<<< HEAD
 
                 //Show icon if student has submitted text response
                 if (studentList[student].textRes) icons += `<img src="{{ url_for('static', filename='img/users/text.png') }}" class="icon" title="Response submitted">`;
@@ -155,10 +197,16 @@
                 newDetails.classList.add('user');
                 if (collapsed) newDetails.classList.add("hidden");
                 if (studentList[student].textRes) newDetails.innerHTML += "<div style='margin-bottom: 8px;'><b>Response: </b>" + studentList[student].textRes + "</div>";
+=======
+                newStudent.innerHTML = icons + studentList[student].name;
+                let newDetails = document.createElement('span');
+                newDetails.classList.add('user');
+>>>>>>> parent of 2f817e0 (Last Working RC)
                 if (studentList[student].excluded) {
                     newStudent.style.background = "var(--highlight-color)";
                     newDetails.innerHTML += "Taking a bathroom break <button class='inline popOut' onclick='request.open(\"GET\", \"/break?action=end&name=" + studentList[student].name + "\");  request.send();'>End break</button><br>";
                 }
+<<<<<<< HEAD
                 let studentPerms = studentList[student]['perms'];
                 newDetails.innerHTML +=
                     `
@@ -169,6 +217,19 @@
                     <option value="/users?name=${studentList[student]['name']}&action=perm&perm=3" ${studentPerms === 3 ? "selected" : ""}>${permNames[3]}</option>
                     </select>
                     `
+=======
+                newDetails.innerHTML += permNames[studentList[student]['perms']];
+                newDetails.innerHTML += "	&nbsp; ";
+                newDetails.innerHTML +=
+                    `
+                    <select onchange="updatePerm(this)" id="userpermsDrop" name="userpermsDrop">
+                    <option value="/users?name=${studentList[student]['name']}&action=perm&perm=0">${permNames[0]}</option>
+                    <option value="/users?name=${studentList[student]['name']}&action=perm&perm=1">${permNames[1]}</option>
+                    <option value="/users?name=${studentList[student]['name']}&action=perm&perm=2">${permNames[2]}</option>
+                    <option value="/users?name=${studentList[student]['name']}&action=perm&perm=3" selected="selected">${permNames[3]}</option>
+                    </select>
+                    `
+>>>>>>> parent of 2f817e0 (Last Working RC)
                 //Check the results of the student's current progress bar
                 if (studentList[student]['progress'] && studentList[student]['progress'].length) {
                     let dotbox = document.createElement('div');
@@ -218,6 +279,7 @@
                 }
                 studentBox.appendChild(newStudent)
                 studentBox.appendChild(newDetails)
+<<<<<<< HEAD
                 let name = studentList[student]['name'];
                 newDetails.innerHTML += "	&nbsp; ";
                 newDetails.innerHTML += `<a onclick="remove('${name}')">Remove</a>`;
@@ -230,6 +292,15 @@
                 if (studentList[student]['help'] == true) {
                   newDetails.innerHTML += "	&nbsp; ";
                   newDetails.innerHTML += `<a onclick="removeHelp('${name}')">Remove help ticket</a>`;
+=======
+                newDetails.innerHTML += "	&nbsp; ";
+                newDetails.innerHTML += `<a href="users?name=${studentList[student]['name']}&action=kick">Remove</a>`;
+                newDetails.innerHTML += "	&nbsp; ";
+                newDetails.innerHTML += `<a href="#" onclick="banip('${studentList[student]['name']}')">Ban Device</a>`;
+                if (studentList[student]['help'] == true) {
+                  newDetails.innerHTML += "	&nbsp; ";
+                  newDetails.innerHTML += `<a href=\'/needshelp?remove=${studentList[student]['name']}\'>Clear Help</a>`;
+>>>>>>> parent of 2f817e0 (Last Working RC)
                 }
                 newDetails.innerHTML += "<br><br>";
             }
@@ -244,6 +315,7 @@
         };
         request.send();
     }
+<<<<<<< HEAD
 
     document.getElementById("addUser").addEventListener("click", () => {
       let username;
@@ -255,5 +327,7 @@
         request.send();
       }
     });
+=======
+>>>>>>> parent of 2f817e0 (Last Working RC)
 </script>
 {% endblock %}

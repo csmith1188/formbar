@@ -5,7 +5,11 @@
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>{% block title %}{% endblock %}</title>
       <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<<<<<<< HEAD
       <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+=======
+      <link rel="icon" href="{{ url_for('static', filename='img/favicon.png') }}">
+>>>>>>> parent of 2f817e0 (Last Working RC)
       {% block style %}{% endblock %}
   </head>
 
@@ -17,6 +21,7 @@
     let request = new XMLHttpRequest();
     request.open("GET", '/getip', false);
     request.send(null);
+<<<<<<< HEAD
     let serverIp = JSON.parse(request.responseText).ip;
     let ws = new WebSocket(`ws://${serverIp}:9001`);
 
@@ -47,6 +52,29 @@
       !(window.location.pathname == "/login" && urlParams.get("forward") == "/mobile") &&
       !(window.location.pathname == "/chat" && urlParams.get("mobile"))
     ) window.location = "/mobile";
+=======
+    let serverIp = request.responseText;
+    //let ws = new WebSocket(`ws://${serverIp}:9001`);
+    let urlParams = new URLSearchParams(window.location.search);
+
+    function getResponse(endpoint) {
+      request.open("GET", endpoint, false);
+      request.send(null);
+      try {
+        return JSON.parse(request.responseText);
+      } catch {
+        return {};
+        console.error("Could not get data.");
+      }
+    }
+
+    //If URL param "message" is present, display as alert
+    if (urlParams.get("alert")) {
+      alert(urlParams.get("alert"));
+      //To do: only remove alert, keep other params
+      window.location = window.location.pathname; //Remove message so it doesn't appear again if page is reloaded
+    }
+>>>>>>> parent of 2f817e0 (Last Working RC)
   </script>
   {% block script %}{% endblock %}
 </html>

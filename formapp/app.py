@@ -174,7 +174,8 @@ def newStudent(remote, username, bot=False):
             'help': False,
             'breakReq': False,
             'excluded': False,
-            'preferredHomepage': None
+            'preferredHomepage': None,
+            'wsID': ''
         }
         #Track if the teacher is logged in
         teacher = False

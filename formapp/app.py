@@ -1045,8 +1045,7 @@ def endpoint_break():
                     if sD.studentDict[student]['excluded']:
                         sD.studentDict[student]['excluded'] = False
                         sD.studentDict[student]['perms'] = sD.studentDict[request.remote_addr]['oldPerms']
-                        ##Commented out because WebSocket server isn't working
-                        #server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', student, 'server', 'Your break was ended.')))
+                        server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', student, 'server', 'Your break was ended.')))
                         return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'], ticket = ticket)
                     else:
                         return redirect(request.path + "?alert=This student is not currently taking a bathroom break.")
@@ -1214,8 +1213,8 @@ def endpoint_fighter():
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
         return redirect(sD.mainPage + "?alert=You do not have high enough permissions to do this right now.")
     else:
-        #return render_template('fighter.html', username = sD.studentDict[request.remote_addr]['name'])
-        return redirect(sD.mainPage + "?alert=Fighter will be ready to play soon.")
+        return render_template('fighter.html', username = sD.studentDict[request.remote_addr]['name'])
+        #return redirect(sD.mainPage + "?alert=Fighter will be ready to play soon.")
 
 '''
     /flush
@@ -1739,10 +1738,9 @@ def endpoint_needshelp():
                         sD.studentDict[student]['excluded'] = True
                         sD.studentDict[student]['oldPerms'] = sD.studentDict[request.remote_addr]['perms'] #Get the student's current permissions so they can be restored later
                         sD.studentDict[student]['perms'] = sD.settings['perms']['anyone']
-                    ##Commented out because WebSocket server isn't working
-                        #server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', name, 'server', 'The teacher accepted your break request.')))
-                    #elif helpList[name] == "<i>Requested a bathroom break</i>":
-                        #server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', name, 'server', 'The teacher rejected your break request.')))
+                        server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', name, 'server', 'The teacher accepted your break request.')))
+                    elif helpList[name] == "<i>Requested a bathroom break</i>":
+                        server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', name, 'server', 'The teacher rejected your break request.')))
             del helpList[remove]
             return redirect("/needshelp")
         else:
@@ -2436,7 +2434,7 @@ def message_received(client, server, message):
         else:
             db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
             dbcmd = db.cursor()
-            dbcmd.execute("INSERT INTO messages (from, to, time, content) VALUES (?, ?, ?, ?)", (message['from'], message['to'], message['time'], message['content']))
+            dbcmd.execute("INSERT INTO messages ('from', 'to', 'time', 'content') VALUES (?, ?, ?, ?)", (message['from'], message['to'], message['time'], message['content']))
             db.commit()
             db.close()
             #Check for permissions

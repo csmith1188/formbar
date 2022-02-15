@@ -411,7 +411,7 @@
     }
 
     function dateString(time) {
-      let date = new Date(time);
+      let date = time ? new Date(time) : new Date(); //If the message does not have a time property, use the current time
       let month = date.getMonth() + 1;
       let day = date.getDate();
       let year = date.getFullYear().toString().slice(2);

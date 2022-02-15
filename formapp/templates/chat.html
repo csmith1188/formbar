@@ -8,50 +8,16 @@
 <!-- Extra style declarations here -->
 {% block style %}
 <style>
-  body, #content {
-    background-color: var(--bg-dark);
-    color: white;
-    font: 16px "Segoe UI", sans-serif;
-  }
-
-  ::selection {
-    background: var(--ice-blue);
-    color: var(--bg-dark);
-  }
-
-  ::-webkit-scrollbar {
-    width: 15px;
-    height: 15px;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    box-shadow: inset 0 0 5px 5px var(--ice-blue);
-    border: solid 5px transparent;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    box-shadow: inset 0 0 5px 5px white;
-  }
-
-  ::-webkit-scrollbar-thumb:active {
-    box-shadow: inset 0 0 15px 15px white;
-    border: none;
-  }
-
-  ::-webkit-scrollbar-corner {
-    box-shadow: inset 0 0 5px 5px white;
-    border: solid 5px transparent;
-  }
-
   #outputBox {
     position: fixed;
     top: 0;
     left: 0;
     width: calc(100% - 300px);
-    height: calc(100% - 130px); /*Subtract height of controlChat*/
+    height: calc(100% - 100px); /*Subtract height of controlChat*/
     box-sizing: border-box;
     padding: 0 10px;
     overflow: auto;
+    overflow-wrap: break-word;
   }
 
   .msg {
@@ -60,7 +26,7 @@
   }
 
   .them .username {
-    color: var(--ice-blue);
+    color: var(--theme-color);
     cursor: pointer;
   }
 
@@ -72,20 +38,15 @@
     background-color: var(--bg-dark-highlight);
   }
 
-  .date {
-    color: var(--light-blue);
-    margin-right: 5px;
-  }
-
   .alert .content {
     font-style: italic;
-    color: var(--ice-blue);
+    color: var(--theme-color);
   }
 
   #userlist {
     width: 300px;
     box-sizing: border-box;
-    height: calc(100% - 130px);
+    height: calc(100% - 100px);
     background-color: var(--bg-darker);
     position: fixed;
     top: 0;
@@ -96,7 +57,6 @@
   #ulHeading {
     display: inline-block;
     margin-bottom: 5px;
-    color: white;
   }
 
   .ulName {
@@ -109,15 +69,16 @@
   }
 
   .ulName.them:hover {
-    background-color: var(--ice-blue);
-    color: var(--bg-dark);
+    background-color: var(--theme-color);
+    color: var(--bg-color);
   }
 
   #controlChat {
-    background-color: var(--bg-dark);
-    border-top: 1px solid var(--ice-blue);
+    background-color: var(--bg-color);
+    border-top: 1px solid var(--theme-color);
     position: fixed;
     width: 100%;
+    height: 60px;
     bottom: 0;
     left: 0;
     padding: 20px;
@@ -126,7 +87,7 @@
   #removeRec {
     display: none;
     margin-left: 8px;
-    color: var(--light-gray);
+    color: var(--gray-color);
     cursor: pointer;
   }
 
@@ -138,66 +99,28 @@
     width: 75%;
     height: 32px;
     box-sizing: border-box;
-    background-color: var(--bg-darker);
-    color: white;
-    resize: none;
-    border: 1px solid var(--ice-blue);
-    font-family: "Segoe UI", sans-serif;
-    font-size: 16px;
+    border-color: var(--theme-color);
   }
 
   #input:focus {
-    outline: 1px solid var(--ice-blue);
-  }
-
-  #input::-webkit-scrollbar-thumb {
-    box-shadow: inset 0 0 5px 5px var(--ice-blue);
-    border: solid 5px transparent;
-  }
-
-  #input::-webkit-scrollbar-thumb:hover {
-    box-shadow: inset 0 0 5px 5px white;
-  }
-
-  #input::-webkit-scrollbar-thumb:active {
-    box-shadow: inset 0 0 15px 15px white;
-    border: none;
-  }
-
-  #sendButton, button {
-    box-sizing: border-box;
-    background-color: var(--bg-dark);
-    color: var(--ice-blue);
-    border: 1px solid var(--ice-blue);
-    cursor: pointer;
+    outline-color: var(--theme-color);
   }
 
   #sendButton {
     width: 64px;
     height: 32px;
+    box-sizing: border-box;
     border-radius: 8px;
     margin: 0 0 0 5px;
-    font: 20px "Segoe UI", sans-serif;
+    font-size: 20px;
     vertical-align: top;
     transition-duration: 0.2s;
   }
 
-  button {
-    margin-top: 5px;
-    border-radius: 5.5px;
-    font: 14px "Segoe UI", sans-serif;
-  }
-
-  #sendButton:hover, #sendButton:focus, button:hover, button:focus {
-    background-color: var(--ice-blue);
-    color: var(--bg-dark);
-    outline: none;
-  }
-
   #sendButton:active, button:active {
-    background-color: white;
-    border-color: white;
-    color: var(--bg-dark);
+    background-color: var(--theme-color);
+    border-color: var(--theme-color);
+    color: var(--bg-color);
   }
 
   #sendButton:active {
@@ -211,21 +134,27 @@
 
   #sendButton.rec:hover, #sendButton.rec:focus {
     background-color: var(--light-purple);
-    color: var(--bg-dark);
+    color: var(--bg-color);
   }
 
   #sendButton.rec:active {
     background-color: white;
     border-color: white;
-    color: var(--bg-dark);
+    color: var(--bg-color);
+  }
+
+  #notifications {
+    position: fixed;
+    right: 16px;
+    bottom: 71px;
   }
 
   a {
-    color: var(--ice-blue);
+    color: var(--theme-color);
   }
 
   a:visited {
-    color: var(--light-blue);
+    color: var(--theme-color);
   }
 
   a:active {
@@ -234,63 +163,73 @@
 
   h1 {
     margin: 0;
-    color: var(--ice-blue);
+    color: var(--theme-color);
     font-size: 24px;
   }
 
   h2 {
     margin: 0;
-    color: var(--ice-blue);
-    font-size: 20px;
-  }
-
-  select {
-    box-sizing: border-box;
-    background-color: var(--bg-darker);
-    color: white;
-    border: 1px var(--ice-blue) solid;
-    font: 14px "Segoe UI", sans-serif;
   }
 
   .game #outputBox {
     width: 100%;
-    height: calc(100% - 115px);
+    height: calc(100% - 116px);
+  }
+
+  .small #outputBox {
+    width: 100%;
+    height: calc(100% - 140px);
   }
 
   .game .msg.whisper {
     background-color: initial;
   }
 
-  .game #userlist, .game #recContainer, .game #commands {
+  .game #userlist,
+  .game #recContainer,
+  .small #userlist {
     display: none;
   }
 
-  .game #input, .game #sendButton {
+  .game #controlChat {
+    height: 75px;
+  }
+
+  .small #controlChat {
+    height: 99px;
+  }
+
+  .light #controlChat {
+    background: #dfefff;
+  }
+
+  .game #input,
+  .game #sendButton,
+  .small #input,
+  .small #sendButton {
     width: calc(100% - 40px);
   }
 
-  .game #sendButton {
+  .game #sendButton,
+  .small #sendButton {
     display: block;
     margin: 10px 0 0 0;
   }
 
-  .game #sendButton:active {
+  .game #sendButton:active,
+  .small #sendButton:active {
     transform: none;
   }
 
-  #quickmenu {
+  .game #notifications,
+  .small #notifications {
     display: none;
-  }
-
-  #content {
-    background-color: transparent;
   }
 </style>
 {% endblock %}
 
-<!-- Extra javascript here -->
-{% block script %}
-{% endblock %}
+<!-- Change theme color here -->
+{% block color %}blue{% endblock %}
 
 <!-- Main content here -->
 {% block main %}
@@ -303,16 +242,66 @@
 <div id="controlChat">
     <div id="recContainer" style="font-size: 14px; margin-bottom: 5px;">To <span id="recipient">all</span><span id="removeRec" onclick="removeRec()" title="Reset recipients to all">✕</span></div>
     <form onsubmit="event.preventDefault(); onSubmit(); return false;" style="margin: 0;">
-        <input id="input" placeholder="Enter a message" autocomplete="off">
-        <input type="submit" value="Send" id="sendButton">
+        <input id="input" class="box" placeholder="Enter a message" autocomplete="off">
+        <input type="submit" value="Send" id="sendButton" class="button">
     </form>
-    <div id="commands" style="font-size: 14px; margin-top: 5px;">Commands: <button onclick="enterCommand('!#help')">!#help</button></div>
 </div>
+<div id="notifications">
+  <input type="checkbox" id="notificationsCheckbox"><label for="notificationsCheckbox">Desktop notifications</label>
+</div>
+{% endblock %}
+
+<!-- Extra javascript here -->
+{% block script %}
 <script type="text/javascript">
-    // Connect to Web Socket
-    ws = new WebSocket("ws://{{ serverIp }}:9001");
     var username = "{{ username }}";
     var receiver = 'all';
+
+    //Get old messages from the database
+    let messages = "{{ messages }}".replaceAll("&#34;", "\"");
+    messages = JSON.parse(messages);
+
+    var boxes = {
+        outputBox: document.getElementById('outputBox'),
+        inputBox: document.getElementById("input"),
+        userlist: document.getElementById("userlist"),
+        sendButton: document.getElementById("sendButton"),
+        recBox: document.getElementById("recipient"),
+        ncb: document.getElementById("notificationsCheckbox")
+    }
+
+    //Get user's permissions from server
+    request.open("GET", '/getme', false);
+    request.send(null);
+    let meRes = JSON.parse(request.responseText);
+    let myPerms = meRes.perms;
+
+    //Get chat permissions from the server
+    request.open("GET", '/getpermissions', false);
+    request.send(null);
+    let permsRes = JSON.parse(request.responseText);
+    let sayPerms = permsRes.say;
+
+    //If user doesn't have chat permissions, remove input section
+    if (myPerms > sayPerms) {
+      let cc = document.getElementById("controlChat");
+      cc.innerText = "You don't have high enough permissions to send chat messages.";
+      cc.style.textAlign = "center";
+      cc.style.lineHeight = "60px";
+      cc.style.fontSize = "32px";
+    }
+
+    messages.forEach(message => {
+      if (message[2] == "all" || message[2] == username || message[1] == username) {
+        output({
+          from: message[1],
+          to: message[2],
+          time: message[3],
+          content: message[4]
+        });
+      }
+    });
+
 
     //When the connection opens.
     ws.onopen = function() {};
@@ -356,19 +345,12 @@
         console.log(e)
     };
 
-    var boxes = {
-        outputBox: document.getElementById('outputBox'),
-        inputBox: document.getElementById("input"),
-        userlist: document.getElementById("userlist"),
-        sendButton: document.getElementById("sendButton"),
-        recBox: document.getElementById("recipient")
-    }
-
     function packMSG(type, rx, tx, content) {
         let msgOUT = {
             type: type,
             to: rx,
             from: tx,
+            time: Date.now(),
             content: content
         }
         return msgOUT
@@ -388,7 +370,7 @@
         receiver = 'all';
         boxes.recBox.innerHTML = "all";
         boxes.recBox.style.color = "white";
-        boxes.sendButton.style.color = "var(--ice-blue)";
+        boxes.sendButton.classList.remove("rec");
         //sendButton.value = "Send";
         //el.classList.remove('whisper');
         document.getElementById("removeRec").style.display = "none";
@@ -428,6 +410,24 @@
         ws.close();
     }
 
+    function dateString(time) {
+      let date = time ? new Date(time) : new Date(); //If the message does not have a time property, use the current time
+      let month = date.getMonth() + 1;
+      let day = date.getDate();
+      let year = date.getFullYear().toString().slice(2);
+      let hour = date.getHours();
+      let minute = date.getMinutes().toString();
+      if (minute.length == 1) minute = "0" + minute;
+      if (hour > 12) {
+        hour -= 12;
+        ampm = "PM";
+      } else {
+        if (hour == 0) hour = 12;
+        ampm = "AM";
+      }
+      return `${month}/${day}/${year} ${hour}:${minute} ${ampm}`;
+    }
+
     function output(message) {
         let lockBottom = false;
         if (atBottom(boxes.outputBox)) lockBottom = true;
@@ -445,30 +445,19 @@
           var usernameTitle = "Send a private message";
         }
 
-        let date = new Date();
-        let month = date.getMonth() + 1;
-        let day = date.getDate();
-        let year = date.getFullYear().toString().slice(2);
-        let hour = date.getHours();
-        if (hour > 12) {
-          hour -= 12;
-          ampm = "PM";
-        } else {
-          if (hour == 0) hour = 12;
-          ampm = "AM";
-        }
-        let minute = date.getMinutes().toString();
-        if (minute.length == 1) minute = "0" + minute;
         //Use this if you want to allow HTML
         newMSG.innerHTML = `
           <b class="username" onclick="${usernameOnclick}" title="${usernameTitle}">${message.from}</b>
-          <span style="color: var(--light-blue);">${month}/${day}/${year} ${hour}:${minute} ${ampm} ${message.to != "all" ? "· Private message" : ""}</span>
+          <span style="color: var(--gray-color);">${dateString(message.time)} ${message.to != "all" ? (message.from ? "· Private message" : "· From server") : ""}</span>
           <div class="content">${message.content}</div>
         `;
         //Use this if you want to convert HTML into text
         // newMSG.appendChild(document.createTextNode(message.from + ": " + message.content))
         boxes.outputBox.appendChild(newMSG);
         if (lockBottom) boxes.outputBox.scrollTo(0, boxes.outputBox.scrollHeight);
+
+        let notification;
+        if (localStorage.getItem("chatNotifications")) notification = new Notification(message.from, {body: message.content, icon: "{{ url_for('static', filename='img/favicon.ico') }}"});
     }
 
     function enterCommand(command) {
@@ -476,12 +465,34 @@
       boxes.inputBox.focus();
     }
 
-    let urlParams = new URLSearchParams(window.location.search);
+    boxes.ncb.checked = localStorage.getItem("chatNotifications") && Notification.permission == "granted";
+
+    boxes.ncb.onchange = async function() {
+      await Notification.requestPermission();
+      if (this.checked && Notification.permission == "granted") {
+        this.checked = true;
+        localStorage.setItem("chatNotifications", "true");
+      } else {
+        this.checked = false;
+        localStorage.setItem("chatNotifications", "");
+        if (Notification.permission == "denied") alert("You need to reset this sites's permissions to allow notifications.");
+      }
+    };
+
     let gamePlayer = urlParams.get("game");
     if (gamePlayer) {
-      document.documentElement.classList.add("game");
+      document.body.classList.add("game");
       changeRec(gamePlayer);
       boxes.sendButton.value += " to " + gamePlayer;
     }
+
+    let sidebar = urlParams.get("sidebar");
+    if (sidebar) {
+      document.body.classList.add("small", "light");
+      document.body.classList.remove("blue");
+    }
+
+    let mobile = urlParams.get("mobile");
+    if (mobile) document.body.classList.add("small");
 </script>
 {% endblock %}

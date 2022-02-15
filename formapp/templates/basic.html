@@ -3,18 +3,19 @@
 <!-- This is where the title, top buttons, and stylesheet is located -->
 
 <!-- Change title here -->
-{% block title %}Formbar (Basic Mode){% endblock %}
+{% block title %}Formbar (Basic Homepage){% endblock %}
 
 <!-- Extra style declarations here -->
 {% block style %}
 <style>
-  #advancedLink {
+  body {
+    font-size: 18px;
+  }
+
+  #banner * {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
+    bottom: 0;
     height: 48px;
-    background: var(--color-green);
     color: white;
     font-size: 24px;
     font-weight: bold;
@@ -24,16 +25,69 @@
     user-select: none;
   }
 
-  #setDefaultButton {
-    position: fixed;
-    top: 60px;
+  #bannerLeft {
+    left: 0;
+    width: 75%;
+    background: var(--color-green);
+  }
+
+  #bannerRight {
+    right: 0;
+    width: 25%;
+    background: var(--color-cyan);
+  }
+
+  #topButtons {
+    width: fit-content;
+    margin: auto;
+  }
+
+  #topButtons * {
+    margin: 0 8px;
+    font-size: 24px;
+    font-weight: bold;
+    border-width: 2px !important;
+  }
+
+  .light #topButtons * {
     color: var(--color-purple);
+  }
+
+  .light #topButtons .pressed {
+    background: var(--color-purple);
+    border-color: var(--color-purple);
+    color: white;
+  }
+
+  .light #topButtons.teacher * {
+    color: var(--color-orange);
+  }
+
+  .light #topButtons.teacher .pressed {
+    background: var(--color-orange);
+    border-color: var(--color-orange);
+    color: white;
+  }
+
+  #studentPanel, #teacherPanel {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    top: 20%;
+    text-align: center;
   }
 
   #thumbs, #letters {
     width: 480px;
     display: flex;
     justify-content: space-between;
+    margin: auto;
+  }
+
+  #response {
+    width: 360px;
+    height: 108px;
+    margin-bottom: 8px;
   }
 
   #other {
@@ -45,6 +99,10 @@
   h1 {
     margin-top: 0;
     color: var(--theme-color);
+  }
+
+  h2 {
+    margin: 0;
   }
 
   .thumbButton {
@@ -62,7 +120,7 @@
     box-shadow: none !important;
   }
 
-  button {
+  #studentPanel button {
     width: 180px;
     font-size: 28px;
     font-weight: bold;
@@ -70,24 +128,76 @@
     border-radius: 9999px !important;
   }
 
-  .redColor {
-    color: var(--color-red) !important;
+  #more {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    top: 25%;
+    display: flex;
+    justify-content: center;
+    font-size: 22px;
   }
 
-  .yellowColor {
-    color: var(--color-yellow) !important;
+  #more > div {
+    display: inline-block;
+    vertical-align: top;
+    margin: 0 48px;
   }
 
-  .greenColor {
-    color: var(--color-green) !important;
+  #teacherPanel h1, #more h1 {
+    font-size: 32px;
+    margin: 0 0 4px;
   }
 
-  .cyanColor {
-    color: var(--color-cyan) !important;
+  #teacherPanel button, #teacherPanel select {
+    font-size: 20px;
+    margin: 8px 4px;
   }
 
-  .blueColor {
-    color: var(--color-blue) !important;
+  #more .smallImg {
+    width: 33px;
+  }
+
+  #more input[type="color"] {
+    height: 23px;
+  }
+
+  #more h3 {
+    margin: 0 0 10px;
+    font-size: 26px;
+    color: var(--theme-color);
+  }
+
+  #randomMusic {
+    margin: 0 4px 0 0;
+  }
+
+  #nowPlaying {
+    font-size: 18px;
+  }
+
+  #playPauseMusic, #restartMusic, #stopMusic {
+    margin: 0;
+  }
+
+  #text {
+    text-transform: uppercase;
+    font-family: monospace;
+  }
+
+  #color2Div:not(.hidden) {
+    display: inline-block;
+  }
+
+  #chat {
+    position: fixed;
+    left: 0;
+    top: 74px;
+    width: 100%;
+    height: calc(100% - 74px);
+    border: 1px solid var(--light-blue);
+    border-style: solid none none;
+    z-index: 999;
   }
 </style>
 {% endblock %}
@@ -97,25 +207,30 @@
 
 <!-- Main content here -->
 {% block main %}
-  <div id="advancedLink" onclick="window.location = '/advanced';">Go to advanced mode to use all features</div>
-  <button id="setDefaultButton" class="hCentered" onclick="window.location = '/setdefault';">Set default mode</button>
-  <div class="centered">
-    <h1>Thumbs</h1>
-    <h2 id="noTUTD">There is no thumbs survey right now.</h2>
+  <div id="topButtons" class="hidden">
+    <button id="panelButton"></button>
+    <button id="moreButton">More</button>
+    <button id="chatButton">Chat</button>
+  </div>
+
+  <div id="studentPanel" class="hidden">
+    <h1 id="surveyName"></h1>
     <div id="thumbs" class="hidden">
       <img src="{{ url_for('static', filename='img/basic/thumbButton0.png') }}" id="thumbButton0" class="thumbButton button inline popOut moreDepth greenColor" title="Up" onclick="thumbsVote(0);" tabindex="0">
       <img src="{{ url_for('static', filename='img/basic/thumbButton1.png') }}" id="thumbButton1" class="thumbButton button inline popOut moreDepth cyanColor" title="Wiggle" onclick="thumbsVote(1);" tabindex="0">
       <img src="{{ url_for('static', filename='img/basic/thumbButton2.png') }}" id="thumbButton2" class="thumbButton button inline popOut moreDepth redColor" title="Down" onclick="thumbsVote(2);" tabindex="0">
     </div>
-    <br><br>
-    <h1>Letters</h1>
-    <h2 id="noABCD">There is no letter survey right now.</h2>
     <div id="letters" class="hidden">
       <img src="{{ url_for('static', filename='img/basic/letterButton0.png') }}" id="letterButton0" class="letterButton button inline popOut moreDepth redColor" title="Vote A" onclick="letterVote(0);" tabindex="0">
       <img src="{{ url_for('static', filename='img/basic/letterButton1.png') }}" id="letterButton1" class="letterButton button inline popOut moreDepth blueColor" title="Vote B" onclick="letterVote(1);" tabindex="0">
       <img src="{{ url_for('static', filename='img/basic/letterButton2.png') }}" id="letterButton2" class="letterButton button inline popOut moreDepth yellowColor" title="Vote C" onclick="letterVote(2);" tabindex="0">
       <img src="{{ url_for('static', filename='img/basic/letterButton3.png') }}" id="letterButton3" class="letterButton button inline popOut moreDepth greenColor" title="Vote D" onclick="letterVote(3);" tabindex="0">
     </div>
+    <div id="textBox" class="hidden">
+      <textarea id="response" placeholder="Type your response here" oninput="checkResponse();"></textarea><br>
+      <button id="submitResponse" class="inline popOut unselectable">Submit</button>
+    </div>
+    <h2 id="noSurvey">There is no survey right now.</h2>
     <br><br>
     <h1>Other</h1>
     <div id="other">
@@ -123,90 +238,274 @@
       <button id="break" class="inline popOut moreDepth" title="Request a bathroom break">Bathroom!</button>
     </div>
   </div>
+
+  <div id="teacherPanel" class="hidden">
+    <div>
+      <h1>Mode</h1>
+      <select id="mode" onchange="changeMode();">
+        <option>Survey</option>
+        <option>Progress</option>
+        <option>Playtime</option>
+      </select><br>
+      <div id="newSurvey" class="hidden">New survey:
+        <button class="inline popOut" onclick="startSurvey('tutd')">Thumbs</button>
+        <button class="inline popOut" onclick="startSurvey('abcd')">Letters</button>
+        <button class="inline popOut" onclick="startSurvey('text')">Text response</button><br>
+        <span id="textLink" class="hidden">Click <a onclick="window.open('/advanced?page=users')">here</a> to see responses</span>
+      </div>
+      <button class="inline popOut" onclick="window.open('/advanced?page=settings');">All settings 🡆</button>
+    </div>
+    <br><br>
+    <div>
+      <h1>Help tickets</h1>
+      <span id="ticketsText"></span><br>
+      <button class="inline popOut" onclick="window.open('/advanced?page=needshelp');">All tickets 🡆</button>
+    </div>
+    <br><br>
+    <div>
+      <h1>Users</h1>
+      <span id="usersText"></span><br>
+      <button class="inline popOut" onclick="window.open('/advanced?page=users');">All users 🡆</button>
+    </div>
+  </div>
+
+  <div id="more" class="hidden">
+    <div id="soundDiv">
+      <h1>Sound effects</h1>
+      <input type="text" class="line" id="sound" placeholder="Filename" list="sfxFiles">
+      <datalist id="sfxFiles"></datalist>
+      <img src="{{ url_for('static', filename='img/advanced/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendSound();">
+    </div>
+
+    <div id="musicDiv">
+      <h1>Play music</h1>
+      <img src="{{ url_for('static', filename='img/advanced/random.png') }}" id="randomMusic" class="smallImg" title="Random" onclick="randomBGM()"><input type="text" id="music" class="line" placeholder="Filename" list="bgmFiles">
+      <datalist id="bgmFiles"></datalist>
+      <img src="{{ url_for('static', filename='img/advanced/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendMusic();"><br>
+      <label for="volume">Volume: </label><input type="range" id="volume" min="0.1" max="1" step="0.1">
+      <span id="volNumber"></span>
+      <div id="nowPlaying" class="hidden">Now playing: <b id="nowPlayingTitle" title="Song"></b></div>
+      <div id="musicControls" class="hidden">
+        <img src="{{ url_for('static', filename='img/advanced/pause.png') }}" class="smallImg" id="playPauseMusic" title="Pause" onclick="playPauseMusic();">
+        <img src="{{ url_for('static', filename='img/advanced/restart.png') }}" class="smallImg" id="restartMusic" title="Restart" onclick="restartMusic();">
+        <img src="{{ url_for('static', filename='img/advanced/stop.png') }}" class="smallImg" id="stopMusic" title="Stop" onclick="stopMusic();">
+      </div>
+    </div>
+
+    <div id="textDiv">
+      <h1>Change text</h1>
+      Text color: <input type="color" id="fgColor" class="button inline popOut" value="#404040"><br>
+      Background: <input type="color" id="bgColor" class="button inline popOut"><br>
+      <input type="text" class="line" id="text" placeholder="Phrase">
+      <img src="{{ url_for('static', filename='img/advanced/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendText();">
+    </div>
+
+    <div id="colorDiv">
+      <h1>Change color</h1>
+      <input type="radio" id="hideSegment" name="segment" checked onclick="hideSegment();" style="margin-left: 0;"><label for="hideSegment">Entire bar</label>
+      <input type="radio" id="showSegment" name="segment" style="margin-left: 8px;" onclick="showSegment();"><label for="showSegment">Segment</label>
+      <br>
+      <div id="segment" class="hidden" style="margin-bottom: 8px;">
+        <input type="number" id="segmentStart" class="line" min="0" value="0" onchange="validNumber(this);"> –
+        <input type="number" id="segmentEnd" class="line" min="0" onchange="validNumber(this);">
+      </div>
+      <input type="radio" id="hideColor2" name="gradient" checked onclick="hideColor2();" style="margin-left: 0;"><label for="hideColor2">Single color</label>
+      <input type="radio" id="showColor2" name="gradient" style="margin-left: 8px;" onclick="showColor2();"><label for="showColor2">Gradient</label>
+      <br>
+      <div style="display: inline-block;">
+        <h3 id="color1Heading" class="hidden" style="margin-bottom: 0;">Color 1</h3>
+        <input type="color" id="color1" class="button inline popOut">
+      </div>
+      <div id="color2Div" class="hidden" style="margin-left: 8px;">
+        <h3 style="margin-bottom: 0;">Color 2</h3>
+        <input type="color" id="color2" class="button inline popOut">
+      </div>
+      <img src="{{ url_for('static', filename='img/advanced/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendColor();">
+    </div>
+  </div>
+
+  <iframe src="/chat" id="chat" class="hidden"></iframe>
+
+  <div id="banner">
+    <div id="bannerLeft" onclick="window.location = '/advanced';">Go to the advanced homepage to use all features</div>
+    <div id="bannerRight" onclick="window.location = '/setdefault';">Set default</div>
+  </div>
 {% endblock %}
 
 <!-- Extra JavaScript here -->
 {% block script %}
 <script src="{{ url_for('static', filename='js/home.js') }}"></script>
-<script>
-  ////Check for break, fix buttons
-  checkForSurvey();
-  checkForHelpTicket();
-  setInterval(() => {
-    checkIfRemoved();
-    checkForSurvey();
-    checkForHelpTicket();
-  }, 1000);
+  <script>
+    ////Check for break, fix buttons
+    function init() {
+      showPanel();
+      updateVotes();
+      checkForSurvey();
+      checkForHelpTicket();
+      updateMode();
+      usersText();
+      ticketsText();
+      nowPlaying();
+      updateVolume();
+      disableVolume();
+      listSounds("{{ sfx }}");
+      listMusic("{{ bgm }}");
+      segmentNumbers();
+    };
+    getApiData(true);
 
-  document.getElementById("help").onclick = requestHelp;
-  document.getElementById("break").onclick = requestBreak;
+    function update() {
+      checkIfRemoved();
+      updateVotes();
+      checkForSurvey();
+      checkForHelpTicket();
+      updateMode();
+      usersText();
+      ticketsText();
+      nowPlaying();
+      updateVolume();
+      disableVolume();
+    };
+    setInterval(getApiData, 1000);
 
-  function checkIfRemoved() {
-    //If the user is removed by the teacher, send them back to the login page
-    let res = getResponse("/getme");
-    if (res.error == "You are not logged in.") window.location = "/login?forward=/basic&alert=You have been logged out.";
-  }
-
-  function checkForSurvey() {
-    let res = getResponse("/getmode");
-    let mode = res.mode;
-    if (mode == "tutd") {
-      document.getElementById("thumbs").classList.remove("hidden");
-      document.getElementById("noTUTD").classList.add("hidden");
-    } else {
-      document.getElementById("thumbs").classList.add("hidden");
-      document.getElementById("noTUTD").classList.remove("hidden");
+    function showPanel() {
+      let button = document.getElementById("panelButton");
+      let container = document.getElementById("topButtons");
+      if (meRes.perms == permsRes.teacher) {
+        container.classList.add("teacher");
+        button.innerText = "Teacher panel";
+        button.onclick = () => showSection("teacherPanel");
+        showSection("teacherPanel");
+      } else {
+        button.innerText = "Student panel";
+        button.onclick = () => showSection("studentPanel");
+        showSection("studentPanel");
+      }
+      container.classList.remove("hidden");
     }
-    if (mode == "abcd") {
-      document.getElementById("letters").classList.remove("hidden");
-      document.getElementById("noABCD").classList.add("hidden");
-    } else {
-      document.getElementById("letters").classList.add("hidden");
-      document.getElementById("noABCD").classList.remove("hidden");
+
+    function showSection(toShow) {
+      ["studentPanel", "teacherPanel", "more", "chat"].forEach(section => {
+        let cl = document.getElementById(section).classList;
+        section == toShow ? cl.remove("hidden") : cl.add("hidden");
+      });
+
+      if (toShow == "studentPanel" || toShow == "teacherPanel") {
+        document.getElementById("panelButton").classList.add("pressed");
+        document.getElementById("moreButton").classList.remove("pressed");
+        document.getElementById("chatButton").classList.remove("pressed");
+      } else {
+        document.getElementById("panelButton").classList.remove("pressed");
+        document.getElementById("moreButton").classList.remove("pressed");
+        document.getElementById("chatButton").classList.remove("pressed");
+        document.getElementById(toShow + "Button").classList.add("pressed");
+      }
+
+      if (toShow == "chat") {
+        document.body.classList.remove("light");
+        document.body.classList.add("blue");
+      } else {
+        document.body.classList.remove("blue");
+        document.body.classList.add("light");
+      }
     }
-  }
 
-  function checkForHelpTicket() {
-    ////Don't use param
-    if ("{{ helpTicket }}") {
-      if ("{{ helpTicket }}" == "&lt;i&gt;Requested a bathroom break&lt;/i&gt;") ticketSent("break");
-      else ticketSent("help");
-    } else {
-      document.getElementById("help").onclick = requestHelp;
-      document.getElementById("break").onclick = requestBreak;
+    document.getElementById("moreButton").onclick = () => showSection("more");
+    document.getElementById("chatButton").onclick = () => showSection("chat");
+
+    document.getElementById("help").onclick = requestHelp;
+    document.getElementById("break").onclick = requestBreak;
+
+    function checkForSurvey() {
+      let mode = modeRes.mode;
+      let myPerms = meRes.perms;
+      let studentPerms = permsRes.student;
+      let surveyName = document.getElementById("surveyName");
+      let thumbs = document.getElementById("thumbs");
+      let letters = document.getElementById("letters");
+      let textBox = document.getElementById("textBox");
+      let noSurvey = document.getElementById("noSurvey");
+      if (mode == "tutd" || mode == "abcd" || mode == "text") {
+        if (myPerms == studentPerms) {
+          noSurvey.classList.add("hidden");
+          if (mode == "tutd") {
+            thumbs.classList.remove("hidden");
+            surveyName.innerText = "Survey: thumbs";
+          } else {
+            thumbs.classList.add("hidden");
+          }
+          if (mode == "abcd") {
+            letters.classList.remove("hidden");
+            surveyName.innerText = "Survey: letters";
+          } else {
+            letters.classList.add("hidden");
+          }
+          if (mode == "text") {
+            textBox.classList.remove("hidden");
+            surveyName.innerText = "Survey: text response";
+          } else {
+            textBox.classList.add("hidden");
+          }
+        } else {
+          surveyName.innerText = "Survey";
+          noSurvey.innerText = "Only students can vote in surveys.";
+          noSurvey.classList.remove("hidden");
+        }
+      } else {
+        surveyName.innerText = "Survey";
+        noSurvey.classList.remove("hidden");
+      }
     }
-  }
 
-  function ticketSent(type) {
-    let sentEl;
-    let otherEl;
-    if (type == "help") {
-      sentEl = document.getElementById("help");
-      otherEl = document.getElementById("break");
-    } else if (type == "break") {
-      sentEl = document.getElementById("break");
-      otherEl = document.getElementById("help");
+    function updateMode() {
+      let mode = modeRes.mode;
+      let el = document.getElementById("mode");
+      let ns = document.getElementById("newSurvey").classList;
+      let tl = document.getElementById("textLink").classList;
+      if (el != document.activeElement) {
+        ns.add("hidden");
+        tl.add("hidden");
+        switch (mode) {
+          case "text":
+            tl.remove("hidden");
+          case "survey":
+          case "tutd":
+          case "abcd":
+            el.value = "Survey";
+            ns.remove("hidden");
+            break;
+          case "progress":
+            el.value = "Progress";
+            break;
+          case "playtime":
+            el.value = "Playtime";
+        }
+      } else if (el.value == "Survey") {
+        ns.remove("hidden");
+      } else {
+        ns.add("hidden");
+      }
     }
-    sentEl.onclick = null;
-    otherEl.onclick = null;
-    sentEl.classList.add("pressed");
-    sentEl.classList.add("unselectable");
-    sentEl.innerText = "Ticket sent";
-    otherEl.classList.add("unselectable");
-  }
 
-  function requestHelp() {
-    let el = document.getElementById("help");
-    request.open("GET", "/help?action=send");
-    request.send();
-    ticketSent("help");
-  }
+    function changeMode() {
+      let newMode = document.getElementById("mode").value;
+      switch (newMode) {
+        case "Survey":
+          request.open("GET", "/settings?barmode=survey");
+          break;
+        case "Progress":
+          request.open("GET", "/settings?barmode=progress");
+          break;
+        case "Playtime":
+          request.open("GET", "/settings?barmode=playtime");
+      }
+      request.send();
+      updateMode();
+    }
 
-  function requestBreak() {
-    let el = document.getElementById("break");
-    request.open("GET", "/break?action=request");
-    request.send();
-    ticketSent("break");
-  }
-</script>
+    function startSurvey(type) {
+      request.open("GET", "/startsurvey?type=" + type);
+      request.send();
+    }
+  </script>
 {% endblock %}

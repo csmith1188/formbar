@@ -16,34 +16,7 @@
     }
 
     body, #content {
-      background: var(--bg-dark);
-      color: white;
-      font: 16px "Segoe UI", sans-serif;
       user-select: none;
-    }
-
-    ::-webkit-scrollbar {
-      width: 15px;
-      height: 15px;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      box-shadow: inset 0 0 5px 5px;
-      border: solid 5px transparent;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      box-shadow: inset 0 0 5px 5px;
-    }
-
-    ::-webkit-scrollbar-thumb:active {
-      box-shadow: inset 0 0 15px 15px;
-      border: none;
-    }
-
-    ::-webkit-scrollbar-corner {
-      box-shadow: inset 0 0 5px 5px;
-      border: solid 5px transparent;
     }
 
     div, h1, input[type="text"], button, iframe {
@@ -74,16 +47,11 @@
     button {
       width: 112px;
       height: 40px;
-      border-radius: 20px;
-      background: transparent;
-      color: var(--light-green);
-      border: 1px solid;
-      font: 18px "Segoe UI", sans-serif;
-      cursor: pointer;
     }
 
-    button:not(.unselectable):not(.on):hover {
-      background: var(--bg-dark-highlight);
+    .backButton {
+      left: 16px;
+      top: 16px;
     }
 
     #randomButton {
@@ -100,37 +68,8 @@
       width: 160px;
       height: 40px;
       padding: 4px;
-      background: var(--bg-darker);
-      color: white;
-      border: 1px solid;
-      font: 18px "Segoe UI", sans-serif;
+      font-size: 18px;
       text-align: center;
-    }
-
-    input[type="text"]:focus {
-      outline: 1px solid white;
-    }
-
-    input[type="checkbox"] {
-    	-webkit-appearance: none;
-      width: 14px;
-      height: 14px;
-      margin: 3px 6px 3px 0;
-      background: var(--bg-darker);
-      color: white;
-      border: 1px solid;
-    	border-radius: 0%;
-      vertical-align: text-bottom;
-    }
-
-    input[type="checkbox"]:checked {
-      background: var(--light-green) url("{{ url_for('static', filename='img/fighter/checkMark.png') }}") no-repeat;
-      background-size: 100%;
-      color: var(--light-green);
-    }
-
-    input[type="checkbox"]:hover, input[type="checkbox"]:checked:hover {
-      box-shadow: 0 0 4px;
     }
 
     #border > * {
@@ -168,34 +107,6 @@
       border-color: var(--color-blue);
     }
 
-    .hidden {
-      display: none;
-    }
-
-    .fullScreen {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      padding: 8px;
-    }
-
-    .hCentered {
-      left: 50%;
-      transform: translateX(-50%);
-      text-align: center;
-    }
-
-    .vCentered {
-      top: 50%;
-      transform: translateY(-50%);
-    }
-
-    .hCentered.vCentered {
-      transform: translate(-50%, -50%);
-    }
-
     .large {
       font-size: 18px;
     }
@@ -203,11 +114,6 @@
     .targetOption:hover {
       cursor: pointer;
       filter: drop-shadow(0 0 6px white);
-    }
-
-    .unselectable {
-      opacity: 50%;
-      cursor: not-allowed;
     }
 
     .fighter {
@@ -219,35 +125,35 @@
       font-size: 14px;
     }
 
-    .red {
+    .redBg {
       background: #fbb;
     }
 
-    .yellow {
+    .yellowBg {
       background: #ffb;
     }
 
-    .green {
+    .greenBg {
       background: #bfb;
     }
 
-    .blue {
+    .blueBg {
       background: #bdf;
     }
 
-    .orange {
+    .orangeBg {
       background: #fc9;
     }
 
-    .magenta {
+    .magentaBg {
       background: #fbf;
     }
 
-    .gray {
+    .grayBg {
       background: #ddd;
     }
 
-    .gold {
+    .goldBg {
       background: linear-gradient(to bottom right, #fea, #ba4, #fea, #ba4);
     }
 
@@ -616,34 +522,13 @@
       border: none;
       border-left: 1px solid;
     }
-
-    .on {
-      background: var(--light-green);
-      color: var(--bg-dark);
-      cursor: default;
-    }
-
-    #quickmenu {
-      display: none;
-    }
-
-    #content {
-      /*Paste this to make a full-screen page*/
-      position: fixed;
-      left: 0;
-      top: 0;
-      width: 100%;
-      max-width: 100%; /*For some reason, this only works if max-width is present*/
-      height: 100%;
-      box-sizing: border-box;
-      border-radius: 0;
-      background-color: transparent;
-    }
   </style>
 {% endblock %}
 
+<!-- Change theme color here -->
+{% block color %}green{% endblock %}
+
 <!-- Extra javascript here -->
-{% block script %}{% endblock %}
 
 <!-- Main content here -->
 {% block main %}
@@ -667,21 +552,25 @@
 
     <div id="joinMatch" class="vCentered" style="left: calc(50% - 482px);">
       <h2>Join match</h2>
-      <input type="text" id="joinCode" class="hCentered vCentered" placeholder="Six-digit code" maxlength="6" autocomplete="off"></input>
+      <input type="text" id="joinCode" class="box centered" placeholder="Six-digit code" maxlength="6" autocomplete="off"></input>
       <button id="joinButton" class="hCentered unselectable" style="bottom: 32px;">Go</button>
     </div>
 
     <div id="createMatch" class="vCentered" style="right: calc(50% - 482px);">
       <h2>Create match</h2>
-      <div class="hCentered vCentered"><input type="checkbox" id="chatCheckbox" checked><label for="chatCheckbox">Send a link in the chat</label></div>
+      <div class="centered"><input type="checkbox" id="chatCheckbox" checked><label for="chatCheckbox">Send a link in the chat</label></div>
       <button class="hCentered" style="bottom: 32px;" onclick="createMatch();">Go</button>
     </div>
+
+    <div class="large hCentered" style="bottom: 24px;">Created by Oley Birkeland</div>
   </div>
 
   <div id="chooseFighters" class="fullScreen hidden">
+    <button class="backButton" onclick="backToHome();">🡨 Back</button>
+
     <div class="large hCentered" style="top: 16px;">
       Choose two fighters to take into the match.<br>
-      <button id="randomButton" onclick="randomFighters()"><img src="{{ url_for('static', filename='img/fighter/random.png') }}" class="randomIcon"> Random</button>
+      <button id="randomButton" onclick="randomFighters();"><img src="{{ url_for('static', filename='img/fighter/random.png') }}" class="randomIcon"> Random</button>
     </div>
     <div id="fighterOptions" class="vCentered">
       <div id="redFighter"></div>
@@ -697,6 +586,8 @@
   </div>
 
   <div id="chooseItems" class="fullScreen hidden">
+    <button class="backButton" onclick="backToFighters();">🡨 Back</button>
+
     <div class="large hCentered" style="top: 192px; width: 100%;">Choose up to three items to take into the match. You can pick the same item more than once.</div>
     <div id="chooseItemsCenter" class="vCentered">
       <div id="itemOptions"></div><br>
@@ -713,11 +604,11 @@
   </div>
 
   <div id="waiting" class="fullScreen hidden">
-    <div class="hCentered" style="top: 64px;">
+    <div class="hCentered" style="top: 25%;">
       <h1 id="opponentStatus" style="position: static;">Waiting for opponent…</h1>
       <h2 style="font-weight: normal;">Your match code is <b id="matchCode"></b></h2>
     </div>
-    <iframe width="560" height="315" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen id="video" class="hCentered vCentered"></iframe>
+    <iframe width="560" height="315" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen id="video" class="centered"></iframe>
     <div id="tip" class="large hCentered" style="bottom: 32px;"></div>
   </div>
 
@@ -781,10 +672,9 @@
     <button id="rematchButton" onclick="rematchButton();">Rematch?</button>
     <button style="margin-left: 16px; color: white;" onclick="window.location = '/fighter';">Home</button>
   </div>
-
+{% endblock %}
+{% block script %}
   <script>
-    let ws = new WebSocket("ws://{{ serverIp }}:9001");
-
     let red = {
       color: "red",
       effective: "yellow",
@@ -1130,7 +1020,6 @@
     let damageProperties = ["damage", "minDamage", "maxDamage", "critDamage", "secondaryDamage", "combinedDamage", "teamDamage"];
 
 
-    let request = new XMLHttpRequest();
     let match;
     let matchCode;
     let itemsArr = [];
@@ -1145,7 +1034,6 @@
     let winnerOverride;
     let matchOver;
 
-    let urlParams = new URLSearchParams(window.location.search);
     let joinCode = urlParams.get("match");
     let rematchCode = urlParams.get("rematch");
     if (joinCode) joinMatch(joinCode);
@@ -1157,7 +1045,7 @@
     }
 
     function capitalize(string) {
-      return string.charAt(0).toUpperCase() + string.slice(1);
+      return string[0].toUpperCase() + string.slice(1);
     }
 
     function pickRandom(max) {
@@ -1193,10 +1081,10 @@
         from: "server",
         content: content
       };
-      //ws.send(JSON.stringify(messageObj));
+      ////ws.send(JSON.stringify(messageObj));
       if (!recipient != "all") { //If message is private, send to sender in addition to recipient
         messageObj.to = me.name;
-        //ws.send(JSON.stringify(messageObj));
+        ////ws.send(JSON.stringify(messageObj));
       }
     }
 
@@ -1319,7 +1207,7 @@
 
     function createMatch() {
       //Give this match a six-digit ID
-      matchCode = pickRandom(1000000).toString();
+      matchCode = pickRandom(1_000_000).toString();
       while (matchCode.length < 6) matchCode = "0" + matchCode;
       me.team = 1;
       me.fighters = [fighter1a, fighter1b];
@@ -1355,9 +1243,16 @@
         let el = document.getElementById(color.color + "Fighter");
         color.hp = 100;
         createFighter(color, el);
+        unchooseFighter(color);
         el.classList.add("targetOption");
         el.onclick = () => {chooseFighter(color);};
       });
+
+    }
+
+    function backToHome() {
+      document.getElementById("chooseFighters").classList.add("hidden");
+      document.getElementById("home").classList.remove("hidden");
     }
 
     function createFighter(fighter, fighterEl) {
@@ -1365,7 +1260,7 @@
       let fighterEffects = "";
       if (colors.includes(fighter)) fighterId = fighter.color;
       else fighterId = fighter.name;
-      fighterEl.classList.add("fighter", fighter.color);
+      fighterEl.classList.add("fighter", fighter.color + "Bg");
       fighter.attackFactor = 1;
       fighter.effects = {};
       for (let effect in effects) {
@@ -1471,21 +1366,33 @@
       document.getElementById("chooseItems").classList.remove("hidden");
       document.getElementById("itemsDone").onclick = () => itemsDone();
 
+      removeItem(2);
+      removeItem(1);
+      removeItem(0);
+
       for (let item in items) itemsArr.push(item);
-      itemsArr.forEach(item => {
-        let itemObj = items[item];
-        document.getElementById("itemOptions").innerHTML +=
-        `<div class="itemNameAndImage">
-          <h3>${capitalize(itemObj.name)}</h3><br>
-          <img id="${item}" class="item targetOption" src="/static/img/fighter/${item}.png" draggable="false">
-        </div>`;
-      });
-      itemsArr.forEach(item => {
-        let el = document.getElementById(item);
-        el.onmouseover = () => document.getElementById("itemDesc").innerText = items[item].description;
-        el.onmouseout = () => document.getElementById("itemDesc").innerText = null;
-        el.onclick = () => chooseItem(item);
-      });
+      //Add items unless they are already there
+      if (!document.getElementById("itemOptions").innerHTML) {
+        itemsArr.forEach(item => {
+          let itemObj = items[item];
+          document.getElementById("itemOptions").innerHTML +=
+          `<div class="itemNameAndImage">
+            <h3>${capitalize(itemObj.name)}</h3><br>
+            <img id="${item}" class="item targetOption" src="/static/img/fighter/${item}.png" draggable="false">
+          </div>`;
+        });
+        itemsArr.forEach(item => {
+          let el = document.getElementById(item);
+          el.onmouseover = () => document.getElementById("itemDesc").innerText = items[item].description;
+          el.onmouseout = () => document.getElementById("itemDesc").innerText = null;
+          el.onclick = () => chooseItem(item);
+        });
+      }
+    }
+
+    function backToFighters() {
+      document.getElementById("chooseItems").classList.add("hidden");
+      document.getElementById("chooseFighters").classList.remove("hidden");
     }
 
     function chooseItem(item) {
@@ -1601,9 +1508,6 @@
 
       let randomTip = pickRandom(tips.length);
       document.getElementById("tip").innerText = tips[randomTip];
-      ////!let randomVideo = pickRandom(videos.length);
-      ////document.getElementById("video").src = "https://www.youtube.com/embed/" + videos[randomVideo] + "?autoplay=1&fs=0&modestbranding=1";
-      ////if (true) document.getElementById("video").src += "&cc_load_policy=1&mute=1";
 
       /*//for testing
       receivePlayerReady({
@@ -1658,10 +1562,11 @@
 
       updateStats();
 
-      ////save to account instead?
-      //Add a loss and reset win streak in case player leaves during match
-      localStorage.setItem("fighterLosses", me.losses + 1);
-      localStorage.setItem("fighterWinStreak", 0);
+      //Add a loss and reset win streak if player leaves during match
+      window.onunload = () => {
+        localStorage.setItem("fighterLosses", me.losses + 1);
+        localStorage.setItem("fighterWinStreak", 0);
+      };
 
       players = [player1, player2];
 
@@ -2454,9 +2359,11 @@
       updateStats();
     }
 
+    window.onunload = null;
+
     function rematchButton() {
       let el = document.getElementById("rematchButton");
-      el.classList.add("on");
+      el.classList.add("pressed");
       el.onclick = null;
       me.rematch = true;
       ws.send(JSON.stringify({
@@ -2471,7 +2378,7 @@
       sendMessage(me.name + " wants to rematch.");
     }
 
-    function opponentDisconnected() { ////
+    function opponentDisconnected() { ////!
       if (opponent.fighters) { //If in match
         sendMessage(opponent.name + " disconnected.");
         document.getElementById("rematchButton").classList.add("unselectable");

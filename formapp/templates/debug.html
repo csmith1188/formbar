@@ -1,79 +1,29 @@
 {% extends 'header.html' %}
 
-{% block title %}Debugging{% endblock %}
+{% block title %}API Data for Debugging{% endblock %}
 {% block style %}
 <style>
-  body {
-    background: var(--bg-dark);
-    color: white;
-    font: 16px "Segoe UI", sans-serif;
-  }
-
-  #virtualBar {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    box-sizing: border-box;
-    padding: 8px;
-    background: black;
-  }
-
-  #vbText {
-    height: 24px;
-    width: 10ch;
-    padding: 0 4px;
-    box-sizing:
-    border-box; border: 1px white;
-    border-style: solid solid none;
-    font: 20px monospace;
-    text-transform: uppercase;
-  }
-
-  #pixBox {
-    width: 100%;
-    height: 16px;
-    box-sizing: border-box;
-    border: 1px solid white;
-    display: flex;
-    justify-content: space-around;
-    user-select: none;
-  }
-
   #buttonContainer {
     position: fixed;
     left: 0;
-    top: 56px;
+    top: 0;
     width: 100%;
     height: 60px;
     box-sizing: border-box;
     padding: 10px;
-    background: var(--bg-dark-highlight);
+    background: var(--bg-darker);
   }
 
   button {
-    box-sizing: border-box;
-    border-radius: 15px;
     margin: 5px;
-    padding: 2px 8px;
-    background: transparent;
-    color: var(--light-red);
-    border: 1px var(--light-red) solid;
-    font: 18px "Segoe UI", sans-serif;
-    cursor: pointer;
-  }
-
-  button.open, button:hover {
-    background: var(--light-red);
-    color: var(--bg-dark);
   }
 
   #data {
     position: absolute;
     left: 0;
-    top: 116px;
+    top: 60px;
     width: 100%;
-    height: calc(100% - 56px - 60px - 24px);
+    height: calc(100% - 60px - 24px);
     box-sizing: border-box;
     padding: 8px;
   }
@@ -86,7 +36,7 @@
     height: 28px;
     padding: 7px 14px;
     box-sizing: border-box;
-    background: linear-gradient(to right, var(--light-red), var(--light-red) 50%, var(--bg-dark-highlight) 50%);
+    background: linear-gradient(to right, var(--theme-color), var(--theme-color) 50%, var(--bg-dark-highlight) 50%);
     font-size: 14px;
     line-height: 14px;
     text-align: right;
@@ -102,94 +52,64 @@
       background-position: 0% 50%;
     }
   }
-
-  #quickmenu {
-    display: none;
-  }
-
-  #content {
-    background-color: transparent;
-  }
 </style>
 {% endblock %}
 
-{% block main %}
-  <div id="virtualBar">
-    <div id="vbText"><!--Text goes here--></div>
-    <span id="pixBox"></span>
-  </div>
+<!-- Change theme color here -->
+{% block color %}red{% endblock %}
 
-  <div id="buttonContainer">
-    <button id="/getpix" onclick="request('/getpix')">/getpix</button>
-    <button id="/getme" onclick="request('/getme')">/getme</button>
-    <button id="/getpermissions" onclick="request('/getpermissions')">/getpermissions</button>
-  </div>
+{% block main %}
+  <div id="buttonContainer"></div>
 
   <div id="data"></div>
 
   <div id="updateBar">Updating in <span id="timeLeft">3</span></div>
+{% endblock %}
 
+<!-- Extra JavaScript here -->
+{% block script %}
+<script>
+  let urls = [
+    "/getbgm",
+    "/getfightermatches",
+    "/getme",
+    "/getmode",
+    "/getpermissions",
+    "/getphrase",
+    "/getpix",
+    "/getquizname",
+    "/getstudents",
+  ];
+  let timeLeft = 3;
+  let dataURL = "/getpix";
 
-  <script>
-    let xhr = new XMLHttpRequest();
-    let urls = ["/getpix", "/getme", "/getpermissions"];
-    let timeLeft = 3;
-    let dataURL = "/getpix";
+  urls.forEach(url => document.getElementById("buttonContainer").innerHTML += `<button id="${url}" onclick="update('${url}')">${url}</button>`);
 
-    function updateBar() {
-      xhr.open("GET", '/getphrase', false);
-      xhr.send(null);
-      let phraseRes = JSON.parse(xhr.responseText);
-      let phrase = phraseRes.phrase;
-      let vbText = document.getElementById("vbText");
-      vbText.innerText = phrase;
-      //To do: update color
+  function countdown() {
+    document.getElementById("timeLeft").innerHTML = timeLeft--;
+  }
 
-      xhr.open("GET", '/getpix', false);
-      xhr.send(null);
-      let pixRes = JSON.parse(xhr.responseText);
-      let pix = eval(pixRes.pixels);
-      let pixBox = document.getElementById("pixBox");
-      pixBox.innerHTML = '';
-      for (let i = pix.length - 1; i >= 0; i--) {
-          for (let color = 0; color < pix[i].length; color++) {
-              pix[i][color] = pix[i][color].toString(16);
-              if (pix[i][color].length < 2)
-                  pix[i][color] = "0" + pix[i][color];
-          }
-          pixBox.innerHTML += "<div style='display: inline; flex-grow: 1; overflow: hidden; background-color: #" + pix[i][0] + "" + pix[i][1] + "" + pix[i][2] + ";'>&nbsp;</div>";
-      }
+  function update(newURL = dataURL) {
+    urls.forEach(url => {
+      let el = document.getElementById(url);
+      if (url == newURL) el.classList.add("pressed");
+      else el.classList.remove("pressed");
+    });
+    dataURL = newURL;
 
-      timeLeft = 3;
-    }
+    //Update the data
+    let newRequest = new XMLHttpRequest();
+    newRequest.open("GET", newURL);
+    newRequest.onload = () => document.getElementById("data").innerText = newRequest.responseText;
+    newRequest.send(null);
 
-    function countdown() {
-      document.getElementById("timeLeft").innerHTML = timeLeft--;
-    }
+    //Reset the update time
+    timeLeft = 3;
+  }
 
-    setInterval(updateBar, 3000);
-    setInterval(countdown, 1000);
-    updateBar();
-    countdown();
-
-    function request(newURL) {
-      dataURL = newURL;
-      xhr.open('GET', newURL);
-      xhr.onload = function() {
-          data = xhr.response;
-          if (newURL) {
-            urls.forEach(url => {
-              let el = document.getElementById(url);
-              if (url == newURL) el.classList.add("open");
-              else el.classList.remove("open");
-            });
-            document.getElementById("data").innerText = data;
-          }
-      };
-      xhr.send();
-    }
-
-    request(dataURL);
-    setInterval(() => request(dataURL), 3000);
+  update();
+  countdown();
+  setInterval(update, 3000);
+  setInterval(countdown, 1000);
   </script>
 {% endblock %}

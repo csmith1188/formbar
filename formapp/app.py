@@ -2485,7 +2485,7 @@ def start_flask():
 
 #This function activate chat and let students chat with one another.
 def start_chat():
-    server = WebsocketServer(WSPORT, host='0.0.0.0')
+    server = WebsocketServer('0.0.0.0', WSPORT)
     server.set_fn_new_client(new_client)
     server.set_fn_client_left(client_left)
     server.set_fn_message_received(message_received)

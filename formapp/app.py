@@ -2434,6 +2434,11 @@ def message_received(client, server, message):
             playSFX("sfx_up04")
             server.send_message(client, json.dumps(packMSG('alert', sD.studentDict[client['address'][0]]['name'], 'server', 'Your help ticket was sent. Keep working on the problem while you wait!')))
         else:
+            db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+            dbcmd = db.cursor()
+            dbcmd.execute("INSERT INTO messages (from, to, time, content) VALUES (?, ?, ?, ?)", (message['from'], message['to'], message['time'], message['content']))
+            db.commit()
+            db.close()
             #Check for permissions
             if sD.studentDict[client['address'][0]]['perms'] > sD.settings['perms']['say']:
                 messageOut = packMSG('alert', sD.studentDict[client['address'][0]]['name'], 'server', "You do not have permission to send text messages.")

@@ -350,6 +350,7 @@
             type: type,
             to: rx,
             from: tx,
+            time: Date.now(),
             content: content
         }
         return msgOUT
@@ -409,8 +410,8 @@
         ws.close();
     }
 
-    function getDate(time) {
-      let date = time ? new Date(time) : new Date(); //If the message does not have a time property, use the current time
+    function dateString(time) {
+      let date = new Date(time);
       let month = date.getMonth() + 1;
       let day = date.getDate();
       let year = date.getFullYear().toString().slice(2);
@@ -447,7 +448,7 @@
         //Use this if you want to allow HTML
         newMSG.innerHTML = `
           <b class="username" onclick="${usernameOnclick}" title="${usernameTitle}">${message.from}</b>
-          <span style="color: var(--gray-color);">${getDate(message.time)} ${message.to != "all" ? (message.from ? "· Private message" : "· From server") : ""}</span>
+          <span style="color: var(--gray-color);">${dateString(message.time)} ${message.to != "all" ? (message.from ? "· Private message" : "· From server") : ""}</span>
           <div class="content">${message.content}</div>
         `;
         //Use this if you want to convert HTML into text

@@ -2399,13 +2399,14 @@ def new_client(client, server):
 
 # Called for every client disconnecting
 def client_left(client, server):
-    print("[info] " + sD.studentDict[client['address'][0]]['name'] + " disconnected")
-    del sD.studentDict[client['address'][0]]['wsID']
-    #Send a message to every client that isn't THIS disconnecting client, telling them the user disconnected
-    for i, user in enumerate(server.clients):
-        if not server.clients[i] == client:
-            server.send_message(server.clients[i], json.dumps(packMSG('alert', 'all', 'server', sD.studentDict[client['address'][0]]['name'] + " has left the server...")))
-            server.send_message(server.clients[i], json.dumps(packMSG('userlist', 'all', 'server', chatUsers())))
+    if client['address'][0] in sD.studentDict:
+        print("[info] " + sD.studentDict[client['address'][0]]['name'] + " disconnected")
+        del sD.studentDict[client['address'][0]]['wsID']
+        #Send a message to every client that isn't THIS disconnecting client, telling them the user disconnected
+        for i, user in enumerate(server.clients):
+            if not server.clients[i] == client:
+                server.send_message(server.clients[i], json.dumps(packMSG('alert', 'all', 'server', sD.studentDict[client['address'][0]]['name'] + " has left the server...")))
+                server.send_message(server.clients[i], json.dumps(packMSG('userlist', 'all', 'server', chatUsers())))
 
 # Called when a client sends a message
 def message_received(client, server, message):

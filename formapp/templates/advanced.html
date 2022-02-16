@@ -366,9 +366,9 @@
   let tabLabels = Array.from(document.querySelectorAll(".tabText"));
   let menus = ["students", "games", "teacher"];
   let innerPage = document.getElementById("innerPage");
+  let sidebar = "formbar";
   let innerPageTitle;
   let urlOpen;
-  let newMessages = 0;
   let username = "{{ username }}";
 
   function init() {
@@ -401,9 +401,10 @@
 
   openPage("{{ page }}" || "{{ mainPage }}"); //If there is no "page" param, go to the main page
 
-  function changeSidebar(el) {
+  function changeSidebar(id) {
+    sidebar = id;
     sbSections.forEach(section => {
-      if (section == el) {
+      if (section == id) {
         document.getElementById(section + "Sidebar").classList.remove("hidden");
         document.getElementById(section + "Button").classList.add("pressed");
       } else {
@@ -411,6 +412,11 @@
         document.getElementById(section + "Button").classList.remove("pressed");
       }
     });
+    if (id == "chat") {
+      document.title = `${innerPageTitle} - Formbar`;
+      document.getElementById("newMessages").innerText = null;
+      newMessages = 0;
+    }
   }
 
   function showEnabled() {
@@ -535,6 +541,7 @@
     if (path == "/chat") {
       newMessages = 0;
       document.getElementById("newMessages").innerText = null;
+      newMessages = 0;
       menuPositions();
     }
   }
@@ -578,8 +585,8 @@
 
   ws.onmessage = message => {
     let data = JSON.parse(message.data);
-    if (data.type == 'message' || data.type == 'alert') {
-      if (document.hidden || !innerPage.contentWindow.location.pathname == "/chat") {
+    if (data.type == "message") {
+      if (document.hidden || (innerPage.contentWindow.location.pathname != "/chat" && sidebar != "chat")) {
         newMessages++;
         document.title = `(${newMessages}) ${innerPageTitle} - Formbar`;
         if (innerPage.contentWindow.location.pathname != "chat") {
@@ -590,6 +597,13 @@
     }
   };
 
-  document.addEventListener("visibilitychange", () => {if (!document.hidden && innerPage.contentWindow.location.pathname == "chat") document.title = `${innerPageTitle} - Formbar`}); //When user goes to this page, if chat is open, remove number of new messages from title
+  //When user goes to this page, if chat is open, remove number of new messages from title
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && (innerPage.contentWindow.location.pathname == "/chat" || sidebar == "chat")) {
+      document.title = `${innerPageTitle} - Formbar`;
+      document.getElementById("newMessages").innerText = null;
+      newMessages = 0;
+    }
+  });
 </script>
 {% endblock %}

@@ -6,6 +6,7 @@ let thumbButtons = Array.from(document.querySelectorAll(".thumbButton"));
 let letterButtons = Array.from(document.querySelectorAll(".letterButton"));
 let chosenThumb = false;
 let chosenLetter = false;
+let newMessages = 0;
 let permsError = "You do not have high enough permissions to do this right now.";
 let bgm;
 let sfx;

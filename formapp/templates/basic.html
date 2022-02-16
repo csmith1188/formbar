@@ -210,7 +210,7 @@
   <div id="topButtons" class="hidden">
     <button id="panelButton"></button>
     <button id="moreButton">More</button>
-    <button id="chatButton">Chat</button>
+    <button id="chatButton"><b id="newMessages" style="margin: 0;"></b> Chat</button>
   </div>
 
   <div id="studentPanel" class="hidden">
@@ -336,6 +336,8 @@
 {% block script %}
 <script src="{{ url_for('static', filename='js/home.js') }}"></script>
   <script>
+    let visibleSection;
+
     ////Check for break, fix buttons
     function init() {
       showPanel();
@@ -404,10 +406,15 @@
       if (toShow == "chat") {
         document.body.classList.remove("light");
         document.body.classList.add("blue");
+        document.title = "Formbar (Basic Mode)";
+        document.getElementById("newMessages").innerText = null;
+        newMessages = 0;
       } else {
         document.body.classList.remove("blue");
         document.body.classList.add("light");
       }
+
+      visibleSection = toShow;
     }
 
     document.getElementById("moreButton").onclick = () => showSection("more");
@@ -507,5 +514,25 @@
       request.open("GET", "/startsurvey?type=" + type);
       request.send();
     }
+
+    ws.onmessage = message => {
+      let data = JSON.parse(message.data);
+      if (data.type == "message") {
+        if (document.hidden || visibleSection != "chat") {
+          newMessages++;
+          document.title = `(${newMessages}) Formbar (Basic Homepage)`;
+          if (visibleSection != "chat") document.getElementById("newMessages").innerText = "(" + newMessages + ")";
+        }
+      }
+    };
+
+    //When user goes to this page, if chat is open, remove number of new messages from title
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden && visibleSection == "chat") {
+        document.title = "Formbar (Basic Mode)";
+        document.getElementById("newMessages").innerText = null;
+        newMessages = 0;
+      }
+    });
   </script>
 {% endblock %}

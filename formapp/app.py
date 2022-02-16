@@ -1801,7 +1801,10 @@ def endpoint_profile():
                 dbcmd = db.cursor()
                 highScores = {
                     "2048": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='2048' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
-                    "hangman": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='hangamn' ORDER BY score DESC", {"uname": user['name']}).fetchone()
+                    "bitshifter": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='bitshifter' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
+                    "hangman": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='hangman' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
+                    "minesweeper": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='minesweeper' ORDER BY score ASC", {"uname": user['name']}).fetchone(),
+                    "speedtype": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='speedtype' ORDER BY score DESC", {"uname": user['name']}).fetchone()
                 }
                 db.close()
                 return render_template("profile.html", username = user['name'], perms = sD.settings['permname'][user['perms']], bot = user['bot'], highScores = json.dumps(highScores))
@@ -2399,7 +2402,7 @@ def new_client(client, server):
 
 # Called for every client disconnecting
 def client_left(client, server):
-    if client['address'][0] in sD.studentDict:
+    if client['address'][0] in sD.studentDict and 'wsID' in sD.studentDict[client['address'][0]]: #Do nothing is user has already disconnected or logged out
         print("[info] " + sD.studentDict[client['address'][0]]['name'] + " disconnected")
         del sD.studentDict[client['address'][0]]['wsID']
         #Send a message to every client that isn't THIS disconnecting client, telling them the user disconnected

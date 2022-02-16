@@ -60,17 +60,30 @@
   }
 
   .ulName {
+    position: relative;
     margin: 8px 0;
-    padding: 3px;
+    padding: 6px 3px;
   }
 
   .ulName.them {
     cursor: pointer;
   }
 
-  .ulName.them:hover {
+  .ulHover {
     background-color: var(--theme-color);
     color: var(--bg-color);
+  }
+
+  button.profileButton {
+    position: absolute;
+    vertical-align: top;
+    right: 3px;
+    top: 3px;
+    font-size: 14px;
+  }
+
+  :not(.ulHover) > button.profileButton:not(:hover) {
+    display: none;
   }
 
   #controlChat {
@@ -117,7 +130,7 @@
     transition-duration: 0.2s;
   }
 
-  #sendButton:active, button:active {
+  #sendButton:active {
     background-color: var(--theme-color);
     border-color: var(--theme-color);
     color: var(--bg-color);
@@ -314,16 +327,28 @@
         } else if (data.type == 'userlist') {
             boxes.userlist.innerHTML = '<h2 id="ulHeading">Online</h2>'
             for (user in data.content) {
-                let newUser = document.createElement('div')
-                newUser.classList.add('msg', 'ulName')
-                if (data.content[user].name == username) newUser.classList.add('me')
+                let newUser = document.createElement('div');
+                boxes.userlist.appendChild(newUser);
+                newUser.classList.add('msg', 'ulName');
+                let name = data.content[user].name;
+                newUser.appendChild(document.createTextNode(name));
+                if (data.content[user].name == username) newUser.classList.add('me');
                 else {
                   newUser.classList.add('them')
-                  newUser.setAttribute("onclick", "changeRec('" + data.content[user].name + "', this)");
+                  newUser.setAttribute("onclick", "changeRec('" + name + "', this)");
                   newUser.title = "Send a private message";
+                  let profileButton = document.createElement("button");
+                  newUser.appendChild(profileButton);
+                  profileButton.innerText = "View profile";
+                  profileButton.classList.add("profileButton");
+                  profileButton.onmouseover = event => event.stopPropagation();
+                  profileButton.onclick = event => {
+                    window.location = "/profile?user=" + name;
+                    event.stopPropagation();
+                  };
+                  newUser.onmouseover = function() {this.classList.add("ulHover");};
+                  newUser.onmouseout = function() {this.classList.remove("ulHover");};
                 }
-                newUser.appendChild(document.createTextNode(data.content[user].name))
-                boxes.userlist.appendChild(newUser);
             }
         }
     };

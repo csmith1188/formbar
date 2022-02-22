@@ -214,7 +214,7 @@
   </div>
 
   <div id="studentPanel" class="hidden">
-    <h1 id="surveyName"></h1>
+    <h1 id="pollName"></h1>
     <div id="thumbs" class="hidden">
       <img src="{{ url_for('static', filename='img/basic/thumbButton0.png') }}" id="thumbButton0" class="thumbButton button inline popOut moreDepth greenColor" title="Up" onclick="thumbsVote(0);" tabindex="0">
       <img src="{{ url_for('static', filename='img/basic/thumbButton1.png') }}" id="thumbButton1" class="thumbButton button inline popOut moreDepth cyanColor" title="Wiggle" onclick="thumbsVote(1);" tabindex="0">
@@ -230,7 +230,7 @@
       <textarea id="response" placeholder="Type your response here" oninput="checkResponse();"></textarea><br>
       <button id="submitResponse" class="inline popOut unselectable">Submit</button>
     </div>
-    <h2 id="noSurvey">There is no survey right now.</h2>
+    <h2 id="noPoll">There is no poll right now.</h2>
     <br><br>
     <h1>Other</h1>
     <div id="other">
@@ -243,14 +243,14 @@
     <div>
       <h1>Mode</h1>
       <select id="mode" onchange="changeMode();">
-        <option>Survey</option>
+        <option>Poll</option>
         <option>Progress</option>
         <option>Playtime</option>
       </select><br>
-      <div id="newSurvey" class="hidden">New survey:
-        <button class="inline popOut" onclick="startSurvey('tutd')">Thumbs</button>
-        <button class="inline popOut" onclick="startSurvey('abcd')">Letters</button>
-        <button class="inline popOut" onclick="startSurvey('text')">Text response</button><br>
+      <div id="newPoll" class="hidden">New poll:
+        <button class="inline popOut" onclick="startPoll('tutd')">Thumbs</button>
+        <button class="inline popOut" onclick="startPoll('abcd')">Letters</button>
+        <button class="inline popOut" onclick="startPoll('text')">Text response</button><br>
         <span id="textLink" class="hidden">Click <a onclick="window.open('/advanced?page=users')">here</a> to see responses</span>
       </div>
       <button class="inline popOut" onclick="window.open('/advanced?page=settings');">All settings 🡆</button>
@@ -342,7 +342,7 @@
     function init() {
       showPanel();
       updateVotes();
-      checkForSurvey();
+      checkForPoll();
       checkForHelpTicket();
       updateMode();
       usersText();
@@ -359,7 +359,7 @@
     function update() {
       checkIfRemoved();
       updateVotes();
-      checkForSurvey();
+      checkForPoll();
       checkForHelpTicket();
       updateMode();
       usersText();
@@ -423,51 +423,51 @@
     document.getElementById("help").onclick = requestHelp;
     document.getElementById("break").onclick = requestBreak;
 
-    function checkForSurvey() {
+    function checkForPoll() {
       let mode = modeRes.mode;
       let myPerms = meRes.perms;
       let studentPerms = permsRes.student;
-      let surveyName = document.getElementById("surveyName");
+      let pollName = document.getElementById("pollName");
       let thumbs = document.getElementById("thumbs");
       let letters = document.getElementById("letters");
       let textBox = document.getElementById("textBox");
-      let noSurvey = document.getElementById("noSurvey");
+      let noPoll = document.getElementById("noPoll");
       if (mode == "tutd" || mode == "abcd" || mode == "text") {
         if (myPerms == studentPerms) {
-          noSurvey.classList.add("hidden");
+          noPoll.classList.add("hidden");
           if (mode == "tutd") {
             thumbs.classList.remove("hidden");
-            surveyName.innerText = "Survey: thumbs";
+            pollName.innerText = "Poll: thumbs";
           } else {
             thumbs.classList.add("hidden");
           }
           if (mode == "abcd") {
             letters.classList.remove("hidden");
-            surveyName.innerText = "Survey: letters";
+            pollName.innerText = "Poll: letters";
           } else {
             letters.classList.add("hidden");
           }
           if (mode == "text") {
             textBox.classList.remove("hidden");
-            surveyName.innerText = "Survey: text response";
+            pollName.innerText = "Poll: text response";
           } else {
             textBox.classList.add("hidden");
           }
         } else {
-          surveyName.innerText = "Survey";
-          noSurvey.innerText = "Only students can vote in surveys.";
-          noSurvey.classList.remove("hidden");
+          pollName.innerText = "Poll";
+          noPoll.innerText = "Only students can vote in polls.";
+          noPoll.classList.remove("hidden");
         }
       } else {
-        surveyName.innerText = "Survey";
-        noSurvey.classList.remove("hidden");
+        pollName.innerText = "Poll";
+        noPoll.classList.remove("hidden");
       }
     }
 
     function updateMode() {
       let mode = modeRes.mode;
       let el = document.getElementById("mode");
-      let ns = document.getElementById("newSurvey").classList;
+      let ns = document.getElementById("newPoll").classList;
       let tl = document.getElementById("textLink").classList;
       if (el != document.activeElement) {
         ns.add("hidden");
@@ -475,10 +475,10 @@
         switch (mode) {
           case "text":
             tl.remove("hidden");
-          case "survey":
+          case "poll":
           case "tutd":
           case "abcd":
-            el.value = "Survey";
+            el.value = "Poll";
             ns.remove("hidden");
             break;
           case "progress":
@@ -487,7 +487,7 @@
           case "playtime":
             el.value = "Playtime";
         }
-      } else if (el.value == "Survey") {
+      } else if (el.value == "Poll") {
         ns.remove("hidden");
       } else {
         ns.add("hidden");
@@ -497,8 +497,8 @@
     function changeMode() {
       let newMode = document.getElementById("mode").value;
       switch (newMode) {
-        case "Survey":
-          request.open("GET", "/settings?barmode=survey");
+        case "Poll":
+          request.open("GET", "/settings?barmode=poll");
           break;
         case "Progress":
           request.open("GET", "/settings?barmode=progress");
@@ -510,8 +510,8 @@
       updateMode();
     }
 
-    function startSurvey(type) {
-      request.open("GET", "/startsurvey?type=" + type);
+    function startPoll(type) {
+      request.open("GET", "/startpoll?type=" + type);
       request.send();
     }
 

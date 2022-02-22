@@ -494,11 +494,11 @@ def abcdBar():
     clearBar()
     #Go through IP list and see what each IP sent as a response
     for student in sD.studentDict:
-        #if the survey answer is a valid a, b, c, or d:
+        #if the poll answer is a valid a, b, c, or d:
         if sD.studentDict[student]['letter'] in ['a', 'b', 'c', 'd']:
             #add this result to the results list
             results.append(sD.studentDict[student]['letter'])
-    #The number of results is how many have complete the survey
+    #The number of results is how many have complete the poll
     complete = len(results)
     #calculate the chunk length for each student
     chunkLength = math.floor(BARPIX / sD.settings['numStudents'])
@@ -731,11 +731,11 @@ def updateStep():
     elif step['Type'] == 'Essay': ##
         sD.settings['barmode'] = 'essay'
         sD.activePrompt = step['Prompt']
-    elif step['Type'] == 'survey':
-        sD.settings['barmode'] = 'survey'
+    elif step['Type'] == 'poll':
+        sD.settings['barmode'] = 'poll'
         sD.activeQuiz = sD.lesson.quizList[step['Prompt']]
-        surveyIndex = int(sD.activeQuiz['name'].split(' ', 1))
-        sD.activePrompt = sD.activeQuiz['questions'][surveyIndex]
+        pollIndex = int(sD.activeQuiz['name'].split(' ', 1))
+        sD.activePrompt = sD.activeQuiz['questions'][pollIndex]
     elif step['Type'] == 'Quiz':
         sD.activeQuiz = sD.lesson.quizList[step['Prompt']]
         sD.settings['barmode'] = 'quiz'
@@ -2111,22 +2111,22 @@ def endpoint_speedtype():
             highScore = 0
         return render_template("speedtype.html", highScore = highScore)
 
-#Start a thumbs survey
-@app.route('/startsurvey')
-def endpoint_startsurvey():
+#Start a thumbs poll
+@app.route('/startpoll')
+def endpoint_startpoll():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['mod']:
         return "You do not have high enough permissions to do this right now."
     else:
         if not request.args.get('type'):
-            return "You need a survey type."
+            return "You need a poll type."
         type = request.args.get('type')
         if not (type == 'tutd' or type == 'abcd' or type == 'text'):
-            return "Invalid survey type."
+            return "Invalid poll type."
         changeMode(type)
         repeatMode()
-        return 'Started a new ' + type + ' survey.'
+        return 'Started a new ' + type + ' poll.'
 
 # ████████
 #    ██

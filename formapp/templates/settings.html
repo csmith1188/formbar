@@ -76,12 +76,12 @@
     setInterval(updateStudents, 1000);
 
     function changeMode() {
-      if (document.getElementById("survey").checked) {
-        request.open('GET', '/settings?barmode=survey');
+      if (document.getElementById("poll").checked) {
+        request.open('GET', '/settings?barmode=poll');
         request.send();
-        document.getElementById("surveyType").classList.remove("hidden");
+        document.getElementById("pollType").classList.remove("hidden");
       } else {
-        document.getElementById("surveyType").classList.add("hidden");
+        document.getElementById("pollType").classList.add("hidden");
       }
       if (document.getElementById("progress").checked) {
         request.open('GET', '/settings?barmode=progress');
@@ -100,21 +100,21 @@
       }
     }
 
-    function changeSurveyType() {
-      if (document.getElementById("thumbs").checked) document.getElementById("surveyDescription").innerText = "Students can choose between thumbs up, thumbs down, and wiggle.";
-      else if (document.getElementById("letters").checked) document.getElementById("surveyDescription").innerText = "Students can choose between A, B, C, and D.";
-      else if (document.getElementById("textResponse").checked) document.getElementById("surveyDescription").innerHTML = "Students will type out short answers. View responses <a href='/users'>here</a>.";
+    function changePollType() {
+      if (document.getElementById("thumbs").checked) document.getElementById("pollDescription").innerText = "Students can choose between thumbs up, thumbs down, and wiggle.";
+      else if (document.getElementById("letters").checked) document.getElementById("pollDescription").innerText = "Students can choose between A, B, C, and D.";
+      else if (document.getElementById("textResponse").checked) document.getElementById("pollDescription").innerHTML = "Students will type out short answers. View responses <a href='/users'>here</a>.";
     }
 
-    function startSurvey() {
+    function startPoll() {
       if (document.getElementById("thumbs").checked) {
-        request.open('GET', '/startsurvey?type=tutd');
+        request.open('GET', '/startpoll?type=tutd');
         request.send();
       } else if (document.getElementById("letters").checked) {
-        request.open('GET', '/startsurvey?type=abcd');
+        request.open('GET', '/startpoll?type=abcd');
         request.send();
       } else if (document.getElementById("textResponse").checked) {
-        request.open('GET', '/startsurvey?type=text');
+        request.open('GET', '/startpoll?type=text');
         request.send();
       }
     }
@@ -134,21 +134,21 @@
     (async () => {
       let modeRes = await getResponse("/getmode");
       let mode = modeRes.mode;
-      if (mode == "tutd" || mode == "survey") {
-        document.getElementById("survey").checked = true;
-        document.getElementById("surveyType").classList.remove("hidden");
+      if (mode == "tutd" || mode == "poll") {
+        document.getElementById("poll").checked = true;
+        document.getElementById("pollType").classList.remove("hidden");
         document.getElementById("thumbs").checked = true;
-        changeSurveyType();
+        changePollType();
       } else if (mode == "abcd") {
-        document.getElementById("survey").checked = true;
-        document.getElementById("surveyType").classList.remove("hidden");
+        document.getElementById("poll").checked = true;
+        document.getElementById("pollType").classList.remove("hidden");
         document.getElementById("letters").checked = true;
-        changeSurveyType();
+        changePollType();
       } else if (mode == "text") {
-        document.getElementById("survey").checked = true;
-        document.getElementById("surveyType").classList.remove("hidden");
+        document.getElementById("poll").checked = true;
+        document.getElementById("pollType").classList.remove("hidden");
         document.getElementById("textResponse").checked = true;
-        changeSurveyType();
+        changePollType();
       } else if (mode == "progress") {
         document.getElementById("progress").checked = true;
       } else if (mode == "countdown") {
@@ -173,17 +173,17 @@
     <h2>Bar mode</h2>
     <label>
       <div>
-        <input type="radio" id="survey" name="mode"><h3 style="display: inline;">Survey</h3><br>
+        <input type="radio" id="poll" name="mode"><h3 style="display: inline;">Poll</h3><br>
         <span style="margin-left: 21px;">Students' votes are displayed on the bar.</span><br>
       </div>
     </label>
-    <form id="surveyType" class="hidden" style="margin: 8px 0 0 21px;" onchange="changeSurveyType();">
+    <form id="pollType" class="hidden" style="margin: 8px 0 0 21px;" onchange="changePollType();">
       Type:
       <input type="radio" id="thumbs" name="type" checked style="margin-left: 8px;"><label for="thumbs">Thumbs</label>
       <input type="radio" id="letters" name="type" style="margin-left: 8px;"><label for="letters">Letters</label>
       <input type="radio" id="textResponse" name="type" style="margin-left: 8px;"><label for="textResponse">Text response</label><br>
-      <span id="surveyDescription">Students can choose between thumbs up, thumbs down, and wiggle</span><br>
-      <input type="button" class="button inline popOut" value="Start new survey" style="margin-top: 8px;" onclick="startSurvey();">
+      <span id="pollDescription">Students can choose between thumbs up, thumbs down, and wiggle</span><br>
+      <input type="button" class="button inline popOut" value="Start new poll" style="margin-top: 8px;" onclick="startPoll();">
     </form>
     <br>
 
@@ -238,7 +238,7 @@
     </select><br>
     <br>
     <h3>LED bar</h3>
-    The ability to change the appearance of the Formbar. Does not affect surveys.<br>
+    The ability to change the appearance of the Formbar. Does not affect polls.<br>
     <select onchange="updatePerm(this)" id="barpermsDrop" name="barpermsDrop" style="margin-top: 8px;">
         <option value="/settings?bar=0" selected>Teacher</option>
         <option value="/settings?bar=1">Mod</option>
@@ -282,7 +282,7 @@ Only whitelisted users will be able to make changes.<br>
 <input type="checkBox" id="lock" onchange="request.open('GET', `/settings?locked=${this.value}`); request.send();"><label for="lock">Lock</label><br>
 
 <h2>Blind results</h2>
-Results won't be shown until the survey is complete.<br>
+Results won't be shown until the poll is complete.<br>
 <input type="checkBox" id="blind" onchange="request.open('GET', `/settings?blind=${this.value}`); request.send();"><label for="blind">Hide results</label><br>
 
 <h2>Show missing votes</h2>

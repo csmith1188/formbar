@@ -82,7 +82,7 @@
       ["minesweeper", "Minesweeper"],
       ["speedtype", "Speed Typer"],
       //["ttt", "Tic-tac-toe"],
-      //["towerdefense", "Tower Defense"],
+      ["towerdefense", "Tower Defense"],
       //["fighter", "Turn-Based Fighter"]
     ];
     let game;
@@ -103,15 +103,14 @@
             metric = "Wins"
             break;
           case "minesweeper":
+          case "towerdefense":
             metric = "Time"
             break;
           default:
             metric = "Score"
         }
-        if (metric == "Time") {
-          gameData.reverse();
-          gameData.forEach(item => item[3] = `${Math.floor(item[3] / 60)}:${item[3] % 60 < 10 ? "0" + item[3] % 60 : item[3] % 60}`);
-        }
+        if (newGame[0] == "minesweeper") gameData.reverse();
+        if (metric == "Time") gameData.forEach(item => item[3] = `${Math.floor(item[3] / 60)}:${item[3] % 60 < 10 ? "0" + item[3] % 60 : item[3] % 60}`);
         gameData = gameData.slice(0, 10); //Get the first 10 items
         document.getElementById("scores").innerHTML = `
           <table id="table">

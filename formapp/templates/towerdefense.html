@@ -7,7 +7,6 @@
 
 <!-- Extra style declarations here -->
 {% block style %}
-<link rel="stylesheet" href="../Formbar/formapp/static/css/style.css"></link>
 <style>
   body {
     background: var(--bg-darker);
@@ -181,7 +180,7 @@
 {% block main %}
   <div id="container">
     <canvas id="game" width="1920" height="1080"></canvas>
-    <table id="grid"></table>
+    <table id="grid" class="hidden"></table>
     <div id="towers" class="hidden">
       <div id="towerDesc"></div>
     </div>
@@ -381,9 +380,9 @@
       };
 
       towerTypes[type].img = new Image();
-      towerTypes[type].img.src = `${type}.png`;
+      towerTypes[type].img.src = `../static/img/towerdefense/${type}.png`;
       towerTypes[type].activeImg = new Image();
-      towerTypes[type].activeImg.src = `${type}-active.png`;
+      towerTypes[type].activeImg.src = `../static/img/towerdefense/${type}-active.png`;
     }
 
     let enemyTypes = {
@@ -425,10 +424,10 @@
     };
     for (let type in enemyTypes) {
       enemyTypes[type].img = new Image();
-      enemyTypes[type].img.src = `${type}.png`;
+      enemyTypes[type].img.src = `../static/img/towerdefense/${type}.png`;
       if (enemyTypes[type].boss) {
         enemyTypes[type].imgRotated = new Image();
-        enemyTypes[type].imgRotated.src = `${type}-r.png`;
+        enemyTypes[type].imgRotated.src = `../static/img/towerdefense/${type}-r.png`;
       }
     }
 
@@ -611,7 +610,7 @@
       play: new Image(),
       fastForward: new Image()
     };
-    for (let button in buttons) buttons[button].src = `${button}.png`;
+    for (let button in buttons) buttons[button].src = `../static/img/towerdefense/${button}.png`;
 
     let canvas = document.getElementById("game");
     let ctx = canvas.getContext("2d");
@@ -963,6 +962,7 @@
       animate = setInterval(update, 40);
 
       //Create the grid
+      document.getElementById("grid").classList.remove("hidden")
       let gridHTML = "";
       grid.forEach((row, i) => {
         gridHTML += "<tr>"; //For every array in grid, add a row to the table
@@ -973,7 +973,7 @@
 
       //Show the towers
       document.getElementById("towers").classList.remove("hidden");
-      for (let tower in towerTypes) document.getElementById("towers").innerHTML += `<img src="${tower}.png" id="${tower}">`;
+      for (let tower in towerTypes) document.getElementById("towers").innerHTML += `<img src="../static/img/towerdefense/${tower}.png" id="${tower}">`;
 
       this.onclick = null;
     };

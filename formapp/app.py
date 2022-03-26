@@ -1081,6 +1081,10 @@ def endpoint_chat():
     dbcmd = db.cursor()
     messages = dbcmd.execute("SELECT * FROM messages").fetchall()
     db.close()
+    for i, message in enumerate(messages):
+        message = list(message)
+        message[4] = cipher.decrypt(message[4]).decode()
+        messages[i] = message
     return render_template("chat.html", username = sD.studentDict[request.remote_addr]['name'], messages = json.dumps(messages))
 
 @app.route('/cleartable')
@@ -2439,7 +2443,8 @@ def message_received(client, server, message):
         else:
             db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
             dbcmd = db.cursor()
-            dbcmd.execute("INSERT INTO messages ('from', 'to', 'time', 'content') VALUES (?, ?, ?, ?)", (message['from'], message['to'], message['time'], message['content']))
+            contentCrypt = cipher.encrypt(message['content'].encode())
+            dbcmd.execute("INSERT INTO messages ('from', 'to', 'time', 'content') VALUES (?, ?, ?, ?)", (message['from'], message['to'], message['time'], contentCrypt))
             db.commit()
             db.close()
             #Check for permissions

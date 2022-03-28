@@ -608,9 +608,7 @@
       [[5, "g", [3, "r"], "g", pause], "g", [3, "r"], "g"],
       [[8, "ou", "ru", pause], "ou", "ru"],
       [[2, [12, "r"], pause], [12, "r"]],
-      [[100, "y"]],
-
-      [null]
+      [[100, "y"]]
     ];
     waves.forEach(wave => wave.unshift([8, pause])); //Add a break at the start of each wave
 
@@ -696,6 +694,7 @@
 
       if (!(frame % 25) && frame) seconds++; //Do this every 25 frames
 
+      //Spawn enemies
       if (!(frame % 4)) {
         let next = waves[currentWave][currentEnemy];
         while (Array.isArray(next)) {
@@ -707,11 +706,6 @@
             let items = next.slice(1); //Everything that follows is repeated
             let repeated = Array(repeat).fill(items).flat(); //Make an array containing the items array repeated, then flatten it
             waves[currentWave].splice(currentEnemy, 1, ...repeated); //Add each item in repeated to the wave and remove the array
-            for (let i = 0; i < repeat; i++) {
-              for (let i = 1; i <= next.length - 1; i++) {
-                //waves[currentWave].splice(currentEnemy + i, 0, next[i]);
-              }
-            }
           }
           next = waves[currentWave][currentEnemy];
         }
@@ -721,10 +715,19 @@
           enemies.push(newEnemy);
         }
 
-        if (waves[currentWave][currentEnemy + 1] !== undefined) currentEnemy++;
-        else if (waves[currentWave + 1]) {
+        if (waves[currentWave][currentEnemy + 1] !== undefined) { //There are enemies left in the wave
+          currentEnemy++;
+        } else if (waves[currentWave + 1]) { //The wave is over; move to the next
           currentWave++;
           currentEnemy = 0;
+        } else { //There are no waves left
+          //Once all enemies are defeated, end the game
+          if (enemies.length) {
+            waves[currentWave + 1] = [null];
+          } else {
+            alert("Congratulations! You have passed every wave.");
+            endGame();
+          }
         }
       }
 
@@ -881,23 +884,7 @@
         ctx.fillStyle = "#ff6860";
         ctx.fillText("❤︎" + player.lives, 1820, 45);
       } else {
-        //End the game
-        clearInterval(animate);
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        document.getElementById("grid").classList.add("hidden");
-        document.getElementById("towers").classList.add("hidden");
-        ctx.fillStyle = "white";
-        ctx.font = "128px sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText("Game over", 960, 300);
-        ctx.font = "64px sans-serif";
-        ctx.fillText(`Time: ${Math.floor(seconds / 60)}:${seconds % 60 < 10 ? "0" + seconds % 60 : seconds % 60}`, 960, 500);
-        ctx.font = "48px sans-serif";
-        ctx.fillStyle = "#80ffff";
-        if (seconds > 0) ctx.fillText("New best!", 960, 575);
-        ctx.fillStyle = "white";
-        ctx.fillText("Click anywhere to play again", 960, 800);
-        document.getElementById("game").onclick = () => window.location.reload();
+        endGame();
       }
 
       frame++;
@@ -992,5 +979,24 @@
 
       this.onclick = null;
     };
+
+    function endGame() {
+      clearInterval(animate);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      document.getElementById("grid").classList.add("hidden");
+      document.getElementById("towers").classList.add("hidden");
+      ctx.fillStyle = "white";
+      ctx.font = "128px sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("Game over", 960, 300);
+      ctx.font = "64px sans-serif";
+      ctx.fillText(`Time: ${Math.floor(seconds / 60)}:${seconds % 60 < 10 ? "0" + seconds % 60 : seconds % 60}`, 960, 500);
+      ctx.font = "48px sans-serif";
+      ctx.fillStyle = "#80ffff";
+      if (seconds > 0) ctx.fillText("New best!", 960, 575);
+      ctx.fillStyle = "white";
+      ctx.fillText("Click anywhere to play again", 960, 800);
+      document.getElementById("game").onclick = () => window.location.reload();
+    }
   </script>
 {% endblock %}

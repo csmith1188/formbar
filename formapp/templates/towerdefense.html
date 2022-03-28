@@ -566,9 +566,9 @@
         this.speed = this.type.speed;
         this.health = this.type.health;
         this.abilities = [];
-        if (string.includes("n")) this.abilities.push("regen");
+        if (string.includes("h")) this.abilities.push("healing");
         if (string.includes("s")) this.abilities.push("split");
-        if (string.includes("u")) this.abilities.push("speedUp");
+        if (string.includes("u")) this.abilities.push("speed up");
         if (string.includes("k")) this.abilities.push("blink");
         if (string.includes("i")) this.abilities.push("invulnerable");
         this.id = Math.random(); //Give the enemy a random ID so that no two objects are identical
@@ -581,7 +581,7 @@
             player.money += this.type.health * (tower?.extraMoney ? 5 : 1);
             enemies.splice(enemies.indexOf(this), 1);
           } else {
-            if (this.abilities.includes("speedUp")) this.speed = this.type.speed + this.type.speed * (1 - (this.health / this.type.health)) * 3;
+            if (this.abilities.includes("speed up")) this.speed = this.type.speed + this.type.speed * (1 - (this.health / this.type.health)) * 3;
             if (tower?.removeAbilities) this.abilities = [];
           }
         }
@@ -591,10 +591,21 @@
     let pause = [10, null];
     let waves = [
       [[4, "g", pause], "g"],
-      [[7, "g", "g", pause], ["alert", "Each enemy type has different stats."], "y", pause, "y"],
+      [[7, "g", "g", pause], ["alert", "All enemy types have different HP and speed levels."], "y", pause, "y"],
       [[5, "g"], [3, "y"]],
+      [[20, "g"]],
       [[2, "y"], [5, [3, "g"], pause], [3, "y"]],
-      [["alert", "NEW ABILITY: Regeneration\nEnemies with this ability gradually regain health, so you need to destroy them quickly."], [9, "on", pause], "on"],
+      [[10, "y"], [4, "o", pause], "o"],
+      [[6, "g", "y", "o", pause], "g", "y", "o"],
+      [[9, "y"], [7, "o"]],
+      [50, "g"],
+      [["alert", "NEW ABILITY: Healing\nEnemies with this ability gradually regain health, so you need to destroy them quickly."], [9, "oh", pause], "oh"],
+      [[7, [6, "y", pause]], [6, "y"]],
+      [20, "oh"],
+      [60, "o", "y"],
+      [[32, "g"], pause, [16, "y"], pause, [8, "o"], pause, [4, "r"]],
+      [[6, "r"], ["alert", "NEW ABILITY: Speed Up\nEnemies with this ability move faster as they lose health. They also can't be slowed by Slowing Towers."], [10, "ou"]]
+
       [null]
     ];
     waves.forEach(wave => wave.unshift(pause, pause, pause, pause, pause)); //Add a break at the start of each wave
@@ -736,8 +747,8 @@
               let target;
               tower.range == Infinity ? target = strongest : target = furthest;
               target.hit(tower.strength, tower);
-              if (tower.slowing && !target.abilities.includes("speedUp")) target.slowed = tower.permSlow ? Infinity : 250;
-              if (tower.abilityBlocking && !target.abilities.includes("speedUp")) {
+              if (tower.slowing && !target.abilities.includes("speed up")) target.slowed = tower.permSlow ? Infinity : 250;
+              if (tower.abilityBlocking && !target.abilities.includes("speed up")) {
                 target.noAbilities = tower.permSlow ? Infinity : 250;
                 ////
               }
@@ -764,7 +775,7 @@
       enemies.forEach((enemy, i) => {
         if (enemy.slowed) enemy.slowed--;
 
-        if (enemy.abilities.includes("regen") && enemy.health < enemy.type.health) {
+        if (enemy.abilities.includes("healing") && enemy.health < enemy.type.health) {
           enemy.health += 1 / 75;
           if (enemy.health > enemy.type.health) enemy.health = enemy.type.health;
         }
@@ -937,7 +948,7 @@
     });
 
     ////
-    ["split", "regenerate", "blink", "speedUp", "immunity"]
+    ["split", "healing", "blink", "speed up", "immunity"]
 
     "New enemy ability: SPLIT\n"
     [

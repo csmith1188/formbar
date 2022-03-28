@@ -598,17 +598,21 @@
       [[10, "y"], [4, "o", pause], "o"],
       [[6, "g", "y", "o", pause], "g", "y", "o"],
       [[9, "y"], [7, "o"]],
-      [50, "g"],
+      [[50, "g"]],
       [["alert", "NEW ABILITY: Healing\nEnemies with this ability gradually regain health, so you need to destroy them quickly."], [9, "oh", pause], "oh"],
       [[7, [6, "y", pause]], [6, "y"]],
-      [20, "oh"],
-      [60, "o", "y"],
+      [[20, "oh"]],
+      [[15, "o", "y"]],
       [[32, "g"], pause, [16, "y"], pause, [8, "o"], pause, [4, "r"]],
       [[6, "r"], ["alert", "NEW ABILITY: Speed Up\nEnemies with this ability move faster as they lose health. They also can't be slowed by Slowing Towers."], [10, "ou"]],
+      [[5, "g", [3, "r"], "g", pause], "g", [3, "r"], "g"],
+      [[8, "ou", "ru", pause], "ou", "ru"],
+      [[2, [12, "r"], pause], [12, "r"]],
+      [[100, "y"]],
 
       [null]
     ];
-    waves.forEach(wave => wave.unshift(pause, pause, pause, pause, pause)); //Add a break at the start of each wave
+    waves.forEach(wave => wave.unshift([8, pause])); //Add a break at the start of each wave
 
     let grid = Array(15).fill().map(() => Array(32).fill(null)); //Array containing 15 arrays (rows), each containing 32 items (columns). Makes a deep copy of each array.
     grid[0].fill("button", 0, 2); //Two buttons in to top left
@@ -757,13 +761,13 @@
               }
               if (tower.explosionSize) {
                 //Create an explosion centered around the target enemy
-                let inExplosion = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < this.explosionSize);
+                let inExplosion = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < tower.explosionSize);
                 let explosionDamage = tower.powerfulExplosions ? tower.strength : 1;
                 inExplosion.forEach(enemy => enemy.hit(explosionDamage, tower)); //Do damage to every enemy inside the explosion
                 //Draw the explosion as an orange circle
                 ctx.strokeStyle = "transparent";
                 ctx.fillStyle = "#ff8f4055";
-                ctx.drawCircle(target.x, target.y, this.explosionSize);
+                ctx.drawCircle(target.x, target.y, tower.explosionSize);
               }
               ctx.drawImage(tower.activeImg, tower.x - 30, tower.y - 30);
               tower.cooldown += 25 / tower.speed;

@@ -459,21 +459,21 @@
               <h2 id="${this.i}-range">
                 Range: ${this.range}
                 <span class="splitButton">
-                  <span class="buttonLeft">→&nbsp;${this.range + 1}</span><span class="buttonRight">$${this.upgrades.range == 1 ? this.price * 3 : this.price}</span>
+                  <span class="buttonLeft">→&nbsp;${this.range + 1}</span><span class="buttonRight">$${this.upgrades.range == 1 ? this.price * 5 : this.price}</span>
                 </span>
               </h2>
 
               <h2 id="${this.i}-speed">
                 Speed: ${this.speed}
                 <span class="splitButton">
-                  <span class="buttonLeft">→&nbsp;${this.speed * 2}</span><span class="buttonRight">$${this.upgrades.speed == 1 ? this.price * 3 : this.price}</span>
+                  <span class="buttonLeft">→&nbsp;${this.speed * 2}</span><span class="buttonRight">$${this.upgrades.speed == 1 ? this.price * 5 : this.price}</span>
                 </span>
               </h2>
 
               <h2 id="${this.i}-strength">
                 Strength: ${this.strength}
                 <span class="splitButton">
-                  <span class="buttonLeft">→&nbsp;${this.strength * 2}</span><span class="buttonRight">$${this.upgrades.strength == 1 ? this.price * 3 : this.price}</span>
+                  <span class="buttonLeft">→&nbsp;${this.strength * 2}</span><span class="buttonRight">$${this.upgrades.strength == 1 ? this.price * 5 : this.price}</span>
                 </span>
               </h2>
 
@@ -499,8 +499,8 @@
               towers[this.i] = null;
               player.money += this.sellValue;
               ////set square to null
-              ////menu.remove();
-              ////this.menuOpen = false;
+              menu.remove();
+              this.menuOpen = false;
             };
             document.getElementById(this.i + "-range").onclick = this.upgrades.range < 2 ? () => {
               this.range += 1;
@@ -555,30 +555,31 @@
 
     class Enemy {
       constructor(string) {
-        if (string.startsWith("g")) this.type = enemyTypes.green;
-        if (string.startsWith("y")) this.type = enemyTypes.yellow;
-        if (string.startsWith("o")) this.type = enemyTypes.orange;
-        if (string.startsWith("r")) this.type = enemyTypes.red;
-        if (string.startsWith("p")) this.type = enemyTypes.purple;
-        if (string.startsWith("b")) this.type = enemyTypes.brown;
-        if (string.startsWith("x")) this.type = enemyTypes.boss;
-        if (string.startsWith("z")) this.type = enemyTypes.superBoss;
+        if (string[0] == "g") this.type = enemyTypes.green;
+        if (string[0] == "y") this.type = enemyTypes.yellow;
+        if (string[0] == "o") this.type = enemyTypes.orange;
+        if (string[0] == "r") this.type = enemyTypes.red;
+        if (string[0] == "p") this.type = enemyTypes.purple;
+        if (string[0] == "b") this.type = enemyTypes.brown;
+        if (string[0] == "x") this.type = enemyTypes.boss;
+        if (string[0] == "z") this.type = enemyTypes.superBoss;
         this.speed = this.type.speed;
         this.health = this.type.health;
         this.abilities = [];
-        if (string.includes("h")) this.abilities.push("healing");
-        if (string.includes("s")) this.abilities.push("split");
-        if (string.includes("u")) this.abilities.push("speed up");
-        if (string.includes("k")) this.abilities.push("blink");
-        if (string.includes("i")) this.abilities.push("invulnerable");
+        if (string[1] == "h") this.abilities.push("healing");
+        if (string[1] == "u") this.abilities.push("speed up");
+        if (string[1] == "s") this.abilities.push("split");
+        if (string[1] == "k") this.abilities.push("blink");
+        if (string[1] == "d") this.abilities.push("shield");
         this.id = Math.random(); //Give the enemy a random ID so that no two objects are identical
         this.distance = 0;
         this.visible = !this.abilities.includes("blink");
         this.slowed = 0;
-        this.hit = function(damage, tower) {
-          this.health -= damage;
+        this.hit = function(damage, tower, explosion) {
+          ////make explosion true where applicable
+          if (!this.abilities.includes("shield") || explosion || tower.name == "Long Range Tower") this.health -= damage;
           if (this.health <= 0) {
-            player.money += this.type.health * (tower?.extraMoney ? 5 : 1);
+            player.money += tower?.extraMoney ? 5 : 1;
             enemies.splice(enemies.indexOf(this), 1);
           } else {
             if (this.abilities.includes("speed up")) this.speed = this.type.speed + this.type.speed * (1 - (this.health / this.type.health)) * 3;
@@ -591,7 +592,7 @@
     let pause = [10, null];
     let waves = [
       [[4, "g", pause], "g"],
-      [[7, "g", "g", pause], ["alert", "All enemy types have different HP and speed levels."], "y", pause, "y"],
+      [[7, "g", "g", pause], ["alert", "All enemy types have different HP and speed stats."], "y", pause, "y"],
       [[5, "g"], [3, "y"]],
       [[20, "g"]],
       [[2, "y"], [5, [3, "g"], pause], [3, "y"]],
@@ -599,16 +600,47 @@
       [[6, "g", "y", "o", pause], "g", "y", "o"],
       [[9, "y"], [7, "o"]],
       [[50, "g"]],
-      [["alert", "NEW ABILITY: Healing\nEnemies with this ability gradually regain health, so you need to destroy them quickly."], [9, "oh", pause], "oh"],
+      [["alert", "New enemy ability: HEALING\nEnemies with this ability gradually regain health, so you need to destroy them quickly."], [9, "oh", pause], "oh"],
       [[7, [6, "y", pause]], [6, "y"]],
       [[20, "oh"]],
       [[15, "o", "y"]],
       [[32, "g"], pause, [16, "y"], pause, [8, "o"], pause, [4, "r"]],
-      [[6, "r"], ["alert", "NEW ABILITY: Speed Up\nEnemies with this ability move faster as they lose health. They also can't be slowed by Slowing Towers."], [10, "ou"]],
+      [[6, "r"], ["alert", "New enemy ability: SPEED UP\nEnemies with this ability move faster as they lose health. They also can't be slowed by Slowing Towers."], [10, "ou"]],
       [[5, "g", [3, "r"], "g", pause], "g", [3, "r"], "g"],
       [[8, "ou", "ru", pause], "ou", "ru"],
       [[2, [12, "r"], pause], [12, "r"]],
-      [[100, "y"]]
+      [[100, "y"]],
+      [[2, "b", pause], "b"],
+      [["alert", "New enemy ability: SPLIT\nEnemies with this ability split into two or more weaker enemies when they run out of health, making them much harder to destroy."], "rs"],
+      [[7, "y", "o", "r", pause], [12, "rh"]],
+      [[4, "os"], pause, [25, "o"], "bs"],
+      [[5, "p"]],
+      [[3, "pu", "bh", pause], [8, "rs", pause], "rs"],
+      [["alert", "New enemy ability: BLINK\nEnemies with this ability switch between two states: visible and hidden. Without upgrades, towers can only hit them while they're visible."], [29, "yk", pause], "yk"],
+      [[250, "g"]],
+      [["alert", "Boss enemies have 100 HP."], "x"],
+      ["pk"],
+      [[5, "bs"]],
+      [[2, [35, "r"], [5, "p"]]],
+      [[14, "bu"], [26, "rh"]],
+      [["alert", "New enemy ability: SHIELD\nEnemies with this ability can only be damaged by explosions and hits from Long-Range Towers."], "gd"],
+      [[30, "o"], pause, "x", pause, "x"],
+      [[3, "bs"], [3, "ps"]],
+      [[20, "rk"], pause, [5, "bk"]],
+      [[3, "bd", pause], "bd"],
+      ["xs"],
+      [[10, "ok"], [8, "rh"], [19, "p"], [4, "rs"]],
+      [[125, "yh"], "xu", [33, "b"]],
+      [[4, "x"], [45, "r"], "xk"],
+      [[7, "os"], pause, [13, "pk"] [64, "g"]],
+      ["x", [18, "rd"], pause, "x"],
+      [[85, "b", "p"]],
+      [["alert", "Superboss enemies have 500 HP."], "z"],
+      [[10, "x"], pause, [30, "bh"], [20, "r"]],
+      [[3, "z", pause], [17, "ps"], [43, "ok"], [5, "x"]],
+      [[15, "pk"], "xs", [3, "x", "z"], [300, "o"], "pd"],
+      [[50, "ru"], [125, "bk"], pause, [67, "bh"], [999, "yk"], "z"],
+      [[10, "g"], pause, [20, "y"], pause, [30, "o"], pause, [40, "r"], pause, [100, "b"], pause, [100, "p"], pause, [15, "x"], pause, [5, "z"]]
     ];
     waves.forEach(wave => wave.unshift([8, pause])); //Add a break at the start of each wave
 
@@ -624,6 +656,12 @@
       fastForward: new Image()
     };
     for (let button in buttons) buttons[button].src = `../static/img/towerdefense/${button}.png`;
+
+    let abilitySymbols = {
+      healing: new Image(),
+      shield: new Image()
+    };
+    for (let symbol in abilitySymbols) abilitySymbols[symbol].src = `../static/img/towerdefense/${symbol}.png`;
 
     let canvas = document.getElementById("game");
     let ctx = canvas.getContext("2d");
@@ -683,8 +721,8 @@
         paused = !paused;
         paused ? document.getElementById("towers").classList.add("hidden") : document.getElementById("towers").classList.remove("hidden");
         ////disable popups
-        ctx.clearRect(60, 0, 120, 60);
-        ctx.drawImage(buttons.play, 75, 15, 30, 30);
+        ctx.clearRect(0, 0, 120, 60);
+        ctx.drawImage(buttons.play, 15, 15, 30, 30);
       };
       document.getElementById("r0c1").onclick = () => {
         fastForward = !fastForward;
@@ -717,17 +755,18 @@
 
         if (waves[currentWave][currentEnemy + 1] !== undefined) { //There are enemies left in the wave
           currentEnemy++;
-        } else if (waves[currentWave + 1]) { //The wave is over; move to the next
+        } else {
+          if (!waves[currentWave + 1]) { //There are no waves left
+            //Once all enemies are defeated, end the game
+            if (enemies.length) {
+              waves[currentWave + 1] = [null];
+            } else {
+              alert("Congratulations! You have passed every wave.");
+              endGame();
+            }
+          }
           currentWave++;
           currentEnemy = 0;
-        } else { //There are no waves left
-          //Once all enemies are defeated, end the game
-          if (enemies.length) {
-            waves[currentWave + 1] = [null];
-          } else {
-            alert("Congratulations! You have passed every wave.");
-            endGame();
-          }
         }
       }
 
@@ -807,7 +846,11 @@
             if (mapArr[i] == "up") enemy.y -= 1;
             img = enemy.type.boss && (mapArr[i] == "right" || mapArr[i] == "left") ? img = enemy.type.imgRotated : enemy.type.img; //If the enemy is a boss and moving horizontally, rotate it
           }
+          if (!enemy.visible) ctx.globalAlpha = 0.25; //If the enemy is hidden, amke it semitransparent
           ctx.drawImage(img, enemy.x - 40, enemy.y - 40);
+          ctx.globalAlpha = 1;
+          if (enemy.abilities.includes("healing")) ctx.drawImage(abilitySymbols.healing, enemy.x - 40, enemy.y - 40);
+          if (enemy.abilities.includes("shield")) ctx.drawImage(abilitySymbols.shield, enemy.x - 40, enemy.y - 40);
         }
       });
 
@@ -937,18 +980,6 @@
     map.lines.forEach(line => {
       for (let i = 0; i < line[1] * 60; i++) mapArr.push(line[0]);
     });
-
-    ////
-    ["split", "healing", "blink", "speed up", "immunity"]
-
-    "New enemy ability: SPLIT\n"
-    [
-      "Enemies with this ability gradually regain health, so you need to destroy them quickly.",
-      "Enemies with this ability split into two or more weaker enemies when they run out of health, making them much harder to destroy.",
-      "Enemies with this ability move faster as they lose health. They also can't be slowed by Slowing Towers.",
-      "Enemies with this ability switch between two states: visible and hidden. Without upgrades, towers can only hit them while they're visible.",
-      "Enemies with this ability are invulnerable to ."
-    ]
 
     ctx.fillStyle = "white";
     ctx.font = "128px sans-serif";

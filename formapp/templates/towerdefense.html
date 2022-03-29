@@ -459,21 +459,21 @@
               <h2 id="${this.i}-range">
                 Range: ${this.range}
                 <span class="splitButton">
-                  <span class="buttonLeft">→&nbsp;${this.range + 1}</span><span class="buttonRight">$${this.upgrades.range == 1 ? this.price * 5 : this.price}</span>
+                  <span class="buttonLeft">→&nbsp;${this.range + 1}</span><span class="buttonRight">$${this.upgrades.range == 1 ? this.price * 5 : this.price * 2}</span>
                 </span>
               </h2>
 
               <h2 id="${this.i}-speed">
                 Speed: ${this.speed}
                 <span class="splitButton">
-                  <span class="buttonLeft">→&nbsp;${this.speed * 2}</span><span class="buttonRight">$${this.upgrades.speed == 1 ? this.price * 5 : this.price}</span>
+                  <span class="buttonLeft">→&nbsp;${this.speed * 2}</span><span class="buttonRight">$${this.upgrades.speed == 1 ? this.price * 5 : this.price * 2}</span>
                 </span>
               </h2>
 
               <h2 id="${this.i}-strength">
                 Strength: ${this.strength}
                 <span class="splitButton">
-                  <span class="buttonLeft">→&nbsp;${this.strength * 2}</span><span class="buttonRight">$${this.upgrades.strength == 1 ? this.price * 5 : this.price}</span>
+                  <span class="buttonLeft">→&nbsp;${this.strength * 2}</span><span class="buttonRight">$${this.upgrades.strength == 1 ? this.price * 5 : this.price * 2}</span>
                 </span>
               </h2>
 
@@ -504,7 +504,8 @@
             };
             document.getElementById(this.i + "-range").onclick = this.upgrades.range < 2 ? () => {
               this.range += 1;
-              player.money -= this.upgrades.range ? this.price * 3 : this.price;
+              player.money -= this.price * (this.upgrades.range ? 5 : 2);
+              this.value += this.price * (this.upgrades.range ? 5 : 2);
               this.upgrades.range++;
               //Update the menu
               menu.remove();
@@ -512,14 +513,16 @@
             } : null;
             document.getElementById(this.i + "-speed").onclick = this.upgrades.speed < 2 ? () => {
               this.speed *= 2;
-              player.money -= this.upgrades.speed ? this.price * 3 : this.price;
+              player.money -= this.price * (this.upgrades.speed ? 5 : 2);
+              this.value += this.price * (this.upgrades.speed ? 5 : 2);
               this.upgrades.speed++;
               menu.remove();
               this.showMenu();
             } : null;
             document.getElementById(this.i + "-strength").onclick = this.upgrades.strength < 2 ? () => {
               this.strength *= 2;
-              player.money -= this.upgrades.strength ? this.price * 3 : this.price;
+              player.money -= this.price * (this.upgrades.strength ? 5 : 2);
+              this.value += this.price * (this.upgrades.strength ? 5 : 2);
               this.upgrades.strength++;
               menu.remove();
               this.showMenu();
@@ -527,11 +530,15 @@
             document.getElementById(this.i + "-extra").onclick = () => {
               this.nextExtra.add.bind(this)();
               this.nextExtra.bought = true;
+              player.money -= this.nextExtra.price;
+              this.value += this.nextExtra.price;
               menu.remove();
               this.showMenu();
             };
             document.getElementById(this.i + "-ability").onclick = () => {
               this.ability.bought = true;
+              player.money -= this.ability.price;
+              this.value += this.ability.price;
               menu.remove();
               this.showMenu();
             };

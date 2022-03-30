@@ -825,7 +825,7 @@
             if (!tower.seeInvisible) inRange = inRange.filter(enemy => enemy.visible);
             if (inRange.length) {
               let furthest = inRange.sort((a, b) => b.distance - a.distance)[0]; //Sort inRange from highest to lowest distance and get the first item
-              let strongest = inRange.sort((a, b) => b.health - a.health)[0]; //Sort inRange from highest to lowest health and get the first item
+              let strongest = inRange.sort((a, b) => b.type.health - a.type.health)[0]; //Sort inRange from highest to lowest health and get the first item
               let target;
               tower.range == Infinity ? target = strongest : target = furthest;
               target.hit(tower.strength, tower);

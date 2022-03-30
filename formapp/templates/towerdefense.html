@@ -273,7 +273,7 @@
           }
         },
         ability: {
-          description: "Instantly destroys the strongest enemy on the screen.",
+          description: "Does 150 damage the strongest enemy on the screen.",
           use: function() {
             let strongest = enemies.sort((a, b) => b.health - a.health)[0];
             strongest.hit(Infinity, this);

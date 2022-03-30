@@ -212,7 +212,8 @@
         ability: {
           description: "Attacks 5× as fast for 10 seconds.",
           use: function() {
-            this.speedBoost = 250; ////
+            this.speedBoost = 250;
+            ////make speedBoost work
           }
         }
       },
@@ -294,7 +295,7 @@
           description: "Creates a giant explosion that does significant damage.",
           use: function(tower) {
             let inExplosion = enemies.filter(enemy => Math.sqrt((tower.x - enemy.x) ** 2 + (tower.y - enemy.y) ** 2) < 400);
-            inExplosion.forEach(enemy => enemy.hit(25, this));
+            inExplosion.forEach(enemy => enemy.hit(25, this, true));
             ctx.strokeStyle = "transparent";
             ctx.fillStyle = "#ff8f4055";
             ctx.drawCircle(tower.x, tower.y, 400);
@@ -360,14 +361,16 @@
         price: 250,
         extra1: {
           description: "Does extra damage to boss enemies.",
-          add: function() {}
+          add: function() {
+            this.bossBonus = true;
+          }
         },
         extra2: {
           description: "Attack power is slightly increased for each enemy on the screen.",
           add: function() {}
         },
         ability: {
-          description: "All towers get doubled range, speed, and strength for ten seconds.",
+          description: "All towers get double range, speed, and strength for 10 seconds.",
           use: function() {}
         }
       }
@@ -459,21 +462,21 @@
               <h2 id="${this.i}-range">
                 Range: ${this.range}
                 <span class="splitButton">
-                  <span class="buttonLeft">→&nbsp;${this.range + 1}</span><span class="buttonRight">$${this.upgrades.range == 1 ? this.price * 5 : this.price}</span>
+                  <span class="buttonLeft">→&nbsp;${this.range + 1}</span><span class="buttonRight">$${this.upgrades.range == 1 ? this.price * 5 : this.price * 2}</span>
                 </span>
               </h2>
 
               <h2 id="${this.i}-speed">
                 Speed: ${this.speed}
                 <span class="splitButton">
-                  <span class="buttonLeft">→&nbsp;${this.speed * 2}</span><span class="buttonRight">$${this.upgrades.speed == 1 ? this.price * 5 : this.price}</span>
+                  <span class="buttonLeft">→&nbsp;${this.speed * 2}</span><span class="buttonRight">$${this.upgrades.speed == 1 ? this.price * 5 : this.price * 2}</span>
                 </span>
               </h2>
 
               <h2 id="${this.i}-strength">
                 Strength: ${this.strength}
                 <span class="splitButton">
-                  <span class="buttonLeft">→&nbsp;${this.strength * 2}</span><span class="buttonRight">$${this.upgrades.strength == 1 ? this.price * 5 : this.price}</span>
+                  <span class="buttonLeft">→&nbsp;${this.strength * 2}</span><span class="buttonRight">$${this.upgrades.strength == 1 ? this.price * 5 : this.price * 2}</span>
                 </span>
               </h2>
 
@@ -498,13 +501,16 @@
             document.getElementById(this.i + "-sell").onclick = () => {
               towers[this.i] = null;
               player.money += this.sellValue;
-              ////set square to null
+              let row = Math.floor(this.y / 60);
+              let col = Math.floor(this.x / 60);
+              grid[row][col] = null; //Reset the grid square
               menu.remove();
               this.menuOpen = false;
             };
             document.getElementById(this.i + "-range").onclick = this.upgrades.range < 2 ? () => {
               this.range += 1;
-              player.money -= this.upgrades.range ? this.price * 3 : this.price;
+              player.money -= this.price * (this.upgrades.range ? 5 : 2);
+              this.value += this.price * (this.upgrades.range ? 5 : 2);
               this.upgrades.range++;
               //Update the menu
               menu.remove();
@@ -512,14 +518,16 @@
             } : null;
             document.getElementById(this.i + "-speed").onclick = this.upgrades.speed < 2 ? () => {
               this.speed *= 2;
-              player.money -= this.upgrades.speed ? this.price * 3 : this.price;
+              player.money -= this.price * (this.upgrades.speed ? 5 : 2);
+              this.value += this.price * (this.upgrades.speed ? 5 : 2);
               this.upgrades.speed++;
               menu.remove();
               this.showMenu();
             } : null;
             document.getElementById(this.i + "-strength").onclick = this.upgrades.strength < 2 ? () => {
               this.strength *= 2;
-              player.money -= this.upgrades.strength ? this.price * 3 : this.price;
+              player.money -= this.price * (this.upgrades.strength ? 5 : 2);
+              this.value += this.price * (this.upgrades.strength ? 5 : 2);
               this.upgrades.strength++;
               menu.remove();
               this.showMenu();
@@ -527,11 +535,15 @@
             document.getElementById(this.i + "-extra").onclick = () => {
               this.nextExtra.add.bind(this)();
               this.nextExtra.bought = true;
+              player.money -= this.nextExtra.price;
+              this.value += this.nextExtra.price;
               menu.remove();
               this.showMenu();
             };
             document.getElementById(this.i + "-ability").onclick = () => {
               this.ability.bought = true;
+              player.money -= this.ability.price;
+              this.value += this.ability.price;
               menu.remove();
               this.showMenu();
             };
@@ -576,7 +588,6 @@
         this.visible = !this.abilities.includes("blink");
         this.slowed = 0;
         this.hit = function(damage, tower, explosion) {
-          ////make explosion true where applicable
           if (!this.abilities.includes("shield") || explosion || tower.name == "Long Range Tower") this.health -= damage;
           if (this.health <= 0) {
             player.money += tower?.extraMoney ? 5 : 1;
@@ -790,22 +801,23 @@
             if (inRange.length) {
               let furthest = inRange.sort((a, b) => b.distance - a.distance)[0]; //Sort inRange from highest to lowest distance and get the first item
               let strongest = inRange.sort((a, b) => b.health - a.health)[0]; //Sort inRange from highest to lowest health and get the first item
-              let target;
-              tower.range == Infinity ? target = strongest : target = furthest;
-              target.hit(tower.strength, tower);
+              let target = (tower.range == Infinity) ? strongest : furthest;
+              let damage = tower.strength * ((tower.bossBonus && target.boss) ? 1.5 : 1);
+              target.hit(damage, tower);
               if (tower.slowing && !target.abilities.includes("speed up")) target.slowed = tower.permSlow ? Infinity : 250;
               if (tower.abilityBlocking && !target.abilities.includes("speed up")) {
                 target.noAbilities = tower.permSlow ? Infinity : 250;
-                ////
+                ////make noAbilities work
               }
               if (tower.bounce) {
-                let closest = enemies.sort((a, b) => ((target.x - a.x) ** 2 + (target.y - a.y) ** 2) - ((target.x - b.x) ** 2 + (target.y - b.y) ** 2))[0]; ////h
+                let closest = enemies.sort((a, b) => ((target.x - a.x) ** 2 + (target.y - a.y) ** 2) - ((target.x - b.x) ** 2 + (target.y - b.y) ** 2))[0];
+                ////bounce
               }
               if (tower.explosionSize) {
                 //Create an explosion centered around the target enemy
                 let inExplosion = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < tower.explosionSize);
                 let explosionDamage = tower.powerfulExplosions ? tower.strength : 1;
-                inExplosion.forEach(enemy => enemy.hit(explosionDamage, tower)); //Do damage to every enemy inside the explosion
+                inExplosion.forEach(enemy => enemy.hit(explosionDamage, tower, true)); //Do damage to every enemy inside the explosion
                 //Draw the explosion as an orange circle
                 ctx.strokeStyle = "transparent";
                 ctx.fillStyle = "#ff8f4055";

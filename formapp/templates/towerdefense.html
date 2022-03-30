@@ -19,6 +19,8 @@
     top: 50%;
     transform: translate(-50%, -50%);
     aspect-ratio: 16 / 9;
+    outline: 1px solid var(--dark-gray);
+    overflow: hidden;
   }
 
   @media (max-aspect-ratio: 16/9) {
@@ -40,7 +42,6 @@
     width: 100%;
     background: linear-gradient(to bottom right, #030, #300, #003);
     background-size: 100%;
-    outline: 1px solid var(--dark-gray);
   }
 
   #grid {
@@ -81,9 +82,10 @@
     max-width: 20%;
     padding: 0.5%;
     box-sizing: border-box;
-    background: var(--light-gray);
+    background: #cccd;
     color: var(--bg-dark);
     text-align: center;
+    box-shadow: 10px 10px 5px #000c;
   }
 
   .splitButton {
@@ -457,9 +459,6 @@
 
             let menu = document.createElement("div");
             menu.classList.add("menu");
-            menu.style.left = this.x / 1920 * 100 + "%";
-            menu.style.top = "10%";
-            menu.style.transform = "translateX(-50%)";
             menu.innerHTML = `
               <h1>${type.name}</h1>
 
@@ -505,8 +504,28 @@
               </h2>
               ${type.ability.description}
             `;
-
             document.getElementById("container").appendChild(menu);
+            menu.style.left = this.x / 1920 * 100 + "%";
+            menu.style.transform = "translateX(-50%)";
+            let menuRect = menu.getBoundingClientRect();
+            let gameRect = document.getElementById("game").getBoundingClientRect();
+            //If the menu is too far to the left or right, put it on the edge
+            if (menuRect.x < gameRect.x) {
+              menu.style.left = "0";
+              menu.style.transform = "";
+            } else if (menuRect.x + menuRect.width > gameRect.x + gameRect.width) {
+              menu.style.left = "";
+              menu.style.right = "0";
+              menu.style.transform = "";
+            }
+            menu.style.bottom = 100 - (this.y / 1080 * 100) + 10 + "%";
+            menuRect = menu.getBoundingClientRect(); //Get the menu position again
+            //If the menu goes above the top of the game, put it below the tower
+            if (menuRect.y < gameRect.y) {
+              menu.style.bottom = "";
+              menu.style.top = this.y / 1080 * 100 + 10 + "%";
+            }
+
             document.getElementById(this.i + "-sell").onclick = () => {
               towers[this.i] = null;
               player.money += this.sellValue;

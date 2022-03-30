@@ -170,6 +170,14 @@
     opacity: 25%;
   }
 
+  #towerDesc {
+    position: absolute;
+    top: 5%;
+    width: 100%;
+    text-align: center;
+    font-size: 150%;
+  }
+
   #alert {
     position: absolute;
     right: 15px;
@@ -189,7 +197,7 @@
 {% block main %}
   <div id="container">
     <canvas id="game" width="1920" height="1080"></canvas>
-    <!-- Remove this alert if Google Chrome fixes the bug -->
+    <!-- Remove this alert if Chrome fixes the bug -->
     <img src="{{ url_for('static', filename='img/towerdefense/alert.png') }}" id="alert" onclick="alert('If a popup appears while you are dragging a tower, you may become unable to interact with the game.\nThis is an issue with the browser, not the game.\nYou can end this glitch by dragging something onto this page from another tab.');">
     <table id="grid" class="hidden"></table>
     <div id="towers" class="hidden">
@@ -1066,6 +1074,13 @@
       //Show the towers
       document.getElementById("towers").classList.remove("hidden");
       for (let tower in towerTypes) document.getElementById("towers").innerHTML += `<img src="../static/img/towerdefense/${tower}.png" id="${tower}">`;
+      for (let tower in towerTypes) {
+        console.log(document.getElementById(tower));
+        document.getElementById(tower).onmouseover = () => {
+          if (player.money >= towerTypes[tower].price) document.getElementById("towerDesc").innerText = `${towerTypes[tower].name} · $${towerTypes[tower].price} · ${towerTypes[tower].description}`;
+        }
+        document.getElementById(tower).onmouseout = () => document.getElementById("towerDesc").innerText = null;
+      }
 
       this.onclick = null;
     };

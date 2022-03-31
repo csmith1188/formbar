@@ -200,7 +200,7 @@
     <!-- Remove this alert if Chrome fixes the bug -->
     <img src="{{ url_for('static', filename='img/towerdefense/alert.png') }}" id="alert" onclick="alert('If a popup appears while you are dragging a tower, you may become unable to interact with the game.\nThis is an issue with the browser, not the game.\nYou can end this glitch by dragging something onto this page from another tab.');">
     <table id="grid" class="hidden"></table>
-    <div id="towers" class="hidden">
+    <div id="towers" class="hidden" ondragover="event.preventDefault();">
       <div id="towerDesc"></div>
     </div>
   </div>
@@ -232,7 +232,6 @@
           description: "Attacks 5× as fast for 10 seconds.",
           use: function() {
             this.speedBoost = 250;
-            ////make speedBoost work
           }
         }
       },
@@ -640,7 +639,7 @@
             player.money += (this.type.boss ? 10 : 1) * (tower?.extraMoney ? 5 : 1);
             enemies.splice(enemies.indexOf(this), 1);
           } else {
-            if (this.abilities.includes("speed up")) this.speed = this.type.speed + this.type.speed * (1 - (this.health / this.type.health)) * 3;
+            if (this.abilities.includes("speed up") && !this.noAbilities) this.speed = this.type.speed + this.type.speed * (1 - (this.health / this.type.health)) * 3;
             if (tower?.removeAbilities) this.abilities = [];
           }
         }
@@ -780,7 +779,6 @@
         paused ? animate = setInterval(update, fastForward ? 10 : 40) : clearInterval(animate);
         paused = !paused;
         paused ? document.getElementById("towers").classList.add("hidden") : document.getElementById("towers").classList.remove("hidden");
-        ////disable popups
         ctx.clearRect(0, 0, 120, 60);
         ctx.drawImage(buttons.play, 15, 15, 30, 30);
       };
@@ -792,7 +790,6 @@
 
       if (!(frame % 25) && frame) seconds++; //Do this every 25 frames
 
-      ////dragOver
       if (dragOver) {
         ctx.strokeStyle = "white";
         ctx.fillStyle = "#aaa5";
@@ -850,7 +847,7 @@
           if (tower.ability.cooldown) tower.ability.cooldown--;
 
           if (tower.cooldown > 1) {
-            tower.cooldown--;
+            tower.cooldown -= tower.speedBoost ? 5 : 1;
           } else {
             let inRange = enemies.filter(enemy => Math.sqrt((tower.x - enemy.x) ** 2 + (tower.y - enemy.y) ** 2) < tower.range * 60); //Use the Pythagorean Theorem to determine if each enemy is inside the tower's range
             if (!tower.seeInvisible) inRange = inRange.filter(enemy => enemy.visible);
@@ -863,7 +860,6 @@
               if (tower.slowing && !target.abilities.includes("speed up")) target.slowed = tower.permSlow ? Infinity : 250;
               if (tower.abilityBlocking && !target.abilities.includes("speed up")) {
                 target.noAbilities = tower.permSlow ? Infinity : 250;
-                ////make noAbilities work
               }
               if (tower.bounce) {
                 let closest = enemies.sort((a, b) => ((target.x - a.x) ** 2 + (target.y - a.y) ** 2) - ((target.x - b.x) ** 2 + (target.y - b.y) ** 2))[0];
@@ -883,18 +879,22 @@
               tower.cooldown += 25 / tower.speed;
             }
           }
+
+          if (tower.speedBoost) tower.speedBoost--;
         }
       });
 
       enemies.forEach((enemy, i) => {
         if (enemy.slowed) enemy.slowed--;
+        if (enemy.noAbilities) enemy.noAbilities--;
 
-        if (enemy.abilities.includes("healing") && enemy.health < enemy.type.health) {
+        if (enemy.abilities.includes("healing") && enemy.health < enemy.type.health && !enemy.noAbilities) {
           enemy.health += 1 / 75;
           if (enemy.health > enemy.type.health) enemy.health = enemy.type.health;
         }
 
         if (!(frame % 25) && enemy.abilities.includes("blink")) enemy.visible = !enemy.visible;
+        if (enemy.noAbilities) enemy.visible = true; ////alternate
 
         //If enemy is offscreen, subtract a life and remove it from the array
         //Otherwise, draw it in its new position
@@ -968,7 +968,14 @@
           };
           towerEl.ondragend = () => {
             delete towerTypes[tower].dragging;
+            dragOver = null;
             document.getElementById("grid").classList.remove("visibleLines");
+            grid.forEach((row, i) => row.forEach((square, j) => {
+              let squareEl = document.getElementById("r" + i + "c" + j);
+              squareEl.ondragover = null;
+              squareEl.ondragleave = null;
+              squareEl.ondrop = null;
+            }));
           };
         } else {
           towerEl.classList.add("unselectable");
@@ -1075,7 +1082,6 @@
       document.getElementById("towers").classList.remove("hidden");
       for (let tower in towerTypes) document.getElementById("towers").innerHTML += `<img src="../static/img/towerdefense/${tower}.png" id="${tower}">`;
       for (let tower in towerTypes) {
-        console.log(document.getElementById(tower));
         document.getElementById(tower).onmouseover = () => {
           if (player.money >= towerTypes[tower].price) document.getElementById("towerDesc").innerText = `${towerTypes[tower].name} · $${towerTypes[tower].price} · ${towerTypes[tower].description}`;
         }

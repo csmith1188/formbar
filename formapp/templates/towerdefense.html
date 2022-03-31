@@ -82,10 +82,10 @@
     max-width: 20%;
     padding: 0.5%;
     box-sizing: border-box;
-    background: #cccd;
+    background: #cccc;
     color: var(--bg-dark);
     text-align: center;
-    box-shadow: 10px 10px 5px #000c;
+    filter: drop-shadow(10px 10px 5px black);
   }
 
   .splitButton {
@@ -94,6 +94,7 @@
     border-radius: 4px;
     font-size: 80%;
     font-weight: 500;
+    filter: drop-shadow(2px 2px 1px #000c);
   }
 
   .splitButton:not(.unselectable) {
@@ -116,7 +117,7 @@
   }
 
   .splitButton:not(.unselectable):hover {
-    filter: brightness(90%);
+    filter: brightness(90%) drop-shadow(2px 2px 1px #000a);
   }
 
   .sellButton {
@@ -801,8 +802,9 @@
         let next = waves[currentWave][currentEnemy];
         while (Array.isArray(next)) {
           if (next[0] == "alert") {
+            //Stop the game if a tower is being dragged and next is an alert. This is necessary because of an issue with the browser.
             if (Object.values(towerTypes).find(tower => tower.dragging)) {
-              
+
             }
             alert(next[1]);
             waves[currentWave].splice(currentEnemy, 1); //Remove the array

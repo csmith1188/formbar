@@ -841,7 +841,8 @@
         let next = waves[currentWave][currentEnemy];
         while (Array.isArray(next)) {
           if (next[0] == "alert") {
-            alert(next[1]);
+            console.log(Object.values(towers).find(tower => tower.dragging));
+            if (!Object.values(towers).find(tower => tower.dragging)) alert(next[1]);
             waves[currentWave].splice(currentEnemy, 1); //Remove the array
           } else {
             let repeat = next[0]; //The array's first item is the number of times to repeat

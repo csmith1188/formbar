@@ -148,7 +148,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 3%;
+    gap: 5%;
     background: #0005;
     border-top: 1.5px solid var(--light-gray);
     cursor: default;
@@ -179,11 +179,32 @@
     font-size: 150%;
   }
 
+  #abilities {
+    position: absolute;
+    bottom: 10%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 3%;
+    text-align: center;
+  }
+
+  #abilities button {
+    width: 5.125%;
+    padding: 0.1% 0.3%;
+    font-size: 100%;
+  }
+
+  .invisible {
+    visibility: hidden;
+  }
+
   #alert {
     position: absolute;
-    right: 15px;
-    top: 15px;
-    width: 60px;
+    right: 1%;
+    top: 1%;
+    width: 4%;
     opacity: 75%;
     cursor: pointer;
   }
@@ -203,6 +224,7 @@
     <table id="grid" class="hidden"></table>
     <div id="towers" class="hidden" ondragover="event.preventDefault();">
       <div id="towerDesc"></div>
+      <div id="abilities"></div>
     </div>
   </div>
 {% endblock %}
@@ -213,32 +235,36 @@
     let towerTypes = {
       basic: {
         name: "Basic Tower",
-        description: "",
+        color: "var(--light-gray)",
+        description: "A cheap tower with average stats.",
         range: 2.5,
         speed: 1,
         strength: 1,
         price: 25,
         extra1: {
-          description: "Projectiles can hit up to three nearby enemies.",
+          description: "Projectiles can bounce to up to three nearby enemies.",
           price: 15,
           add: function() {
             this.bounce = true;
           }
         },
         extra2: {
-          description: "",
+          description: "Projectiles will keep bouncing as long as there are enemies nearby.",
+          price: 80,
           add: function() {}
         },
         ability: {
-          description: "Attacks 5× as fast for 10 seconds.",
+          description: "All basic towers attack 5× as fast for 10 seconds.",
+          price: 75,
           use: function() {
-            this.speedBoost = 250;
+            towers.filter(tower => tower.name == "Basic Tower").forEach(tower => tower.speedBoost = 250);
           }
         }
       },
       slowing: {
         name: "Slowing Tower",
-        description: "Weak attacks, but hits slow down enemies for 10 seconds.",
+        color: "var(--light-purple)",
+        description: "Weaker attacks, but hits slow down enemies for 10 seconds.",
         range: 3.25,
         speed: 0.75,
         strength: 0.75,
@@ -258,6 +284,7 @@
         },
         ability: {
           description: "Freezes every onscreen enemy for 3 seconds. Frozen enemies take twice as much damage.",
+          price: 60,
           use: function() {
             enemies.forEach(enemy => enemy.frozen = 75);
           }
@@ -265,6 +292,7 @@
       },
       longRange: {
         name: "Long Range Tower",
+        color: "var(--light-yellow)",
         description: "Infinite range and strong attacks, but fires slowly. Targets the strongest enemy onscreen.",
         range: Infinity,
         speed: 0.46,
@@ -284,6 +312,7 @@
         },
         ability: {
           description: "Does 150 damage the strongest enemy on the screen.",
+          price: 150,
           use: function() {
             let strongest = enemies.sort((a, b) => b.health - a.health)[0];
             strongest.hit(Infinity, this);
@@ -292,6 +321,7 @@
       },
       cannon: {
         name: "Cannon Tower",
+        color: "var(--light-orange)",
         description: "Every hit creates an explosion that damages nearby enemies.",
         range: 3.25,
         speed: 0.72,
@@ -311,7 +341,8 @@
           }
         },
         ability: {
-          description: "Creates a giant explosion that does significant damage.",
+          description: "Creates a giant explosion that does significant damage to all enemies inside of it.",
+          price: 100,
           use: function(tower) {
             let inExplosion = enemies.filter(enemy => Math.sqrt((tower.x - enemy.x) ** 2 + (tower.y - enemy.y) ** 2) < 400);
             inExplosion.forEach(enemy => enemy.hit(25, this, true));
@@ -323,6 +354,7 @@
       },
       money: {
         name: "Money Tower",
+        color: "var(--light-green)",
         description: "Gets 5× as much money from hitting enemies.",
         range: 3.5,
         speed: 0.85,
@@ -330,9 +362,9 @@
         extraMoney: true,
         price: 100,
         extra1: {
-          description: "Adds an extra $20 every 10 seconds.",
+          description: "Adds an extra $10 every 10 seconds.",
           add: function() {
-            player.bonusMoney += 20;
+            player.bonusMoney += 10;
           }
         },
         extra2: {
@@ -343,6 +375,7 @@
         },
         ability: {
           description: "Adds $50 to your total.",
+          price: 250,
           use: function() {
             player.money += 50;
           }
@@ -350,9 +383,10 @@
       },
       air: {
         name: "Air Tower",
+        color: "var(--light-cyan)",
         large: true,
-        description: "This tower can move anywhere on the screen. Double-click to make it follow your cursor, and double-click again to make it stay in place. You can only own one.",
-        range: 2.5,
+        description: "This tower can be freely moved after it's placed. It also has a large range andd attacks quickly.",
+        range: 3.75,
         speed: 3,
         strength: 1,
         movable: true,
@@ -367,11 +401,13 @@
         },
         ability: {
           description: "",
+          price: 0,
           use: function() {}
         }
       },
       ultimate: {
         name: "Ultimate Tower",
+        color: "var(--light-red)",
         large: true,
         description: "",
         range: 4.5,
@@ -390,6 +426,7 @@
         },
         ability: {
           description: "All towers get double range, speed, and strength for 10 seconds.",
+          price: 300,
           use: function() {}
         }
       }
@@ -467,6 +504,7 @@
 
             let menu = document.createElement("div");
             menu.classList.add("menu");
+            ////update buttons when enemy defeated
             menu.innerHTML = `
               <h1>${type.name}</h1>
 
@@ -498,7 +536,7 @@
 
               <h2>
                 Extra ${this.extra1.bought ? "2" : "1"}
-                <span id="${this.i}-extra" class="splitButton">
+                <span id="${this.i}-extra" class="splitButton ${(player.money <= this.nextExtra.price) ? "unselectable" : ""}">
                   <span class="buttonLeft">Add</span><span class="buttonRight">$${this.nextExtra.price}</span>
                 </span>
               </h2>
@@ -506,7 +544,7 @@
 
               <h2>
                 Special ability
-                <span id="${this.i}-ability" class="splitButton">
+                <span id="${this.i}-ability" class="splitButton ${(player.money <= this.ability.price) ? "unselectable" : ""}">
                   <span class="buttonLeft">Unlock</span><span class="buttonRight">$${this.ability.price}</span>
                 </span>
               </h2>
@@ -545,6 +583,7 @@
             };
             document.getElementById(this.i + "-range").onclick = () => {
               if (this.upgrades.range < 2 && player.money >= this.upgradePrice("range")) {
+                this.upgrades.xyz = 123;
                 player.money -= this.upgradePrice("range");
                 this.value += this.upgradePrice("range");
                 this.upgrades.range++;
@@ -575,7 +614,7 @@
               }
             };
             document.getElementById(this.i + "-extra").onclick = () => {
-              if (player.money >= this.nextExtra.price) {
+              if (!this.extra2.bought && player.money >= this.nextExtra.price) {
                 player.money -= this.nextExtra.price;
                 this.value += this.nextExtra.price;
                 this.nextExtra.bought = true;
@@ -585,7 +624,7 @@
               }
             };
             document.getElementById(this.i + "-ability").onclick = () => {
-                if (player.money >= this.ability.price) {
+                if (!this.ability.bought && player.money >= this.ability.price) {
                 player.money -= this.ability.price;
                 this.value += this.ability.price;
                 this.ability.bought = true;
@@ -802,10 +841,6 @@
         let next = waves[currentWave][currentEnemy];
         while (Array.isArray(next)) {
           if (next[0] == "alert") {
-            //Stop the game if a tower is being dragged and next is an alert. This is necessary because of an issue with the browser.
-            if (Object.values(towerTypes).find(tower => tower.dragging)) {
-
-            }
             alert(next[1]);
             waves[currentWave].splice(currentEnemy, 1); //Remove the array
           } else {
@@ -890,20 +925,9 @@
       });
 
       enemies.forEach((enemy, i) => {
-        if (enemy.slowed) enemy.slowed--;
-        if (enemy.noAbilities) enemy.noAbilities--;
-
-        if (enemy.abilities.includes("healing") && enemy.health < enemy.type.health && !enemy.noAbilities) {
-          enemy.health += 1 / 75;
-          if (enemy.health > enemy.type.health) enemy.health = enemy.type.health;
-        }
-
-        if (!(frame % 25) && enemy.abilities.includes("blink")) enemy.visible = !enemy.visible;
-        if (enemy.noAbilities) enemy.visible = true; ////alternate
-
         //If enemy is offscreen, subtract a life and remove it from the array
         //Otherwise, draw it in its new position
-        if (enemy.x - 20 > 1920) {
+        if (enemy.x > 1940) {
           player.lives -= enemy.type.health;
           enemies.splice(i, 1);
         } else {
@@ -925,6 +949,16 @@
           if (enemy.abilities.includes("healing")) ctx.drawImage(abilitySymbols.healing, enemy.x - 40, enemy.y - 40);
           if (enemy.abilities.includes("shield")) ctx.drawImage(abilitySymbols.shield, enemy.x - 40, enemy.y - 40);
         }
+
+        if (enemy.slowed) enemy.slowed--;
+        if (enemy.noAbilities) enemy.noAbilities--;
+
+        if (enemy.abilities.includes("healing") && enemy.health < enemy.type.health && !enemy.noAbilities) {
+          enemy.health += 1 / 75;
+          if (enemy.health > enemy.type.health) enemy.health = enemy.type.health;
+        }
+        if (!(frame % 25) && enemy.abilities.includes("blink")) enemy.visible = !enemy.visible;
+        if (enemy.noAbilities) enemy.visible = true; ////alternate
       });
 
       for (let tower in towerTypes) {
@@ -985,6 +1019,20 @@
         } else {
           towerEl.classList.add("unselectable");
           towerEl.draggable = false;
+        }
+
+        let ability = towerTypes[tower].ability;
+        let abilityButton = document.getElementById(tower + "Ability");
+        if (ability.bought/*//// && Object.values(x).find(x => x)*/) {
+          abilityButton.classList.remove("invisible");
+          if (ability.cooldown) {
+            abilityButton.classList.add("unselectable");
+            ////show time left
+          } else {
+            abilityButton.classList.remove("unselectable");
+          }
+        } else {
+          abilityButton.classList.add("invisible");
         }
       }
 
@@ -1085,12 +1133,23 @@
 
       //Show the towers
       document.getElementById("towers").classList.remove("hidden");
-      for (let tower in towerTypes) document.getElementById("towers").innerHTML += `<img src="../static/img/towerdefense/${tower}.png" id="${tower}">`;
+      for (let tower in towerTypes) {
+        document.getElementById("towers").innerHTML += `<img src="../static/img/towerdefense/${tower}.png" id="${tower}">`;
+        document.getElementById("abilities").innerHTML += `<button id="${tower}Ability" class="invisible">Use ability</button>`;
+      }
       for (let tower in towerTypes) {
         document.getElementById(tower).onmouseover = () => {
           if (player.money >= towerTypes[tower].price) document.getElementById("towerDesc").innerText = `${towerTypes[tower].name} · $${towerTypes[tower].price} · ${towerTypes[tower].description}`;
         }
         document.getElementById(tower).onmouseout = () => document.getElementById("towerDesc").innerText = null;
+        document.getElementById(tower + "Ability").style.color = towerTypes[tower].color;
+        document.getElementById(tower + "Ability").onclick = () => {
+          let ability = towerTypes[tower].ability;
+          if (ability.bought && !ability.cooldown/*//// && Object.values(x).find(x => x)*/) {
+            ability.use();
+            ability.cooldown = 1500; ////
+          }
+        };
       }
 
       this.onclick = null;

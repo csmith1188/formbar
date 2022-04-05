@@ -2160,16 +2160,7 @@ def endpoint_towerdefense():
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
         return redirect(sD.mainPage + "?alert=You do not have high enough permissions to do this right now.")
     else:
-        username = sD.studentDict[request.remote_addr]['name']
-        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
-        dbcmd = db.cursor()
-        best = dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='towerdefense' ORDER BY score DESC", {"uname": username}).fetchone()
-        db.close()
-        if best:
-            best = best[3]
-        else:
-            best = 0
-        return render_template('towerdefense.html', best = best)
+        return render_template('towerdefense.html')
 
 
 #Tic Tac Toe

@@ -44,6 +44,25 @@
     background-size: 100%;
   }
 
+  #complete {
+    position: absolute;
+    left: 1.5%;
+    top: calc(24% / 9);
+    width: 100%;
+    color: var(--light-yellow);
+    font-size: 250%;
+    filter: drop-shadow(0 0 5px #fffa);
+  }
+
+  #medal {
+    position: absolute;
+    height: 100%;
+  }
+
+  #completeText {
+    margin-left: 3.5%;
+  }
+
   #grid {
     position: absolute;
     top: 0;
@@ -199,19 +218,6 @@
   .invisible {
     visibility: hidden;
   }
-
-  #alert {
-    position: absolute;
-    right: 1%;
-    top: 1%;
-    width: 4%;
-    opacity: 75%;
-    cursor: pointer;
-  }
-
-  #alert:hover {
-    opacity: 100%;
-  }
 </style>
 {% endblock %}
 
@@ -219,10 +225,9 @@
 {% block main %}
   <div id="container">
     <canvas id="game" width="1920" height="1080"></canvas>
-    <!-- Remove this alert if Chrome fixes the bug -->
-    <img src="{{ url_for('static', filename='img/towerdefense/alert.png') }}" id="alert" onclick="alert('If a popup appears while you are dragging a tower, you may become unable to interact with the game.\nThis is an issue with the browser, not the game.\nYou can end this glitch by dragging something onto this page from another tab.');">
+    <div id="complete" class="hidden"><img src="{{ url_for('static', filename='img/towerdefense/medal.png') }}" id="medal"> <span id="completeText">Game complete</span></div>
     <table id="grid" class="hidden"></table>
-    <div id="towers" class="hidden" ondragover="event.preventDefault();">
+    <div id="towers" class="hidden">
       <div id="towerDesc"></div>
       <div id="abilities"></div>
     </div>
@@ -272,21 +277,23 @@
         price: 20,
         extra1: {
           description: "Slowing affects enemies permanently.",
+          price: 12,
           add: function() {
             this.permSlow = true;
           }
         },
         extra2: {
           description: "Enemies lose all abilities while they are slowed down.",
+          price: 45,
           add: function() {
             this.abilityBlocking = true;
           }
         },
         ability: {
-          description: "Freezes every onscreen enemy for 3 seconds. Frozen enemies take twice as much damage.",
+          description: "Stuns every onscreen enemy for 3 seconds. Stunned enemies take twice as much damage.",
           price: 60,
           use: function() {
-            enemies.forEach(enemy => enemy.frozen = 75);
+            enemies.forEach(enemy => enemy.stunned = 75);
           }
         }
       },
@@ -300,12 +307,14 @@
         price: 60,
         extra1: {
           description: "Can hit blinking enemies while they are hidden.",
+          price: 25,
           add: function() {
             this.superVision = true;
           }
         },
         extra2: {
           description: "Enemies hit by this tower lose all abilities permanently.",
+          price: 100,
           add: function() {
             this.removeAbilities = true;
           }
@@ -330,25 +339,27 @@
         explosionSize: 100,
         extra1: {
           description: "Explosions are increased in size.",
+          price: 30,
           add: function() {
             this.explosionSize = 150;
           }
         },
         extra2: {
           description: "Explosions do as much damage as direct hits.",
+          price: 75,
           add: function() {
             this.powerfulExplosions = true;
           }
         },
         ability: {
-          description: "Creates a giant explosion that does significant damage to all enemies inside of it.",
+          description: "Creates a giant explosion at the center of the screen that does significant damage to all enemies inside of it.",
           price: 100,
-          use: function(tower) {
-            let inExplosion = enemies.filter(enemy => Math.sqrt((tower.x - enemy.x) ** 2 + (tower.y - enemy.y) ** 2) < 400);
+          use: function() {
+            let inExplosion = enemies.filter(enemy => Math.sqrt((960 - enemy.x) ** 2 + (450 - enemy.y) ** 2) < 400);
             inExplosion.forEach(enemy => enemy.hit(25, this, true));
             ctx.strokeStyle = "transparent";
             ctx.fillStyle = "#ff8f4055";
-            ctx.drawCircle(tower.x, tower.y, 400);
+            ctx.drawCircle(960, 450, 400);
           }
         }
       },
@@ -362,13 +373,15 @@
         extraMoney: true,
         price: 100,
         extra1: {
-          description: "Adds an extra $10 every 10 seconds.",
+          description: "Adds an extra $5 every 10 seconds.",
+          price: 160,
           add: function() {
             player.bonusMoney += 10;
           }
         },
         extra2: {
           description: "Adds an extra life every 15 seconds.",
+          price: 300,
           add: function() {
             player.bonusLives += 1;
           }
@@ -385,7 +398,7 @@
         name: "Air Tower",
         color: "var(--light-cyan)",
         large: true,
-        description: "This tower can be freely moved after it's placed. It also has a large range andd attacks quickly.",
+        description: "Moves back and forth above the track. Has a large range and attacks quickly.",
         range: 3.75,
         speed: 3,
         strength: 1,
@@ -393,35 +406,47 @@
         price: 100,
         extra1: {
           description: "Every fifth hit creates a small explosion.",
-          add: function() {}
+          price: 25,
+          add: function() {
+            this.fifthExplode = true;
+            this.nextExplosion = 5;
+            ////
+          }
         },
         extra2: {
-          description: "Whatever tower is closest to the plane will get a range boost.",
-          add: function() {}
+          description: "Whatever tower is closest to the tower's base will get a range boost.",
+          price: 50,
+          add: function() {
+
+          }
         },
         ability: {
-          description: "",
-          price: 0,
-          use: function() {}
+          description: "A highly powerful plane will fly over the track, starting at the exit.",
+          price: 200,
+          use: function() {
+
+          }
         }
       },
       ultimate: {
         name: "Ultimate Tower",
         color: "var(--light-red)",
         large: true,
-        description: "",
+        description: "Can rapidly destroy many enemies across a wide range.",
         range: 4.5,
         speed: 9.3,
         strength: 2,
         price: 250,
         extra1: {
           description: "Does extra damage to boss enemies.",
+          price: 100,
           add: function() {
             this.bossBonus = true;
           }
         },
         extra2: {
           description: "Attack power is slightly increased for each enemy on the screen.",
+          price: 80,
           add: function() {}
         },
         ability: {
@@ -493,6 +518,10 @@
     class Tower {
       constructor(type, row, col) {
         for (let property in type) this[property] = type[property];
+        //Make new objects so towers can be upgraded independently
+        this.upgrades = Object.create(this.upgrades);
+        this.extra1 = Object.create(this.extra1);
+        this.extra2 = Object.create(this.extra2);
         this.value = type.price;
         this.x = col * 60 + 30;
         this.y = row * 60 + 30;
@@ -543,7 +572,7 @@
               ${this.nextExtra?.description || this.extra2.description}
 
               <h2>
-                Special ability
+                Ability
                 <span id="${this.i}-ability" class="splitButton ${(player.money <= this.ability.price) ? "unselectable" : ""}">
                   <span class="buttonLeft">Unlock</span><span class="buttonRight">$${this.ability.price}</span>
                 </span>
@@ -653,33 +682,88 @@
 
     class Enemy {
       constructor(string) {
-        if (string[0] == "g") this.type = enemyTypes.green;
-        if (string[0] == "y") this.type = enemyTypes.yellow;
-        if (string[0] == "o") this.type = enemyTypes.orange;
-        if (string[0] == "r") this.type = enemyTypes.red;
-        if (string[0] == "p") this.type = enemyTypes.purple;
-        if (string[0] == "b") this.type = enemyTypes.brown;
-        if (string[0] == "x") this.type = enemyTypes.boss;
-        if (string[0] == "z") this.type = enemyTypes.superBoss;
+        switch(string[0]) {
+          case "g":
+            this.type = enemyTypes.green;
+            break;
+          case "y":
+            this.type = enemyTypes.yellow;
+            break;
+          case "o":
+            this.type = enemyTypes.orange;
+            break;
+          case "r":
+            this.type = enemyTypes.red;
+            break;
+          case "p":
+            this.type = enemyTypes.purple;
+            break;
+          case "b":
+            this.type = enemyTypes.brown;
+            break;
+          case "x":
+            this.type = enemyTypes.boss;
+            break;
+          case "z":
+            this.type = enemyTypes.superBoss;
+            break;
+        }
         this.speed = this.type.speed;
         this.health = this.type.health;
         this.abilities = [];
-        if (string[1] == "h") this.abilities.push("healing");
-        if (string[1] == "u") this.abilities.push("speed up");
-        if (string[1] == "s") this.abilities.push("split");
-        if (string[1] == "k") this.abilities.push("blink");
-        if (string[1] == "d") this.abilities.push("shield");
+          switch(string[1]) {
+            case "h":
+              this.type = enemyTypes.healing;
+              break;
+            case "a":
+              this.type = enemyTypes.acceleration;
+              break;
+            case "s":
+              this.type = enemyTypes.split;
+              break;
+            case "k":
+              this.type = enemyTypes.blink;
+              break;
+            case "d":
+              this.type = enemyTypes.shield;
+              break;
+          }
         this.id = Math.random(); //Give the enemy a random ID so that no two objects are identical
         this.distance = 0;
         this.visible = !this.abilities.includes("blink");
         this.slowed = 0;
         this.hit = function(damage, tower, explosion) {
+          if (this.stunned) damage *= 2;
           if (!this.abilities.includes("shield") || explosion || tower.name == "Long Range Tower") this.health -= damage;
           if (this.health <= 0) {
+            let i = enemies.indexOf(this);
             player.money += (this.type.boss ? 10 : 1) * (tower?.extraMoney ? 5 : 1);
-            enemies.splice(enemies.indexOf(this), 1);
+            if (this.abilities.includes("split")) {
+              let type;
+              switch (this.type.color) {
+                case "yellow":
+                  type = "g";
+                  break;
+                case "orange":
+                  type = "y";
+                  break;
+                case "red":
+                  type = "o";
+                  break;
+                case "purple":
+                case "brown":
+                  type = "r";
+              }
+              let new1 = new Enemy(type);
+              let new2 = new Enemy(type);
+              new1.distance = this.distance;
+              new2.distance = this.distance - 20;
+              enemies.splice(i, 1, new1, new2);
+            } else {
+              enemies.splice(i, 1); //Remove the enemy
+            }
           } else {
-            if (this.abilities.includes("speed up") && !this.noAbilities) this.speed = this.type.speed + this.type.speed * (1 - (this.health / this.type.health)) * 3;
+            if (this.abilities.includes("acceleration") && !this.noAbilities) this.speed = this.type.speed + this.type.speed * (1 - (this.health / this.type.health)) * 3;
             if (tower?.removeAbilities) this.abilities = [];
           }
         }
@@ -702,9 +786,9 @@
       [[20, "oh"]],
       [[15, "o", "y"]],
       [[32, "g"], pause, [16, "y"], pause, [8, "o"], pause, [4, "r"]],
-      [[6, "r"], ["alert", "New enemy ability: SPEED UP\nEnemies with this ability move faster as they lose health. They also can't be slowed by Slowing Towers."], [10, "ou"]],
+      [[6, "r"], ["alert", "New enemy ability: ACCELERATION\nEnemies with this ability move faster as they lose health. They also can't be slowed by Slowing Towers."], [10, "oa"]],
       [[5, "g", [3, "r"], "g", pause], "g", [3, "r"], "g"],
-      [[8, "ou", "ru", pause], "ou", "ru"],
+      [[8, "oa", "ra", pause], "oa", "ra"],
       [[2, [12, "r"], pause], [12, "r"]],
       [[100, "y"]],
       [[2, "b", pause], "b"],
@@ -712,14 +796,14 @@
       [[7, "y", "o", "r", pause], [12, "rh"]],
       [[4, "os"], pause, [25, "o"], "bs"],
       [[5, "p"]],
-      [[3, "pu", "bh", pause], [8, "rs", pause], "rs"],
+      [[3, "pa", "bh", pause], [8, "rs", pause], "rs"],
       [["alert", "New enemy ability: BLINK\nEnemies with this ability switch between two states: visible and hidden. Without upgrades, towers can only hit them while they're visible."], [29, "yk", pause], "yk"],
       [[250, "g"]],
       [["alert", "Boss enemies have 100 HP."], "x"],
       ["pk"],
       [[5, "bs"]],
       [[2, [35, "r"], [5, "p"]]],
-      [[14, "bu"], [26, "rh"]],
+      [[14, "ba"], [26, "rh"]],
       [["alert", "New enemy ability: SHIELD\nEnemies with this ability can only be damaged by explosions and hits from Long-Range Towers."], "gd"],
       [[30, "o"], pause, "x", pause, "x"],
       [[3, "bs"], [3, "ps"]],
@@ -727,7 +811,7 @@
       [[3, "bd", pause], "bd"],
       ["xs"],
       [[10, "ok"], [8, "rh"], [19, "p"], [4, "rs"]],
-      [[125, "yh"], "xu", [33, "b"]],
+      [[125, "yh"], "xa", [33, "b"]],
       [[4, "x"], [45, "r"], "xk"],
       [[7, "os"], pause, [13, "pk"] [64, "g"]],
       ["x", [18, "rd"], pause, "x"],
@@ -736,7 +820,7 @@
       [[10, "x"], pause, [30, "bh"], [20, "r"]],
       [[3, "z", pause], [17, "ps"], [43, "ok"], [5, "x"]],
       [[15, "pk"], "xs", [3, "x", "z"], [300, "o"], "pd"],
-      [[50, "ru"], [125, "bk"], pause, [67, "bh"], [999, "yk"], "z"],
+      [[50, "ra"], [125, "bk"], pause, [67, "bh"], [999, "yk"], "z"],
       [[10, "g"], pause, [20, "y"], pause, [30, "o"], pause, [40, "r"], pause, [100, "b"], pause, [100, "p"], pause, [15, "x"], pause, [5, "z"]]
     ];
     waves.forEach(wave => wave.unshift([8, pause])); //Add a break at the start of each wave
@@ -758,7 +842,8 @@
 
     let abilitySymbols = {
       healing: new Image(),
-      shield: new Image()
+      shield: new Image(),
+      acceleration: new Image()
     };
     for (let symbol in abilitySymbols) abilitySymbols[symbol].src = `../static/img/towerdefense/${symbol}.png`;
 
@@ -841,8 +926,7 @@
         let next = waves[currentWave][currentEnemy];
         while (Array.isArray(next)) {
           if (next[0] == "alert") {
-            console.log(Object.values(towers).find(tower => tower.dragging));
-            if (!Object.values(towers).find(tower => tower.dragging)) alert(next[1]);
+            if (!Object.values(towerTypes).find(tower => tower.dragging)) alert(next[1]); //Don't show alert if a tower si being dragged. This is necessary because of an issue with the browser.
             waves[currentWave].splice(currentEnemy, 1); //Remove the array
           } else {
             let repeat = next[0]; //The array's first item is the number of times to repeat
@@ -866,7 +950,8 @@
             if (enemies.length) {
               waves[currentWave + 1] = [null];
             } else {
-              alert("Congratulations! You have passed every wave.");
+              if (!Object.values(towerTypes).find(tower => tower.dragging)) alert("Congratulations! You have completed the game.");
+              localStorage.setItem("tdComplete", "true");
               endGame();
             }
           }
@@ -898,8 +983,8 @@
               let target = (tower.range == Infinity) ? strongest : furthest;
               let damage = tower.strength * ((tower.bossBonus && target.boss) ? 1.5 : 1);
               target.hit(damage, tower);
-              if (tower.slowing && !target.abilities.includes("speed up")) target.slowed = tower.permSlow ? Infinity : 250;
-              if (tower.abilityBlocking && !target.abilities.includes("speed up")) {
+              if (tower.slowing && !target.abilities.includes("acceleration")) target.slowed = tower.permSlow ? Infinity : 250;
+              if (tower.abilityBlocking && !target.abilities.includes("acceleration")) {
                 target.noAbilities = tower.permSlow ? Infinity : 250;
               }
               if (tower.bounce) {
@@ -928,12 +1013,13 @@
       enemies.forEach((enemy, i) => {
         //If enemy is offscreen, subtract a life and remove it from the array
         //Otherwise, draw it in its new position
-        if (enemy.x > 1940) {
+        if (enemy.distance >= mapArr.length) { //The enemy is at the end of the track
           player.lives -= enemy.type.health;
           enemies.splice(i, 1);
         } else {
-          ctx.strokeStyle = enemy.type.color;
-          enemy.distance += enemy.speed * (enemy.slowed ? 2 : 4);
+          if (enemy.stunned) enemy.stunned--;
+          else enemy.distance += enemy.speed * (enemy.slowed ? 2 : 4);
+          if (enemy.slowed) enemy.slowed--;
           enemy.x = map.start[0] * 60;
           enemy.y = map.start[1] * 60;
           let img;
@@ -941,18 +1027,15 @@
             if (mapArr[i] == "right") enemy.x += 1;
             if (mapArr[i] == "left") enemy.x -= 1;
             if (mapArr[i] == "down") enemy.y += 1;
-            if (mapArr[i] == "up") enemy.y -= 1;
-            img = enemy.type.boss && (mapArr[i] == "right" || mapArr[i] == "left") ? img = enemy.type.imgRotated : enemy.type.img; //If the enemy is a boss and moving horizontally, rotate it
+            if (mapArr[i] == "up") enemy.y -= 1;img = enemy.type.boss && (mapArr[i] == "right" || mapArr[i] == "left") ? img = enemy.type.imgRotated : enemy.type.img; //If the enemy is a boss and moving horizontally, rotate it
           }
-          if (!enemy.visible) ctx.globalAlpha = 0.25; //If the enemy is hidden, amke it semitransparent
+          if (!enemy.visible) ctx.globalAlpha = 0.25; //If the enemy is hidden, make it semitransparent
           ctx.drawImage(img, enemy.x - 40, enemy.y - 40);
           ctx.globalAlpha = 1;
           if (enemy.abilities.includes("healing")) ctx.drawImage(abilitySymbols.healing, enemy.x - 40, enemy.y - 40);
           if (enemy.abilities.includes("shield")) ctx.drawImage(abilitySymbols.shield, enemy.x - 40, enemy.y - 40);
+          if (enemy.abilities.includes("acceleration")) ctx.drawImage(abilitySymbols.acceleration, enemy.x - 40, enemy.y - 40);
         }
-
-        if (enemy.slowed) enemy.slowed--;
-        if (enemy.noAbilities) enemy.noAbilities--;
 
         if (enemy.abilities.includes("healing") && enemy.health < enemy.type.health && !enemy.noAbilities) {
           enemy.health += 1 / 75;
@@ -960,6 +1043,8 @@
         }
         if (!(frame % 25) && enemy.abilities.includes("blink")) enemy.visible = !enemy.visible;
         if (enemy.noAbilities) enemy.visible = true; ////alternate
+
+        if (enemy.noAbilities) enemy.noAbilities--;
       });
 
       for (let tower in towerTypes) {
@@ -1024,12 +1109,14 @@
 
         let ability = towerTypes[tower].ability;
         let abilityButton = document.getElementById(tower + "Ability");
-        if (ability.bought/*//// && Object.values(x).find(x => x)*/) {
+        if (ability.bought && towers.find(owned => owned?.name == towerTypes[tower].name)) {
           abilityButton.classList.remove("invisible");
           if (ability.cooldown) {
             abilityButton.classList.add("unselectable");
-            ////show time left
+            let percent = ability.cooldown / 1500 * 100;
+            abilityButton.style.background = `linear-gradient(to left, var(--emphasis-color), var(--emphasis-color) ${percent}%, gray ${percent}%)`; //Show how long until the ability can be used again
           } else {
+            abilityButton.style.background = null; //Reset the background
             abilityButton.classList.remove("unselectable");
           }
         } else {
@@ -1038,7 +1125,6 @@
       }
 
       if (!(frame % 250)) player.money += player.bonusMoney;
-
       if (!(frame % 375)) player.lives += player.bonusLives;
 
       //Update text in top-right
@@ -1115,9 +1201,10 @@
     ctx.fillText("Click to start the game", 960, 600);
     ctx.font = "32px Segoe UI";
     ctx.fillText("Created by Oley Birkeland", 960, 1000);
+    if (localStorage.getItem("tdComplete")) document.getElementById("complete").classList.remove("hidden");
 
     document.getElementById("game").onclick = function() {
-      document.getElementById("alert").classList.add("hidden");
+      document.getElementById("complete").classList.add("hidden");
 
       //Start the game
       animate = setInterval(update, 40);
@@ -1139,16 +1226,18 @@
         document.getElementById("abilities").innerHTML += `<button id="${tower}Ability" class="invisible">Use ability</button>`;
       }
       for (let tower in towerTypes) {
-        document.getElementById(tower).onmouseover = () => {
-          if (player.money >= towerTypes[tower].price) document.getElementById("towerDesc").innerText = `${towerTypes[tower].name} · $${towerTypes[tower].price} · ${towerTypes[tower].description}`;
-        }
-        document.getElementById(tower).onmouseout = () => document.getElementById("towerDesc").innerText = null;
-        document.getElementById(tower + "Ability").style.color = towerTypes[tower].color;
-        document.getElementById(tower + "Ability").onclick = () => {
-          let ability = towerTypes[tower].ability;
-          if (ability.bought && !ability.cooldown/*//// && Object.values(x).find(x => x)*/) {
+        let towerEl = document.getElementById(tower);
+        let abilityButton = document.getElementById(tower + "Ability");
+        let ability = towerTypes[tower].ability;
+        towerEl.onmouseover = () => document.getElementById("towerDesc").innerText = `${towerTypes[tower].name} · $${towerTypes[tower].price} · ${towerTypes[tower].description}`;
+        towerEl.onmouseout = () => document.getElementById("towerDesc").innerText = null;
+        abilityButton.style.color = towerTypes[tower].color;
+        abilityButton.onmouseover = () => document.getElementById("towerDesc").innerText = ability.description;
+        abilityButton.onmouseout = () => document.getElementById("towerDesc").innerText = null;
+        abilityButton.onclick = () => {
+          if (ability.bought && !ability.cooldown && towers.find(owned => owned?.name == towerTypes[tower].name)) {
             ability.use();
-            ability.cooldown = 1500; ////
+            ability.cooldown = 1500;
           }
         };
       }

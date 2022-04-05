@@ -248,15 +248,17 @@
         price: 25,
         extra1: {
           description: "Projectiles can bounce to up to three nearby enemies.",
-          price: 15,
+          price: 30,
           add: function() {
-            this.bounce = true;
+            this.bounce = 3;
           }
         },
         extra2: {
           description: "Projectiles will keep bouncing as long as there are enemies nearby.",
-          price: 80,
-          add: function() {}
+          price: 100,
+          add: function() {
+            this.bounce = Infinity;
+          }
         },
         ability: {
           description: "All basic towers attack 5× as fast for 10 seconds.",
@@ -646,8 +648,8 @@
               if (!this.extra2.bought && player.money >= this.nextExtra.price) {
                 player.money -= this.nextExtra.price;
                 this.value += this.nextExtra.price;
-                this.nextExtra.bought = true;
                 this.nextExtra.add.bind(this)();
+                this.nextExtra.bought = true;
                 menu.remove();
                 this.showMenu();
               }
@@ -713,19 +715,19 @@
         this.abilities = [];
           switch(string[1]) {
             case "h":
-              this.type = enemyTypes.healing;
+              this.abilities.push("healing");
               break;
             case "a":
-              this.type = enemyTypes.acceleration;
+              this.abilities.push("acceleration");
               break;
             case "s":
-              this.type = enemyTypes.split;
+              this.abilities.push("split");
               break;
             case "k":
-              this.type = enemyTypes.blink;
+              this.abilities.push("blink");
               break;
             case "d":
-              this.type = enemyTypes.shield;
+              this.abilities.push("shield");
               break;
           }
         this.id = Math.random(); //Give the enemy a random ID so that no two objects are identical
@@ -988,8 +990,19 @@
                 target.noAbilities = tower.permSlow ? Infinity : 250;
               }
               if (tower.bounce) {
-                let closest = enemies.sort((a, b) => ((target.x - a.x) ** 2 + (target.y - a.y) ** 2) - ((target.x - b.x) ** 2 + (target.y - b.y) ** 2))[0];
-                ////bounce
+                let bouncePath = [target]; //Make an array of all enemies hit so they aren't bounced to again
+                let close = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < 100 && !bouncePath.includes(enemy));
+                let bouncesLeft = tower.bounce;
+                while (close.length && bouncesLeft) {
+                  let closest = close.sort((a, b) => ((target.x - a.x) ** 2 + (target.y - a.y) ** 2) - ((target.x - b.x) ** 2 + (target.y - b.y) ** 2))[0];
+                  let distance = Math.sqrt((target.x - closest.x) ** 2 + (target.y - closest.y) ** 2);
+                  target = closest;
+                  damage = tower.strength * ((tower.bossBonus && target.boss) ? 1.5 : 1);
+                  target.hit(damage, tower);
+                  bouncePath.push(target);
+                  close = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < 100 && !bouncePath.includes(enemy));
+                  bouncesLeft--;
+                }
               }
               if (tower.explosionSize) {
                 //Create an explosion centered around the target enemy
@@ -1027,7 +1040,8 @@
             if (mapArr[i] == "right") enemy.x += 1;
             if (mapArr[i] == "left") enemy.x -= 1;
             if (mapArr[i] == "down") enemy.y += 1;
-            if (mapArr[i] == "up") enemy.y -= 1;img = enemy.type.boss && (mapArr[i] == "right" || mapArr[i] == "left") ? img = enemy.type.imgRotated : enemy.type.img; //If the enemy is a boss and moving horizontally, rotate it
+            if (mapArr[i] == "up") enemy.y -= 1;
+            img = enemy.type.boss && (mapArr[i] == "right" || mapArr[i] == "left") ? img = enemy.type.imgRotated : enemy.type.img; //If the enemy is a boss and moving horizontally, rotate it
           }
           if (!enemy.visible) ctx.globalAlpha = 0.25; //If the enemy is hidden, make it semitransparent
           ctx.drawImage(img, enemy.x - 40, enemy.y - 40);

@@ -272,14 +272,14 @@
         name: "Slowing Tower",
         color: "var(--light-purple)",
         description: "Weaker attacks, but hits slow down enemies for 10 seconds.",
-        range: 3.25,
-        speed: 0.75,
+        range: 3.18,
+        speed: 0.68,
         strength: 0.75,
         slowing: true,
         price: 20,
         extra1: {
           description: "Slowing affects enemies permanently.",
-          price: 12,
+          price: 35,
           add: function() {
             this.permSlow = true;
           }
@@ -334,7 +334,7 @@
         name: "Cannon Tower",
         color: "var(--light-orange)",
         description: "Every hit creates an explosion that damages nearby enemies.",
-        range: 3.25,
+        range: 3.4,
         speed: 0.72,
         strength: 2,
         price: 75,
@@ -369,8 +369,8 @@
         name: "Money Tower",
         color: "var(--light-green)",
         description: "Gets 5× as much money from hitting enemies.",
-        range: 3.5,
-        speed: 0.85,
+        range: 3.32,
+        speed: 0.88,
         strength: 1.5,
         extraMoney: true,
         price: 100,
@@ -401,8 +401,8 @@
         color: "var(--light-cyan)",
         large: true,
         description: "Moves back and forth above the track. Has a large range and attacks quickly.",
-        range: 3.75,
-        speed: 3,
+        range: 3.61,
+        speed: 2.79,
         strength: 1,
         movable: true,
         price: 100,
@@ -411,8 +411,6 @@
           price: 25,
           add: function() {
             this.fifthExplode = true;
-            this.nextExplosion = 5;
-            ////
           }
         },
         extra2: {
@@ -435,8 +433,8 @@
         color: "var(--light-red)",
         large: true,
         description: "Can rapidly destroy many enemies across a wide range.",
-        range: 4.5,
-        speed: 9.3,
+        range: 4.65,
+        speed: 9.38,
         strength: 2,
         price: 250,
         extra1: {
@@ -449,12 +447,18 @@
         extra2: {
           description: "Attack power is slightly increased for each enemy on the screen.",
           price: 80,
-          add: function() {}
+          add: function() {
+            this.crowdBoost = true;
+          }
         },
         ability: {
           description: "All towers get double range, speed, and strength for 10 seconds.",
           price: 300,
-          use: function() {}
+          use: function() {
+            towers.forEach(tower => {
+              if (tower) tower.ultimateBoost = 250; ////
+            });
+          }
         }
       }
     };
@@ -466,7 +470,7 @@
       };
 
       towerTypes[type].img = new Image();
-      towerTypes[type].img.src = `../static/img/towerdefense/${type}.png`;
+      towerTypes[type].img.src = `../static/img/towerdefense/${type}${type == "air" ? "-b" : ""}.png`;
       towerTypes[type].activeImg = new Image();
       towerTypes[type].activeImg.src = `../static/img/towerdefense/${type}-active.png`;
     }
@@ -487,7 +491,6 @@
       red: {
         speed: 2.5,
         health: 4,
-        color: "red"
       },
       purple: {
         speed: 4,
@@ -535,39 +538,38 @@
 
             let menu = document.createElement("div");
             menu.classList.add("menu");
-            ////update buttons when enemy defeated
             menu.innerHTML = `
               <h1>${type.name}</h1>
 
 
-              <h2><span id="${this.i}-sell" class="splitButton sellButton">
+              <h2><span id="sell" class="splitButton sellButton">
                 <span class="buttonLeft">Sell</span><span class="buttonRight">+$${this.sellValue}</span>
               </span></h2>
 
-              <h2 id="${this.i}-range">
-                Range: ${this.range}
-                <span class="splitButton ${(player.money <= this.upgradePrice("range")) ? "unselectable" : ""}">
-                  <span class="buttonLeft">→&nbsp;${this.range + 1}</span><span class="buttonRight">${this.upgradePrice("range") ? "$" + this.upgradePrice("range") : "Max"}</span>
+              <h2>
+                Range: ${Math.round(this.range * 100) / 100}
+                <span id="range" class="splitButton ${(player.money < this.upgradePrice("range")) ? "unselectable" : ""}">
+                  <span class="buttonLeft">→&nbsp;${Math.round(this.range * 1.25 * 100) / 100}</span><span class="buttonRight">${this.upgradePrice("range") ? "$" + this.upgradePrice("range") : "Max"}</span>
                 </span>
               </h2>
 
-              <h2 id="${this.i}-speed">
-                Speed: ${this.speed}
-                <span class="splitButton ${(player.money <= this.upgradePrice("speed")) ? "unselectable" : ""}">
-                  <span class="buttonLeft">→&nbsp;${this.speed * 2}</span><span class="buttonRight">${this.upgradePrice("speed") ? "$" + this.upgradePrice("speed") : "Max"}</span>
+              <h2>
+                Speed: ${Math.round(this.speed * 100) / 100}
+                <span id="speed" class="splitButton ${(player.money < this.upgradePrice("speed")) ? "unselectable" : ""}">
+                  <span class="buttonLeft">→&nbsp;${Math.round(this.speed * 1.5 * 100) / 100}</span><span class="buttonRight">${this.upgradePrice("speed") ? "$" + this.upgradePrice("speed") : "Max"}</span>
                 </span>
               </h2>
 
-              <h2 id="${this.i}-strength">
-                Strength: ${this.strength}
-                <span class="splitButton ${(player.money <= this.upgradePrice("strength")) ? "unselectable" : ""}">
-                  <span class="buttonLeft">→&nbsp;${this.strength * 2}</span><span class="buttonRight">${this.upgradePrice("strength") ? "$" + this.upgradePrice("strength") : "Max"}</span>
+              <h2>
+                Strength: ${Math.round(this.strength * 100) / 100}
+                <span id="strength" class="splitButton ${(player.money < this.upgradePrice("strength")) ? "unselectable" : ""}">
+                  <span class="buttonLeft">→&nbsp;${Math.round(this.strength * 2 * 100) / 100}</span><span class="buttonRight">${this.upgradePrice("strength") ? "$" + this.upgradePrice("strength") : "Max"}</span>
                 </span>
               </h2>
 
               <h2>
                 Extra ${this.extra1.bought ? "2" : "1"}
-                <span id="${this.i}-extra" class="splitButton ${(player.money <= this.nextExtra.price) ? "unselectable" : ""}">
+                <span id="extra" class="splitButton ${(player.money < this.nextExtra.price) ? "unselectable" : ""}">
                   <span class="buttonLeft">Add</span><span class="buttonRight">$${this.nextExtra.price}</span>
                 </span>
               </h2>
@@ -575,7 +577,7 @@
 
               <h2>
                 Ability
-                <span id="${this.i}-ability" class="splitButton ${(player.money <= this.ability.price) ? "unselectable" : ""}">
+                <span id="ability" class="splitButton ${(player.money < this.ability.price) ? "unselectable" : ""}">
                   <span class="buttonLeft">Unlock</span><span class="buttonRight">$${this.ability.price}</span>
                 </span>
               </h2>
@@ -603,38 +605,41 @@
               menu.style.top = this.y / 1080 * 100 + 10 + "%";
             }
 
-            document.getElementById(this.i + "-sell").onclick = () => {
+            document.getElementById("sell").onclick = () => {
               towers[this.i] = null;
               player.money += this.sellValue;
               let row = Math.floor(this.y / 60);
               let col = Math.floor(this.x / 60);
               grid[row][col] = null; //Reset the grid square
               menu.remove();
+              let squareEl = document.getElementById("r" + row + "c" + col);
+              squareEl.classList.remove("tower");
+              squareEl.onclick = null;
               this.menuOpen = false;
             };
-            document.getElementById(this.i + "-range").onclick = () => {
+            document.getElementById("range").onclick = () => {
               if (this.upgrades.range < 2 && player.money >= this.upgradePrice("range")) {
                 this.upgrades.xyz = 123;
                 player.money -= this.upgradePrice("range");
                 this.value += this.upgradePrice("range");
                 this.upgrades.range++;
-                this.range += 1;
+                this.range *= 1.25;
                 //Update the menu
                 menu.remove();
                 this.showMenu();
               }
             };
-            document.getElementById(this.i + "-speed").onclick = () => {
+            document.getElementById("speed").onclick = () => {
               if (this.upgrades.speed < 2 && player.money >= this.upgradePrice("speed")) {
                 player.money -= this.upgradePrice("speed");
                 this.value += this.upgradePrice("speed");
                 this.upgrades.speed++;
-                this.speed *= 2;
+                this.speed *= 1.5;
                 menu.remove();
                 this.showMenu();
               }
             };
-            document.getElementById(this.i + "-strength").onclick = () => {
+            document.getElementById("strength").onclick = () => {
               if (this.upgrades.strength < 2 && player.money >= this.upgradePrice("strength")) {
                 player.money -= this.upgradePrice("strength");
                 this.value += this.upgradePrice("strength");
@@ -644,7 +649,7 @@
                 this.showMenu();
               }
             };
-            document.getElementById(this.i + "-extra").onclick = () => {
+            document.getElementById("extra").onclick = () => {
               if (!this.extra2.bought && player.money >= this.nextExtra.price) {
                 player.money -= this.nextExtra.price;
                 this.value += this.nextExtra.price;
@@ -654,7 +659,7 @@
                 this.showMenu();
               }
             };
-            document.getElementById(this.i + "-ability").onclick = () => {
+            document.getElementById("ability").onclick = () => {
                 if (!this.ability.bought && player.money >= this.ability.price) {
                 player.money -= this.ability.price;
                 this.value += this.ability.price;
@@ -664,13 +669,17 @@
               }
             };
 
-            document.getElementById("grid").onmousedown = () => {
+            this.closeMenu = () => {
               menu.remove();
               this.menuOpen = false;
-            };
+            }
+            document.getElementById("grid").onmousedown = this.closeMenu;
+            document.onkeydown = e => {
+              if (e.key == "Escape") this.closeMenu();
+            }
           }
         }
-        this.upgradePrice = (stat) => (this.upgrades[stat] == 2) ? null : this.price * ((this.upgrades[stat] == 1) ? 5 : 2);
+        this.upgradePrice = (stat) => (this.upgrades[stat] == 2) ? null : this.price * ((this.upgrades[stat] == 1) ? 3 : 1);
       }
 
       get sellValue() {
@@ -730,9 +739,14 @@
               this.abilities.push("shield");
               break;
           }
-        this.id = Math.random(); //Give the enemy a random ID so that no two objects are identical
+        this.id = Math.random(); //Give the enemy a random ID so that no two enemy objects are identical
         this.distance = 0;
-        this.visible = !this.abilities.includes("blink");
+        if (this.abilities.includes("blink")) {
+          this.visible = !!(blinkingCount % 2); //Every other blinking enemy will start off invisible
+          blinkingCount++;
+        } else {
+          this.visible = true;
+        }
         this.slowed = 0;
         this.hit = function(damage, tower, explosion) {
           if (this.stunned) damage *= 2;
@@ -742,18 +756,19 @@
             player.money += (this.type.boss ? 10 : 1) * (tower?.extraMoney ? 5 : 1);
             if (this.abilities.includes("split")) {
               let type;
-              switch (this.type.color) {
-                case "yellow":
+              switch (this.type) {
+                ////boss
+                case enemyTypes.yellow:
                   type = "g";
                   break;
-                case "orange":
+                case enemyTypes.orange:
                   type = "y";
                   break;
-                case "red":
+                case enemyTypes.red:
                   type = "o";
                   break;
-                case "purple":
-                case "brown":
+                case enemyTypes.purple:
+                case enemyTypes.brown:
                   type = "r";
               }
               let new1 = new Enemy(type);
@@ -938,7 +953,7 @@
           }
           next = waves[currentWave][currentEnemy];
         }
-        //Display next enemy
+        //Add next enemy
         if (next) {
           let newEnemy = new Enemy(next);
           enemies.push(newEnemy);
@@ -952,9 +967,7 @@
             if (enemies.length) {
               waves[currentWave + 1] = [null];
             } else {
-              if (!Object.values(towerTypes).find(tower => tower.dragging)) alert("Congratulations! You have completed the game.");
-              localStorage.setItem("tdComplete", "true");
-              endGame();
+              endGame(true);
             }
           }
           currentWave++;
@@ -984,6 +997,7 @@
               let strongest = inRange.sort((a, b) => b.type.health - a.type.health)[0]; //Sort inRange from highest to lowest health and get the first item
               let target = (tower.range == Infinity) ? strongest : furthest;
               let damage = tower.strength * ((tower.bossBonus && target.boss) ? 1.5 : 1);
+              if (tower.crowdBoost) damage *= 1 + enemies.length / 100;
               target.hit(damage, tower);
               if (tower.slowing && !target.abilities.includes("acceleration")) target.slowed = tower.permSlow ? Infinity : 250;
               if (tower.abilityBlocking && !target.abilities.includes("acceleration")) {
@@ -1004,6 +1018,7 @@
                   bouncesLeft--;
                 }
               }
+              if (tower.nextExplosion === 0) tower.explosionSize = 50;
               if (tower.explosionSize) {
                 //Create an explosion centered around the target enemy
                 let inExplosion = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < tower.explosionSize);
@@ -1016,6 +1031,12 @@
               }
               ctx.drawImage(tower.activeImg, tower.x - 30, tower.y - 30);
               tower.cooldown += 25 / tower.speed;
+            }
+            if (tower.nextExplosion) {
+              tower.nextExplosion--;
+            } else if (tower.nextExplosion === 0) {
+              delete tower.explosionSize;
+              tower.nextExplosion = 5;
             }
           }
 
@@ -1055,7 +1076,11 @@
           enemy.health += 1 / 75;
           if (enemy.health > enemy.type.health) enemy.health = enemy.type.health;
         }
-        if (!(frame % 25) && enemy.abilities.includes("blink")) enemy.visible = !enemy.visible;
+        if (enemy.abilities.includes("blink")) {
+          if (!(frame % 25)) enemy.visible = !enemy.visible;
+        } else {
+          enemy.visible = true;
+        }
         if (enemy.noAbilities) enemy.visible = true; ////alternate
 
         if (enemy.noAbilities) enemy.noAbilities--;
@@ -1141,6 +1166,15 @@
       if (!(frame % 250)) player.money += player.bonusMoney;
       if (!(frame % 375)) player.lives += player.bonusLives;
 
+      let menuTower = towers.find(tower => tower?.menuOpen);
+      if (menuTower) {
+        if (player.money >= menuTower.upgradePrice("range")) document.getElementById("range").classList.remove("unselectable");
+        if (player.money >= menuTower.upgradePrice("speed")) document.getElementById("speed").classList.remove("unselectable");
+        if (player.money >= menuTower.upgradePrice("strength")) document.getElementById("strength").classList.remove("unselectable");
+        if (player.money >= menuTower.nextExtra.price) document.getElementById("extra").classList.remove("unselectable");
+        if (player.money >= menuTower.ability.price) document.getElementById("ability").classList.remove("unselectable");
+      }
+
       //Update text in top-right
       ctx.font = "30px monospace";
       ctx.textAlign = "left";
@@ -1166,6 +1200,7 @@
       bonusLives: 0
     };
     let enemies = [];
+    let blinkingCount = 0; //Keep track of blinking enemies to alternate between visible and invisible
     let towers = [];
     let frame = 0;
     let currentWave = 0;
@@ -1259,7 +1294,9 @@
       this.onclick = null;
     };
 
-    function endGame() {
+    function endGame(complete) {
+      if (complete) localStorage.setItem("tdComplete", "true");
+      ////close menu
       clearInterval(animate);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       document.getElementById("grid").classList.add("hidden");
@@ -1267,10 +1304,10 @@
       ctx.fillStyle = "white";
       ctx.font = "128px Segoe UI";
       ctx.textAlign = "center";
-      ctx.fillText("Game over", 960, 300);
+      ctx.fillText(complete ? "Congratulations!" : "Game over", 960, 300);
       ctx.font = "64px Segoe UI";
       ctx.fillStyle = "#80ffff";
-      ctx.fillText(`Time: ${Math.floor(seconds / 60)}:${seconds % 60 < 10 ? "0" + seconds % 60 : seconds % 60}`, 960, 500);
+      ctx.fillText(complete ? "You have completed the game." : `Time: ${Math.floor(seconds / 60)}:${seconds % 60 < 10 ? "0" + seconds % 60 : seconds % 60}`, 960, 500);
       ctx.font = "48px Segoe UI";
       ctx.fillStyle = "white";
       ctx.fillText("Click to play again", 960, 800);

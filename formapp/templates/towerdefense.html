@@ -272,7 +272,7 @@
         name: "Slowing Tower",
         color: "var(--light-purple)",
         description: "Weaker attacks, but hits slow down enemies for 10 seconds.",
-        range: 3.18,
+        range: 3.28,
         speed: 0.68,
         strength: 0.75,
         slowing: true,
@@ -410,21 +410,29 @@
           description: "Every fifth hit creates a small explosion.",
           price: 25,
           add: function() {
-            this.fifthExplode = true;
+            this.nextExplosion = 5;
           }
         },
         extra2: {
           description: "Whatever tower is closest to the tower's base will get a range boost.",
           price: 50,
           add: function() {
-
+            this.rangeBoosting = true;
+            ////
           }
         },
         ability: {
-          description: "A highly powerful plane will fly over the track, starting at the exit.",
-          price: 200,
+          description: "A highly powerful plane will fly over the track, starting from the exit.",
+          price: 300,
           use: function() {
-
+            superPlane = {
+              x: 0,
+              y: 0,
+              distance: 0,
+              range: 3.97,
+              speed: 12.57,
+              strength: 8.5
+            }
           }
         }
       },
@@ -438,17 +446,17 @@
         strength: 2,
         price: 250,
         extra1: {
-          description: "Does extra damage to boss enemies.",
-          price: 100,
-          add: function() {
-            this.bossBonus = true;
-          }
-        },
-        extra2: {
           description: "Attack power is slightly increased for each enemy on the screen.",
           price: 80,
           add: function() {
-            this.crowdBoost = true;
+            this.crowdBonus = true;
+          }
+        },
+        extra2: {
+          description: "Does 5× damage to boss enemies.",
+          price: 400,
+          add: function() {
+            this.bossBonus = true;
           }
         },
         ability: {
@@ -514,9 +522,17 @@
     for (let type in enemyTypes) {
       enemyTypes[type].img = new Image();
       enemyTypes[type].img.src = `../static/img/towerdefense/${type}.png`;
+      if (type != "green" && type != "superBoss") {
+        enemyTypes[type].imgSplit = new Image();
+        enemyTypes[type].imgSplit.src = `../static/img/towerdefense/${type}-split.png`;
+      }
       if (enemyTypes[type].boss) {
         enemyTypes[type].imgRotated = new Image();
         enemyTypes[type].imgRotated.src = `../static/img/towerdefense/${type}-r.png`;
+        if (type == "boss") {
+          enemyTypes[type].imgSplitRotated = new Image();
+          enemyTypes[type].imgSplitRotated.src = `../static/img/towerdefense/${type}-split-r.png`;
+        }
       }
     }
 
@@ -530,6 +546,25 @@
         this.value = type.price;
         this.x = col * 60 + 30;
         this.y = row * 60 + 30;
+        if (type.name == "Air Tower") {
+          this.planeInitialX = map.start[0] * 60;
+          this.planeInitialY = map.start[1] * 60;
+          switch (map.lines[0][0]) {
+            case "right":
+              this.planeInitialX += 60;
+              break;
+            case "left":
+              this.planeInitialX -= 60;
+              break;
+            case "down":
+              this.planeInitialY += 60;
+              break;
+            case "up":
+              this.planeInitialY -= 60;
+              break;
+          }
+          this.planeDistance = 0;
+        }
         this.i = towers.length;
         this.cooldown = 0;
         this.showMenu = function() {
@@ -687,13 +722,13 @@
       }
 
       get nextExtra() {
-        return this.extra2.bought ? null : (this.extra1.bought ? this.extra2 : this.extra1);
+        return this.extra2.bought ? {} : (this.extra1.bought ? this.extra2 : this.extra1);
       }
     }
 
     class Enemy {
       constructor(string) {
-        switch(string[0]) {
+        switch (string[0]) {
           case "g":
             this.type = enemyTypes.green;
             break;
@@ -722,7 +757,7 @@
         this.speed = this.type.speed;
         this.health = this.type.health;
         this.abilities = [];
-          switch(string[1]) {
+          switch (string[1]) {
             case "h":
               this.abilities.push("healing");
               break;
@@ -743,6 +778,7 @@
         this.distance = 0;
         if (this.abilities.includes("blink")) {
           this.visible = !!(blinkingCount % 2); //Every other blinking enemy will start off invisible
+          this.startingVisibility = this.visible;
           blinkingCount++;
         } else {
           this.visible = true;
@@ -750,32 +786,44 @@
         this.slowed = 0;
         this.hit = function(damage, tower, explosion) {
           if (this.stunned) damage *= 2;
+          console.log(tower.name);
           if (!this.abilities.includes("shield") || explosion || tower.name == "Long Range Tower") this.health -= damage;
           if (this.health <= 0) {
             let i = enemies.indexOf(this);
             player.money += (this.type.boss ? 10 : 1) * (tower?.extraMoney ? 5 : 1);
             if (this.abilities.includes("split")) {
               let type;
-              switch (this.type) {
-                ////boss
-                case enemyTypes.yellow:
-                  type = "g";
-                  break;
-                case enemyTypes.orange:
-                  type = "y";
-                  break;
-                case enemyTypes.red:
-                  type = "o";
-                  break;
-                case enemyTypes.purple:
-                case enemyTypes.brown:
-                  type = "r";
+              if (this.type == enemyTypes.boss) {
+                let new1 = new Enemy("p");
+                let new2 = new Enemy("p");
+                let new3 = new Enemy("b");
+                let new4 = new Enemy("b");
+                new1.distance = this.distance;
+                new2.distance = this.distance - 20;
+                new3.distance = this.distance - 40;
+                new4.distance = this.distance - 60;
+                enemies.splice(i, 1, new1, new2, new3, new4);
+              } else {
+                switch (this.type) {
+                  case enemyTypes.yellow:
+                    type = "g";
+                    break;
+                  case enemyTypes.orange:
+                    type = "y";
+                    break;
+                  case enemyTypes.red:
+                    type = "o";
+                    break;
+                  case enemyTypes.purple:
+                  case enemyTypes.brown:
+                    type = "r";
+                }
+                let new1 = new Enemy(type);
+                let new2 = new Enemy(type);
+                new1.distance = this.distance;
+                new2.distance = this.distance - 20;
+                enemies.splice(i, 1, new1, new2);
               }
-              let new1 = new Enemy(type);
-              let new2 = new Enemy(type);
-              new1.distance = this.distance;
-              new2.distance = this.distance - 20;
-              enemies.splice(i, 1, new1, new2);
             } else {
               enemies.splice(i, 1); //Remove the enemy
             }
@@ -863,6 +911,22 @@
       acceleration: new Image()
     };
     for (let symbol in abilitySymbols) abilitySymbols[symbol].src = `../static/img/towerdefense/${symbol}.png`;
+
+    let planes = {
+      left: new Image(),
+      right: new Image(),
+      up: new Image(),
+      down: new Image(),
+    };
+    for (let plane in planes) planes[plane].src = `../static/img/towerdefense/superPlane-${plane}.png`;
+
+    let superPlanes = {
+      left: new Image(),
+      right: new Image(),
+      up: new Image(),
+      down: new Image(),
+    };
+    for (let plane in superPlanes) superPlanes[plane].src = `../static/img/towerdefense/superPlane-${plane}.png`;
 
     let canvas = document.getElementById("game");
     let ctx = canvas.getContext("2d");
@@ -979,10 +1043,39 @@
         if (tower) {
           ctx.drawImage(tower.img, tower.x - 30, tower.y - 30);
 
+          if (tower.name == "Air Tower") {
+            tower.planeDistance += 8;
+            tower.planeX = tower.planeInitialX;
+            tower.planeY = tower.planeInitialY;
+            let img;
+            for (let i = 0; i < Math.round(tower.planeDistance); i++) {
+              let j = i;
+              while (j >= planePathArr.length) j -= planePathArr.length;
+              switch (planePathArr[j]) {
+                case "right":
+                  tower.planeX++;
+                  break;
+                case "left":
+                  tower.planeX--;
+                  break;
+                case "down":
+                  tower.planeY++;
+                  break;
+                case "up":
+                  tower.planeY--;
+                  break;
+              }
+              img = planes[planePathArr[j]];
+            }
+            ctx.drawImage(img, tower.planeX - 30, tower.planeY - 30);
+          }
+
           if (tower.menuOpen) {
             ctx.strokeStyle = "white";
             ctx.fillStyle = "#aaa5";
-            ctx.drawCircle(tower.x, tower.y, tower.range * 60);
+            let x = (tower.name == "Air Tower") ? tower.planeX : tower.x;
+            let y = (tower.name == "Air Tower") ? tower.planeY : tower.y;
+            ctx.drawCircle(x, y, tower.range * 60);
           }
 
           if (tower.ability.cooldown) tower.ability.cooldown--;
@@ -990,14 +1083,19 @@
           if (tower.cooldown > 1) {
             tower.cooldown -= tower.speedBoost ? 5 : 1;
           } else {
-            let inRange = enemies.filter(enemy => Math.sqrt((tower.x - enemy.x) ** 2 + (tower.y - enemy.y) ** 2) < tower.range * 60); //Use the Pythagorean Theorem to determine if each enemy is inside the tower's range
+            let x = (tower.name == "Air Tower") ? tower.planeX : tower.x;
+            let y = (tower.name == "Air Tower") ? tower.planeY : tower.y;
+            let range = tower.range;
+            if (tower.rangeBoost) range *= 1.25;
+            if (tower.ultimateBoost) range *= 2;
+            let inRange = enemies.filter(enemy => Math.sqrt((x - enemy.x) ** 2 + (y - enemy.y) ** 2) < tower.range * 60); //Use the Pythagorean Theorem to determine if each enemy is inside the tower's range
             if (!tower.seeInvisible) inRange = inRange.filter(enemy => enemy.visible);
             if (inRange.length) {
               let furthest = inRange.sort((a, b) => b.distance - a.distance)[0]; //Sort inRange from highest to lowest distance and get the first item
-              let strongest = inRange.sort((a, b) => b.type.health - a.type.health)[0]; //Sort inRange from highest to lowest health and get the first item
+              let strongest = inRange.sort((a, b) => b.type.health - a.type.health)[0]; //Sort inRange from highest to lowest health and get the first item ////target shield first
               let target = (tower.range == Infinity) ? strongest : furthest;
-              let damage = tower.strength * ((tower.bossBonus && target.boss) ? 1.5 : 1);
-              if (tower.crowdBoost) damage *= 1 + enemies.length / 100;
+              let damage = tower.strength * ((tower.bossBonus && target.boss) ? 5 : 1);
+              if (tower.crowdBonus) damage *= 1 + enemies.length / 100;
               target.hit(damage, tower);
               if (tower.slowing && !target.abilities.includes("acceleration")) target.slowed = tower.permSlow ? Infinity : 250;
               if (tower.abilityBlocking && !target.abilities.includes("acceleration")) {
@@ -1011,14 +1109,14 @@
                   let closest = close.sort((a, b) => ((target.x - a.x) ** 2 + (target.y - a.y) ** 2) - ((target.x - b.x) ** 2 + (target.y - b.y) ** 2))[0];
                   let distance = Math.sqrt((target.x - closest.x) ** 2 + (target.y - closest.y) ** 2);
                   target = closest;
-                  damage = tower.strength * ((tower.bossBonus && target.boss) ? 1.5 : 1);
+                  damage = tower.strength;
                   target.hit(damage, tower);
                   bouncePath.push(target);
                   close = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < 100 && !bouncePath.includes(enemy));
                   bouncesLeft--;
                 }
               }
-              if (tower.nextExplosion === 0) tower.explosionSize = 50;
+              if (tower.nextExplosion === 0) tower.explosionSize = 75;
               if (tower.explosionSize) {
                 //Create an explosion centered around the target enemy
                 let inExplosion = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < tower.explosionSize);
@@ -1029,20 +1127,46 @@
                 ctx.fillStyle = "#ff8f4055";
                 ctx.drawCircle(target.x, target.y, tower.explosionSize);
               }
+              if (tower.nextExplosion) {
+                tower.nextExplosion--;
+              } else if (tower.nextExplosion === 0) {
+                delete tower.explosionSize;
+                tower.nextExplosion = 5;
+              }
               ctx.drawImage(tower.activeImg, tower.x - 30, tower.y - 30);
               tower.cooldown += 25 / tower.speed;
-            }
-            if (tower.nextExplosion) {
-              tower.nextExplosion--;
-            } else if (tower.nextExplosion === 0) {
-              delete tower.explosionSize;
-              tower.nextExplosion = 5;
             }
           }
 
           if (tower.speedBoost) tower.speedBoost--;
         }
       });
+
+      if (superPlane) {
+        superPlane.distance += 8;
+        superPlane.x = tower.initialX;
+        superPlane.y = tower.initialY;
+        let img;
+        for (let i = mapArr.length - 1; i < Math.round(tower.planeDistance); i--) {
+          ////Move from end to start
+          switch (mapArr[i]) {
+            case "right":
+              superPlane.x++;
+              break;
+            case "left":
+              superPlane.x--;
+              break;
+            case "down":
+              superPlane.y++;
+              break;
+            case "up":
+              superPlane.y--;
+              break;
+          }
+          img = superPlanes[planePathArr[i]];
+        }
+        ctx.drawImage(img, superPlane.x - 30, superPlane.y - 30);
+      }
 
       enemies.forEach((enemy, i) => {
         //If enemy is offscreen, subtract a life and remove it from the array
@@ -1058,11 +1182,25 @@
           enemy.y = map.start[1] * 60;
           let img;
           for (let i = 0; i < Math.round(enemy.distance); i++) {
-            if (mapArr[i] == "right") enemy.x += 1;
-            if (mapArr[i] == "left") enemy.x -= 1;
-            if (mapArr[i] == "down") enemy.y += 1;
-            if (mapArr[i] == "up") enemy.y -= 1;
-            img = enemy.type.boss && (mapArr[i] == "right" || mapArr[i] == "left") ? img = enemy.type.imgRotated : enemy.type.img; //If the enemy is a boss and moving horizontally, rotate it
+            switch (mapArr[i]) {
+              case "right":
+                enemy.x++;
+                break;
+              case "left":
+                enemy.x--;
+                break;
+              case "down":
+                enemy.y++;
+                break;
+              case "up":
+                enemy.y--;
+                break;
+            }
+            if (enemy.abilities.includes("split")) {
+              img = (enemy.type.boss && (mapArr[i] == "right" || mapArr[i] == "left")) ? enemy.type.imgSplitRotated : enemy.type.imgSplit; //If the enemy is a boss and moving horizontally, rotate it
+            } else {
+              img = (enemy.type.boss && (mapArr[i] == "right" || mapArr[i] == "left")) ? enemy.type.imgRotated : enemy.type.img;
+            }
           }
           if (!enemy.visible) ctx.globalAlpha = 0.25; //If the enemy is hidden, make it semitransparent
           ctx.drawImage(img, enemy.x - 40, enemy.y - 40);
@@ -1194,7 +1332,7 @@
     }
 
     let player = {
-      money: 50,
+      money: 500,
       lives: 100,
       bonusMoney: 0,
       bonusLives: 0
@@ -1205,6 +1343,7 @@
     let frame = 0;
     let currentWave = 0;
     let currentEnemy = 0;
+    let superPlane;
     let seconds = 0;
     let paused = false;
     let fastForward = false;
@@ -1241,6 +1380,26 @@
     map.lines.forEach(line => {
       for (let i = 0; i < line[1] * 60; i++) mapArr.push(line[0]);
     });
+
+    let planePathArr = mapArr.slice(60, -60); //Remove start and end for plane path
+    //Make the plane return to the start once it reaches the end
+    for (let i = planePathArr.length - 1; i >= 0; i--) {
+      switch (planePathArr[i]) {
+        case "right":
+          planePathArr.push("left");
+          break;
+        case "left":
+          planePathArr.push("right");
+          break;
+        case "down":
+          planePathArr.push("up");
+          break;
+        case "up":
+          planePathArr.push("down");
+          break;
+      }
+    };
+
 
     ctx.fillStyle = "white";
     ctx.font = "128px Segoe UI";
@@ -1296,7 +1455,9 @@
 
     function endGame(complete) {
       if (complete) localStorage.setItem("tdComplete", "true");
-      ////close menu
+      //If a tower has a menu open, close it
+      let menuTower = towers.find(tower => tower?.menuOpen);
+      menuTower?.closeMenu();
       clearInterval(animate);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       document.getElementById("grid").classList.add("hidden");

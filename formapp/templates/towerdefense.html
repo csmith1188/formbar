@@ -147,6 +147,14 @@
     background: var(--color-red);
   }
 
+  .bought .buttonLeft {
+  border-radius: 4px;
+  }
+
+  .bought .buttonRight {
+    display: none;
+  }
+
   h1 {
     margin: 0 0 4% 0;
     font-size: 150%;
@@ -261,7 +269,7 @@
           }
         },
         ability: {
-          description: "All basic towers attack 5× as fast for 10 seconds.",
+          description: "All Basic Towers attack 5× as fast for 10 seconds.",
           price: 75,
           use: function() {
             towers.filter(tower => tower.name == "Basic Tower").forEach(tower => tower.speedBoost = 250);
@@ -309,7 +317,7 @@
         price: 60,
         extra1: {
           description: "Can hit blinking enemies while they are hidden.",
-          price: 25,
+          price: 15,
           add: function() {
             this.superVision = true;
           }
@@ -398,7 +406,7 @@
       },
       air: {
         name: "Air Tower",
-        color: "var(--light-cyan)",
+        color: "var(--light-blue)",
         large: true,
         description: "Moves back and forth above the track. Has a large range and attacks quickly.",
         range: 3.61,
@@ -418,20 +426,37 @@
           price: 50,
           add: function() {
             this.rangeBoosting = true;
-            ////
           }
         },
         ability: {
           description: "A highly powerful plane will fly over the track, starting from the exit.",
           price: 300,
           use: function() {
+            let initialX = map.start[0] * 60;
+            let initialY = map.start[1] * 60;
+            mapArr.forEach(direction => {
+              switch (direction) {
+                case "right":
+                  initialX++;
+                  break;
+                case "left":
+                  initialX--;
+                  break;
+                case "down":
+                  initialY++;
+                  break;
+                case "up":
+                  initialY--;
+                  break;
+              }
+            });
             superPlane = {
-              x: 0,
-              y: 0,
+              initialX: initialX,
+              initialY: initialY,
               distance: 0,
               range: 3.97,
               speed: 12.57,
-              strength: 8.5
+              strength: 3.5
             }
           }
         }
@@ -464,7 +489,7 @@
           price: 300,
           use: function() {
             towers.forEach(tower => {
-              if (tower) tower.ultimateBoost = 250; ////
+              if (tower) tower.ultimateBoost = 250;
             });
           }
         }
@@ -479,6 +504,8 @@
 
       towerTypes[type].img = new Image();
       towerTypes[type].img.src = `../static/img/towerdefense/${type}${type == "air" ? "-b" : ""}.png`;
+      towerTypes[type].icon = new Image();
+      towerTypes[type].icon.src = `../static/img/towerdefense/${type}.png`;
       towerTypes[type].activeImg = new Image();
       towerTypes[type].activeImg.src = `../static/img/towerdefense/${type}-active.png`;
     }
@@ -583,42 +610,62 @@
 
               <h2>
                 Range: ${Math.round(this.range * 100) / 100}
-                <span id="range" class="splitButton ${(player.money < this.upgradePrice("range")) ? "unselectable" : ""}">
-                  <span class="buttonLeft">→&nbsp;${Math.round(this.range * 1.25 * 100) / 100}</span><span class="buttonRight">${this.upgradePrice("range") ? "$" + this.upgradePrice("range") : "Max"}</span>
+                <span id="range" class="splitButton">
+                  <span class="buttonLeft">${(this.upgrades.range == 2) ? "Max" : "→&nbsp;" + Math.round(this.range * 1.25 * 100) / 100}</span><span class="buttonRight">$${this.upgradePrice("range")}</span>
                 </span>
               </h2>
 
               <h2>
                 Speed: ${Math.round(this.speed * 100) / 100}
-                <span id="speed" class="splitButton ${(player.money < this.upgradePrice("speed")) ? "unselectable" : ""}">
-                  <span class="buttonLeft">→&nbsp;${Math.round(this.speed * 1.5 * 100) / 100}</span><span class="buttonRight">${this.upgradePrice("speed") ? "$" + this.upgradePrice("speed") : "Max"}</span>
+                <span id="speed" class="splitButton">
+                  <span class="buttonLeft">${(this.upgrades.speed == 2) ? "Max" : "→&nbsp;" + Math.round(this.speed * 1.5 * 100) / 100}</span><span class="buttonRight">$${this.upgradePrice("speed")}</span>
                 </span>
               </h2>
 
               <h2>
                 Strength: ${Math.round(this.strength * 100) / 100}
-                <span id="strength" class="splitButton ${(player.money < this.upgradePrice("strength")) ? "unselectable" : ""}">
-                  <span class="buttonLeft">→&nbsp;${Math.round(this.strength * 2 * 100) / 100}</span><span class="buttonRight">${this.upgradePrice("strength") ? "$" + this.upgradePrice("strength") : "Max"}</span>
+                <span id="strength" class="splitButton">
+                  <span class="buttonLeft">${(this.upgrades.strength == 2) ? "Max" : "→&nbsp;" + Math.round(this.strength * 2 * 100) / 100}</span><span class="buttonRight">$${this.upgradePrice("strength")}</span>
                 </span>
               </h2>
 
               <h2>
                 Extra ${this.extra1.bought ? "2" : "1"}
-                <span id="extra" class="splitButton ${(player.money < this.nextExtra.price) ? "unselectable" : ""}">
-                  <span class="buttonLeft">Add</span><span class="buttonRight">$${this.nextExtra.price}</span>
+                <span id="extra" class="splitButton">
+                  <span class="buttonLeft">${this.extra2.bought ? "Bought" : "Add"}</span><span class="buttonRight">$${this.nextExtra.price}</span>
                 </span>
               </h2>
-              ${this.nextExtra?.description || this.extra2.description}
+              ${this.nextExtra.description || this.extra2.description}
 
               <h2>
                 Ability
-                <span id="ability" class="splitButton ${(player.money < this.ability.price) ? "unselectable" : ""}">
-                  <span class="buttonLeft">Unlock</span><span class="buttonRight">$${this.ability.price}</span>
+                <span id="ability" class="splitButton">
+                  <span class="buttonLeft">${this.ability.bought ? "Bought" : "Unlock"}</span><span class="buttonRight">$${this.ability.price}</span>
                 </span>
               </h2>
               ${type.ability.description}
             `;
             document.getElementById("container").appendChild(menu);
+
+            let sellButton = document.getElementById("sell");
+            let rangeButton = document.getElementById("range");
+            let speedButton = document.getElementById("speed");
+            let strengthButton = document.getElementById("strength");
+            let extraButton = document.getElementById("extra");
+            let abilityButton = document.getElementById("ability");
+
+            if (player.money < this.upgradePrice("range")) rangeButton.classList.add("unselectable");
+            if (player.money < this.upgradePrice("speed")) speedButton.classList.add("unselectable");
+            if (player.money < this.upgradePrice("strength")) strengthButton.classList.add("unselectable");
+            if (player.money < this.nextExtra.price) extraButton.classList.add("unselectable");
+            if (player.money < this.ability.price || this.ability.bought) abilityButton.classList.add("unselectable");
+
+            if (this.upgrades.range == 2) rangeButton.classList.add("bought");
+            if (this.upgrades.speed == 2) speedButton.classList.add("bought");
+            if (this.upgrades.strength == 2) strengthButton.classList.add("bought");
+            if (this.extra2.bought) extraButton.classList.add("bought");
+            if (this.ability.bought) abilityButton.classList.add("bought");
+
             menu.style.left = this.x / 1920 * 100 + "%";
             menu.style.transform = "translateX(-50%)";
             let menuRect = menu.getBoundingClientRect();
@@ -640,7 +687,7 @@
               menu.style.top = this.y / 1080 * 100 + 10 + "%";
             }
 
-            document.getElementById("sell").onclick = () => {
+            sellButton.onclick = () => {
               towers[this.i] = null;
               player.money += this.sellValue;
               let row = Math.floor(this.y / 60);
@@ -652,7 +699,7 @@
               squareEl.onclick = null;
               this.menuOpen = false;
             };
-            document.getElementById("range").onclick = () => {
+            rangeButton.onclick = () => {
               if (this.upgrades.range < 2 && player.money >= this.upgradePrice("range")) {
                 this.upgrades.xyz = 123;
                 player.money -= this.upgradePrice("range");
@@ -664,7 +711,7 @@
                 this.showMenu();
               }
             };
-            document.getElementById("speed").onclick = () => {
+            speedButton.onclick = () => {
               if (this.upgrades.speed < 2 && player.money >= this.upgradePrice("speed")) {
                 player.money -= this.upgradePrice("speed");
                 this.value += this.upgradePrice("speed");
@@ -674,7 +721,7 @@
                 this.showMenu();
               }
             };
-            document.getElementById("strength").onclick = () => {
+            strengthButton.onclick = () => {
               if (this.upgrades.strength < 2 && player.money >= this.upgradePrice("strength")) {
                 player.money -= this.upgradePrice("strength");
                 this.value += this.upgradePrice("strength");
@@ -684,7 +731,7 @@
                 this.showMenu();
               }
             };
-            document.getElementById("extra").onclick = () => {
+            extraButton.onclick = () => {
               if (!this.extra2.bought && player.money >= this.nextExtra.price) {
                 player.money -= this.nextExtra.price;
                 this.value += this.nextExtra.price;
@@ -694,7 +741,7 @@
                 this.showMenu();
               }
             };
-            document.getElementById("ability").onclick = () => {
+            abilityButton.onclick = () => {
                 if (!this.ability.bought && player.money >= this.ability.price) {
                 player.money -= this.ability.price;
                 this.value += this.ability.price;
@@ -714,7 +761,16 @@
             }
           }
         }
-        this.upgradePrice = (stat) => (this.upgrades[stat] == 2) ? null : this.price * ((this.upgrades[stat] == 1) ? 3 : 1);
+        this.upgradePrice = stat => {
+          switch (this.upgrades[stat]) {
+            case 2:
+              return Infinity;
+            case 1:
+              return this.price * 3;
+            default:
+              return this.price;
+          }
+        }
       }
 
       get sellValue() {
@@ -722,7 +778,7 @@
       }
 
       get nextExtra() {
-        return this.extra2.bought ? {} : (this.extra1.bought ? this.extra2 : this.extra1);
+        return this.extra2.bought ? {price: Infinity} : (this.extra1.bought ? this.extra2 : this.extra1);
       }
     }
 
@@ -778,7 +834,6 @@
         this.distance = 0;
         if (this.abilities.includes("blink")) {
           this.visible = !!(blinkingCount % 2); //Every other blinking enemy will start off invisible
-          this.startingVisibility = this.visible;
           blinkingCount++;
         } else {
           this.visible = true;
@@ -786,8 +841,7 @@
         this.slowed = 0;
         this.hit = function(damage, tower, explosion) {
           if (this.stunned) damage *= 2;
-          console.log(tower.name);
-          if (!this.abilities.includes("shield") || explosion || tower.name == "Long Range Tower") this.health -= damage;
+          if (!this.abilities.includes("shield") || explosion || tower.name == "Long Range Tower") this.health -= damage; //Only Long Range Towers and explosions can damage shielded enemies
           if (this.health <= 0) {
             let i = enemies.indexOf(this);
             player.money += (this.type.boss ? 10 : 1) * (tower?.extraMoney ? 5 : 1);
@@ -918,7 +972,7 @@
       up: new Image(),
       down: new Image(),
     };
-    for (let plane in planes) planes[plane].src = `../static/img/towerdefense/superPlane-${plane}.png`;
+    for (let plane in planes) planes[plane].src = `../static/img/towerdefense/air-${plane}.png`;
 
     let superPlanes = {
       left: new Image(),
@@ -996,7 +1050,7 @@
 
       if (!(frame % 25) && frame) seconds++; //Do this every 25 frames
 
-      if (dragOver) {
+      if (dragOver && dragOver[0].name != "Air Tower") {
         ctx.strokeStyle = "white";
         ctx.fillStyle = "#aaa5";
         ctx.drawCircle(dragOver[1] * 60 + 30, dragOver[2] * 60 + 30, dragOver[0].range * 60);
@@ -1007,7 +1061,8 @@
         let next = waves[currentWave][currentEnemy];
         while (Array.isArray(next)) {
           if (next[0] == "alert") {
-            if (!Object.values(towerTypes).find(tower => tower.dragging)) alert(next[1]); //Don't show alert if a tower si being dragged. This is necessary because of an issue with the browser.
+            if (!Object.values(towerTypes).find(tower => tower.dragging)) alert(next[1]); //Don't show alert if a tower is being dragged. This is necessary because of an issue with the browser.
+            else skippedAlert = {message: next[1], time: Date.now()};
             waves[currentWave].splice(currentEnemy, 1); //Remove the array
           } else {
             let repeat = next[0]; //The array's first item is the number of times to repeat
@@ -1032,6 +1087,7 @@
               waves[currentWave + 1] = [null];
             } else {
               endGame(true);
+              return;
             }
           }
           currentWave++;
@@ -1075,32 +1131,45 @@
             ctx.fillStyle = "#aaa5";
             let x = (tower.name == "Air Tower") ? tower.planeX : tower.x;
             let y = (tower.name == "Air Tower") ? tower.planeY : tower.y;
-            ctx.drawCircle(x, y, tower.range * 60);
+            let range = tower.range;
+            if (towers.find(owned => owned?.rangeBoosted == tower)) range *= 1.25;
+            if (tower.ultimateBoost) range *= 2;
+            ctx.drawCircle(x, y, range * 60);
           }
 
           if (tower.ability.cooldown) tower.ability.cooldown--;
 
+          if (tower.rangeBoosting) {
+            let otherTowers = towers.filter(owned => owned && owned != tower && owned.range != Infinity); //Remove this tower, sold towers, and Long Range Towers
+            let closest = otherTowers.sort((a, b) => ((tower.planeX - a.x) ** 2 + (tower.planeY - a.y) ** 2) - ((tower.planeX - b.x) ** 2 + (tower.planeY - b.y) ** 2))[0];
+            tower.rangeBoosted = closest;
+          }
+
           if (tower.cooldown > 1) {
-            tower.cooldown -= tower.speedBoost ? 5 : 1;
+            let reduceCooldown = 1;
+            if (tower.speedBoost) reduceCooldown *= 5;
+            if (tower.ultimateBoost) reduceCooldown *= 2;
+            tower.cooldown -= reduceCooldown;
           } else {
             let x = (tower.name == "Air Tower") ? tower.planeX : tower.x;
             let y = (tower.name == "Air Tower") ? tower.planeY : tower.y;
             let range = tower.range;
-            if (tower.rangeBoost) range *= 1.25;
+            if (towers.find(owned => owned?.rangeBoosted == tower)) range *= 1.25; //Range boost from Air Tower
             if (tower.ultimateBoost) range *= 2;
             let inRange = enemies.filter(enemy => Math.sqrt((x - enemy.x) ** 2 + (y - enemy.y) ** 2) < tower.range * 60); //Use the Pythagorean Theorem to determine if each enemy is inside the tower's range
             if (!tower.seeInvisible) inRange = inRange.filter(enemy => enemy.visible);
             if (inRange.length) {
               let furthest = inRange.sort((a, b) => b.distance - a.distance)[0]; //Sort inRange from highest to lowest distance and get the first item
-              let strongest = inRange.sort((a, b) => b.type.health - a.type.health)[0]; //Sort inRange from highest to lowest health and get the first item ////target shield first
+              let strong = inRange.sort((a, b) => b.type.health - a.type.health); //Sort inRange from highest to lowest health
+              let strongest = strong.find(enemy => enemy.abilities.includes("shield")) || strong[0]; //Target shielded enemies
               let target = (tower.range == Infinity) ? strongest : furthest;
-              let damage = tower.strength * ((tower.bossBonus && target.boss) ? 5 : 1);
+              let damage = tower.strength;
               if (tower.crowdBonus) damage *= 1 + enemies.length / 100;
+              if (tower.bossBonus && target.boss) damage *= 5;
+              if (tower.ultimateBoost) damage *= 2;
               target.hit(damage, tower);
               if (tower.slowing && !target.abilities.includes("acceleration")) target.slowed = tower.permSlow ? Infinity : 250;
-              if (tower.abilityBlocking && !target.abilities.includes("acceleration")) {
-                target.noAbilities = tower.permSlow ? Infinity : 250;
-              }
+              if (tower.abilityBlocking && !target.abilities.includes("acceleration")) target.noAbilities = tower.permSlow ? Infinity : 250;
               if (tower.bounce) {
                 let bouncePath = [target]; //Make an array of all enemies hit so they aren't bounced to again
                 let close = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < 100 && !bouncePath.includes(enemy));
@@ -1110,6 +1179,7 @@
                   let distance = Math.sqrt((target.x - closest.x) ** 2 + (target.y - closest.y) ** 2);
                   target = closest;
                   damage = tower.strength;
+                  if (tower.ultimateBoost) damage *= 2;
                   target.hit(damage, tower);
                   bouncePath.push(target);
                   close = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < 100 && !bouncePath.includes(enemy));
@@ -1144,28 +1214,42 @@
 
       if (superPlane) {
         superPlane.distance += 8;
-        superPlane.x = tower.initialX;
-        superPlane.y = tower.initialY;
-        let img;
-        for (let i = mapArr.length - 1; i < Math.round(tower.planeDistance); i--) {
-          ////Move from end to start
-          switch (mapArr[i]) {
-            case "right":
-              superPlane.x++;
-              break;
-            case "left":
-              superPlane.x--;
-              break;
-            case "down":
-              superPlane.y++;
-              break;
-            case "up":
-              superPlane.y--;
-              break;
+        if (superPlane.distance > superPlanePathArr.length) {
+          superPlane = null;
+        } else {
+          superPlane.x = superPlane.initialX;
+          superPlane.y = superPlane.initialY;
+          let img;
+          for (let i = 0; i < Math.round(superPlane.distance); i++) {
+            switch (superPlanePathArr[i]) {
+              case "right":
+                superPlane.x++;
+                break;
+              case "left":
+                superPlane.x--;
+                break;
+              case "down":
+                superPlane.y++;
+                break;
+              case "up":
+                superPlane.y--;
+                break;
+            }
+            img = superPlanes[superPlanePathArr[i]];
           }
-          img = superPlanes[planePathArr[i]];
+          ctx.drawImage(img, superPlane.x - 45, superPlane.y - 45);
+
+          if (superPlane.cooldown > 1) {
+            superPlane.cooldown --;
+          } else {
+            let inRange = enemies.filter(enemy => Math.sqrt((superPlane.x - enemy.x) ** 2 + (superPlane.y - enemy.y) ** 2) < superPlane.range * 60 && enemy.visible);
+            if (inRange.length) {
+              let target = inRange.sort((a, b) => b.distance - a.distance)[0];
+              target.hit(superPlane.strength);
+              superPlane.cooldown += 25 / superPlane.speed;
+            }
+          }
         }
-        ctx.drawImage(img, superPlane.x - 30, superPlane.y - 30);
       }
 
       enemies.forEach((enemy, i) => {
@@ -1178,6 +1262,7 @@
           if (enemy.stunned) enemy.stunned--;
           else enemy.distance += enemy.speed * (enemy.slowed ? 2 : 4);
           if (enemy.slowed) enemy.slowed--;
+
           enemy.x = map.start[0] * 60;
           enemy.y = map.start[1] * 60;
           let img;
@@ -1219,7 +1304,7 @@
         } else {
           enemy.visible = true;
         }
-        if (enemy.noAbilities) enemy.visible = true; ////alternate
+        if (enemy.noAbilities) enemy.visible = true;
 
         if (enemy.noAbilities) enemy.noAbilities--;
       });
@@ -1269,6 +1354,11 @@
             }));
           };
           towerEl.ondragend = () => {
+            //If an alert was skipped less than 10 seconds ago, show it
+            if (Date.now() - skippedAlert?.time < 10_000) {
+              alert(skippedAlert.message);
+              skippedAlert = null;
+            }
             delete towerTypes[tower].dragging;
             dragOver = null;
             document.getElementById("grid").classList.remove("visibleLines");
@@ -1310,7 +1400,7 @@
         if (player.money >= menuTower.upgradePrice("speed")) document.getElementById("speed").classList.remove("unselectable");
         if (player.money >= menuTower.upgradePrice("strength")) document.getElementById("strength").classList.remove("unselectable");
         if (player.money >= menuTower.nextExtra.price) document.getElementById("extra").classList.remove("unselectable");
-        if (player.money >= menuTower.ability.price) document.getElementById("ability").classList.remove("unselectable");
+        if (player.money >= menuTower.ability.price && !menuTower.ability.bought) document.getElementById("ability").classList.remove("unselectable");
       }
 
       //Update text in top-right
@@ -1332,7 +1422,7 @@
     }
 
     let player = {
-      money: 500,
+      money: 50,
       lives: 100,
       bonusMoney: 0,
       bonusLives: 0
@@ -1348,6 +1438,7 @@
     let paused = false;
     let fastForward = false;
     let animate;
+    let skippedAlert;
 
     let map = {
       start: [6.5, -0.5],
@@ -1398,8 +1489,26 @@
           planePathArr.push("down");
           break;
       }
-    };
+    }
 
+    let superPlanePathArr = [];
+    //SuperPlane moves from end to start
+    for (let i = mapArr.length - 1; i >= 0; i--) {
+      switch (mapArr[i]) {
+        case "right":
+          superPlanePathArr.push("left");
+          break;
+        case "left":
+          superPlanePathArr.push("right");
+          break;
+        case "down":
+          superPlanePathArr.push("up");
+          break;
+        case "up":
+          superPlanePathArr.push("down");
+          break;
+      }
+    }
 
     ctx.fillStyle = "white";
     ctx.font = "128px Segoe UI";
@@ -1445,7 +1554,7 @@
         abilityButton.onclick = () => {
           if (ability.bought && !ability.cooldown && towers.find(owned => owned?.name == towerTypes[tower].name)) {
             ability.use();
-            ability.cooldown = 1500;
+            ability.cooldown = 3000;
           }
         };
       }
@@ -1474,5 +1583,16 @@
       ctx.fillText("Click to play again", 960, 800);
       document.getElementById("game").onclick = () => window.location.reload();
     }
+
+    //Achievements will be added later
+    let achievements = [
+      "Complete a game with 100 lives left",
+      "Fully upgrade a tower",
+      "Purchase every tower in one game",
+      "Win a game without using any abilities",
+      "Use every ability in one game",
+      "Win a game without any Ultimate Towers",
+      "Win a game without any Basic Towers"
+    ];
   </script>
 {% endblock %}

@@ -309,7 +309,7 @@
         }
       },
       longRange: {
-        name: "Long Range Tower",
+        name: "Long-Range Tower",
         color: "var(--light-yellow)",
         description: "Infinite range and strong attacks, but fires slowly. Targets the strongest enemy onscreen.",
         range: Infinity,
@@ -842,7 +842,7 @@
         this.slowed = 0;
         this.hit = function(damage, tower, explosion) {
           if (this.stunned) damage *= 2;
-          if (!this.abilities.includes("shield") || explosion || tower.name == "Long Range Tower") this.health -= damage; //Only Long Range Towers and explosions can damage shielded enemies
+          if (!this.abilities.includes("shield") || explosion || tower.name == "Long-Range Tower") this.health -= damage; //Only Long-Range Towers and explosions can damage shielded enemies
           if (this.health <= 0) {
             let i = enemies.indexOf(this);
             player.money += (this.type.boss ? 10 : 1) * (tower?.extraMoney ? 5 : 1);
@@ -946,7 +946,7 @@
     waves.forEach(wave => wave.unshift([8, pause])); //Add a break at the start of each wave
 
     let grid = Array(15).fill().map(() => Array(32).fill(null)); //Array containing 15 arrays (rows), each containing 32 items (columns). Makes a deep copy of each array.
-    grid[0].fill("button", 0, 2); //Two buttons in to top left
+    grid[0].fill("button", 0, 3); //Three buttons in to top left
     grid[0].fill("info", 26, 32); //Area for game info in the top right
 
     let dragOver;
@@ -1032,18 +1032,18 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height); //Clear the canvas
       ctx.drawPath(map);
 
-      //ctx.drawImage(document.fullscreenElement ? buttons.exitFullscreen : buttons.fullscreen, 15, 15, 30, 30);
-      ctx.drawImage(buttons.pause, 15, 15, 30, 30);
-      ctx.drawImage(fastForward ? buttons.play : buttons.fastForward, 75, 15, 30, 30);
-      //document.getElementById("r0c0").onclick = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
-      document.getElementById("r0c0").onclick = () => {
+      ctx.drawImage(document.fullscreenElement ? buttons.exitFullscreen : buttons.fullscreen, 15, 15, 30, 30);
+      ctx.drawImage(buttons.pause, 75, 15, 30, 30);
+      ctx.drawImage(fastForward ? buttons.play : buttons.fastForward, 135, 15, 30, 30);
+      document.getElementById("r0c0").onclick = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+      document.getElementById("r0c1").onclick = () => {
         paused ? animate = setInterval(update, fastForward ? 10 : 40) : clearInterval(animate);
         paused = !paused;
         paused ? document.getElementById("towers").classList.add("hidden") : document.getElementById("towers").classList.remove("hidden");
         ctx.clearRect(0, 0, 120, 60);
         ctx.drawImage(buttons.play, 15, 15, 30, 30);
       };
-      document.getElementById("r0c1").onclick = () => {
+      document.getElementById("r0c2").onclick = () => {
         fastForward = !fastForward;
         clearInterval(animate);
         animate = setInterval(update, fastForward ? 10 : 40); //If fast forward is turned on, play at 4x the normal speed
@@ -1141,7 +1141,7 @@
           if (tower.ability.cooldown) tower.ability.cooldown--;
 
           if (tower.rangeBoosting) {
-            let otherTowers = towers.filter(owned => owned && owned != tower && owned.range != Infinity); //Remove this tower, sold towers, and Long Range Towers
+            let otherTowers = towers.filter(owned => owned && owned != tower && owned.range != Infinity); //Remove this tower, sold towers, and Long-Range Towers
             let closest = otherTowers.sort((a, b) => ((tower.planeX - a.x) ** 2 + (tower.planeY - a.y) ** 2) - ((tower.planeX - b.x) ** 2 + (tower.planeY - b.y) ** 2))[0];
             tower.rangeBoosted = closest;
           }

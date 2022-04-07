@@ -308,7 +308,7 @@
         }
       },
       longRange: {
-        name: "Long Range Tower",
+        name: "Long-Range Tower",
         color: "var(--light-yellow)",
         description: "Infinite range and strong attacks, but fires slowly. Targets the strongest enemy onscreen.",
         range: Infinity,
@@ -841,7 +841,7 @@
         this.slowed = 0;
         this.hit = function(damage, tower, explosion) {
           if (this.stunned) damage *= 2;
-          if (!this.abilities.includes("shield") || explosion || tower.name == "Long Range Tower") this.health -= damage; //Only Long Range Towers and explosions can damage shielded enemies
+          if (!this.abilities.includes("shield") || explosion || tower.name == "Long-Range Tower") this.health -= damage; //Only Long-Range Towers and explosions can damage shielded enemies
           if (this.health <= 0) {
             let i = enemies.indexOf(this);
             player.money += (this.type.boss ? 10 : 1) * (tower?.extraMoney ? 5 : 1);
@@ -1140,7 +1140,7 @@
           if (tower.ability.cooldown) tower.ability.cooldown--;
 
           if (tower.rangeBoosting) {
-            let otherTowers = towers.filter(owned => owned && owned != tower && owned.range != Infinity); //Remove this tower, sold towers, and Long Range Towers
+            let otherTowers = towers.filter(owned => owned && owned != tower && owned.range != Infinity); //Remove this tower, sold towers, and Long-Range Towers
             let closest = otherTowers.sort((a, b) => ((tower.planeX - a.x) ** 2 + (tower.planeY - a.y) ** 2) - ((tower.planeX - b.x) ** 2 + (tower.planeY - b.y) ** 2))[0];
             tower.rangeBoosted = closest;
           }

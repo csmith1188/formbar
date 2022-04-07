@@ -611,7 +611,7 @@
               <h2>
                 Range: ${Math.round(this.range * 100) / 100}
                 <span id="range" class="splitButton">
-                  <span class="buttonLeft">${(this.upgrades.range == 2) ? "Max" : "→&nbsp;" + Math.round(this.range * 1.25 * 100) / 100}</span><span class="buttonRight">$${this.upgradePrice("range")}</span>
+                  <span class="buttonLeft">${(this.upgrades.range == 2 || this.range == Infinity) ? "Max" : "→&nbsp;" + Math.round(this.range * 1.25 * 100) / 100}</span><span class="buttonRight">$${this.upgradePrice("range")}</span>
                 </span>
               </h2>
 
@@ -660,7 +660,7 @@
             if (player.money < this.nextExtra.price) extraButton.classList.add("unselectable");
             if (player.money < this.ability.price || this.ability.bought) abilityButton.classList.add("unselectable");
 
-            if (this.upgrades.range == 2) rangeButton.classList.add("bought");
+            if (this.upgrades.range == 2 || this.range == Infinity) rangeButton.classList.add("bought");
             if (this.upgrades.speed == 2) speedButton.classList.add("bought");
             if (this.upgrades.strength == 2) strengthButton.classList.add("bought");
             if (this.extra2.bought) extraButton.classList.add("bought");
@@ -700,7 +700,7 @@
               this.menuOpen = false;
             };
             rangeButton.onclick = () => {
-              if (this.upgrades.range < 2 && player.money >= this.upgradePrice("range")) {
+              if (this.upgrades.range < 2 && player.money >= this.upgradePrice("range") && this.range != Infinity) {
                 this.upgrades.xyz = 123;
                 player.money -= this.upgradePrice("range");
                 this.value += this.upgradePrice("range");

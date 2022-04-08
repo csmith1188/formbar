@@ -1048,7 +1048,7 @@
       document.getElementById("r0c0").onclick = () => {
         fullscreen ? document.exitFullscreen() : document.documentElement.requestFullscreen();
         fullscreen = !fullscreen;
-      }
+      };
       document.getElementById("r0c1").onclick = () => {
         paused ? animate = setInterval(update, fastForward ? 10 : 40) : clearInterval(animate);
         paused = !paused;

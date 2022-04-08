@@ -1054,7 +1054,7 @@
         paused = !paused;
         paused ? document.getElementById("towers").classList.add("hidden") : document.getElementById("towers").classList.remove("hidden");
         ctx.clearRect(0, 0, 120, 60);
-        ctx.drawImage(buttons.play, 15, 15, 30, 30);
+        ctx.drawImage(buttons.play, 75, 15, 30, 30);
       };
       document.getElementById("r0c2").onclick = () => {
         fastForward = !fastForward;
@@ -1398,7 +1398,7 @@
           abilityButton.classList.remove("invisible");
           if (ability.cooldown) {
             abilityButton.classList.add("unselectable");
-            let percent = ability.cooldown / 1500 * 100;
+            let percent = ability.cooldown / 3000 * 100;
             abilityButton.style.background = `linear-gradient(to left, var(--emphasis-color), var(--emphasis-color) ${percent}%, gray ${percent}%)`; //Show how long until the ability can be used again
           } else {
             abilityButton.style.background = null; //Reset the background

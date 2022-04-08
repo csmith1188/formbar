@@ -376,10 +376,10 @@
       money: {
         name: "Money Tower",
         color: "var(--light-green)",
-        description: "Gets 5× as much money from hitting enemies.",
+        description: "Gets 3× as much money from defeating enemies.",
         range: 3.32,
         speed: 0.88,
-        strength: 1.5,
+        strength: 0.5,
         extraMoney: true,
         price: 100,
         extra1: {
@@ -529,7 +529,7 @@
       },
       purple: {
         speed: 4,
-        health: 1
+        health: 2
       },
       brown: {
         speed: 1,
@@ -654,7 +654,7 @@
             let extraButton = document.getElementById("extra");
             let abilityButton = document.getElementById("ability");
 
-            if (player.money < this.upgradePrice("range")) rangeButton.classList.add("unselectable");
+            if (player.money < this.upgradePrice("range") || this.range == Infinity) rangeButton.classList.add("unselectable");
             if (player.money < this.upgradePrice("speed")) speedButton.classList.add("unselectable");
             if (player.money < this.upgradePrice("strength")) strengthButton.classList.add("unselectable");
             if (player.money < this.nextExtra.price) extraButton.classList.add("unselectable");
@@ -844,7 +844,7 @@
           if (!this.abilities.includes("shield") || explosion || tower.name == "Long-Range Tower") this.health -= damage; //Only Long-Range Towers and explosions can damage shielded enemies
           if (this.health <= 0) {
             let i = enemies.indexOf(this);
-            player.money += (this.type.boss ? 10 : 1) * (tower?.extraMoney ? 5 : 1);
+            player.money += (this.type.boss ? 10 : 1) * (tower?.extraMoney ? 3 : 1);
             if (this.abilities.includes("split")) {
               let type;
               if (this.type == enemyTypes.boss) {
@@ -940,7 +940,7 @@
       [[3, "z", pause], [17, "ps"], [43, "ok"], [5, "x"]],
       [[15, "pk"], "xs", [3, "x", "z"], [300, "o"], "pd"],
       [[50, "ra"], [125, "bk"], pause, [67, "bh"], [999, "yk"], "z"],
-      [[10, "g"], pause, [20, "y"], pause, [30, "o"], pause, [40, "r"], pause, [100, "b"], pause, [100, "p"], pause, [15, "x"], pause, [5, "z"]]
+      [[10, "g"], pause, [20, "y"], pause, [30, "o"], pause, [40, "r"], pause, [100, "p"], pause, [100, "b"], pause, [15, "x"], pause, [5, "z"]]
     ];
     waves.forEach(wave => wave.unshift([8, pause])); //Add a break at the start of each wave
 
@@ -1034,7 +1034,10 @@
       //ctx.drawImage(document.fullscreenElement ? buttons.exitFullscreen : buttons.fullscreen, 15, 15, 30, 30);
       ctx.drawImage(buttons.pause, 15, 15, 30, 30);
       ctx.drawImage(fastForward ? buttons.play : buttons.fastForward, 75, 15, 30, 30);
-      //document.getElementById("r0c0").onclick = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+      /*document.getElementById("r0c0").onclick = () => {
+        fullscreen ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+        fullscreen = !fullscreen;
+      };*/
       document.getElementById("r0c0").onclick = () => {
         paused ? animate = setInterval(update, fastForward ? 10 : 40) : clearInterval(animate);
         paused = !paused;
@@ -1061,8 +1064,12 @@
         let next = waves[currentWave][currentEnemy];
         while (Array.isArray(next)) {
           if (next[0] == "alert") {
-            if (!Object.values(towerTypes).find(tower => tower.dragging)) alert(next[1]); //Don't show alert if a tower is being dragged. This is necessary because of an issue with the browser.
-            else skippedAlert = {message: next[1], time: Date.now()};
+            if (!Object.values(towerTypes).find(tower => tower.dragging)) {
+              alert(next[1]); //Don't show alert if a tower is being dragged. This is necessary because of an issue with the browser.
+              if (fullscreen) document.documentElement.requestFullscreen(); //If fullscreen mode was on, return to it after the alert
+            } else {
+              skippedAlert = {message: next[1], time: Date.now()};
+            }
             waves[currentWave].splice(currentEnemy, 1); //Remove the array
           } else {
             let repeat = next[0]; //The array's first item is the number of times to repeat
@@ -1435,6 +1442,7 @@
     let currentEnemy = 0;
     let superPlane;
     let seconds = 0;
+    let fullscreen = false;
     let paused = false;
     let fastForward = false;
     let animate;

@@ -2167,15 +2167,6 @@ def endpoint_towerdefense():
         return render_template('towerdefense.html')
 
 
-@app.route('/towerdefense')
-def endpoint_towerdefense():
-    if not request.remote_addr in sD.studentDict:
-        return redirect('/login?forward=' + request.path)
-    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
-        return render_template("message.html", message = "You do not have high enough permissions to do this right now. " )
-    else:
-        return render_template('towerdefense.html')
-
 #Tic Tac Toe
 @app.route('/ttt')
 def endpoint_ttt():

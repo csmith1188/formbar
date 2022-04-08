@@ -1077,7 +1077,7 @@
           if (next[0] == "alert") {
             if (!Object.values(towerTypes).find(tower => tower.dragging)) {
               alert(next[1]); //Don't show alert if a tower is being dragged. This is necessary because of an issue with the browser.
-              if (fullscreen) document.documentElement.requestFullscreen(); //If fullscreen mode was on, return to it after the alert
+              //if (fullscreen) document.documentElement.requestFullscreen(); //If fullscreen mode was on, return to it after the alert
             } else {
               skippedAlert = {message: next[1], time: Date.now()};
             }

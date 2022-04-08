@@ -1053,7 +1053,7 @@
         paused ? animate = setInterval(update, fastForward ? 10 : 40) : clearInterval(animate);
         paused = !paused;
         paused ? document.getElementById("towers").classList.add("hidden") : document.getElementById("towers").classList.remove("hidden");
-        ctx.clearRect(0, 0, 120, 60);
+        ctx.clearRect(60, 0, 120, 60);
         ctx.drawImage(buttons.play, 75, 15, 30, 30);
       };
       document.getElementById("r0c2").onclick = () => {
@@ -1190,7 +1190,7 @@
               if (tower.abilityBlocking && !target.abilities.includes("acceleration")) target.noAbilities = tower.permSlow ? Infinity : 250;
               if (tower.bounce) {
                 let bouncePath = [target]; //Make an array of all enemies hit so they aren't bounced to again
-                let close = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < 100 && !bouncePath.includes(enemy));
+                let close = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < 100 && !bouncePath.includes(enemy) && enemy.visible);
                 let bouncesLeft = tower.bounce;
                 while (close.length && bouncesLeft) {
                   let closest = close.sort((a, b) => ((target.x - a.x) ** 2 + (target.y - a.y) ** 2) - ((target.x - b.x) ** 2 + (target.y - b.y) ** 2))[0];
@@ -1200,7 +1200,7 @@
                   if (tower.ultimateBoost) damage *= 2;
                   target.hit(damage, tower);
                   bouncePath.push(target);
-                  close = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < 100 && !bouncePath.includes(enemy));
+                  close = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < 100 && !bouncePath.includes(enemy) && enemy.visible);
                   bouncesLeft--;
                 }
               }
@@ -1318,7 +1318,7 @@
           if (enemy.health > enemy.type.health) enemy.health = enemy.type.health;
         }
         if (enemy.abilities.includes("blink")) {
-          if (!(frame % 25)) enemy.visible = !enemy.visible;
+          if (!(frame % 100)) enemy.visible = !enemy.visible;
         } else {
           enemy.visible = true;
         }

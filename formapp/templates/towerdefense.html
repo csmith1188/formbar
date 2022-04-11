@@ -70,7 +70,12 @@
     top: calc(250% / 9);
     width: calc(75% / 16);
     height: calc(75% / 9);
-    background: red;
+    padding: 0;
+    text-align: center;
+    font-size: 400%;
+    line-height: 130%;
+    color: var(--light-cyan);
+    cursor: pointer;
   }
 
   #nextMap {
@@ -79,7 +84,16 @@
     top: calc(250% / 9);
     width: calc(75% / 16);
     height: calc(75% / 9);
-    background: red;
+    padding: 0;
+    text-align: center;
+    font-size: 400%;
+    line-height: 130%;
+    color: var(--light-cyan);
+    cursor: pointer;
+  }
+
+  #prevMap:active, #nextMap:active {
+    color: white;
   }
 
   #grid {
@@ -1710,8 +1724,16 @@
       let right = document.createElement("div");
       left.id = "prevMap";
       right.id = "nextMap";
-      left.onclick = () => mapIndex--;
-      right.onclick = () => mapIndex++;
+      left.innerText = "◀";
+      right.innerText = "▶";
+      left.onclick = () => {
+        (mapIndex == 0) ? mapIndex = maps.length - 1 : mapIndex--;
+        ctx.fillText(mapIndex, 500, 200);
+      }
+      right.onclick = () => {
+        (mapIndex == maps.length - 1) ? mapIndex = 0 : mapIndex++;
+        ctx.fillText(mapIndex, 500, 200);
+      }
       document.getElementById("container").appendChild(left);
       document.getElementById("container").appendChild(right);
       ctx.font = "30px Segoe UI";

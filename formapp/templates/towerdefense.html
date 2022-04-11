@@ -96,6 +96,68 @@
     color: white;
   }
 
+  #difficulty {
+    position: absolute;
+    left: 0;
+    top: 58%;
+    width: 100%;
+    text-align: center;
+    font-size: 200%;
+  }
+
+  #easy, #hard {
+    padding: 0.25% 1%;
+    margin: 0 0.5%;
+    background: transparent;
+    border: 1px solid;
+    border-radius: 9999px;
+    font-weight: 500;
+  }
+
+  #easy {
+    color: var(--light-green);
+  }
+
+  #easy.pressed {
+    background: var(--light-green);
+    border-color: var(--light-green);
+    color: var(--bg-dark);
+    cursor: pointer;
+  }
+
+  #hard {
+    color: var(--light-orange);
+  }
+
+  #hard.pressed {
+    background: var(--light-orange);
+    border-color: var(--light-orange);
+    color: var(--bg-dark);
+    cursor: pointer;
+  }
+
+  #easy:not(.pressed):hover, #hard:not(.pressed):hover {
+    background: var(--bg-dark);
+  }
+
+  #startButton {
+    position: absolute;
+    left: 50%;
+    bottom: 5%;
+    transform: translateX(-50%);
+    padding: 0.25% 1%;
+    background: transparent;
+    color: var(--light-cyan);
+    border: 1px solid;
+    border-radius: 9999px;
+    font-size: 200%;
+    font-weight: 500;
+  }
+
+  #startButton:not(.unselectable):hover {
+    background: var(--bg-dark);
+  }
+
   #grid {
     position: absolute;
     top: 0;
@@ -155,6 +217,7 @@
     bottom: 10%;
     width: 20%;
     height: 20%;
+    padding: 0.25% 1%;
     background: white;
     color: var(--color-blue);
     border: 1px solid;
@@ -1147,7 +1210,7 @@
     }
 
     function update() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, 1920, 1080);
       ctx.drawPath(map);
 
       ctx.drawImage(document.fullscreenElement ? buttons.exitFullscreen : buttons.fullscreen, 15, 15, 30, 30);
@@ -1226,6 +1289,63 @@
           currentEnemy = 0;
         }
       }
+
+      enemies.forEach((enemy, i) => {
+        //If enemy is offscreen, subtract a life and remove it from the array
+        //Otherwise, draw it in its new position
+        if (enemy.distance >= mapArr.length) { //The enemy is at the end of the track
+          player.lives -= enemy.type.health;
+          enemies.splice(i, 1);
+        } else {
+          if (enemy.stunned) enemy.stunned--;
+          else enemy.distance += enemy.speed * (enemy.slowed ? 2 : 4);
+          if (enemy.slowed) enemy.slowed--;
+
+          enemy.x = map.start[0] * 60;
+          enemy.y = map.start[1] * 60;
+          let img;
+          for (let i = 0; i < Math.round(enemy.distance); i++) {
+            switch (mapArr[i]) {
+              case "right":
+                enemy.x++;
+                break;
+              case "left":
+                enemy.x--;
+                break;
+              case "down":
+                enemy.y++;
+                break;
+              case "up":
+                enemy.y--;
+                break;
+            }
+            if (enemy.abilities.includes("split")) {
+              img = (enemy.type.boss && (mapArr[i] == "right" || mapArr[i] == "left")) ? enemy.type.imgSplitRotated : enemy.type.imgSplit; //If the enemy is a boss and moving horizontally, rotate it
+            } else {
+              img = (enemy.type.boss && (mapArr[i] == "right" || mapArr[i] == "left")) ? enemy.type.imgRotated : enemy.type.img;
+            }
+          }
+          if (!enemy.visible) ctx.globalAlpha = 0.25; //If the enemy is hidden, make it semitransparent
+          ctx.drawImage(img, enemy.x - 40, enemy.y - 40);
+          ctx.globalAlpha = 1;
+          if (enemy.abilities.includes("healing")) ctx.drawImage(abilitySymbols.healing, enemy.x - 40, enemy.y - 40);
+          if (enemy.abilities.includes("shield")) ctx.drawImage(abilitySymbols.shield, enemy.x - 40, enemy.y - 40);
+          if (enemy.abilities.includes("acceleration")) ctx.drawImage(abilitySymbols.acceleration, enemy.x - 40, enemy.y - 40);
+        }
+
+        if (enemy.abilities.includes("healing") && enemy.health < enemy.type.health && !enemy.noAbilities) {
+          enemy.health += 1 / 75;
+          if (enemy.health > enemy.type.health) enemy.health = enemy.type.health;
+        }
+        if (enemy.abilities.includes("blink")) {
+          if (!(frame % 100)) enemy.visible = !enemy.visible;
+        } else {
+          enemy.visible = true;
+        }
+        if (enemy.noAbilities) enemy.visible = true;
+
+        if (enemy.noAbilities) enemy.noAbilities--;
+      });
 
       towers.forEach(tower => {
         if (tower) {
@@ -1385,63 +1505,6 @@
         }
       }
 
-      enemies.forEach((enemy, i) => {
-        //If enemy is offscreen, subtract a life and remove it from the array
-        //Otherwise, draw it in its new position
-        if (enemy.distance >= mapArr.length) { //The enemy is at the end of the track
-          player.lives -= enemy.type.health;
-          enemies.splice(i, 1);
-        } else {
-          if (enemy.stunned) enemy.stunned--;
-          else enemy.distance += enemy.speed * (enemy.slowed ? 2 : 4);
-          if (enemy.slowed) enemy.slowed--;
-
-          enemy.x = map.start[0] * 60;
-          enemy.y = map.start[1] * 60;
-          let img;
-          for (let i = 0; i < Math.round(enemy.distance); i++) {
-            switch (mapArr[i]) {
-              case "right":
-                enemy.x++;
-                break;
-              case "left":
-                enemy.x--;
-                break;
-              case "down":
-                enemy.y++;
-                break;
-              case "up":
-                enemy.y--;
-                break;
-            }
-            if (enemy.abilities.includes("split")) {
-              img = (enemy.type.boss && (mapArr[i] == "right" || mapArr[i] == "left")) ? enemy.type.imgSplitRotated : enemy.type.imgSplit; //If the enemy is a boss and moving horizontally, rotate it
-            } else {
-              img = (enemy.type.boss && (mapArr[i] == "right" || mapArr[i] == "left")) ? enemy.type.imgRotated : enemy.type.img;
-            }
-          }
-          if (!enemy.visible) ctx.globalAlpha = 0.25; //If the enemy is hidden, make it semitransparent
-          ctx.drawImage(img, enemy.x - 40, enemy.y - 40);
-          ctx.globalAlpha = 1;
-          if (enemy.abilities.includes("healing")) ctx.drawImage(abilitySymbols.healing, enemy.x - 40, enemy.y - 40);
-          if (enemy.abilities.includes("shield")) ctx.drawImage(abilitySymbols.shield, enemy.x - 40, enemy.y - 40);
-          if (enemy.abilities.includes("acceleration")) ctx.drawImage(abilitySymbols.acceleration, enemy.x - 40, enemy.y - 40);
-        }
-
-        if (enemy.abilities.includes("healing") && enemy.health < enemy.type.health && !enemy.noAbilities) {
-          enemy.health += 1 / 75;
-          if (enemy.health > enemy.type.health) enemy.health = enemy.type.health;
-        }
-        if (enemy.abilities.includes("blink")) {
-          if (!(frame % 100)) enemy.visible = !enemy.visible;
-        } else {
-          enemy.visible = true;
-        }
-        if (enemy.noAbilities) enemy.visible = true;
-
-        if (enemy.noAbilities) enemy.noAbilities--;
-      });
-
       for (let tower in towerTypes) {
         let towerEl = document.getElementById(tower);
 
@@ -1549,6 +1612,7 @@
       frame++;
     }
 
+    let gameProgress = "00000";
     let player = {
       money: 50,
       lives: 100,
@@ -1715,11 +1779,11 @@
     if (localStorage.getItem("tdComplete")) document.getElementById("complete").classList.remove("hidden");
 
     function showMaps() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height); //Clear the canvas
+      ctx.clearRect(0, 0, 1920, 1080); //Clear the canvas
       ctx.font = "48px Segoe UI";
       ctx.textAlign = "center";
       ctx.fillText("Choose a map", 960, 75);
-      ctx.fillRect(480, 120, 960, 450);
+      switchMap();
       let left = document.createElement("div");
       let right = document.createElement("div");
       left.id = "prevMap";
@@ -1728,26 +1792,87 @@
       right.innerText = "▶";
       left.onclick = () => {
         (mapIndex == 0) ? mapIndex = maps.length - 1 : mapIndex--;
-        ctx.fillText(mapIndex, 500, 200);
+        switchMap();
       }
       right.onclick = () => {
         (mapIndex == maps.length - 1) ? mapIndex = 0 : mapIndex++;
-        ctx.fillText(mapIndex, 500, 200);
+        switchMap();
       }
       document.getElementById("container").appendChild(left);
       document.getElementById("container").appendChild(right);
-      ctx.font = "30px Segoe UI";
-      ctx.fillText("• 50 waves", 960, 750);
-      ctx.fillText("• 100 lives", 960, 800);
-      //ctx.fillText("• No abilities", 960, 850);
-      //ctx.fillText("• Fast forward permanently on", 960, 900);
+
+      let difficultyButtons = document.createElement("div");
+      difficultyButtons.id = "difficulty";
+      difficultyButtons.innerText = "Difficulty: ";
+      let easy = document.createElement("button");
+      let hard = document.createElement("button");
+      easy.id = "easy";
+      hard.id = "hard";
+      easy.innerText = "Easy";
+      hard.innerText = "Hard";
+      easy.onclick = () => {
+        difficulty = "easy";
+        switchDifficulty();
+      };
+      hard.onclick = () => {
+        difficulty = "hard";
+        switchDifficulty();
+      };
+      document.getElementById("container").appendChild(difficultyButtons);
+      document.getElementById("difficulty").appendChild(easy);
+      document.getElementById("difficulty").appendChild(hard);
+
+      let startButton = document.createElement("button");
+      startButton.id = "startButton";
+      startButton.innerText = "Start game";
+      document.getElementById("container").appendChild(startButton);
+
+      switchDifficulty();
+
+      document.getElementById("game").onclick = null; ////
     }
     document.getElementById("game").onclick = showMaps;
+
+    function switchMap() {
+      ctx.clearRect(480, 120, 960, 450);
+      ctx.strokeRect(480, 120, 960, 450);
+      ctx.fillText(mapIndex, 500, 200);
+    }
+
+    function switchDifficulty() {
+      let easy = document.getElementById("easy");
+      let hard = document.getElementById("hard");
+      ctx.font = "30px Segoe UI";
+      ctx.clearRect(0, 700, 1920, 250);
+      if (difficulty == "easy") {
+        easy.classList.add("pressed");
+        hard.classList.remove("pressed");
+        ctx.fillText("• 50 waves", 960, 750);
+        ctx.fillText("• 100 lives", 960, 800);
+      } else {
+        hard.classList.add("pressed");
+        easy.classList.remove("pressed");
+        ctx.fillText("• 75 waves", 960, 750);
+        ctx.fillText("• 50 lives", 960, 800);
+        ctx.fillText("• No abilities", 960, 850);
+        ctx.fillText("• Fast forward permanently on", 960, 900);
+      }
+      let startButton = document.getElementById("startButton");
+      let mapComplete = gameProgress[mapIndex];
+      if (difficulty == "hard" && mapComplete < 2) {
+        startButton.classList.add("unselectable");
+        startButton.onclick = null;
+      } else {
+        startButton.classList.remove("unselectable");
+        startButton.onclick = startGame;
+      }
+    }
 
     function startGame() {
       document.getElementById("complete").classList.add("hidden");
       document.getElementById("prevMap").classList.add("hidden");
       document.getElementById("nextMap").classList.add("hidden");
+      document.getElementById("startButton").classList.add("hidden");
 
       map = maps[mapIndex];
 
@@ -1866,7 +1991,7 @@
       let menuTower = towers.find(tower => tower?.menuOpen);
       menuTower?.closeMenu();
       clearInterval(animate);
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, 1920, 1080);
       document.getElementById("grid").classList.add("hidden");
       document.getElementById("towers").classList.add("hidden");
       ctx.fillStyle = "white";
@@ -1884,13 +2009,13 @@
 
     //Achievements will be added later
     let achievements = [
-      "Complete a game with 100 lives left",
+      "Complete a game without losing any lives",
       "Fully upgrade a tower",
       "Purchase every tower in one game",
-      "Win a game without using any abilities",
       "Use every ability in one game",
       "Win a game without any Ultimate Towers",
-      "Win a game without any Basic Towers"
+      "Win a game without any Basic Towers",
+      "Win a game with three or fewer towers"
     ];
   </script>
 {% endblock %}

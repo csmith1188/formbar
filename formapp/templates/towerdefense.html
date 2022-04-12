@@ -1701,311 +1701,6 @@
     let dragOver;
     let animate;
 
-    let maps = [
-      {
-        name: "Map #01",
-        author: "Oley Birkeland",
-        start: [6.5, -0.5],
-        lines: [
-          ["down", 13],
-          ["left", 3],
-          ["up", 3],
-          ["right", 7],
-          ["down", 2],
-          ["right", 2],
-          ["up", 6],
-          ["left", 3],
-          ["up", 3],
-          ["right", 7],
-          ["down", 8],
-          ["right", 6],
-          ["down", 3],
-          ["left", 3],
-          ["up", 8],
-          ["right", 9],
-          ["down", 4],
-          ["left", 4],
-          ["down", 2],
-          ["right", 8]
-        ]
-      },
-      {
-        name: "Map #02",
-        author: "Oley Birkeland",
-        start: [-0.5, 12.5],
-        lines: [
-          ["right", 9],
-          ["up", 10],
-          ["right", 13],
-          ["down", 8],
-          ["left", 2],
-          ["up", 6],
-          ["left", 9],
-          ["down", 8],
-          ["right", 2],
-          ["up", 6],
-          ["right", 5],
-          ["down", 6],
-          ["right", 6],
-          ["up", 10],
-          ["right", 9]
-        ]
-      },
-      {
-        name: "Map #03",
-        author: "Oley Birkeland",
-        start: [23.5, -0.5],
-        lines: [
-          ["down", 3],
-          ["right", 5],
-          ["down", 4],
-          ["left", 4],
-          ["down", 3],
-          ["right", 2],
-          ["down", 4],
-          ["left", 9],
-          ["up", 4],
-          ["right", 2],
-          ["down", 2],
-          ["left", 8],
-          ["down", 1],
-          ["left", 7],
-          ["up", 5],
-          ["right", 9],
-          ["up", 5],
-          ["left", 4],
-          ["down", 2],
-          ["right", 8],
-          ["up", 1],
-          ["right", 1],
-          ["up", 1],
-          ["right", 1],
-          ["up", 1],
-          ["right", 1],
-          ["up", 2]
-        ]
-      },
-      {
-        name: "Map #04",
-        author: "Oley Birkeland",
-        start: [8.5, -0.5],
-        lines: [
-          ["down", 13],
-          ["right", 6],
-          ["up", 5],
-          ["right", 4],
-          ["down", 4],
-          ["left", 9],
-          ["up", 6],
-          ["right", 7],
-          ["down", 4],
-          ["right", 9],
-          ["down", 3],
-          ["left", 5],
-          ["up", 7],
-          ["right", 2],
-          ["down", 2],
-          ["right", 4],
-          ["up", 3],
-          ["left", 9],
-          ["up", 1],
-          ["right", 4],
-          ["up", 1],
-          ["left", 22]
-        ]
-      },
-      {
-        name: "Map #05",
-        author: "Oley Birkeland",
-        start: [32.5, 7.5],
-        lines: [
-          ["left", 4],
-          ["down", 2],
-          ["left", 4],
-          ["up", 2],
-          ["left", 3],
-          ["up", 5],
-          ["left", 4],
-          ["down", 5],
-          ["left", 3],
-          ["down", 5],
-          ["left", 4],
-          ["up", 5],
-          ["left", 3],
-          ["up", 2],
-          ["left", 4],
-          ["down", 2],
-          ["left", 4]
-        ]
-      },
-      {
-        name: "Celtic Knot",
-        author: "Mr. Smith",
-        start: [-0.5, 12.5],
-        lines: [
-          ["right", 9],
-          ["up", 7],
-          ["left", 5],
-          ["down", 3],
-          ["right", 12],
-          ["up", 6],
-          ["left", 4],
-          ["down", 3],
-          ["right", 9],
-          ["up", 3],
-          ["left", 4],
-          ["down", 6],
-          ["right", 12],
-          ["up", 3],
-          ["left", 5],
-          ["down", 7],
-          ["right", 8]
-        ]
-      },
-      {
-        name: "Outer Loop",
-        author: "Mr. Smith",
-        start: [15.5, -0.5],
-        lines: [
-          ["down", 1],
-          ["left", 15],
-          ["down", 14],
-          ["right", 15],
-          ["up", 4],
-          ["left", 3],
-          ["down", 3],
-          ["right", 8],
-          ["up", 3],
-          ["left", 3],
-          ["down", 4],
-          ["right", 14],
-          ["up", 14],
-          ["left", 13],
-          ["up", 1]
-        ]
-      },
-      {
-        name: "Where'dja Go?",
-        author: "Mr. Smith",
-        start: [-0.5, 7.5],
-        lines: [
-          //jiggle
-          ["right", 4],
-          ["left", 2],
-          ["right", 10],
-          ["up", 8],
-          //loop
-          ["right", 2],
-          ["up", 1],
-          ["left", 1],
-          ["down", 1],
-          ["right", 1],
-          //loop
-          ["right", 2],
-          ["up", 1],
-          ["left", 1],
-          ["down", 1],
-          ["right", 1],
-          //loop
-          ["right", 2],
-          ["up", 1],
-          ["left", 1],
-          ["down", 1],
-          ["right", 1],
-          //loop
-          ["right", 2],
-          ["up", 1],
-          ["left", 1],
-          ["down", 1],
-          ["right", 1],
-          //loop
-          ["right", 2],
-          ["up", 1],
-          ["left", 1],
-          ["down", 1],
-          ["right", 1],
-
-          ["down", 8],
-          ["right", 4],
-          ["left", 2],
-          ["right", 9]
-
-        ]
-      },
-      {
-        name: "Jiggle'n'Juke",
-        author: "Mr. Smith",
-        start: [-0.5, 7.5],
-        lines: [
-          //jiggle
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2]
-
-        ]
-      }
-    ];
-
     if (progress == "00000" && localStorage.getItem("tdComplete")) progress = "10000"; ////
     progress = progress.padEnd(maps.length, "0");
     localStorage.setItem("tdProgress", progress);
@@ -2046,9 +1741,6 @@
       back.onclick = () => window.location.reload();
       container.appendChild(back);
 
-      ctx.font = "48px Segoe UI";
-      ctx.textAlign = "center";
-      ctx.fillText("Choose a map", 960, 75);
       let left = document.createElement("div");
       let right = document.createElement("div");
       left.id = "prevMap";
@@ -2100,7 +1792,11 @@
 
     function switchMap() {
       map = maps[mapIndex];
-      ctx.clearRect(480, 120, 960, 450);
+      ctx.clearRect(480, 0, 960, 570);
+      ctx.fillStyle = "white";
+      ctx.font = "48px Segoe UI";
+      ctx.textAlign = "center";
+      ctx.fillText(`${map.name} by ${map.author}`, 960, 75);
       ctx.drawPreview(map); //Draw preview of map
       ctx.strokeStyle = "white";
       ctx.lineWidth = 2;
@@ -2113,15 +1809,14 @@
       let hard = document.getElementById("hard");
       let startButton = document.getElementById("startButton");
       let mapComplete = +progress[mapIndex];
-      ctx.font = "30px Segoe UI";
       ctx.clearRect(0, 675, 1920, 275);
       ctx.fillStyle = "white";
-      ctx.fillText("• " + maps[mapIndex].name + " by " + maps[mapIndex].author, 960, 700);
+      ctx.font = "30px Segoe UI";
       if (difficulty == "normal") {
         normal.classList.add("pressed");
         hard.classList.remove("pressed");
-        ctx.fillText("• 50 waves", 960, 750);
-        ctx.fillText("• 100 lives", 960, 800);
+        ctx.fillText("• 50 waves", 960, 700);
+        ctx.fillText("• 100 lives", 960, 750);
         if (mapComplete) {
           ctx.fillStyle = "#80ff80";
           ctx.fillText("✔️ Normal mode complete", 960, 935);
@@ -2129,10 +1824,10 @@
       } else {
         hard.classList.add("pressed");
         normal.classList.remove("pressed");
-        ctx.fillText("• 75 waves", 960, 750);
-        ctx.fillText("• 50 lives", 960, 800);
-        ctx.fillText("• No abilities", 960, 850);
-        ctx.fillText("• Fast forward permanently on", 960, 900);
+        ctx.fillText("• 75 waves", 960, 700);
+        ctx.fillText("• 50 lives", 960, 750);
+        ctx.fillText("• No abilities", 960, 800);
+        ctx.fillText("• Fast forward permanently on", 960, 850);
         if (mapComplete == 2) {
           ctx.fillStyle = "#80ff80";
           ctx.fillText("✔️ Hard mode complete", 960, 935);

@@ -17,6 +17,8 @@
 
 let maps = [
   {
+    name: "Map #01",
+    author: "Oley Birkeland",
     start: [6.5, -0.5],
     lines: [
       ["down", 13],
@@ -42,6 +44,8 @@ let maps = [
     ]
   },
   {
+    name: "Map #02",
+    author: "Oley Birkeland",
     start: [-0.5, 12.5],
     lines: [
       ["right", 9],
@@ -62,6 +66,8 @@ let maps = [
     ]
   },
   {
+    name: "Map #03",
+    author: "Oley Birkeland",
     start: [23.5, -0.5],
     lines: [
       ["down", 3],
@@ -94,6 +100,8 @@ let maps = [
     ]
   },
   {
+    name: "Map #04",
+    author: "Oley Birkeland",
     start: [8.5, -0.5],
     lines: [
       ["down", 13],
@@ -121,6 +129,8 @@ let maps = [
     ]
   },
   {
+    name: "Map #05",
+    author: "Oley Birkeland",
     start: [32.5, 7.5],
     lines: [
       ["left", 4],
@@ -140,6 +150,171 @@ let maps = [
       ["left", 4],
       ["down", 2],
       ["left", 4]
+    ]
+  },
+  {
+    name: "Celtic Knot",
+    author: "Mr. Smith",
+    start: [-0.5, 12.5],
+    lines: [
+      ["right", 9],
+      ["up", 7],
+      ["left", 5],
+      ["down", 3],
+      ["right", 12],
+      ["up", 6],
+      ["left", 4],
+      ["down", 3],
+      ["right", 9],
+      ["up", 3],
+      ["left", 4],
+      ["down", 6],
+      ["right", 12],
+      ["up", 3],
+      ["left", 5],
+      ["down", 7],
+      ["right", 8]
+    ]
+  },
+  {
+    name: "Outer Loop",
+    author: "Mr. Smith",
+    start: [15.5, -0.5],
+    lines: [
+      ["down", 2],
+      ["left", 15],
+      ["down", 13],
+      ["right", 15],
+      ["up", 4],
+      ["left", 3],
+      ["down", 3],
+      ["right", 8],
+      ["up", 3],
+      ["left", 3],
+      ["down", 4],
+      ["right", 14],
+      ["up", 13],
+      ["left", 13],
+      ["up", 2]
+    ]
+  },
+  {
+    name: "Where'dja Go?",
+    author: "Mr. Smith",
+    start: [-0.5, 7.5],
+    lines: [
+      //jiggle
+      ["right", 4],
+      ["left", 2],
+      ["right", 10],
+      ["up", 8],
+      //loop
+      ["right", 2],
+      ["up", 1],
+      ["left", 1],
+      ["down", 1],
+      ["right", 1],
+      //loop
+      ["right", 2],
+      ["up", 1],
+      ["left", 1],
+      ["down", 1],
+      ["right", 1],
+      //loop
+      ["right", 2],
+      ["up", 1],
+      ["left", 1],
+      ["down", 1],
+      ["right", 1],
+      //loop
+      ["right", 2],
+      ["up", 1],
+      ["left", 1],
+      ["down", 1],
+      ["right", 1],
+      //loop
+      ["right", 2],
+      ["up", 1],
+      ["left", 1],
+      ["down", 1],
+      ["right", 1],
+
+      ["down", 8],
+      ["right", 4],
+      ["left", 2],
+      ["right", 9]
+
+    ]
+  },
+  {
+    name: "Jiggle'n'Juke",
+    author: "Mr. Smith",
+    start: [-0.5, 7.5],
+    lines: [
+      //jiggle
+      ["right", 2],
+      ["left", 1],
+      ["right", 2],
+      ["left", 1],
+      ["right", 2],
+      ["left", 1],
+      ["right", 2],
+      ["left", 1],
+      ["right", 2],
+      ["left", 1],
+      ["right", 2],
+      ["left", 1],
+      ["right", 2],
+      ["left", 1],
+      ["right", 2],
+      ["left", 1],
+      ["right", 2],
+      ["left", 1],
+      ["right", 2],
+      ["left", 1],
+      ["right", 2],
+      ["left", 1],
+      ["right", 2],
+      ["left", 1],
+      ["right", 2],
+      ["left", 1],
+      ["right", 2],
+      ["left", 1],
+      ["right", 2],
+      ["left", 1],
+      ["right", 2],
+      ["left", 1],
+      ["right", 2],
+      ["left", 1],
+      ["right", 2],
+      ["left", 1],
+      ["right", 2],
+      ["left", 1],
+      ["right", 2],
+      ["left", 1],
+      ["right", 2],
+      ["left", 1],
+      ["right", 2],
+      ["left", 1],
+      ["right", 2],
+      ["left", 1],
+      ["right", 2],
+      ["left", 1],
+      ["right", 2],
+      ["left", 1],
+      ["right", 2],
+      ["left", 1],
+      ["right", 2],
+      ["left", 1],
+      ["right", 2],
+      ["left", 1],
+      ["right", 2],
+      ["left", 1],
+      ["right", 2],
+      ["left", 1],
+      ["right", 2],
+      ["left", 1],
+      ["right", 2]
     ]
   },
 

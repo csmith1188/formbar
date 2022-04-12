@@ -141,7 +141,6 @@
     background: var(--light-green);
     border-color: var(--light-green);
     color: var(--bg-dark);
-    cursor: pointer;
   }
 
   #hard {
@@ -152,7 +151,6 @@
     background: var(--light-orange);
     border-color: var(--light-orange);
     color: var(--bg-dark);
-    cursor: pointer;
   }
 
   #normal:not(.pressed):hover, #hard:not(.pressed):hover {
@@ -411,6 +409,7 @@
 
 <!-- Extra javascript here -->
 {% block script %}
+  <script src="{{ url_for('static', filename='js/tdMaps.js') }}"></script>
   <script>
     let towerTypes = {
       basic: {

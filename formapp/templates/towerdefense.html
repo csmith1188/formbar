@@ -45,13 +45,17 @@
     background-size: 100%;
   }
 
-  #complete {
+  #progress {
     position: absolute;
     left: 1.5%;
     top: calc(24% / 9);
     width: 100%;
-    color: var(--light-yellow);
     font-size: 250%;
+    color: var(--light-blue);
+  }
+
+  #progress.complete {
+    color: var(--light-yellow);
     filter: drop-shadow(0 0 5px #fffa);
   }
 
@@ -60,8 +64,117 @@
     height: 100%;
   }
 
-  #completeText {
+  .complete #progressText {
     margin-left: 3.5%;
+  }
+
+  #back {
+    position: absolute;
+    left: 0%;
+    top: 0;
+    width: calc(75% / 16);
+    height: calc(75% / 9);
+    padding: 0;
+    text-align: center;
+    font-size: 400%;
+    line-height: 130%;
+    color: white;
+    cursor: pointer;
+  }
+
+  #prevMap {
+    position: absolute;
+    left: 15%;
+    top: calc(250% / 9);
+    width: calc(75% / 16);
+    height: calc(75% / 9);
+    padding: 0;
+    text-align: center;
+    font-size: 400%;
+    line-height: 130%;
+    color: var(--light-cyan);
+    cursor: pointer;
+  }
+
+  #nextMap {
+    position: absolute;
+    right: 15%;
+    top: calc(250% / 9);
+    width: calc(75% / 16);
+    height: calc(75% / 9);
+    padding: 0;
+    text-align: center;
+    font-size: 400%;
+    line-height: 130%;
+    color: var(--light-cyan);
+    cursor: pointer;
+  }
+
+  #prevMap:active, #nextMap:active {
+    color: white;
+  }
+
+  #difficulty {
+    position: absolute;
+    left: 0;
+    top: 56%;
+    width: 100%;
+    text-align: center;
+    font-size: 200%;
+  }
+
+  #easy, #hard {
+    padding: 0.25% 1%;
+    margin: 0 0.5%;
+    background: transparent;
+    border: 1px solid;
+    border-radius: 9999px;
+    font-size: calc(inherit x 0.75);
+    font-weight: 500;
+  }
+
+  #easy {
+    color: var(--light-green);
+  }
+
+  #easy.pressed {
+    background: var(--light-green);
+    border-color: var(--light-green);
+    color: var(--bg-dark);
+    cursor: pointer;
+  }
+
+  #hard {
+    color: var(--light-orange);
+  }
+
+  #hard.pressed {
+    background: var(--light-orange);
+    border-color: var(--light-orange);
+    color: var(--bg-dark);
+    cursor: pointer;
+  }
+
+  #easy:not(.pressed):hover, #hard:not(.pressed):hover {
+    background: var(--bg-dark);
+  }
+
+  #startButton {
+    position: absolute;
+    left: 50%;
+    bottom: 5%;
+    transform: translateX(-50%);
+    padding: 0.25% 1%;
+    background: transparent;
+    color: var(--light-cyan);
+    border: 1px solid;
+    border-radius: 9999px;
+    font-size: 200%;
+    font-weight: 500;
+  }
+
+  #startButton:not(.unselectable):hover {
+    background: var(--bg-dark);
   }
 
   #grid {
@@ -94,6 +207,48 @@
 
   td.tower {
     cursor: pointer;
+  }
+
+  #alert {
+    position: absolute;
+    left: 35%;
+    top: 35%;
+    width: 30%;
+    height: 30%;
+    padding: 1.5%;
+    box-sizing: border-box;
+    background: #cccc;
+    color: var(--bg-dark);
+    font-size: 150%;
+    filter: drop-shadow(10px 10px 5px black);
+  }
+
+  #alert h1 {
+    margin: 0 0 3% 0;
+    font-size: 125%;
+    font-weight: normal;
+    text-align: inherit;
+  }
+
+  #ok {
+    position: absolute;
+    left: 40%;
+    bottom: 10%;
+    width: 20%;
+    height: 20%;
+    padding: 0.25% 1%;
+    background: white;
+    color: var(--color-blue);
+    border: 1px solid;
+    border-radius: 9999px;
+    font-size: calc(400% / 3);
+    font-weight: 500;
+    filter: drop-shadow(2px 2px 1px #000c);
+  }
+
+  #ok:hover {
+    background: white !important;
+    filter: brightness(90%) drop-shadow(2px 2px 1px #000a);
   }
 
   .menu {
@@ -156,13 +311,14 @@
     display: none;
   }
 
-  h1 {
+  .menu h1 {
     margin: 0 0 4% 0;
     font-size: 150%;
     font-weight: normal;
+    text-align: inherit;
   }
 
-  h2 {
+  .menu h2 {
     margin: 3% 0 0 0;
     font-size: 125%;
     font-weight: normal;
@@ -244,7 +400,7 @@
 {% block main %}
   <div id="container">
     <canvas id="game" width="1920" height="1080"></canvas>
-    <div id="complete" class="hidden"><img src="{{ url_for('static', filename='img/towerdefense/medal.png') }}" id="medal"> <span id="completeText">Game complete</span></div>
+    <div id="progress"></div>
     <table id="grid" class="hidden"></table>
     <div id="towers" class="hidden">
       <div id="towerDesc"></div>
@@ -330,7 +486,7 @@
           description: "Can hit blinking enemies while they are hidden.",
           price: 15,
           add: function() {
-            this.superVision = true;
+            this.seeInvisible = true;
           }
         },
         extra2: {
@@ -490,7 +646,7 @@
         },
         extra2: {
           description: "Does 5× damage to boss enemies.",
-          price: 400,
+          price: 600,
           add: function() {
             this.bossBonus = true;
           }
@@ -551,16 +707,21 @@
         health: 100,
         boss: true
       },
-      superBoss: {
+      brownBoss: {
         speed: 0.25,
         health: 500,
+        boss: true
+      },
+      purpleBoss: {
+        speed: 4,
+        health: 100,
         boss: true
       },
     };
     for (let type in enemyTypes) {
       enemyTypes[type].img = new Image();
       enemyTypes[type].img.src = `../static/img/towerdefense/${type}.png`;
-      if (type != "green" && type != "superBoss") {
+      if (type != "green" && type != "brownBoss" && type != "purpleBoss") {
         enemyTypes[type].imgSplit = new Image();
         enemyTypes[type].imgSplit.src = `../static/img/towerdefense/${type}-split.png`;
       }
@@ -646,12 +807,12 @@
                   <span class="buttonLeft">${this.extra2.bought ? "Bought" : "Add"}</span><span class="buttonRight">$${this.nextExtra.price}</span>
                 </span>
               </h2>
-              ${this.nextExtra.description || this.extra2.description}
+              ${this.nextExtra.description ?? this.extra2.description}
 
               <h2>
                 Ability
                 <span id="ability" class="splitButton">
-                  <span class="buttonLeft">${this.ability.bought ? "Bought" : "Unlock"}</span><span class="buttonRight">$${this.ability.price}</span>
+                  <span class="buttonLeft">${difficulty == "hard" ? "Locked" : (this.ability.bought ? "Bought" : "Unlock")}</span><span class="buttonRight">$${this.ability.price}</span>
                 </span>
               </h2>
               ${type.ability.description}
@@ -669,13 +830,13 @@
             if (player.money < this.upgradePrice("speed")) speedButton.classList.add("unselectable");
             if (player.money < this.upgradePrice("strength")) strengthButton.classList.add("unselectable");
             if (player.money < this.nextExtra.price) extraButton.classList.add("unselectable");
-            if (player.money < this.ability.price || this.ability.bought) abilityButton.classList.add("unselectable");
+            if (player.money < this.ability.price || this.ability.bought || difficulty == "hard") abilityButton.classList.add("unselectable");
 
             if (this.upgrades.range == 2 || this.range == Infinity) rangeButton.classList.add("bought");
             if (this.upgrades.speed == 2) speedButton.classList.add("bought");
             if (this.upgrades.strength == 2) strengthButton.classList.add("bought");
             if (this.extra2.bought) extraButton.classList.add("bought");
-            if (this.ability.bought) abilityButton.classList.add("bought");
+            if (this.ability.bought || difficulty == "hard") abilityButton.classList.add("bought");
 
             menu.style.left = this.x / 1920 * 100 + "%";
             menu.style.transform = "translateX(-50%)";
@@ -753,7 +914,7 @@
               }
             };
             abilityButton.onclick = () => {
-                if (!this.ability.bought && player.money >= this.ability.price) {
+                if (!this.ability.bought && player.money >= this.ability.price && difficulty == "easy") {
                 player.money -= this.ability.price;
                 this.value += this.ability.price;
                 this.ability.bought = true;
@@ -767,9 +928,9 @@
               this.menuOpen = false;
             }
             document.getElementById("grid").onmousedown = this.closeMenu;
-            document.onkeydown = e => {
+            document.addEventListener("keydown", e => {
               if (e.key == "Escape") this.closeMenu();
-            }
+            });
           }
         }
         this.upgradePrice = stat => {
@@ -818,7 +979,10 @@
             this.type = enemyTypes.boss;
             break;
           case "z":
-            this.type = enemyTypes.superBoss;
+            this.type = enemyTypes.brownBoss;
+            break;
+          case "u":
+            this.type = enemyTypes.purpleBoss;
             break;
         }
         this.speed = this.type.speed;
@@ -903,7 +1067,7 @@
     let pause = [10, null];
     let waves = [
       [[4, "g", pause], "g"],
-      [[7, "g", "g", pause], ["alert", "All enemy types have different HP and speed stats."], "y", pause, "y"],
+      [[7, "g", "g", pause], ["alert", "All enemy types have different health and speed stats."], "y", pause, "y"],
       [[5, "g"], [3, "y"]],
       [[20, "g"]],
       [[2, "y"], [5, [3, "g"], pause], [3, "y"]],
@@ -911,30 +1075,30 @@
       [[6, "g", "y", "o", pause], "g", "y", "o"],
       [[9, "y"], [7, "o"]],
       [[50, "g"]],
-      [["alert", "New enemy ability: HEALING\nEnemies with this ability gradually regain health, so you need to destroy them quickly."], [9, "oh", pause], "oh"],
+      [["alert", "<h1>New enemy ability: <b>Healing</b></h1>Enemies with this ability gradually regain health, so you need to destroy them quickly."], [9, "oh", pause], "oh"],
       [[7, [6, "y", pause]], [6, "y"]],
       [[20, "oh"]],
       [[15, "o", "y"]],
       [[32, "g"], pause, [16, "y"], pause, [8, "o"], pause, [4, "r"]],
-      [[6, "r"], ["alert", "New enemy ability: ACCELERATION\nEnemies with this ability move faster as they lose health. They also can't be slowed by Slowing Towers."], [10, "oa"]],
+      [[6, "r"], ["alert", "<h1>New enemy ability: <b>Acceleration</b></h1>Enemies with this ability move faster as they lose health. They also can't be slowed by Slowing Towers."], [10, "oa"]],
       [[5, "g", [3, "r"], "g", pause], "g", [3, "r"], "g"],
       [[8, "oa", "ra", pause], "oa", "ra"],
       [[2, [12, "r"], pause], [12, "r"]],
       [[100, "y"]],
       [[2, "b", pause], "b"],
-      [["alert", "New enemy ability: SPLIT\nEnemies with this ability split into two or more weaker enemies when they run out of health, making them much harder to destroy."], "rs"],
+      [["alert", "<h1>New enemy ability: <b>Split</b></h1>Enemies with this ability split into two or more weaker enemies when they run out of health, making them much harder to destroy."], "rs"],
       [[7, "y", "o", "r", pause], [12, "rh"]],
       [[4, "os"], pause, [25, "o"], "bs"],
       [[5, "p"]],
       [[3, "pa", "bh", pause], [8, "rs", pause], "rs"],
-      [["alert", "New enemy ability: BLINK\nEnemies with this ability switch between two states: visible and hidden. Without upgrades, towers can only hit them while they're visible."], [29, "yk", pause], "yk"],
+      [["alert", "<h1>New enemy ability: <b>Blink</b></h1>Enemies with this ability switch between two states: visible and hidden. Without upgrades, towers can only hit them while they're visible."], [29, "yk", pause], "yk"],
       [[250, "g"]],
       [["alert", "Boss enemies have 100 HP."], "x"],
       ["pk"],
       [[5, "bs"]],
       [[2, [35, "r"], [5, "p"]]],
       [[14, "ba"], [26, "rh"]],
-      [["alert", "New enemy ability: SHIELD\nEnemies with this ability can only be damaged by explosions and hits from Long-Range Towers."], "gd"],
+      [["alert", "<h1>New enemy ability: <b>Shield</b></h1>Enemies with this ability can only be damaged by explosions and hits from Long-Range Towers."], "gd"],
       [[30, "o"], pause, "x", pause, "x"],
       [[3, "bs"], [3, "ps"]],
       [[20, "rk"], pause, [5, "bk"]],
@@ -946,27 +1110,53 @@
       [[7, "os"], pause, [13, "pk"] [64, "g"]],
       ["x", [18, "rd"], pause, "x"],
       [[85, "b", "p"]],
-      [["alert", "Super-boss enemies have 500 HP."], "z"],
+      [["alert", "Brown-boss enemies have 500 HP."], "z"],
       [[10, "x"], pause, [30, "bh"], [20, "r"]],
       [[3, "z", pause], [17, "ps"], [43, "ok"], [5, "x"]],
       [[15, "pk"], "xs", [3, "x", "z"], [300, "o"], "pd"],
       [[50, "ra"], [125, "bk"], pause, [67, "bh"], [999, "yk"], "z"],
-      [[10, "g"], pause, [20, "y"], pause, [30, "o"], pause, [40, "r"], pause, [100, "p"], pause, [100, "b"], pause, [15, "x"], pause, [5, "z"]]
+      [[10, "g"], pause, [20, "y"], pause, [30, "o"], pause, [40, "r"], pause, [100, "p"], pause, [100, "b"], pause, [15, "x"], pause, [5, "z"]],
+
+      [[150, "bs"], [15, "bd"]],
+      [[7, "x"], [80, "oa", "p"]],
+      [[10, "za"]],
+      [[100, "bk"], [12, "xh"], [75, "r", "pa", "os"]],
+      [["alert", "Purple-boss enemies move much faster than normal bosses."], [4, "u", pause], "u"],
+      [[30, "bd"], [3, "x"], pause, "xs"],
+      [[150, "ra", "rh"]],
+      [[3, "za"], pause, [2, "zh"], pause, "zk"],
+      [[200, "ra"], "xd"],
+      [[375, "p", "r", "b"], [20, "xa"]],
+      [[6, "uh"], [15, "xa"]],
+      [[50, "x"], pause, [10, "zh"]],
+      [[8, "zk", pause], [20, "x"]],
+      [[135, "bh", "rs"]],
+      [[11, [17, "ra"], "z"]],
+      [[14, "xa"], [15, [5, "od"], pause], [5, "z"], [5, "u"]],
+      [[50, [2, "pa"], [5, "r"]], pause, [15, "za"]],
+      [[5, "xd"]],
+      [[60, "b"], [10, "uk"], [130, "b"]],
+      ["uh", [10, [23, "rk"], "z"], [65, "ba"]],
+      [[20, "u"], pause, [40, "xh"]],
+      [[20, "pa"], [25, "pa", "xs"], pause, [200, "gd"], [3, "ua", "zh"]],
+      [[100, "bh"], [8, "za"], [35, [9, "ph", "uk"]]],
+      [[90, "b", "p"], pause, [100, "x"]],
+      [[2, "zd", "ud", pause], "zd", "ud", [300, "ba"], [30, "xh"], pause, [20, "u", "uh", "ua"]]
     ];
     waves.forEach(wave => wave.unshift([8, pause])); //Add a break at the start of each wave
 
     let grid = Array(15).fill().map(() => Array(32).fill(null)); //Array containing 15 arrays (rows), each containing 32 items (columns). Makes a deep copy of each array.
-    grid[0].fill("button", 0, 3); //Three buttons in to top left
+    grid[0].fill("button", 0, 4); //Four buttons in to top left
     grid[0].fill("info", 26, 32); //Area for game info in the top right
-
-    let dragOver;
 
     let buttons = {
       fullscreen: new Image(),
       exitFullscreen: new Image(),
       pause: new Image(),
       play: new Image(),
-      fastForward: new Image()
+      fastForward: new Image(),
+      noAlerts: new Image(),
+      showAlerts: new Image()
     };
     for (let button in buttons) buttons[button].src = `../static/img/towerdefense/${button}.png`;
 
@@ -1032,31 +1222,82 @@
               row--;
           }
           this.lineTo(xPos, yPos);
-          if (grid[row][col] === null) grid[row][col] = "track"; //Change the value of every square the path goes through
+          if (grid[row] && grid[row][col] === null) grid[row][col] = "track"; //Change the value of every square the path goes through
+        }
+      });
+      this.stroke();
+    }
+
+    ctx.drawPreview = function(instructions) {
+      this.lineWidth = 1.5;
+      this.strokeStyle = "#80ffff";
+      this.beginPath();
+      let xPos = instructions.start[0] * 30 + 480;
+      let yPos = instructions.start[1] * 30 + 120;
+      instructions.lines.forEach(line => {
+        let startX = xPos;
+        let startY = yPos;
+        if (startX < 480) startX = 480;
+        if (startX > 1440) startX = 1440;
+        if (startY < 120) startY = 120;
+        if (startY > 570) startY = 570;
+        this.moveTo(startX, startY);
+        for (let i = 0; i < line[1]; i++) {
+          switch (line[0]) {
+            case "right":
+              xPos += 30;
+              break;
+            case "left":
+              xPos -= 30;
+              break;
+            case "down":
+              yPos += 30;
+              break;
+            case "up":
+              yPos -= 30;
+          }
+          let endX = xPos;
+          let endY = yPos;
+          if (endX < 480) endX = 480;
+          if (endX > 1440) endX = 1440;
+          if (endY < 120) endY = 120;
+          if (endY > 570) endY = 570;
+          this.lineTo(endX, endY);
         }
       });
       this.stroke();
     }
 
     function update() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height); //Clear the canvas
+      ctx.clearRect(0, 0, 1920, 1080);
       ctx.drawPath(map);
 
       ctx.drawImage(document.fullscreenElement ? buttons.exitFullscreen : buttons.fullscreen, 15, 15, 30, 30);
-      ctx.drawImage(buttons.pause, 75, 15, 30, 30);
-      ctx.drawImage(fastForward ? buttons.play : buttons.fastForward, 135, 15, 30, 30);
-      document.getElementById("r0c0").onclick = () => {
-        fullscreen ? document.exitFullscreen() : document.documentElement.requestFullscreen();
-        fullscreen = !fullscreen;
-      };
+      ctx.drawImage(noAlerts ? buttons.showAlerts : buttons.noAlerts, 75, 15, 30, 30);
+      ctx.drawImage(buttons.pause, 135, 15, 30, 30);
+      if (difficulty == "easy") ctx.drawImage(fastForward ? buttons.play : buttons.fastForward, 195, 15, 30, 30); ////combine w/ onclick
+      document.getElementById("r0c0").onclick = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
       document.getElementById("r0c1").onclick = () => {
-        paused ? animate = setInterval(update, fastForward ? 10 : 40) : clearInterval(animate);
-        paused = !paused;
-        paused ? document.getElementById("towers").classList.add("hidden") : document.getElementById("towers").classList.remove("hidden");
-        ctx.clearRect(0, 0, 120, 60);
-        ctx.drawImage(buttons.play, 15, 15, 30, 30);
+        if (noAlerts === undefined) gameAlert("No more alerts will be shown.");
+        noAlerts = !noAlerts;
       };
       document.getElementById("r0c2").onclick = () => {
+        paused = !paused;
+        if (paused) {
+          clearInterval(animate);
+          document.getElementById("towers").classList.add("hidden");
+          ////prevent dropping
+        } else {
+          animate = setInterval(update, fastForward ? 10 : 40);
+          document.getElementById("towers").classList.remove("hidden");
+        }
+        let menuTower = towers.find(tower => tower?.menuOpen);
+        menuTower?.closeMenu();
+        if (document.getElementById("alert")) hideAlert(); //If there is an alert, hide it
+        ctx.clearRect(120, 0, 120, 60);
+        ctx.drawImage(buttons.play, 135, 15, 30, 30);
+      };
+      if (difficulty == "easy") document.getElementById("r0c3").onclick = () => {
         fastForward = !fastForward;
         clearInterval(animate);
         animate = setInterval(update, fastForward ? 10 : 40); //If fast forward is turned on, play at 4x the normal speed
@@ -1075,12 +1316,7 @@
         let next = waves[currentWave][currentEnemy];
         while (Array.isArray(next)) {
           if (next[0] == "alert") {
-            if (!Object.values(towerTypes).find(tower => tower.dragging)) {
-              alert(next[1]); //Don't show alert if a tower is being dragged. This is necessary because of an issue with the browser.
-              //if (fullscreen) document.documentElement.requestFullscreen(); //If fullscreen mode was on, return to it after the alert
-            } else {
-              skippedAlert = {message: next[1], time: Date.now()};
-            }
+            if (!noAlerts) gameAlert(next[1]);
             waves[currentWave].splice(currentEnemy, 1); //Remove the array
           } else {
             let repeat = next[0]; //The array's first item is the number of times to repeat
@@ -1112,6 +1348,68 @@
           currentEnemy = 0;
         }
       }
+
+      enemies.forEach((enemy, i) => {
+        //If enemy is offscreen, subtract a life and remove it from the array
+        //Otherwise, draw it in its new position
+        if (enemy.distance >= mapArr.length) { //The enemy is at the end of the track
+          player.lives -= enemy.type.health;
+          enemies.splice(i, 1);
+        } else {
+          if (enemy.stunned) enemy.stunned--;
+          else enemy.distance += enemy.speed * (enemy.slowed ? 2 : 4);
+          if (enemy.slowed) enemy.slowed--;
+
+          enemy.x = map.start[0] * 60;
+          enemy.y = map.start[1] * 60;
+          let img;
+          for (let i = 0; i < Math.round(enemy.distance); i++) {
+            switch (mapArr[i]) {
+              case "right":
+                enemy.x++;
+                break;
+              case "left":
+                enemy.x--;
+                break;
+              case "down":
+                enemy.y++;
+                break;
+              case "up":
+                enemy.y--;
+                break;
+            }
+            if (enemy.abilities.includes("split")) {
+              img = (enemy.type.boss && (mapArr[i] == "right" || mapArr[i] == "left")) ? enemy.type.imgSplitRotated : enemy.type.imgSplit; //If the enemy is a boss and moving horizontally, rotate it
+            } else {
+              img = (enemy.type.boss && (mapArr[i] == "right" || mapArr[i] == "left")) ? enemy.type.imgRotated : enemy.type.img;
+            }
+          }
+          if (!enemy.visible) ctx.globalAlpha = 0.25; //If the enemy is hidden, make it semitransparent
+          ////
+          try {
+            ctx.drawImage(img, enemy.x - 40, enemy.y - 40);
+          } catch (error) {
+            console.log(currentWave, currentEnemy);
+          }
+          ctx.globalAlpha = 1;
+          if (enemy.abilities.includes("healing")) ctx.drawImage(abilitySymbols.healing, enemy.x - 40, enemy.y - 40);
+          if (enemy.abilities.includes("shield")) ctx.drawImage(abilitySymbols.shield, enemy.x - 40, enemy.y - 40);
+          if (enemy.abilities.includes("acceleration")) ctx.drawImage(abilitySymbols.acceleration, enemy.x - 40, enemy.y - 40);
+        }
+
+        if (enemy.abilities.includes("healing") && enemy.health < enemy.type.health && !enemy.noAbilities) {
+          enemy.health += 1 / 75;
+          if (enemy.health > enemy.type.health) enemy.health = enemy.type.health;
+        }
+        if (enemy.abilities.includes("blink")) {
+          if (!(frame % 100)) enemy.visible = !enemy.visible;
+        } else {
+          enemy.visible = true;
+        }
+        if (enemy.noAbilities) enemy.visible = true;
+
+        if (enemy.noAbilities) enemy.noAbilities--;
+      });
 
       towers.forEach(tower => {
         if (tower) {
@@ -1155,8 +1453,6 @@
             ctx.drawCircle(x, y, range * 60);
           }
 
-          if (tower.ability.cooldown) tower.ability.cooldown--;
-
           if (tower.rangeBoosting) {
             let otherTowers = towers.filter(owned => owned && owned != tower && owned.range != Infinity); //Remove this tower, sold towers, and Long-Range Towers
             let closest = otherTowers.sort((a, b) => ((tower.planeX - a.x) ** 2 + (tower.planeY - a.y) ** 2) - ((tower.planeX - b.x) ** 2 + (tower.planeY - b.y) ** 2))[0];
@@ -1190,7 +1486,7 @@
               if (tower.abilityBlocking && !target.abilities.includes("acceleration")) target.noAbilities = tower.permSlow ? Infinity : 250;
               if (tower.bounce) {
                 let bouncePath = [target]; //Make an array of all enemies hit so they aren't bounced to again
-                let close = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < 100 && !bouncePath.includes(enemy));
+                let close = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < 100 && !bouncePath.includes(enemy) && enemy.visible);
                 let bouncesLeft = tower.bounce;
                 while (close.length && bouncesLeft) {
                   let closest = close.sort((a, b) => ((target.x - a.x) ** 2 + (target.y - a.y) ** 2) - ((target.x - b.x) ** 2 + (target.y - b.y) ** 2))[0];
@@ -1200,7 +1496,7 @@
                   if (tower.ultimateBoost) damage *= 2;
                   target.hit(damage, tower);
                   bouncePath.push(target);
-                  close = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < 100 && !bouncePath.includes(enemy));
+                  close = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < 100 && !bouncePath.includes(enemy) && enemy.visible);
                   bouncesLeft--;
                 }
               }
@@ -1231,7 +1527,7 @@
       });
 
       if (superPlane) {
-        superPlane.distance += 8;
+        superPlane.distance += 12;
         if (superPlane.distance > superPlanePathArr.length) {
           superPlane = null;
         } else {
@@ -1270,65 +1566,10 @@
         }
       }
 
-      enemies.forEach((enemy, i) => {
-        //If enemy is offscreen, subtract a life and remove it from the array
-        //Otherwise, draw it in its new position
-        if (enemy.distance >= mapArr.length) { //The enemy is at the end of the track
-          player.lives -= enemy.type.health;
-          enemies.splice(i, 1);
-        } else {
-          if (enemy.stunned) enemy.stunned--;
-          else enemy.distance += enemy.speed * (enemy.slowed ? 2 : 4);
-          if (enemy.slowed) enemy.slowed--;
-
-          enemy.x = map.start[0] * 60;
-          enemy.y = map.start[1] * 60;
-          let img;
-          for (let i = 0; i < Math.round(enemy.distance); i++) {
-            switch (mapArr[i]) {
-              case "right":
-                enemy.x++;
-                break;
-              case "left":
-                enemy.x--;
-                break;
-              case "down":
-                enemy.y++;
-                break;
-              case "up":
-                enemy.y--;
-                break;
-            }
-            if (enemy.abilities.includes("split")) {
-              img = (enemy.type.boss && (mapArr[i] == "right" || mapArr[i] == "left")) ? enemy.type.imgSplitRotated : enemy.type.imgSplit; //If the enemy is a boss and moving horizontally, rotate it
-            } else {
-              img = (enemy.type.boss && (mapArr[i] == "right" || mapArr[i] == "left")) ? enemy.type.imgRotated : enemy.type.img;
-            }
-          }
-          if (!enemy.visible) ctx.globalAlpha = 0.25; //If the enemy is hidden, make it semitransparent
-          ctx.drawImage(img, enemy.x - 40, enemy.y - 40);
-          ctx.globalAlpha = 1;
-          if (enemy.abilities.includes("healing")) ctx.drawImage(abilitySymbols.healing, enemy.x - 40, enemy.y - 40);
-          if (enemy.abilities.includes("shield")) ctx.drawImage(abilitySymbols.shield, enemy.x - 40, enemy.y - 40);
-          if (enemy.abilities.includes("acceleration")) ctx.drawImage(abilitySymbols.acceleration, enemy.x - 40, enemy.y - 40);
-        }
-
-        if (enemy.abilities.includes("healing") && enemy.health < enemy.type.health && !enemy.noAbilities) {
-          enemy.health += 1 / 75;
-          if (enemy.health > enemy.type.health) enemy.health = enemy.type.health;
-        }
-        if (enemy.abilities.includes("blink")) {
-          if (!(frame % 25)) enemy.visible = !enemy.visible;
-        } else {
-          enemy.visible = true;
-        }
-        if (enemy.noAbilities) enemy.visible = true;
-
-        if (enemy.noAbilities) enemy.noAbilities--;
-      });
-
       for (let tower in towerTypes) {
         let towerEl = document.getElementById(tower);
+
+        if (towerTypes[tower].ability.cooldown) towerTypes[tower].ability.cooldown--;
 
         if (player.money >= towerTypes[tower].price) {
           towerEl.classList.remove("unselectable");
@@ -1372,11 +1613,6 @@
             }));
           };
           towerEl.ondragend = () => {
-            //If an alert was skipped less than 10 seconds ago, show it
-            if (Date.now() - skippedAlert?.time < 10_000) {
-              alert(skippedAlert.message);
-              skippedAlert = null;
-            }
             delete towerTypes[tower].dragging;
             dragOver = null;
             document.getElementById("grid").classList.remove("visibleLines");
@@ -1394,11 +1630,11 @@
 
         let ability = towerTypes[tower].ability;
         let abilityButton = document.getElementById(tower + "Ability");
-        if (ability.bought && towers.find(owned => owned?.name == towerTypes[tower].name)) {
+        if (ability.bought && towers.find(owned => owned?.name == towerTypes[tower].name) && difficulty == "easy") {
           abilityButton.classList.remove("invisible");
           if (ability.cooldown) {
             abilityButton.classList.add("unselectable");
-            let percent = ability.cooldown / 1500 * 100;
+            let percent = ability.cooldown / 3000 * 100;
             abilityButton.style.background = `linear-gradient(to left, var(--emphasis-color), var(--emphasis-color) ${percent}%, gray ${percent}%)`; //Show how long until the ability can be used again
           } else {
             abilityButton.style.background = null; //Reset the background
@@ -1414,11 +1650,11 @@
 
       let menuTower = towers.find(tower => tower?.menuOpen);
       if (menuTower) {
-        if (player.money >= menuTower.upgradePrice("range")) document.getElementById("range").classList.remove("unselectable");
+        if (player.money >= menuTower.upgradePrice("range") && menuTower.range !== Infinity) document.getElementById("range").classList.remove("unselectable");
         if (player.money >= menuTower.upgradePrice("speed")) document.getElementById("speed").classList.remove("unselectable");
         if (player.money >= menuTower.upgradePrice("strength")) document.getElementById("strength").classList.remove("unselectable");
         if (player.money >= menuTower.nextExtra.price) document.getElementById("extra").classList.remove("unselectable");
-        if (player.money >= menuTower.ability.price && !menuTower.ability.bought) document.getElementById("ability").classList.remove("unselectable");
+        if (player.money >= menuTower.ability.price && !menuTower.ability.bought && difficulty == "easy") document.getElementById("ability").classList.remove("unselectable");
       }
 
       //Update text in top-right
@@ -1427,9 +1663,9 @@
       if (player.lives > 0) {
         //Display time, money, and lives in the top-right corner
         ctx.fillStyle = "#ddd";
-        ctx.fillText(`${Math.floor(seconds / 60).toString().padStart(2, "0")}:${(seconds % 60).toString().padStart(2, "0")}`, 1580, 40); //Show minutes and seconds since the game started
+        ctx.fillText(`${Math.floor(seconds / 60).toString().padStart(2, "0")}:${(seconds % 60).toString().padStart(2, "0")}`, 1564, 40); //Show minutes and seconds since the game started
         ctx.fillStyle = "#80ff80";
-        ctx.fillText("$" + player.money.toString().padStart(4, "0"), 1700, 40);
+        ctx.fillText("$" + player.money.toString().padStart(5, "0"), 1684, 40);
         ctx.fillStyle = "#ff6860";
         ctx.fillText("❤︎" + player.lives.toString().padStart(3, "0"), 1820, 40);
       } else {
@@ -1439,12 +1675,19 @@
       frame++;
     }
 
+    let progress = localStorage.getItem("tdProgress") || "00000"; //2 means map completed on hard, 1 means map completed on easy, 0 means map not completed
     let player = {
       money: 50,
       lives: 100,
       bonusMoney: 0,
       bonusLives: 0
     };
+    let mapIndex = 0;
+    let map;
+    let mapArr;
+    let planePathArr;
+    let superPlanePathArr;
+    let difficulty = "easy";
     let enemies = [];
     let blinkingCount = 0; //Keep track of blinking enemies to alternate between visible and invisible
     let towers = [];
@@ -1453,97 +1696,341 @@
     let currentEnemy = 0;
     let superPlane;
     let seconds = 0;
-    let fullscreen = false;
-    let paused = false;
-    let fastForward = false;
+    let noAlerts;
+    let paused;
+    let fastForward;
+    let dragOver;
     let animate;
-    let skippedAlert;
 
-    let map = {
-      start: [6.5, -0.5],
-      lines: [
-        ["down", 13],
-        ["left", 3],
-        ["up", 3],
-        ["right", 7],
-        ["down", 2],
-        ["right", 2],
-        ["up", 6],
-        ["left", 3],
-        ["up", 3],
-        ["right", 7],
-        ["down", 8],
-        ["right", 6],
-        ["down", 3],
-        ["left", 3],
-        ["up", 8],
-        ["right", 9],
-        ["down", 4],
-        ["left", 4],
-        ["down", 2],
-        ["right", 8],
-      ]
-    };
-
-    //Make an array with one item for each pixel of the path
-    let mapArr = [];
-    map.lines.forEach(line => {
-      for (let i = 0; i < line[1] * 60; i++) mapArr.push(line[0]);
-    });
-
-    let planePathArr = mapArr.slice(60, -60); //Remove start and end for plane path
-    //Make the plane return to the start once it reaches the end
-    for (let i = planePathArr.length - 1; i >= 0; i--) {
-      switch (planePathArr[i]) {
-        case "right":
-          planePathArr.push("left");
-          break;
-        case "left":
-          planePathArr.push("right");
-          break;
-        case "down":
-          planePathArr.push("up");
-          break;
-        case "up":
-          planePathArr.push("down");
-          break;
+    let maps = [
+      {
+        start: [6.5, -0.5],
+        lines: [
+          ["down", 13],
+          ["left", 3],
+          ["up", 3],
+          ["right", 7],
+          ["down", 2],
+          ["right", 2],
+          ["up", 6],
+          ["left", 3],
+          ["up", 3],
+          ["right", 7],
+          ["down", 8],
+          ["right", 6],
+          ["down", 3],
+          ["left", 3],
+          ["up", 8],
+          ["right", 9],
+          ["down", 4],
+          ["left", 4],
+          ["down", 2],
+          ["right", 8]
+        ]
+      },
+      {
+        start: [-0.5, 12.5],
+        lines: [
+          ["right", 9],
+          ["up", 10],
+          ["right", 13],
+          ["down", 8],
+          ["left", 2],
+          ["up", 6],
+          ["left", 9],
+          ["down", 8],
+          ["right", 2],
+          ["up", 6],
+          ["right", 5],
+          ["down", 6],
+          ["right", 6],
+          ["up", 10],
+          ["right", 9]
+        ]
+      },
+      {
+        start: [23.5, -0.5],
+        lines: [
+          ["down", 3],
+          ["right", 5],
+          ["down", 4],
+          ["left", 4],
+          ["down", 3],
+          ["right", 2],
+          ["down", 4],
+          ["left", 9],
+          ["up", 4],
+          ["right", 2],
+          ["down", 2],
+          ["left", 8],
+          ["down", 1],
+          ["left", 7],
+          ["up", 5],
+          ["right", 9],
+          ["up", 5],
+          ["left", 4],
+          ["down", 2],
+          ["right", 8],
+          ["up", 1],
+          ["right", 1],
+          ["up", 1],
+          ["right", 1],
+          ["up", 1],
+          ["right", 1],
+          ["up", 2]
+        ]
+      },
+      {
+        start: [8.5, -0.5],
+        lines: [
+          ["down", 13],
+          ["right", 6],
+          ["up", 5],
+          ["right", 4],
+          ["down", 4],
+          ["left", 9],
+          ["up", 6],
+          ["right", 7],
+          ["down", 4],
+          ["right", 9],
+          ["down", 3],
+          ["left", 5],
+          ["up", 7],
+          ["right", 2],
+          ["down", 2],
+          ["right", 4],
+          ["up", 3],
+          ["left", 9],
+          ["up", 1],
+          ["right", 4],
+          ["up", 1],
+          ["left", 22]
+        ]
+      },
+      {
+        start: [32.5, 7.5],
+        lines: [
+          ["left", 4],
+          ["down", 2],
+          ["left", 4],
+          ["up", 2],
+          ["left", 3],
+          ["up", 5],
+          ["left", 4],
+          ["down", 5],
+          ["left", 3],
+          ["down", 5],
+          ["left", 4],
+          ["up", 5],
+          ["left", 3],
+          ["up", 2],
+          ["left", 4],
+          ["down", 2],
+          ["left", 4]
+        ]
       }
-    }
+    ];
 
-    let superPlanePathArr = [];
-    //SuperPlane moves from end to start
-    for (let i = mapArr.length - 1; i >= 0; i--) {
-      switch (mapArr[i]) {
-        case "right":
-          superPlanePathArr.push("left");
-          break;
-        case "left":
-          superPlanePathArr.push("right");
-          break;
-        case "down":
-          superPlanePathArr.push("up");
-          break;
-        case "up":
-          superPlanePathArr.push("down");
-          break;
-      }
-    }
+    progress = progress.padEnd(maps.length, "0");
+    localStorage.setItem("tdProgress", progress);
+    progress = progress.split(""); //Turn the string into an array
 
     ctx.fillStyle = "white";
     ctx.font = "128px Segoe UI";
     ctx.textAlign = "center";
     ctx.fillText("Tower Defense", 960, 300);
     ctx.font = "48px Segoe UI";
-    ctx.fillText("Click to start the game", 960, 600);
+    ctx.fillText("Click to continue", 960, 600);
     ctx.font = "32px Segoe UI";
     ctx.fillText("Created by Oley Birkeland", 960, 1000);
-    if (localStorage.getItem("tdComplete")) document.getElementById("complete").classList.remove("hidden");
+    let complete = progress.reduce((a, b) => +a + +b); //Convert every character to a number and add
+    let total = progress.length * 2;
+    let progressEl = document.getElementById("progress");
+    if (complete == total) {
+      progressEl.classList.add("complete");
+      let medal = document.createElement("img");
+      medal.id = "medal";
+      medal.src = "../static/img/towerdefense/medal.png";
+      progressEl.append(medal);
+    }
+    let progressText = document.createElement("span");
+    progressText.id = "progressText";
+    progressEl.append(progressText);
+    document.getElementById("progressText").innerText = `${complete}/${total} complete`;
 
-    document.getElementById("game").onclick = function() {
-      document.getElementById("complete").classList.add("hidden");
+    function showMaps() {
+      document.getElementById("progress").classList.add("hidden");
+      ctx.clearRect(0, 0, 1920, 1080); //Clear the canvas
 
-      //Start the game
-      animate = setInterval(update, 40);
+      let container = document.getElementById("container");
+
+      let back = document.createElement("div");
+      back.id = "back";
+      back.innerText = "🡄";
+      back.onclick = () => window.location.reload();
+      container.appendChild(back);
+
+      ctx.font = "48px Segoe UI";
+      ctx.textAlign = "center";
+      ctx.fillText("Choose a map", 960, 75);
+      let left = document.createElement("div");
+      let right = document.createElement("div");
+      left.id = "prevMap";
+      right.id = "nextMap";
+      left.innerText = "◀";
+      right.innerText = "▶";
+      left.onclick = () => {
+        (mapIndex == 0) ? mapIndex = maps.length - 1 : mapIndex--;
+        switchMap();
+      }
+      right.onclick = () => {
+        (mapIndex == maps.length - 1) ? mapIndex = 0 : mapIndex++;
+        switchMap();
+      }
+      container.appendChild(left);
+      container.appendChild(right);
+
+      let difficultyButtons = document.createElement("div");
+      difficultyButtons.id = "difficulty";
+      difficultyButtons.innerText = "Difficulty: ";
+      let easy = document.createElement("button");
+      let hard = document.createElement("button");
+      easy.id = "easy";
+      hard.id = "hard";
+      easy.innerText = "Easy";
+      hard.innerText = "Hard";
+      easy.onclick = () => {
+        difficulty = "easy";
+        switchDifficulty();
+      };
+      hard.onclick = () => {
+        difficulty = "hard";
+        switchDifficulty();
+      };
+      container.appendChild(difficultyButtons);
+      document.getElementById("difficulty").appendChild(easy);
+      document.getElementById("difficulty").appendChild(hard);
+
+      let startButton = document.createElement("button");
+      startButton.id = "startButton";
+      startButton.innerText = "Start game";
+      container.appendChild(startButton);
+
+      switchMap();
+
+      document.getElementById("game").onclick = null;
+    }
+    document.getElementById("game").onclick = showMaps;
+
+    function switchMap() {
+      map = maps[mapIndex];
+      ctx.clearRect(480, 120, 960, 450);
+      ctx.drawPreview(map); //Draw preview of map
+      ctx.strokeStyle = "white";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(480, 120, 960, 450);
+      switchDifficulty();
+    }
+
+    function switchDifficulty() {
+      let easy = document.getElementById("easy");
+      let hard = document.getElementById("hard");
+      let startButton = document.getElementById("startButton");
+      let mapComplete = +progress[mapIndex];
+      ctx.font = "30px Segoe UI";
+      ctx.clearRect(0, 675, 1920, 275);
+      ctx.fillStyle = "white";
+      if (difficulty == "easy") {
+        easy.classList.add("pressed");
+        hard.classList.remove("pressed");
+        ctx.fillText("• 50 waves", 960, 700);
+        ctx.fillText("• 100 lives", 960, 750);
+        if (mapComplete) {
+          ctx.fillStyle = "#80ff80";
+          ctx.fillText("✔️ Easy mode complete", 960, 935);
+        }
+      } else {
+        hard.classList.add("pressed");
+        easy.classList.remove("pressed");
+        ctx.fillText("• 75 waves", 960, 700);
+        ctx.fillText("• 50 lives", 960, 750);
+        ctx.fillText("• No abilities", 960, 800);
+        ctx.fillText("• Fast forward permanently on", 960, 850);
+        if (mapComplete == 2) {
+          ctx.fillStyle = "#80ff80";
+          ctx.fillText("✔️ Hard mode complete", 960, 935);
+        } else if (!mapComplete) {
+          ctx.fillStyle = "#ff6860";
+          ctx.fillText("🔒 Complete easy mode to unlock hard mode", 960, 935);
+          startButton.classList.add("unselectable");
+          startButton.onclick = null;
+        }
+      }
+      if (difficulty == "easy" || mapComplete) {
+        startButton.classList.remove("unselectable");
+        startButton.onclick = startGame;
+      }
+    }
+
+    function startGame() {
+      document.getElementById("back").remove();
+      document.getElementById("prevMap").remove();
+      document.getElementById("nextMap").remove();
+      document.getElementById("difficulty").remove();
+      document.getElementById("startButton").remove();
+
+      //Make an array with one item for each pixel of the path
+      mapArr = [];
+      map.lines.forEach(line => {
+        for (let i = 0; i < line[1] * 60; i++) mapArr.push(line[0]);
+      });
+
+      planePathArr = mapArr.slice(60, -60); //Remove start and end for plane path
+      //Make the plane return to the start once it reaches the end
+      for (let i = planePathArr.length - 1; i >= 0; i--) {
+        switch (planePathArr[i]) {
+          case "right":
+            planePathArr.push("left");
+            break;
+          case "left":
+            planePathArr.push("right");
+            break;
+          case "down":
+            planePathArr.push("up");
+            break;
+          case "up":
+            planePathArr.push("down");
+            break;
+        }
+      }
+
+      superPlanePathArr = [];
+      //SuperPlane moves from end to start
+      for (let i = mapArr.length - 1; i >= 0; i--) {
+        switch (mapArr[i]) {
+          case "right":
+            superPlanePathArr.push("left");
+            break;
+          case "left":
+            superPlanePathArr.push("right");
+            break;
+          case "down":
+            superPlanePathArr.push("up");
+            break;
+          case "up":
+            superPlanePathArr.push("down");
+            break;
+        }
+      }
+
+      if (difficulty == "easy") {
+        waves.splice(-25, 25); //Remove the last 25 waves
+        animate = setInterval(update, 40); //Start the game at normal speed
+      } else {
+        player.lives = 50;
+        fastForward = true;
+        animate = setInterval(update, 10); //Start the game at a 4x speed
+      }
 
       //Create the grid
       document.getElementById("grid").classList.remove("hidden")
@@ -1571,7 +2058,7 @@
         abilityButton.onmouseover = () => document.getElementById("towerDesc").innerText = ability.description;
         abilityButton.onmouseout = () => document.getElementById("towerDesc").innerText = null;
         abilityButton.onclick = () => {
-          if (ability.bought && !ability.cooldown && towers.find(owned => owned?.name == towerTypes[tower].name)) {
+          if (ability.bought && !ability.cooldown && towers.find(owned => owned?.name == towerTypes[tower].name) && difficulty == "easy") {
             ability.use();
             ability.cooldown = 3000;
           }
@@ -1581,13 +2068,37 @@
       this.onclick = null;
     };
 
+    function gameAlert(message) {
+      document.getElementById("r0c2").click(); //Pause the game
+      let alertBox = document.createElement("div");
+      alertBox.id = "alert";
+      alertBox.innerHTML = message;
+      let okButton = document.createElement("button");
+      okButton.id = "ok";
+      okButton.innerText = "OK";
+      okButton.onclick = hideAlert;
+      alertBox.appendChild(okButton);
+      document.getElementById("container").appendChild(alertBox);
+      document.addEventListener("keydown", hideAlert);
+    }
+
+    function hideAlert() {
+      document.getElementById("alert").remove(); //Hide the alert box
+      if (paused) document.getElementById("r0c2").click(); //Unpause the game
+      document.removeEventListener("keydown", hideAlert);
+    }
+
     function endGame(complete) {
-      if (complete) localStorage.setItem("tdComplete", "true");
+      if (complete) {
+        let num = (difficulty == "hard") ? 2 : 1;
+        if (progress[mapIndex] < num) progress.splice(mapIndex, 1, num); //Update progress
+        localStorage.setItem("tdProgress", progress.join("")); //Save to local storage as string
+      }
       //If a tower has a menu open, close it
       let menuTower = towers.find(tower => tower?.menuOpen);
       menuTower?.closeMenu();
       clearInterval(animate);
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, 1920, 1080);
       document.getElementById("grid").classList.add("hidden");
       document.getElementById("towers").classList.add("hidden");
       ctx.fillStyle = "white";
@@ -1605,13 +2116,13 @@
 
     //Achievements will be added later
     let achievements = [
-      "Complete a game with 100 lives left",
+      "Complete a game without losing any lives",
       "Fully upgrade a tower",
       "Purchase every tower in one game",
-      "Win a game without using any abilities",
       "Use every ability in one game",
       "Win a game without any Ultimate Towers",
-      "Win a game without any Basic Towers"
+      "Win a game without any Basic Towers",
+      "Win a game without buying more than three towers"
     ];
   </script>
 {% endblock %}

@@ -1831,7 +1831,7 @@
       }
     ];
 
-    if (progress == "00000" && localStorage.getItem("tdComplete")) progress = "10000";
+    if (progress == "00000" && localStorage.getItem("tdComplete")) progress = "10000"; ////
     progress = progress.padEnd(maps.length, "0");
     localStorage.setItem("tdProgress", progress);
     progress = progress.split(""); //Turn the string into an array

@@ -123,7 +123,7 @@
     font-size: 200%;
   }
 
-  #easy, #hard {
+  #normal, #hard {
     padding: 0.25% 1%;
     margin: 0 0.5%;
     background: transparent;
@@ -133,11 +133,11 @@
     font-weight: 500;
   }
 
-  #easy {
+  #normal {
     color: var(--light-green);
   }
 
-  #easy.pressed {
+  #normal.pressed {
     background: var(--light-green);
     border-color: var(--light-green);
     color: var(--bg-dark);
@@ -155,7 +155,7 @@
     cursor: pointer;
   }
 
-  #easy:not(.pressed):hover, #hard:not(.pressed):hover {
+  #normal:not(.pressed):hover, #hard:not(.pressed):hover {
     background: var(--bg-dark);
   }
 
@@ -914,7 +914,7 @@
               }
             };
             abilityButton.onclick = () => {
-                if (!this.ability.bought && player.money >= this.ability.price && difficulty == "easy") {
+                if (!this.ability.bought && player.money >= this.ability.price && difficulty == "normal") {
                 player.money -= this.ability.price;
                 this.value += this.ability.price;
                 this.ability.bought = true;
@@ -1275,7 +1275,7 @@
       ctx.drawImage(document.fullscreenElement ? buttons.exitFullscreen : buttons.fullscreen, 15, 15, 30, 30);
       ctx.drawImage(noAlerts ? buttons.showAlerts : buttons.noAlerts, 75, 15, 30, 30);
       ctx.drawImage(buttons.pause, 135, 15, 30, 30);
-      if (difficulty == "easy") ctx.drawImage(fastForward ? buttons.play : buttons.fastForward, 195, 15, 30, 30); ////combine w/ onclick
+      if (difficulty == "normal") ctx.drawImage(fastForward ? buttons.play : buttons.fastForward, 195, 15, 30, 30); ////combine w/ onclick
       document.getElementById("r0c0").onclick = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
       document.getElementById("r0c1").onclick = () => {
         if (noAlerts === undefined) gameAlert("No more alerts will be shown.");
@@ -1297,7 +1297,7 @@
         ctx.clearRect(120, 0, 120, 60);
         ctx.drawImage(buttons.play, 135, 15, 30, 30);
       };
-      if (difficulty == "easy") document.getElementById("r0c3").onclick = () => {
+      if (difficulty == "normal") document.getElementById("r0c3").onclick = () => {
         fastForward = !fastForward;
         clearInterval(animate);
         animate = setInterval(update, fastForward ? 10 : 40); //If fast forward is turned on, play at 4x the normal speed
@@ -1630,7 +1630,7 @@
 
         let ability = towerTypes[tower].ability;
         let abilityButton = document.getElementById(tower + "Ability");
-        if (ability.bought && towers.find(owned => owned?.name == towerTypes[tower].name) && difficulty == "easy") {
+        if (ability.bought && towers.find(owned => owned?.name == towerTypes[tower].name) && difficulty == "normal") {
           abilityButton.classList.remove("invisible");
           if (ability.cooldown) {
             abilityButton.classList.add("unselectable");
@@ -1654,7 +1654,7 @@
         if (player.money >= menuTower.upgradePrice("speed")) document.getElementById("speed").classList.remove("unselectable");
         if (player.money >= menuTower.upgradePrice("strength")) document.getElementById("strength").classList.remove("unselectable");
         if (player.money >= menuTower.nextExtra.price) document.getElementById("extra").classList.remove("unselectable");
-        if (player.money >= menuTower.ability.price && !menuTower.ability.bought && difficulty == "easy") document.getElementById("ability").classList.remove("unselectable");
+        if (player.money >= menuTower.ability.price && !menuTower.ability.bought && difficulty == "normal") document.getElementById("ability").classList.remove("unselectable");
       }
 
       //Update text in top-right
@@ -1675,7 +1675,7 @@
       frame++;
     }
 
-    let progress = localStorage.getItem("tdProgress") || "00000"; //2 means map completed on hard, 1 means map completed on easy, 0 means map not completed
+    let progress = localStorage.getItem("tdProgress") || "00000"; //2 means map completed on hard, 1 means map completed on normal, 0 means map not completed
     let player = {
       money: 50,
       lives: 100,
@@ -1687,7 +1687,7 @@
     let mapArr;
     let planePathArr;
     let superPlanePathArr;
-    let difficulty = "easy";
+    let difficulty = "normal";
     let enemies = [];
     let blinkingCount = 0; //Keep track of blinking enemies to alternate between visible and invisible
     let towers = [];
@@ -1831,6 +1831,7 @@
       }
     ];
 
+    if (progress == "00000" && localStorage.getItem("tdComplete")) progress = "10000";
     progress = progress.padEnd(maps.length, "0");
     localStorage.setItem("tdProgress", progress);
     progress = progress.split(""); //Turn the string into an array
@@ -1893,14 +1894,14 @@
       let difficultyButtons = document.createElement("div");
       difficultyButtons.id = "difficulty";
       difficultyButtons.innerText = "Difficulty: ";
-      let easy = document.createElement("button");
+      let normal = document.createElement("button");
       let hard = document.createElement("button");
-      easy.id = "easy";
+      normal.id = "normal";
       hard.id = "hard";
-      easy.innerText = "Easy";
+      normal.innerText = "Normal";
       hard.innerText = "Hard";
-      easy.onclick = () => {
-        difficulty = "easy";
+      normal.onclick = () => {
+        difficulty = "normal";
         switchDifficulty();
       };
       hard.onclick = () => {
@@ -1908,7 +1909,7 @@
         switchDifficulty();
       };
       container.appendChild(difficultyButtons);
-      document.getElementById("difficulty").appendChild(easy);
+      document.getElementById("difficulty").appendChild(normal);
       document.getElementById("difficulty").appendChild(hard);
 
       let startButton = document.createElement("button");
@@ -1933,25 +1934,25 @@
     }
 
     function switchDifficulty() {
-      let easy = document.getElementById("easy");
+      let normal = document.getElementById("normal");
       let hard = document.getElementById("hard");
       let startButton = document.getElementById("startButton");
       let mapComplete = +progress[mapIndex];
       ctx.font = "30px Segoe UI";
       ctx.clearRect(0, 675, 1920, 275);
       ctx.fillStyle = "white";
-      if (difficulty == "easy") {
-        easy.classList.add("pressed");
+      if (difficulty == "normal") {
+        normal.classList.add("pressed");
         hard.classList.remove("pressed");
         ctx.fillText("• 50 waves", 960, 700);
         ctx.fillText("• 100 lives", 960, 750);
         if (mapComplete) {
           ctx.fillStyle = "#80ff80";
-          ctx.fillText("✔️ Easy mode complete", 960, 935);
+          ctx.fillText("✔️ Normal mode complete", 960, 935);
         }
       } else {
         hard.classList.add("pressed");
-        easy.classList.remove("pressed");
+        normal.classList.remove("pressed");
         ctx.fillText("• 75 waves", 960, 700);
         ctx.fillText("• 50 lives", 960, 750);
         ctx.fillText("• No abilities", 960, 800);
@@ -1961,12 +1962,12 @@
           ctx.fillText("✔️ Hard mode complete", 960, 935);
         } else if (!mapComplete) {
           ctx.fillStyle = "#ff6860";
-          ctx.fillText("🔒 Complete easy mode to unlock hard mode", 960, 935);
+          ctx.fillText("🔒 Complete normal mode to unlock hard mode", 960, 935);
           startButton.classList.add("unselectable");
           startButton.onclick = null;
         }
       }
-      if (difficulty == "easy" || mapComplete) {
+      if (difficulty == "normal" || mapComplete) {
         startButton.classList.remove("unselectable");
         startButton.onclick = startGame;
       }
@@ -2023,7 +2024,7 @@
         }
       }
 
-      if (difficulty == "easy") {
+      if (difficulty == "normal") {
         waves.splice(-25, 25); //Remove the last 25 waves
         animate = setInterval(update, 40); //Start the game at normal speed
       } else {
@@ -2058,7 +2059,7 @@
         abilityButton.onmouseover = () => document.getElementById("towerDesc").innerText = ability.description;
         abilityButton.onmouseout = () => document.getElementById("towerDesc").innerText = null;
         abilityButton.onclick = () => {
-          if (ability.bought && !ability.cooldown && towers.find(owned => owned?.name == towerTypes[tower].name) && difficulty == "easy") {
+          if (ability.bought && !ability.cooldown && towers.find(owned => owned?.name == towerTypes[tower].name) && difficulty == "normal") {
             ability.use();
             ability.cooldown = 3000;
           }
@@ -2110,7 +2111,7 @@
       ctx.fillText(complete ? "You have completed the game." : `Time: ${Math.floor(seconds / 60)}:${seconds % 60 < 10 ? "0" + seconds % 60 : seconds % 60}`, 960, 500);
       ctx.font = "48px Segoe UI";
       ctx.fillStyle = "white";
-      ctx.fillText("Click to play again", 960, 800);
+      ctx.fillText("Click to return to the home screen", 960, 800);
       document.getElementById("game").onclick = () => window.location.reload();
     }
 

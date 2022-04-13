@@ -173,28 +173,28 @@ let maps = [
       ["up", 3],
       ["left", 5],
       ["down", 7],
-      ["right", 8]
+      ["right", 9]
     ]
   },
   {
     name: "Outer Loop",
     author: "Mr. Smith",
-    start: [15.5, -0.5],
+    start: [14.5, -0.5],
     lines: [
       ["down", 2],
-      ["left", 15],
+      ["left", 14],
       ["down", 13],
-      ["right", 15],
+      ["right", 14],
       ["up", 4],
       ["left", 3],
       ["down", 3],
-      ["right", 8],
+      ["right", 9],
       ["up", 3],
       ["left", 3],
       ["down", 4],
       ["right", 14],
       ["up", 13],
-      ["left", 13],
+      ["left", 14],
       ["up", 2]
     ]
   },
@@ -243,7 +243,6 @@ let maps = [
       ["right", 4],
       ["left", 2],
       ["right", 9]
-
     ]
   },
   {

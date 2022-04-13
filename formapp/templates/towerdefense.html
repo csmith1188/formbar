@@ -251,9 +251,7 @@
 
   #startButton {
     position: absolute;
-    left: 50%;
     bottom: 5%;
-    transform: translateX(-50%);
     padding: 0.25% 1%;
     background: transparent;
     color: var(--light-cyan);
@@ -526,7 +524,7 @@
       },
       slowing: {
         name: "Slowing Tower",
-        color: "var(--light-purple)",
+        color: "var(--light-cyan)",
         description: "Weaker attacks, but hits slow down enemies for 10 seconds.",
         range: 3.28,
         speed: 0.68,
@@ -552,6 +550,37 @@
           price: 60,
           use: function() {
             enemies.forEach(enemy => enemy.stunned = 75);
+          }
+        }
+      },
+      poison: {
+        name: "Poison Tower",
+        color: "var(--light-purple)",
+        description: "Enemies are poisoned when hit, taking 0.4 damage a second for 5 seconds.",
+        range: 3.16,
+        speed: 0.8,
+        strength: 0.6,
+        poison: true,
+        price: 50,
+        extra1: {
+          description: "Poison can splash to a nearby enemy.",
+          price: 30,
+          add: function() {
+            this.poisonSplash = true;
+          }
+        },
+        extra2: {
+          description: "Poisoned enemies take damage twice a second.",
+          price: 40,
+          add: function() {
+            this.doublePoison = true;
+          }
+        },
+        ability: {
+          description: "All onscreen enemeis move backward for 3 seconds.",
+          price: 55,
+          use: function() {
+            enemies.forEach(enemy => enemy.reverse = 75);
           }
         }
       },
@@ -614,7 +643,7 @@
           price: 100,
           use: function() {
             let inExplosion = enemies.filter(enemy => Math.sqrt((960 - enemy.x) ** 2 + (450 - enemy.y) ** 2) < 400);
-            inExplosion.forEach(enemy => enemy.hit(25, this, true));
+            inExplosion.forEach(enemy => enemy.hit(25, this, "explosion"));
             ctx.strokeStyle = "transparent";
             ctx.fillStyle = "#ff8f4055";
             ctx.drawCircle(960, 450, 400);
@@ -811,7 +840,7 @@
         enemyTypes[type].imgRotated.src = `../static/img/towerdefense/${type}-r.png`;
         if (type == "boss") {
           enemyTypes[type].imgSplitRotated = new Image();
-          enemyTypes[type].imgSplitRotated.src = `../static/img/towerdefense/${type}-split-r.png`;
+          enemyTypes[type].imgSplitRotated.src = `../static/img/towerdefense/boss-split-r.png`;
         }
       }
     }
@@ -1095,10 +1124,11 @@
           this.visible = true;
         }
         this.slowed = 0;
-        this.hit = function(damage, tower, explosion) {
+        this.poisoned = 0;
+        this.hit = function(damage, tower, type) {
           if (this.stunned) damage *= 2;
-          if (!this.abilities.includes("shield") || explosion || tower.name == "Long-Range Tower") this.health -= damage; //Only Long-Range Towers and explosions can damage shielded enemies
-          if (this.health <= 0) {
+          if (!this.abilities.includes("shield") || type == "explosion" || type == "poison" || tower.name == "Long-Range Tower") this.health -= damage; //Only explosions, poison, and Long-Range Towers can damage shielded enemies
+          if (this.health <= 0.001) {
             let i = enemies.indexOf(this);
             player.money += (this.type.boss ? 10 : 1) * (tower?.extraMoney ? 3 : 1);
             if (this.abilities.includes("split")) {
@@ -1156,7 +1186,7 @@
       [[6, "g", "y", "o", pause], "g", "y", "o"],
       [[9, "y"], [7, "o"]],
       [[50, "g"]],
-      [["alert", "<h1>New enemy ability: <b>Healing</b></h1>Enemies with this ability gradually regain health, so you need to destroy them quickly."], [9, "oh", pause], "oh"],
+      [["alert", "<h1>New enemy ability: <b>Healing</b></h1>Enemies with this ability gradually regain health, so you need to destroy them quickly. They're also immune to poison."], [9, "oh", pause], "oh"],
       [[7, [6, "y", pause]], [6, "y"]],
       [[20, "oh"]],
       [[15, "o", "y"]],
@@ -1179,7 +1209,7 @@
       [[5, "bs"]],
       [[2, [35, "r"], [5, "p"]]],
       [[14, "ba"], [26, "rh"]],
-      [["alert", "<h1>New enemy ability: <b>Shield</b></h1>Enemies with this ability can only be damaged by explosions and hits from Long-Range Towers."], "gd"],
+      [["alert", "<h1>New enemy ability: <b>Shield</b></h1>Enemies with this ability can only be damaged by explosions, poison, and hits from Long-Range Towers."], "gd"],
       [[30, "o"], pause, "x", pause, "x"],
       [[3, "bs"], [3, "ps"]],
       [[20, "rk"], pause, [5, "bk"]],
@@ -1220,7 +1250,7 @@
       ["uh", [10, [23, "rk"], "z"], [65, "ba"]],
       [[20, "u"], pause, [40, "xh"]],
       [[20, "pa"], [25, "pa", "xs"], pause, [200, "gd"], [3, "ua", "zh"]],
-      [[100, "bh"], [8, "za"], [35, [9, "ph", "uk"]]],
+      [[111, "bh"], [8, "za"], [35, [9, "ph", "uk"]]],
       [[90, "b", "p"], pause, [100, "x"]],
       [[2, "zd", "ud", pause], "zd", "ud", [300, "ba"], [30, "xh"], pause, [20, "u", "uh", "ua"]]
     ];
@@ -1437,13 +1467,21 @@
           player.lives -= enemy.type.health;
           enemies.splice(i, 1);
         } else {
-          if (enemy.stunned) enemy.stunned--;
-          else enemy.distance += enemy.speed * (enemy.slowed ? 2 : 4);
+          if (enemy.stunned) {
+            enemy.stunned--;
+          } else if (enemy.reverse) {
+            enemy.distance -= enemy.speed * (enemy.slowed ? 2 : 4);
+            enemy.reverse--;
+          } else {
+            enemy.distance += enemy.speed * (enemy.slowed ? 2 : 4);
+          }
           if (enemy.slowed) enemy.slowed--;
+          if (enemy.poisoned && --enemy.poisoned % (enemy.doublePoisoned ? 12.5 : 25) < 1) enemy.hit(0.4, null, "poison");
+          if (!enemy.poisoned) delete enemy.doublePoisoned;
 
           enemy.x = map.start[0] * 60;
           enemy.y = map.start[1] * 60;
-          let img;
+          let img = enemy.type.img;
           for (let i = 0; i < Math.round(enemy.distance); i++) {
             switch (mapArr[i]) {
               case "right":
@@ -1461,8 +1499,8 @@
             }
             if (enemy.abilities.includes("split")) {
               img = (enemy.type.boss && (mapArr[i] == "right" || mapArr[i] == "left")) ? enemy.type.imgSplitRotated : enemy.type.imgSplit; //If the enemy is a boss and moving horizontally, rotate it
-            } else {
-              img = (enemy.type.boss && (mapArr[i] == "right" || mapArr[i] == "left")) ? enemy.type.imgRotated : enemy.type.img;
+            } else if (enemy.type.boss && (mapArr[i] == "right" || mapArr[i] == "left")) {
+              img = enemy.type.imgRotated;
             }
           }
           if (!enemy.visible) ctx.globalAlpha = 0.25; //If the enemy is hidden, make it semitransparent
@@ -1565,6 +1603,10 @@
               target.hit(damage, tower);
               if (tower.slowing && !target.abilities.includes("acceleration")) target.slowed = tower.permSlow ? Infinity : 250;
               if (tower.abilityBlocking && !target.abilities.includes("acceleration")) target.noAbilities = tower.permSlow ? Infinity : 250;
+              if (tower.poison && !target.abilities.includes("healing")) {
+                target.poisoned = 125;
+                if (tower.doublePoison) target.doublePoisoned = true;
+              }
               if (tower.bounce) {
                 let bouncePath = [target]; //Make an array of all enemies hit so they aren't bounced to again
                 let close = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < 100 && !bouncePath.includes(enemy) && enemy.visible);
@@ -1581,12 +1623,22 @@
                   bouncesLeft--;
                 }
               }
+              if (tower.poisonSplash) {
+                let close = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < 100 && enemy != target && enemy.visible);
+                if (close.length) {
+                  let closest = close.sort((a, b) => ((target.x - a.x) ** 2 + (target.y - a.y) ** 2) - ((target.x - b.x) ** 2 + (target.y - b.y) ** 2))[0];
+                  let distance = Math.sqrt((target.x - closest.x) ** 2 + (target.y - closest.y) ** 2);
+                  target = closest;
+                  target.poisoned = 125;
+                  if (tower.doublePoison) target.doublePoisoned = true;
+                }
+              }
               if (tower.nextExplosion === 0) tower.explosionSize = 75;
               if (tower.explosionSize) {
                 //Create an explosion centered around the target enemy
                 let inExplosion = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < tower.explosionSize);
                 let explosionDamage = tower.powerfulExplosions ? tower.strength : 1;
-                inExplosion.forEach(enemy => enemy.hit(explosionDamage, tower, true)); //Do damage to every enemy inside the explosion
+                inExplosion.forEach(enemy => enemy.hit(explosionDamage, tower, "explosion")); //Do damage to every enemy inside the explosion
                 //Draw the explosion as an orange circle
                 ctx.strokeStyle = "transparent";
                 ctx.fillStyle = "#ff8f4055";
@@ -1863,6 +1915,7 @@
 
       let startButton = document.createElement("button");
       startButton.id = "startButton";
+      startButton.classList.add("hCentered");
       startButton.innerText = "Start game";
       container.appendChild(startButton);
 

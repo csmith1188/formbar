@@ -2077,7 +2077,7 @@ if '--silent' not in str(sys.argv):
 
 def start_flask():
     global DEBUG
-    app.run(host='0.0.0.0', port=420, use_reloader=False, debug=DEBUG)
+    app.run(host='0.0.0.0', use_reloader=False, debug=DEBUG)
 
 #This function activate chat and let students chat with one another.
 def start_chat():

@@ -251,9 +251,7 @@
 
   #startButton {
     position: absolute;
-    left: 50%;
     bottom: 5%;
-    transform: translateX(-50%);
     padding: 0.25% 1%;
     background: transparent;
     color: var(--light-cyan);
@@ -1927,6 +1925,7 @@
 
       let startButton = document.createElement("button");
       startButton.id = "startButton";
+      startButton.classList.add("hCentered");
       startButton.innerText = "Start game";
       container.appendChild(startButton);
 

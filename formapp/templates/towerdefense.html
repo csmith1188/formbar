@@ -1163,6 +1163,7 @@
         this.distance = 0;
         if (this.abilities.includes("blink")) {
           this.visible = !!(blinkingCount % 2); //Every other blinking enemy will start off invisible
+          if (Math.floor(frame / 100) % 2) this.visible = !this.visible; //Blinking enemies switch states every 100 frames
           blinkingCount++;
         } else {
           this.visible = true;
@@ -1531,8 +1532,8 @@
           enemy.x = map.start[0] * 60;
           enemy.y = map.start[1] * 60;
           let img = enemy.type.img;
-          for (let i = 0; i < Math.round(enemy.distance); i++) {
-            switch (mapArr[i]) {
+          for (let j = 0; j < Math.round(enemy.distance); j++) {
+            switch (mapArr[j]) {
               case "right":
                 enemy.x++;
                 break;
@@ -1547,9 +1548,11 @@
                 break;
             }
             if (enemy.abilities.includes("split")) {
-              img = (enemy.type.boss && (mapArr[i] == "right" || mapArr[i] == "left")) ? enemy.type.imgSplitRotated : enemy.type.imgSplit; //If the enemy is a boss and moving horizontally, rotate it
-            } else if (enemy.type.boss && (mapArr[i] == "right" || mapArr[i] == "left")) {
+              img = (enemy.type.boss && (mapArr[j] == "right" || mapArr[j] == "left")) ? enemy.type.imgSplitRotated : enemy.type.imgSplit; //If the enemy is a boss and moving horizontally, rotate it
+            } else if (enemy.type.boss && (mapArr[j] == "right" || mapArr[j] == "left")) {
               img = enemy.type.imgRotated;
+            } else {
+              img = enemy.type.img;
             }
           }
           if (!enemy.visible) ctx.globalAlpha = 0.25; //If the enemy is hidden, make it semitransparent

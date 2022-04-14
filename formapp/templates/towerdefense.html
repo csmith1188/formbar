@@ -602,7 +602,7 @@
         name: "Poison Tower",
         color: "var(--light-purple)",
         description: "Enemies are poisoned when hit, taking 0.4 damage a second for 5 seconds.",
-        range: 3.16,
+        range: 3.19,
         speed: 0.8,
         strength: 0.6,
         poison: true,
@@ -1442,7 +1442,10 @@
           clearInterval(animate);
           document.getElementById("towers").classList.add("hidden");
           //Prevent placing towers while paused
-          if (dragOver) grid.forEach((row, i) => row.forEach((square, j) => document.getElementById("r" + i + "c" + j).ondragleave()));
+          grid.forEach((row, i) => row.forEach((square, j) => {
+            let squareEl = document.getElementById("r" + i + "c" + j);
+            if (squareEl.ondragleave) squareEl.ondragleave();
+          }));
           for (let tower in towerTypes) if (towerTypes[tower].dragging) document.getElementById(tower).ondragend();
         } else {
           animate = setInterval(update, fastForward ? 10 : 40);
@@ -1907,7 +1910,7 @@
       "Complete a game without losing any lives",
       "Purchase every tower type in one game",
       "Fully upgrade a tower",
-      "Use every ability in one game",
+      "Use every tower ability in one game",
       "Win a game without any Ultimate Towers",
       "Win a game without any Basic Towers",
       "Win a game without placing more than three towers"

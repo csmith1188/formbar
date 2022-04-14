@@ -1,5 +1,6 @@
 //The game area is a 32 x 15 square grid
 //In general, maps should start and end a half-square outside this area
+//Maps should always start in the middle of a square
 //The tower menu at the bottom is 3 squares tall
 //New maps must be added to the end of the list
 

@@ -1,6 +1,6 @@
 //The game area is a 32 x 15 square grid
 //In general, maps should start and end a half-square outside this area
-//Avoid the tower icons at the bottom, the buttons at the top-left, and the info at the top-right
+//The tower menu at the bottom is 3 squares tall
 //New maps must be added to the end of the list
 
 //Map object template:
@@ -179,23 +179,23 @@ let maps = [
   {
     name: "Outer Loop",
     author: "Mr. Smith",
-    start: [14.5, -0.5],
+    start: [15.5, -0.5],
     lines: [
-      ["down", 2],
-      ["left", 14],
-      ["down", 13],
-      ["right", 14],
+      ["down", 1],
+      ["left", 15],
+      ["down", 14],
+      ["right", 15],
       ["up", 4],
       ["left", 3],
       ["down", 3],
-      ["right", 9],
+      ["right", 8],
       ["up", 3],
       ["left", 3],
       ["down", 4],
       ["right", 14],
-      ["up", 13],
-      ["left", 14],
-      ["up", 2]
+      ["up", 14],
+      ["left", 13],
+      ["up", 1]
     ]
   },
   {

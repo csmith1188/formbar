@@ -85,19 +85,41 @@
       transform: translateY(-50%);
     }
 
-    button, .button {
+    ::-webkit-scrollbar {
+      width: 15px;
+      height: 15px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      box-shadow: inset 0 0 5px 5px var(--dark-gray);
+      border: solid 5px transparent;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      box-shadow: inset 0 0 5px 5px var(--bg-darker);
+    }
+
+    ::-webkit-scrollbar-thumb:active {
+      box-shadow: inset 0 0 13px 13px var(--bg-darker);
+      border: solid 2px transparent;
+    }
+
+    ::-webkit-scrollbar-corner {
+      box-shadow: inset 0 0 5px 5px;
+      border: solid 5px transparent;
+    }
+
+    button {
       padding: 3px 9px;
       border-radius: 9999px;
-      background: var(--emphasis-color);
-      color: var(--theme-color);
+      background: transparent;
       border: 1px solid;
       font-size: 18px;
       cursor: pointer;
       user-select: none;
     }
 
-    button:not(.unselectable):not(.pressed):hover,
-    .button:not(.unselectable):not(.pressed):hover {
+    button:not(.unselectable):not(.pressed):hover {
       background: var(--highlight-color);
     }
 
@@ -142,22 +164,29 @@
       left: 1.5%;
       top: calc(24% / 9);
       width: 100%;
-      font-size: 250%;
       color: var(--light-blue);
     }
 
-    #progress.complete {
-      color: var(--light-yellow);
+    #progressText {
+      font-size: 250%;
+    }
+
+    #achievements {
+      margin-top: 1%;
+      font-size: 200%;
+    }
+
+    #achvButton {
+      margin-left: 0.75%;
+      font-size: 75%;
+    }
+
+    .complete {
+      color: var(--light-yellow) !important;
+    }
+
+    .complete span, .complete button:not(:hover) {
       filter: drop-shadow(0 0 5px #fffa);
-    }
-
-    #medal {
-      position: absolute;
-      height: 100%;
-    }
-
-    .complete #progressText {
-      margin-left: 3.5%;
     }
 
     #back {
@@ -253,16 +282,11 @@
       position: absolute;
       bottom: 5%;
       padding: 0.25% 1%;
-      background: transparent;
       color: var(--light-cyan);
       border: 1px solid;
       border-radius: 9999px;
       font-size: 200%;
       font-weight: 500;
-    }
-
-    #startButton:not(.unselectable):hover {
-      background: var(--bg-dark);
     }
 
     #grid {
@@ -311,11 +335,19 @@
       filter: drop-shadow(10px 10px 5px black);
     }
 
+    #alertText {
+      position: absolute;
+      top: calc(5% * 16 / 9);
+      left: 5%;
+      width: 90%;
+      height: 50%;
+      overflow: auto;
+    }
+
     #alert h1 {
       margin: 0 0 3% 0;
       font-size: 125%;
       font-weight: normal;
-      text-align: inherit;
     }
 
     #ok {
@@ -403,7 +435,6 @@
       margin: 0 0 4% 0;
       font-size: 150%;
       font-weight: normal;
-      text-align: inherit;
     }
 
     .menu h2 {
@@ -993,7 +1024,6 @@
             };
             rangeButton.onclick = () => {
               if (this.upgrades.range < 2 && player.money >= this.upgradePrice("range") && this.range != Infinity) {
-                this.upgrades.xyz = 123;
                 player.money -= this.upgradePrice("range");
                 this.value += this.upgradePrice("range");
                 this.upgrades.range++;
@@ -1475,6 +1505,7 @@
         //Otherwise, draw it in its new position
         if (enemy.distance >= mapArr.length) { //The enemy is at the end of the track
           player.lives -= enemy.type.health;
+          gameAchievements[0] = 0;
           enemies.splice(i, 1);
         } else {
           if (enemy.stunned) {
@@ -1666,6 +1697,8 @@
           }
 
           if (tower.speedBoost) tower.speedBoost--;
+
+          if (Object.values(tower.upgrades).every(upgrade => upgrade == 2) && tower.extra2.bought) gameAchievements[2] = 1;
         }
       });
 
@@ -1750,6 +1783,11 @@
                     let squareEl = document.getElementById("r" + i + "c" + j);
                     squareEl.classList.add("tower");
                     squareEl.onclick = () => newTower.showMenu();
+                    towerTypes[tower].placed = true;
+                    if (Object.values(towerTypes).every(tower => tower.placed)) gameAchievements[1] = 1;
+                    if (newTower.name == "Ultimate Tower") gameAchievements[4] = 0;
+                    if (newTower.name == "Basic Tower") gameAchievements[5] = 0;
+                    if (towers.length == 4) gameAchievements[6] = 0;
                   }
                 };
               }
@@ -1818,7 +1856,9 @@
       frame++;
     }
 
-    let progress = localStorage.getItem("tdProgress") || "00000"; //2 means map completed on hard, 1 means map completed on normal, 0 means map not completed
+    let progress = localStorage.getItem("tdProgress") || ""; //2 means map completed on hard, 1 means map completed on normal, 0 means map not completed
+    let achievements = localStorage.getItem("tdAchievements") || "0000000";
+    achievements = achievements.split("");
     let player = {
       money: 50,
       lives: 100,
@@ -1831,6 +1871,7 @@
     let planePathArr;
     let superPlanePathArr;
     let difficulty = "normal";
+    let gameAchievements = [1, 0, 0, 0, 1, 1, 1];
     let enemies = [];
     let blinkingCount = 0; //Keep track of blinking enemies to alternate between visible and invisible
     let towers = [];
@@ -1845,36 +1886,136 @@
     let dragOver;
     let animate;
 
-    if (progress == "00000" && localStorage.getItem("tdComplete")) progress = "10000"; ////
-    progress = progress.padEnd(maps.length, "0");
+    if (progress[0] == "0" && localStorage.getItem("tdComplete")) progress.splice(0, 1, "1"); ////
+    progress = progress.padEnd(maps.length, "0"); //Add zeroes to the end when maps are added
+    if (progress.length > maps.length) progress = progress.slice(0, maps.length - progress.length); //Remove numbers from the end if maps are deleted
     localStorage.setItem("tdProgress", progress);
     progress = progress.split(""); //Turn the string into an array
 
+    let achievementList = [
+      "Complete a game without losing any lives",
+      "Purchase every tower type in one game",
+      "Fully upgrade a tower",
+      "Use every ability in one game",
+      "Win a game without any Ultimate Towers",
+      "Win a game without any Basic Towers",
+      "Win a game without placing more than three towers"
+    ];
+
+    //Create the title
+    ctx.drawPreview({
+      start: [1, 3],
+      lines: [
+        ["right", 1],
+        ["up", 1],
+        ["down", 1],
+        ["right", 1],
+        ["left", 1],
+        ["down", 3],
+        ["right", 2],
+        ["up", 2],
+        ["right", 2],
+        ["down", 2],
+        ["left", 2],
+        ["up", 2],
+        ["right", 3],
+        ["down", 2],
+        ["right", 1],
+        ["up", 1],
+        ["down", 1],
+        ["right", 1],
+        ["up", 2],
+        ["right", 1],
+        ["down", 1],
+        ["right", 1],
+        ["up", 1],
+        ["left", 1],
+        ["down", 2],
+        ["right", 2],
+        ["up", 2],
+        ["right", 1],
+        ["down", 1],
+      ]
+    });
+    ctx.drawPreview({
+      start: [17, 2],
+      lines: [
+        ["down", 4],
+        ["left", 2],
+        ["up", 2],
+        ["right", 3],
+        ["down", 1],
+        ["right", 1],
+        ["up", 1],
+        ["left", 1],
+        ["down", 2],
+        ["right", 2],
+        ["up", 4],
+        ["right", 1],
+        ["down", 1],
+        ["up", 1],
+        ["left", 1],
+        ["down", 2],
+        ["right", 2],
+        ["down", 1],
+        ["right", 1],
+        ["up", 1],
+        ["left", 1],
+        ["down", 2],
+        ["right", 2],
+        ["up", 2],
+        ["right", 2],
+        ["down", 2],
+        ["right", 2],
+        ["up", 1],
+        ["left", 1],
+        ["up", 1],
+        ["right", 2],
+        ["down", 1],
+        ["right", 1],
+        ["up", 1],
+        ["left", 1],
+        ["down", 2],
+        ["right", 2]
+      ]
+    });
     ctx.fillStyle = "white";
-    ctx.font = "128px Segoe UI";
     ctx.textAlign = "center";
-    ctx.fillText("Tower Defense", 960, 300);
     ctx.font = "48px Segoe UI";
     ctx.fillText("Click to continue", 960, 600);
     ctx.font = "32px Segoe UI";
     ctx.fillText("Created by Oley Birkeland", 960, 1000);
-    let complete = progress.reduce((a, b) => +a + +b); //Convert every character to a number and add
-    let total = progress.length * 2;
+    let completeMaps = progress.reduce((a, b) => +a + +b); //Convert every character to a number and add
+    let totalMaps = progress.length * 2;
+    let completeAchv = achievements.reduce((a, b) => +a + +b);
+    let totalAchv = achievementList.length;
     let progressEl = document.getElementById("progress");
-    if (complete == total) {
-      progressEl.classList.add("complete");
-      let medal = document.createElement("img");
-      medal.id = "medal";
-      medal.src = "../static/img/towerdefense/medal.png";
-      progressEl.append(medal);
-    }
+    if (completeMaps == totalMaps && completeAchv == totalAchv) progressEl.classList.add("complete");
     let progressText = document.createElement("span");
     progressText.id = "progressText";
+    progressText.innerText = `${completeMaps}/${totalMaps} complete`;
     progressEl.append(progressText);
-    document.getElementById("progressText").innerText = `${complete}/${total} complete`;
+    let achvText = document.createElement("div");
+    achvText.id = "achievements";
+    achvText.innerHTML = `<span>${completeAchv}/${totalAchv} achievements</span>`;
+    let achvButton = document.createElement("button");
+    achvButton.id = "achvButton";;
+    achvButton.innerText = "Open list";
+    achvButton.onclick = () => {
+      let listText = "";
+      achievementList.forEach((achievement, i) => {
+        let earned = +achievements[i];
+        let tag = earned ? "s" : "b";
+        listText += `<${tag}>${earned ? "✓" : "•"} ${achievement}</${tag}><br>`;
+      });
+      gameAlert(listText);
+    }
+    achvText.append(achvButton);
+    progressEl.append(achvText);
 
     function showMaps() {
       document.getElementById("progress").classList.add("hidden");
+      if (document.getElementById("alert")) hideAlert();
       ctx.clearRect(0, 0, 1920, 1080); //Clear the canvas
 
       let container = document.getElementById("container");
@@ -2078,6 +2219,8 @@
           if (ability.bought && !ability.cooldown && towers.find(owned => owned?.name == towerTypes[tower].name) && difficulty == "normal") {
             ability.use();
             ability.cooldown = 3000;
+            ability.used = true;
+            if (Object.values(towerTypes).every(tower => tower.ability.used)) gameAchievements[3] = 1;
           }
         };
       }
@@ -2086,10 +2229,13 @@
     };
 
     function gameAlert(message) {
-      document.getElementById("r0c2").click(); //Pause the game
+      document.getElementById("r0c2")?.click(); //Pause the game
       let alertBox = document.createElement("div");
       alertBox.id = "alert";
-      alertBox.innerHTML = message;
+      let alertText = document.createElement("div");
+      alertText.id = "alertText";
+      alertText.innerHTML = message;
+      alertBox.appendChild(alertText);
       let okButton = document.createElement("button");
       okButton.id = "ok";
       okButton.innerText = "OK";
@@ -2110,7 +2256,13 @@
         let num = (difficulty == "hard") ? 2 : 1;
         if (progress[mapIndex] < num) progress.splice(mapIndex, 1, num); //Update progress
         localStorage.setItem("tdProgress", progress.join("")); //Save to local storage as string
+      } else {
+        gameAchievements[4] = 0;
+        gameAchievements[5] = 0;
+        gameAchievements[6] = 0;
       }
+      let allAchievements = achievements.map((achievement, i) => +achievement || gameAchievements[i]); //New achievements + ones that were earned before
+      localStorage.setItem("tdAchievements", allAchievements.join(""));
       //If a tower has a menu open, close it
       let menuTower = towers.find(tower => tower?.menuOpen);
       menuTower?.closeMenu();
@@ -2121,25 +2273,17 @@
       ctx.fillStyle = "white";
       ctx.font = "128px Segoe UI";
       ctx.textAlign = "center";
-      ctx.fillText(complete ? "Congratulations!" : "Game over", 960, 300);
+      ctx.fillText(complete ? "Map complete!" : "Game over", 960, 300);
       ctx.font = "64px Segoe UI";
       ctx.fillStyle = "#80ffff";
-      ctx.fillText(complete ? "You have completed the game." : `Time: ${Math.floor(seconds / 60)}:${seconds % 60 < 10 ? "0" + seconds % 60 : seconds % 60}`, 960, 500);
+      if (!complete) ctx.fillText(`Time: ${Math.floor(seconds / 60)}:${seconds % 60 < 10 ? "0" + seconds % 60 : seconds % 60}`, 960, 500);
+      ctx.fillStyle = "#ffdf40";
+      let newAchievements = achievements.filter((achievement, i) => !+achievement && gameAchievements[i]).length;
+      if (newAchievements) ctx.fillText(`${newAchievements} new ${(newAchievements == 1) ? "achievement" : "achievements"} earned`, 960, 650);
       ctx.font = "48px Segoe UI";
       ctx.fillStyle = "white";
       ctx.fillText("Click to return to the home screen", 960, 800);
       document.getElementById("game").onclick = () => window.location.reload();
     }
-
-    //Achievements will be added later
-    let achievements = [
-      "Complete a game without losing any lives",
-      "Fully upgrade a tower",
-      "Purchase every tower in one game",
-      "Use every ability in one game",
-      "Win a game without any Ultimate Towers",
-      "Win a game without any Basic Towers",
-      "Win a game without buying more than three towers"
-    ];
   </script>
 {% endblock %}

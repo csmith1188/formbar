@@ -1,6 +1,7 @@
 //The game area is a 32 x 15 square grid
 //In general, maps should start and end a half-square outside this area
-//Avoid the tower icons at the bottom, the buttons at the top-left, and the info at the top-right
+//Maps should always start in the middle of a square
+//The tower menu at the bottom is 3 squares tall
 //New maps must be added to the end of the list
 
 //Map object template:
@@ -173,7 +174,7 @@ let maps = [
       ["up", 3],
       ["left", 5],
       ["down", 7],
-      ["right", 8]
+      ["right", 9]
     ]
   },
   {
@@ -181,9 +182,9 @@ let maps = [
     author: "Mr. Smith",
     start: [15.5, -0.5],
     lines: [
-      ["down", 2],
+      ["down", 1],
       ["left", 15],
-      ["down", 13],
+      ["down", 14],
       ["right", 15],
       ["up", 4],
       ["left", 3],
@@ -193,9 +194,9 @@ let maps = [
       ["left", 3],
       ["down", 4],
       ["right", 14],
-      ["up", 13],
+      ["up", 14],
       ["left", 13],
-      ["up", 2]
+      ["up", 1]
     ]
   },
   {
@@ -243,7 +244,6 @@ let maps = [
       ["right", 4],
       ["left", 2],
       ["right", 9]
-
     ]
   },
   {

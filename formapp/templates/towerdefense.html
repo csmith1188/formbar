@@ -2288,7 +2288,7 @@
       ctx.fillText(complete ? "Map complete!" : "Game over", 960, 300);
       ctx.font = "64px Segoe UI";
       ctx.fillStyle = "#80ffff";
-      ctx.fillText(complete ? `${map.name} completed on ${difficulty} mode` : `Time: ${Math.floor(seconds / 60)}:${seconds % 60 < 10 ? "0" + seconds % 60 : seconds % 60}`, 960, 500);
+      ctx.fillText(complete ? `${map.name} cleared on ${difficulty} mode` : `Time: ${Math.floor(seconds / 60)}:${seconds % 60 < 10 ? "0" + seconds % 60 : seconds % 60}`, 960, 500);
       ctx.fillStyle = "#ffdf40";
       let newAchievements = achievements.filter((achievement, i) => !+achievement && gameAchievements[i]).length;
       if (newAchievements) ctx.fillText(`${newAchievements} new ${(newAchievements == 1) ? "achievement" : "achievements"} earned`, 960, 600);

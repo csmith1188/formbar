@@ -577,17 +577,17 @@
         slowing: true,
         price: 20,
         extra1: {
-          description: "Slowing affects enemies permanently.",
-          price: 35,
-          add: function() {
-            this.permSlow = true;
-          }
-        },
-        extra2: {
           description: "Enemies lose all abilities while they are slowed down.",
           price: 45,
           add: function() {
             this.abilityBlocking = true;
+          }
+        },
+        extra2: {
+          description: "Slowing affects enemies permanently.",
+          price: 135,
+          add: function() {
+            this.permSlow = true;
           }
         },
         ability: {
@@ -744,7 +744,7 @@
           }
         },
         extra2: {
-          description: "Whatever tower is closest to the tower's base will get a range boost.",
+          description: "Whatever tower is closest to the plane will get a range boost.",
           price: 50,
           add: function() {
             this.rangeBoosting = true;
@@ -1222,7 +1222,7 @@
 
     let pause = [10, null];
     let waves = [
-      [[4, "g", pause], "g"],
+      [[40, "xk", pause], "g"],
       [[7, "g", "g", pause], ["alert", "All enemy types have different health and speed stats."], "y", pause, "y"],
       [[5, "g"], [3, "y"]],
       [[20, "g"]],
@@ -1712,7 +1712,7 @@
 
           if (tower.speedBoost) tower.speedBoost--;
 
-          if (Object.values(tower.upgrades).every(upgrade => upgrade == 2) && tower.extra2.bought) gameAchievements[2] = 1;
+          if (tower.upgrades.range == 2 && tower.upgrades.speed == 2 && tower.upgrades.strength == 2 && tower.extra2.bought) gameAchievements[2] = 1;
         }
       });
 

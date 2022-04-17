@@ -773,7 +773,6 @@
                   break;
                 case "up":
                   initialY--;
-                  break;
               }
             });
             superPlane = {
@@ -905,24 +904,52 @@
         this.x = col * 60 + 30;
         this.y = row * 60 + 30;
         if (type.name == "Air Tower") {
-          this.planeInitialX = map.start[0] * 60;
-          this.planeInitialY = map.start[1] * 60;
+          //Make an array of all the squares the track goes through
+          let trackSquares = [];
+          grid.forEach((row, i) => row.forEach((square, j) => {
+            if (square == "track") trackSquares.push([j, i]);
+          }));
+          //The plane will appear at the nearest track square to the tower
+          let closest = trackSquares.sort((a, b) => ((col - a[0]) ** 2 + (row - a[1]) ** 2) - ((col - b[0]) ** 2 + (row - b[1]) ** 2))[0];
+          this.planeStartX = map.start[0] * 60;
+          this.planeStartY = map.start[1] * 60;
           switch (map.lines[0][0]) {
             case "right":
-              this.planeInitialX += 60;
+              this.planeStartX += 60;
               break;
             case "left":
-              this.planeInitialX -= 60;
+              this.planeStartX -= 60;
               break;
             case "down":
-              this.planeInitialY += 60;
+              this.planeStartY += 60;
               break;
             case "up":
-              this.planeInitialY -= 60;
-              break;
+              this.planeStartY -= 60;
           }
           this.planeDistance = 0;
+          let closestX = closest[0] * 60 + 30;
+          let closestY = closest[1] * 60 + 30;
+          let xPos = this.planeStartX;
+          let yPos = this.planeStartY;
+          //Increase the plane's distance on the track until it reaches the point closest to the tower
+          for (let i = 0; xPos != closestX || yPos != closestY; i++) {
+            switch (planePathArr[i]) {
+              case "right":
+                xPos++;
+                break;
+              case "left":
+                xPos--;
+                break;
+              case "down":
+                yPos++;
+                break;
+              case "up":
+                yPos--;
+            }
+            this.planeDistance++;
+          }
         }
+        console.log(this.planeDistance);
         this.i = towers.length;
         this.cooldown = 0;
         this.showMenu = function() {
@@ -1141,7 +1168,6 @@
             break;
           case "u":
             this.type = enemyTypes.purpleBoss;
-            break;
         }
         this.speed = this.type.speed;
         this.health = this.type.health;
@@ -1161,7 +1187,6 @@
               break;
             case "d":
               this.abilities.push("shield");
-              break;
           }
         this.id = Math.random(); //Give the enemy a random ID so that no two enemy objects are identical
         this.distance = 0;
@@ -1177,7 +1202,7 @@
         this.hit = function(damage, tower, type) {
           if (this.stunned) damage *= 2;
           if (!this.abilities.includes("shield") || type == "explosion" || type == "poison" || tower.name == "Long-Range Tower") this.health -= damage; //Only explosions, poison, and Long-Range Towers can damage shielded enemies
-          if (this.health <= 0.001) {
+          if (this.health < 0.001) {
             let i = enemies.indexOf(this);
             player.money += (this.type.boss ? 10 : 1) * (tower?.extraMoney ? 3 : 1);
             if (this.abilities.includes("split")) {
@@ -1552,7 +1577,6 @@
                 break;
               case "up":
                 enemy.y--;
-                break;
             }
             if (enemy.abilities.includes("split")) {
               img = (enemy.type.boss && (mapArr[j] == "right" || mapArr[j] == "left")) ? enemy.type.imgSplitRotated : enemy.type.imgSplit; //If the enemy is a boss and moving horizontally, rotate it
@@ -1595,8 +1619,8 @@
 
           if (tower.name == "Air Tower") {
             tower.planeDistance += 8;
-            tower.planeX = tower.planeInitialX;
-            tower.planeY = tower.planeInitialY;
+            tower.planeX = tower.planeStartX;
+            tower.planeY = tower.planeStartY;
             let img;
             for (let i = 0; i < Math.round(tower.planeDistance); i++) {
               let j = i;
@@ -1613,7 +1637,6 @@
                   break;
                 case "up":
                   tower.planeY--;
-                  break;
               }
               img = planes[planePathArr[j]];
             }
@@ -1741,7 +1764,6 @@
                 break;
               case "up":
                 superPlane.y--;
-                break;
             }
             img = superPlanes[superPlanePathArr[i]];
           }
@@ -2177,7 +2199,6 @@
             break;
           case "up":
             planePathArr.push("down");
-            break;
         }
       }
 
@@ -2196,7 +2217,6 @@
             break;
           case "up":
             superPlanePathArr.push("down");
-            break;
         }
       }
 

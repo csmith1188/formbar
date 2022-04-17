@@ -318,5 +318,5 @@ let maps = [
     ]
   },
 
-  //^ New maps go here ^
+  //↑ New maps go here ↑
 ];

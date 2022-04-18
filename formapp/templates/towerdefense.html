@@ -1064,6 +1064,12 @@
       }
     }
 
+    let sound = {
+      enabled: false,
+      delay: 0.05,
+      sfx_explode01: new Audio("../static/sound/sfx_explode01.wav")
+    }
+
     let pause = [10, null];
     let waves = [
       [[4, "g", pause], "g"],
@@ -1517,13 +1523,32 @@
                 delete tower.explosionSize;
                 tower.nextExplosion = 5;
               }
+
+              //Play sounds
+              if (sound.enabled) {
+                if (sound.sfx_explode01.currentTime >= sound.delay) {
+                  sound.sfx_explode01.currentTime = 0;
+                } else {
+                  sound.sfx_explode01.play();
+                }
+              }
+
+              //Show firing frame
               ctx.drawImage(tower.activeImg, tower.x - 30, tower.y - 30);
+
+              //Draw line of fire
               ctx.lineWidth = 4;
               ctx.strokeStyle = '#FF0000';
               ctx.beginPath();       // Start a new path
-              ctx.moveTo(tower.x, tower.y);    // Move the pen to (30, 50)
-              ctx.lineTo(target.x, target.y);  // Draw a line to (150, 100)
+              if (tower.name == 'Air Tower') {
+                ctx.moveTo(tower.planeX, tower.planeY);
+
+              } else {
+                ctx.moveTo(tower.x, tower.y);
+              }
+              ctx.lineTo(target.x, target.y);
               ctx.stroke();          // Render the path
+
               tower.cooldown += 25 / tower.speed;
             }
           }

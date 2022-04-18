@@ -1518,6 +1518,12 @@
                 tower.nextExplosion = 5;
               }
               ctx.drawImage(tower.activeImg, tower.x - 30, tower.y - 30);
+              ctx.lineWidth = 4;
+              ctx.strokeStyle = '#FF0000';
+              ctx.beginPath();       // Start a new path
+              ctx.moveTo(tower.x, tower.y);    // Move the pen to (30, 50)
+              ctx.lineTo(target.x, target.y);  // Draw a line to (150, 100)
+              ctx.stroke();          // Render the path
               tower.cooldown += 25 / tower.speed;
             }
           }

@@ -7,393 +7,520 @@
 
 <!-- Extra style declarations here -->
 {% block style %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/new.css') }}">
-<style>
-  body {
-    background: var(--bg-darker);
-    user-select: none;
-  }
+  <style>
+    :root {
+      --color-red: #bf0000;
+      --color-brown: #802000;
+      --color-orange: #ff4000;
+      --color-gold: #fa0;
+      --color-yellow: #ffbf00;
+      --color-green: #00bf00;
+      --color-cyan: #009fbf;
+      --color-blue: #0040bf;
+      --color-purple: #bf00ff;
+      --color-pink: #ff4080;
+      --dark-gray: #555;
 
-  #container {
-    position: fixed;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    aspect-ratio: 16 / 9;
-    outline: 1px solid var(--dark-gray);
-    overflow: hidden;
-  }
+      --light-red: #ff6860;
+      --light-brown: #bf6040;
+      --light-orange: #ff8f40;
+      --light-yellow: #ffdf40;
+      --light-green: #80ff80;
+      --light-cyan: #80ffff;
+      --light-blue: #bfcfff;
+      --light-purple: #df80ff;
+      --light-pink: #ff80bfff;
+      --light-gray: #ccc;
 
-  @media (max-aspect-ratio: 16/9) {
+      --bg-dark: #333;
+      --bg-darker: #222;
+      --bg-dark-highlight: #444;
+      --bg-dark-red: #400;
+      --bg-dark-yellow: #430;
+      --bg-dark-green: #243;
+      --bg-dark-blue: #000922;
+      --bg-dark-purple: #423;
+
+      --bg-color: var(--bg-dark);
+      --main-color: white;
+      --gray-color: var(--light-gray);
+      --emphasis-color: var(--bg-darker);
+      --highlight-color: var(--bg-dark-highlight);
+    }
+
+    * {
+      font-family: inherit;
+      color: inherit;
+    }
+
+    body {
+      background: var(--bg-darker);
+      font: 16px "Segoe UI", sans-serif;
+      color: var(--main-color);
+      user-select: none;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .invisible {
+      visibility: hidden;
+    }
+
+    .centered, .hCentered.vCentered {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+
+    .hCentered {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+    }
+
+    .vCentered {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    ::-webkit-scrollbar {
+      width: 15px;
+      height: 15px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      box-shadow: inset 0 0 5px 5px var(--dark-gray);
+      border: solid 5px transparent;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      box-shadow: inset 0 0 5px 5px var(--bg-darker);
+    }
+
+    ::-webkit-scrollbar-thumb:active {
+      box-shadow: inset 0 0 13px 13px var(--bg-darker);
+      border: solid 2px transparent;
+    }
+
+    ::-webkit-scrollbar-corner {
+      box-shadow: inset 0 0 5px 5px;
+      border: solid 5px transparent;
+    }
+
+    button {
+      padding: 3px 9px;
+      border-radius: 9999px;
+      background: transparent;
+      border: 1px solid;
+      font-size: 18px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    button:not(.unselectable):not(.pressed):hover {
+      background: var(--highlight-color);
+    }
+
+    button.pressed {
+      cursor: default;
+    }
+
+    .unselectable {
+      opacity: 50%;
+      cursor: not-allowed;
+    }
+
     #container {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      aspect-ratio: 16 / 9;
+      outline: 1px solid var(--dark-gray);
+      overflow: hidden;
+    }
+
+    @media (max-aspect-ratio: 16/9) {
+      #container {
+        width: 100%;
+        font-size: calc(5vw / 6);
+      }
+    }
+
+    @media (min-aspect-ratio: 16/9) {
+      #container {
+        height: 100%;
+        font-size: calc(40vh / 27);
+      }
+    }
+
+    #game {
+      position: absolute;
       width: 100%;
-      font-size: calc(5vw / 6);
+      background: linear-gradient(to bottom right, #030, #300, #003);
+      background-size: 100%;
     }
-  }
 
-  @media (min-aspect-ratio: 16/9) {
-    #container {
-      height: 100%;
-      font-size: calc(40vh / 27);
+    #progress {
+      position: absolute;
+      left: 1.5%;
+      top: calc(24% / 9);
+      width: 100%;
+      color: var(--light-blue);
     }
-  }
 
-  #game {
-    position: absolute;
-    width: 100%;
-    background: linear-gradient(to bottom right, #030, #300, #003);
-    background-size: 100%;
-  }
+    #progressText {
+      font-size: 250%;
+    }
 
-  #progress {
-    position: absolute;
-    left: 1.5%;
-    top: calc(24% / 9);
-    width: 100%;
-    font-size: 250%;
-    color: var(--light-blue);
-  }
+    #achievements {
+      margin-top: 1%;
+      font-size: 200%;
+    }
 
-  #progress.complete {
-    color: var(--light-yellow);
-    filter: drop-shadow(0 0 5px #fffa);
-  }
+    #achvButton {
+      margin-left: 0.75%;
+      font-size: 75%;
+    }
 
-  #medal {
-    position: absolute;
-    height: 100%;
-  }
+    .complete {
+      color: var(--light-yellow) !important;
+    }
 
-  .complete #progressText {
-    margin-left: 3.5%;
-  }
+    .complete span, .complete button:not(:hover) {
+      filter: drop-shadow(0 0 5px #fffa);
+    }
 
-  #back {
-    position: absolute;
-    left: 0%;
-    top: 0;
-    width: calc(75% / 16);
-    height: calc(75% / 9);
-    padding: 0;
-    text-align: center;
-    font-size: 400%;
-    line-height: 130%;
-    color: white;
-    cursor: pointer;
-  }
+    #back {
+      position: absolute;
+      left: 0%;
+      top: 0;
+      width: calc(75% / 16);
+      height: calc(75% / 9);
+      padding: 0;
+      text-align: center;
+      font-size: 400%;
+      line-height: 130%;
+      color: white;
+      cursor: pointer;
+    }
 
-  #prevMap {
-    position: absolute;
-    left: 15%;
-    top: calc(250% / 9);
-    width: calc(75% / 16);
-    height: calc(75% / 9);
-    padding: 0;
-    text-align: center;
-    font-size: 400%;
-    line-height: 130%;
-    color: var(--light-cyan);
-    cursor: pointer;
-  }
+    #prevMap {
+      position: absolute;
+      left: 15%;
+      top: calc(250% / 9);
+      width: calc(75% / 16);
+      height: calc(75% / 9);
+      padding: 0;
+      text-align: center;
+      font-size: 400%;
+      line-height: 130%;
+      color: var(--light-cyan);
+      cursor: pointer;
+    }
 
-  #nextMap {
-    position: absolute;
-    right: 15%;
-    top: calc(250% / 9);
-    width: calc(75% / 16);
-    height: calc(75% / 9);
-    padding: 0;
-    text-align: center;
-    font-size: 400%;
-    line-height: 130%;
-    color: var(--light-cyan);
-    cursor: pointer;
-  }
+    #nextMap {
+      position: absolute;
+      right: 15%;
+      top: calc(250% / 9);
+      width: calc(75% / 16);
+      height: calc(75% / 9);
+      padding: 0;
+      text-align: center;
+      font-size: 400%;
+      line-height: 130%;
+      color: var(--light-cyan);
+      cursor: pointer;
+    }
 
-  #prevMap:active, #nextMap:active {
-    color: white;
-  }
+    #prevMap:active, #nextMap:active {
+      color: white;
+    }
 
-  #difficulty {
-    position: absolute;
-    left: 0;
-    top: 56%;
-    width: 100%;
-    text-align: center;
-    font-size: 200%;
-  }
+    #difficulty {
+      position: absolute;
+      left: 0;
+      top: 56%;
+      width: 100%;
+      text-align: center;
+      font-size: 200%;
+    }
 
-  #normal, #hard {
-    padding: 0.25% 1%;
-    margin: 0 0.5%;
-    background: transparent;
-    border: 1px solid;
-    border-radius: 9999px;
-    font-size: calc(inherit x 0.75);
-    font-weight: 500;
-  }
+    #normal, #hard {
+      padding: 0.25% 1%;
+      margin: 0 0.5%;
+      background: transparent;
+      border: 1px solid;
+      border-radius: 9999px;
+      font-size: calc(inherit x 0.75);
+      font-weight: 500;
+    }
 
-  #normal {
-    color: var(--light-green);
-  }
+    #normal {
+      color: var(--light-green);
+    }
 
-  #normal.pressed {
-    background: var(--light-green);
-    border-color: var(--light-green);
-    color: var(--bg-dark);
-    cursor: pointer;
-  }
+    #normal.pressed {
+      background: var(--light-green);
+      border-color: var(--light-green);
+      color: var(--bg-dark);
+    }
 
-  #hard {
-    color: var(--light-orange);
-  }
+    #hard {
+      color: var(--light-orange);
+    }
 
-  #hard.pressed {
-    background: var(--light-orange);
-    border-color: var(--light-orange);
-    color: var(--bg-dark);
-    cursor: pointer;
-  }
+    #hard.pressed {
+      background: var(--light-orange);
+      border-color: var(--light-orange);
+      color: var(--bg-dark);
+    }
 
-  #normal:not(.pressed):hover, #hard:not(.pressed):hover {
-    background: var(--bg-dark);
-  }
+    #normal:not(.pressed):hover, #hard:not(.pressed):hover {
+      background: var(--bg-dark);
+    }
 
-  #startButton {
-    position: absolute;
-    left: 50%;
-    bottom: 5%;
-    transform: translateX(-50%);
-    padding: 0.25% 1%;
-    background: transparent;
-    color: var(--light-cyan);
-    border: 1px solid;
-    border-radius: 9999px;
-    font-size: 200%;
-    font-weight: 500;
-  }
+    #startButton {
+      position: absolute;
+      bottom: 5%;
+      padding: 0.25% 1%;
+      color: var(--light-cyan);
+      border: 1px solid;
+      border-radius: 9999px;
+      font-size: 200%;
+      font-weight: 500;
+    }
 
-  #startButton:not(.unselectable):hover {
-    background: var(--bg-dark);
-  }
+    #grid {
+      position: absolute;
+      top: 0;
+      width: 100%;
+      aspect-ratio: 32 / 15;
+      border-collapse: collapse;
+    }
 
-  #grid {
-    position: absolute;
-    top: 0;
-    width: 100%;
-    aspect-ratio: 32 / 15;
-    border-collapse: collapse;
-  }
+    table, td {
+      border: none;
+    }
 
-  table, td {
-    border: none;
-  }
+    td {
+      width: calc(100% / 32);
+    }
 
-  td {
-    width: calc(100% / 32);
-  }
+    .visibleLines td {
+      border: 1px solid #555;
+    }
 
-  .visibleLines td {
-    border: 1px solid #555;
-  }
+    td.droppable {
+      background: #aaa5;
+    }
 
-  td.droppable {
-    background: #aaa5;
-  }
+    td.undroppable {
+      background: #a555;
+    }
 
-  td.undroppable {
-    background: #a555;
-  }
+    td.tower {
+      cursor: pointer;
+    }
 
-  td.tower {
-    cursor: pointer;
-  }
+    #alert {
+      position: absolute;
+      left: 35%;
+      top: 35%;
+      width: 30%;
+      height: 30%;
+      padding: 1.5%;
+      box-sizing: border-box;
+      background: #cccc;
+      color: var(--bg-dark);
+      font-size: 150%;
+      filter: drop-shadow(10px 10px 5px black);
+    }
 
-  #alert {
-    position: absolute;
-    left: 35%;
-    top: 35%;
-    width: 30%;
-    height: 30%;
-    padding: 1.5%;
-    box-sizing: border-box;
-    background: #cccc;
-    color: var(--bg-dark);
-    font-size: 150%;
-    filter: drop-shadow(10px 10px 5px black);
-  }
+    #alertText {
+      position: absolute;
+      top: calc(5% * 16 / 9);
+      left: 5%;
+      width: 90%;
+      height: 50%;
+      overflow: auto;
+    }
 
-  #alert h1 {
-    margin: 0 0 3% 0;
-    font-size: 125%;
-    font-weight: normal;
-    text-align: inherit;
-  }
+    #alert h1 {
+      margin: 0 0 3% 0;
+      font-size: 125%;
+      font-weight: normal;
+    }
 
-  #ok {
-    position: absolute;
-    left: 40%;
-    bottom: 10%;
-    width: 20%;
-    height: 20%;
-    padding: 0.25% 1%;
-    background: white;
-    color: var(--color-blue);
-    border: 1px solid;
-    border-radius: 9999px;
-    font-size: calc(400% / 3);
-    font-weight: 500;
-    filter: drop-shadow(2px 2px 1px #000c);
-  }
+    li.earned::marker {
+      content: "🗸  ";
+    }
 
-  #ok:hover {
-    background: white !important;
-    filter: brightness(90%) drop-shadow(2px 2px 1px #000a);
-  }
+    #ok {
+      position: absolute;
+      left: 40%;
+      bottom: 10%;
+      width: 20%;
+      height: 20%;
+      padding: 0.25% 1%;
+      background: white;
+      color: var(--color-blue);
+      border: 1px solid;
+      border-radius: 9999px;
+      font-size: calc(400% / 3);
+      font-weight: 500;
+      filter: drop-shadow(2px 2px 1px #000c);
+    }
 
-  .menu {
-    position: absolute;
-    min-width: 15%;
-    max-width: 20%;
-    padding: 0.5%;
-    box-sizing: border-box;
-    background: #cccc;
-    color: var(--bg-dark);
-    text-align: center;
-    filter: drop-shadow(10px 10px 5px black);
-  }
+    #ok:hover {
+      background: white !important;
+      filter: brightness(90%) drop-shadow(2px 2px 1px #000a);
+    }
 
-  .splitButton {
-    color: var(--color-green);
-    border: 1px solid;
+    .menu {
+      position: absolute;
+      min-width: 15%;
+      max-width: 20%;
+      padding: 0.5%;
+      box-sizing: border-box;
+      background: #cccc;
+      color: var(--bg-dark);
+      text-align: center;
+      filter: drop-shadow(10px 10px 5px black);
+    }
+
+    .splitButton {
+      color: var(--color-green);
+      border: 1px solid;
+      border-radius: 4px;
+      font-size: 80%;
+      font-weight: 500;
+      filter: drop-shadow(2px 2px 1px #000c);
+    }
+
+    .splitButton:not(.unselectable) {
+      cursor: pointer;
+    }
+
+    .buttonLeft {
+      width: fit-content;
+      padding: 0 1.5%;
+      border-radius: 4px 0 0 4px;
+      background: white;
+    }
+
+    .buttonRight {
+      width: fit-content;
+      padding: 0 1.5%;
+      border-radius: 0 4px 4px 0;
+      background: var(--color-green);
+      color: white;
+    }
+
+    .splitButton:not(.unselectable):hover {
+      filter: brightness(90%) drop-shadow(2px 2px 1px #000a);
+    }
+
+    .sellButton {
+      color: var(--color-red);
+    }
+
+    .sellButton .buttonRight {
+      background: var(--color-red);
+    }
+
+    .bought .buttonLeft {
     border-radius: 4px;
-    font-size: 80%;
-    font-weight: 500;
-    filter: drop-shadow(2px 2px 1px #000c);
-  }
+    }
 
-  .splitButton:not(.unselectable) {
-    cursor: pointer;
-  }
+    .bought .buttonRight {
+      display: none;
+    }
 
-  .buttonLeft {
-    width: fit-content;
-    padding: 0 1.5%;
-    border-radius: 4px 0 0 4px;
-    background: white;
-  }
+    .menu h1 {
+      margin: 0 0 4% 0;
+      font-size: 150%;
+      font-weight: normal;
+    }
 
-  .buttonRight {
-    width: fit-content;
-    padding: 0 1.5%;
-    border-radius: 0 4px 4px 0;
-    background: var(--color-green);
-    color: white;
-  }
+    .menu h2 {
+      margin: 3% 0 0 0;
+      font-size: 125%;
+      font-weight: normal;
+    }
 
-  .splitButton:not(.unselectable):hover {
-    filter: brightness(90%) drop-shadow(2px 2px 1px #000a);
-  }
+    #towers {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      aspect-ratio: 32 / 3;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 5%;
+      background: #0005;
+      border-top: 1.5px solid var(--light-gray);
+      cursor: default;
+    }
 
-  .sellButton {
-    color: var(--color-red);
-  }
+    #towers img {
+      height: calc(100% / 3);
+    }
 
-  .sellButton .buttonRight {
-    background: var(--color-red);
-  }
+    #towers img:not(.unselectable):hover {
+      cursor: grab;
+      filter: drop-shadow(0 0 6px white);
+    }
 
-  .bought .buttonLeft {
-  border-radius: 4px;
-  }
+    #towers img:not(.unselectable):active {
+      cursor: grabbing;
+    }
 
-  .bought .buttonRight {
-    display: none;
-  }
+    #towers img.unselectable {
+      opacity: 25%;
+    }
 
-  .menu h1 {
-    margin: 0 0 4% 0;
-    font-size: 150%;
-    font-weight: normal;
-    text-align: inherit;
-  }
+    #towerDesc {
+      position: absolute;
+      top: 5%;
+      width: 100%;
+      text-align: center;
+      font-size: 150%;
+    }
 
-  .menu h2 {
-    margin: 3% 0 0 0;
-    font-size: 125%;
-    font-weight: normal;
-  }
+    #abilities {
+      position: absolute;
+      bottom: 10%;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 3%;
+      text-align: center;
+    }
 
-  #towers {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    aspect-ratio: 32 / 3;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 5%;
-    background: #0005;
-    border-top: 1.5px solid var(--light-gray);
-    cursor: default;
-  }
-
-  #towers img {
-    height: calc(100% / 3);
-  }
-
-  #towers img:not(.unselectable):hover {
-    cursor: grab;
-    filter: drop-shadow(0 0 6px white);
-  }
-
-  #towers img:not(.unselectable):active {
-    cursor: grabbing;
-  }
-
-  #towers img.unselectable {
-    opacity: 25%;
-  }
-
-  #towerDesc {
-    position: absolute;
-    top: 5%;
-    width: 100%;
-    text-align: center;
-    font-size: 150%;
-  }
-
-  #abilities {
-    position: absolute;
-    bottom: 10%;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 3%;
-    text-align: center;
-  }
-
-  #abilities button {
-    width: 5.125%;
-    padding: 0.1% 0.3%;
-    font-size: 100%;
-  }
-
-  .invisible {
-    visibility: hidden;
-  }
+    #abilities button {
+      width: 5.125%;
+      padding: 0.1% 0.3%;
+      font-size: 100%;
+    }
 
 
-  #quickmenu {
-    display: none;
-  }
+    #quickmenu {
+      display: none;
+    }
 
-  #content {
-    background-color: transparent;
-    font-family: "Segoe UI";
-  }
-</style>
+    #content {
+      background-color: transparent;
+      font-family: "Segoe UI";
+    }
+  </style>
 {% endblock %}
 
 <!-- Main content here -->
@@ -411,11 +538,12 @@
 
 <!-- Extra javascript here -->
 {% block script %}
+  <script src="{{ url_for('static', filename='js/tdMaps.js') }}"></script>
   <script>
     let towerTypes = {
       basic: {
         name: "Basic Tower",
-        color: "var(--light-gray)",
+        color: "#ccc",
         description: "A cheap tower with average stats.",
         range: 2.5,
         speed: 1,
@@ -440,12 +568,13 @@
           price: 75,
           use: function() {
             towers.filter(tower => tower.name == "Basic Tower").forEach(tower => tower.speedBoost = 250);
+            if (sound.enabled) sound.sfx.powerUp.play();
           }
         }
       },
       slowing: {
         name: "Slowing Tower",
-        color: "var(--light-purple)",
+        color: "#80ffff",
         description: "Weaker attacks, but hits slow down enemies for 10 seconds.",
         range: 1.64,
         speed: 3,
@@ -453,17 +582,17 @@
         slowing: true,
         price: 30,
         extra1: {
-          description: "Slowing affects enemies permanently.",
-          price: 50,
-          add: function() {
-            this.permSlow = true;
-          }
-        },
-        extra2: {
           description: "Enemies lose all abilities while they are slowed down.",
           price: 45,
           add: function() {
             this.abilityBlocking = true;
+          }
+        },
+        extra2: {
+          description: "Slowing affects enemies permanently.",
+          price: 135,
+          add: function() {
+            this.permSlow = true;
           }
         },
         ability: {
@@ -471,12 +600,45 @@
           price: 60,
           use: function() {
             enemies.forEach(enemy => enemy.stunned = 75);
+            if (sound.enabled) sound.sfx.powerUp.play();
+          }
+        }
+      },
+      poison: {
+        name: "Poison Tower",
+        color: "#df80ff",
+        description: "Enemies are poisoned when hit, taking 0.4 damage a second for 5 seconds.",
+        range: 3.19,
+        speed: 0.8,
+        strength: 0.6,
+        poison: true,
+        price: 50,
+        extra1: {
+          description: "Poison can splash to a nearby enemy.",
+          price: 30,
+          add: function() {
+            this.poisonSplash = true;
+          }
+        },
+        extra2: {
+          description: "Poisoned enemies take damage twice a second.",
+          price: 40,
+          add: function() {
+            this.doublePoison = true;
+          }
+        },
+        ability: {
+          description: "All onscreen enemeis move backward for 3 seconds.",
+          price: 55,
+          use: function() {
+            enemies.forEach(enemy => enemy.reverse = 75);
+            if (sound.enabled) sound.sfx.powerUp.play();
           }
         }
       },
       longRange: {
         name: "Long-Range Tower",
-        color: "var(--light-yellow)",
+        color: "#ffdf40",
         description: "Infinite range and strong attacks, but fires slowly. Targets the strongest enemy onscreen.",
         range: Infinity,
         speed: 0.46,
@@ -491,7 +653,7 @@
         },
         extra2: {
           description: "Enemies hit by this tower lose all abilities permanently.",
-          price: 100,
+          price: 200,
           add: function() {
             this.removeAbilities = true;
           }
@@ -501,13 +663,14 @@
           price: 150,
           use: function() {
             let strongest = enemies.sort((a, b) => b.health - a.health)[0];
-            strongest.hit(Infinity, this);
+            strongest?.hit(Infinity, this);
+            if (sound.enabled) sound.sfx.laser.play();
           }
         }
       },
       cannon: {
         name: "Cannon Tower",
-        color: "var(--light-orange)",
+        color: "#ff8f40",
         description: "Every hit creates an explosion that damages nearby enemies.",
         range: 3.4,
         speed: 0.72,
@@ -533,16 +696,17 @@
           price: 100,
           use: function() {
             let inExplosion = enemies.filter(enemy => Math.sqrt((960 - enemy.x) ** 2 + (450 - enemy.y) ** 2) < 400);
-            inExplosion.forEach(enemy => enemy.hit(25, this, true));
+            inExplosion.forEach(enemy => enemy.hit(25, this, "explosion"));
             ctx.strokeStyle = "transparent";
             ctx.fillStyle = "#ff8f4055";
             ctx.drawCircle(960, 450, 400);
+            if (sound.enabled) sound.sfx.explode.play();
           }
         }
       },
       money: {
         name: "Money Tower",
-        color: "var(--light-green)",
+        color: "#80ff80",
         description: "Gets 3× as much money from defeating enemies.",
         range: 3.32,
         speed: 0.88,
@@ -568,12 +732,13 @@
           price: 250,
           use: function() {
             player.money += 50;
+            if (sound.enabled) sound.sfx.pickUp.play();
           }
         }
       },
       air: {
         name: "Air Tower",
-        color: "var(--light-blue)",
+        color: "#bfcfff",
         large: true,
         description: "Moves back and forth above the track. Has a large range and attacks quickly.",
         range: 3.61,
@@ -589,7 +754,7 @@
           }
         },
         extra2: {
-          description: "Whatever tower is closest to the tower's base will get a range boost.",
+          description: "Whatever tower is closest to the plane will get a range boost.",
           price: 50,
           add: function() {
             this.rangeBoosting = true;
@@ -614,7 +779,6 @@
                   break;
                 case "up":
                   initialY--;
-                  break;
               }
             });
             superPlane = {
@@ -630,7 +794,7 @@
       },
       ultimate: {
         name: "Ultimate Tower",
-        color: "var(--light-red)",
+        color: "#ff6860",
         large: true,
         description: "Can rapidly destroy many enemies across a wide range.",
         range: 4.65,
@@ -657,6 +821,7 @@
           use: function() {
             towers.forEach(tower => {
               if (tower) tower.ultimateBoost = 250;
+              if (sound.enabled) sound.sfx.powerUp.play();
             });
           }
         }
@@ -730,7 +895,7 @@
         enemyTypes[type].imgRotated.src = `../static/img/towerdefense/${type}-r.png`;
         if (type == "boss") {
           enemyTypes[type].imgSplitRotated = new Image();
-          enemyTypes[type].imgSplitRotated.src = `../static/img/towerdefense/${type}-split-r.png`;
+          enemyTypes[type].imgSplitRotated.src = `../static/img/towerdefense/boss-split-r.png`;
         }
       }
     }
@@ -746,23 +911,50 @@
         this.x = col * 60 + 30;
         this.y = row * 60 + 30;
         if (type.name == "Air Tower") {
-          this.planeInitialX = map.start[0] * 60;
-          this.planeInitialY = map.start[1] * 60;
+          //Make an array of all the squares the track goes through
+          let trackSquares = [];
+          grid.forEach((row, i) => row.forEach((square, j) => {
+            if (square == "track") trackSquares.push([j, i]);
+          }));
+          //The plane will appear at the nearest track square to the tower
+          let closest = trackSquares.sort((a, b) => ((col - a[0]) ** 2 + (row - a[1]) ** 2) - ((col - b[0]) ** 2 + (row - b[1]) ** 2))[0];
+          this.planeStartX = map.start[0] * 60;
+          this.planeStartY = map.start[1] * 60;
           switch (map.lines[0][0]) {
             case "right":
-              this.planeInitialX += 60;
+              this.planeStartX += 60;
               break;
             case "left":
-              this.planeInitialX -= 60;
+              this.planeStartX -= 60;
               break;
             case "down":
-              this.planeInitialY += 60;
+              this.planeStartY += 60;
               break;
             case "up":
-              this.planeInitialY -= 60;
-              break;
+              this.planeStartY -= 60;
           }
           this.planeDistance = 0;
+          let closestX = closest[0] * 60 + 30;
+          let closestY = closest[1] * 60 + 30;
+          let xPos = this.planeStartX;
+          let yPos = this.planeStartY;
+          //Increase the plane's distance on the track until it reaches the point closest to the tower
+          for (let i = 0; xPos != closestX || yPos != closestY; i++) {
+            switch (planePathArr[i]) {
+              case "right":
+                xPos++;
+                break;
+              case "left":
+                xPos--;
+                break;
+              case "down":
+                yPos++;
+                break;
+              case "up":
+                yPos--;
+            }
+            this.planeDistance++;
+          }
         }
         this.i = towers.length;
         this.cooldown = 0;
@@ -873,7 +1065,6 @@
             };
             rangeButton.onclick = () => {
               if (this.upgrades.range < 2 && player.money >= this.upgradePrice("range") && this.range != Infinity) {
-                this.upgrades.xyz = 123;
                 player.money -= this.upgradePrice("range");
                 this.value += this.upgradePrice("range");
                 this.upgrades.range++;
@@ -983,7 +1174,6 @@
             break;
           case "u":
             this.type = enemyTypes.purpleBoss;
-            break;
         }
         this.speed = this.type.speed;
         this.health = this.type.health;
@@ -1003,21 +1193,23 @@
               break;
             case "d":
               this.abilities.push("shield");
-              break;
           }
         this.id = Math.random(); //Give the enemy a random ID so that no two enemy objects are identical
         this.distance = 0;
         if (this.abilities.includes("blink")) {
           this.visible = !!(blinkingCount % 2); //Every other blinking enemy will start off invisible
+          if (Math.floor(frame / 100) % 2) this.visible = !this.visible; //Blinking enemies switch states every 100 frames
           blinkingCount++;
         } else {
           this.visible = true;
         }
         this.slowed = 0;
-        this.hit = function(damage, tower, explosion) {
+        this.poisoned = 0;
+        this.hit = function(damage, tower, type) {
           if (this.stunned) damage *= 2;
-          if (!this.abilities.includes("shield") || explosion || tower.name == "Long-Range Tower") this.health -= damage; //Only Long-Range Towers and explosions can damage shielded enemies
-          if (this.health <= 0) {
+          if (!this.abilities.includes("shield") || type == "explosion" || type == "poison" || tower?.name == "Long-Range Tower") this.health -= damage; //Only explosions, poison, and Long-Range Towers can damage shielded enemies
+
+          if (this.health < 0.001) {
             let i = enemies.indexOf(this);
             player.money += (this.type.boss ? 10 : 1) * (tower?.extraMoney ? 3 : 1);
             if (this.abilities.includes("split")) {
@@ -1064,18 +1256,6 @@
       }
     }
 
-    let sound = {
-      enabled: false,
-      delay: 0.05,
-      td_coin01: new Audio("../static/sound/td/td_coin01.wav"),
-      td_explode01: new Audio("../static/sound/td/td_explode01.wav"),
-      td_explode02: new Audio("../static/sound/td/td_explode02.wav"),
-      td_explode03: new Audio("../static/sound/td/td_explode03.wav"),
-      td_hit01: new Audio("../static/sound/td/td_hit01.wav"),
-      td_powerup01: new Audio("../static/sound/td/td_powerup01.wav"),
-      td_shoot01: new Audio("../static/sound/td/td_shoot01.wav")
-    }
-
     let pause = [10, null];
     let waves = [
       [[4, "g", pause], "g"],
@@ -1087,7 +1267,7 @@
       [[6, "g", "y", "o", pause], "g", "y", "o"],
       [[9, "y"], [7, "o"]],
       [[50, "g"]],
-      [["alert", "<h1>New enemy ability: <b>Healing</b></h1>Enemies with this ability gradually regain health, so you need to destroy them quickly."], [9, "oh", pause], "oh"],
+      [["alert", "<h1>New enemy ability: <b>Healing</b></h1>Enemies with this ability gradually regain health, so you need to destroy them quickly. They're also immune to poison."], [9, "oh", pause], "oh"],
       [[7, [6, "y", pause]], [6, "y"]],
       [[20, "oh"]],
       [[15, "o", "y"]],
@@ -1110,7 +1290,7 @@
       [[5, "bs"]],
       [[2, [35, "r"], [5, "p"]]],
       [[14, "ba"], [26, "rh"]],
-      [["alert", "<h1>New enemy ability: <b>Shield</b></h1>Enemies with this ability can only be damaged by explosions and hits from Long-Range Towers."], "gd"],
+      [["alert", "<h1>New enemy ability: <b>Shield</b></h1>Enemies with this ability can only be damaged by explosions, poison, and hits from Long-Range Towers."], "gd"],
       [[30, "o"], pause, "x", pause, "x"],
       [[3, "bs"], [3, "ps"]],
       [[20, "rk"], pause, [5, "bk"]],
@@ -1151,24 +1331,24 @@
       ["uh", [10, [23, "rk"], "z"], [65, "ba"]],
       [[20, "u"], pause, [40, "xh"]],
       [[20, "pa"], [25, "pa", "xs"], pause, [200, "gd"], [3, "ua", "zh"]],
-      [[100, "bh"], [8, "za"], [35, [9, "ph", "uk"]]],
+      [[111, "bh"], [8, "za"], [35, [9, "ph", "uk"]]],
       [[90, "b", "p"], pause, [100, "x"]],
       [[2, "zd", "ud", pause], "zd", "ud", [300, "ba"], [30, "xh"], pause, [20, "u", "uh", "ua"]]
     ];
     waves.forEach(wave => wave.unshift([8, pause])); //Add a break at the start of each wave
 
     let grid = Array(15).fill().map(() => Array(32).fill(null)); //Array containing 15 arrays (rows), each containing 32 items (columns). Makes a deep copy of each array.
-    grid[0].fill("button", 0, 4); //Four buttons in to top left
-    grid[0].fill("info", 26, 32); //Area for game info in the top right
 
     let buttons = {
       fullscreen: new Image(),
       exitFullscreen: new Image(),
+      sound: new Image(),
+      noSound: new Image(),
+      showAlerts: new Image(),
+      noAlerts: new Image(),
       pause: new Image(),
       play: new Image(),
-      fastForward: new Image(),
-      noAlerts: new Image(),
-      showAlerts: new Image()
+      fastForward: new Image()
     };
     for (let button in buttons) buttons[button].src = `../static/img/towerdefense/${button}.png`;
 
@@ -1194,6 +1374,33 @@
       down: new Image(),
     };
     for (let plane in superPlanes) superPlanes[plane].src = `../static/img/towerdefense/superPlane-${plane}.png`;
+
+    let sound = {
+      enabled: true,
+      delay: 0.05,
+      sfx: {
+        blip: new Audio("../static/sound/sfx_blip01.wav"),
+        explode: new Audio("../static/sound/sfx_explode01.wav"),
+        hit: new Audio("../static/sound/sfx_hit01.wav"),
+        laser: new Audio("../static/sound/sfx_laser01.wav"),
+        pickUp: new Audio("../static/sound/sfx_pickup01.wav"),
+        powerUp: new Audio("../static/sound/sfx_powerup02.wav"),
+        shoot: new Audio("../static/sound/sfx_shoot01.wav"),
+        success: new Audio("../static/sound/sfx_success01.wav"),
+        td_coin01: new Audio("../static/sound/td/td_coin01.wav"),
+        td_explode01: new Audio("../static/sound/td/td_explode01.wav"),
+        td_explode02: new Audio("../static/sound/td/td_explode02.wav"),
+        td_explode03: new Audio("../static/sound/td/td_explode03.wav"),
+        td_hit01: new Audio("../static/sound/td/td_hit01.wav"),
+        td_powerup01: new Audio("../static/sound/td/td_powerup01.wav"),
+        td_shoot01: new Audio("../static/sound/td/td_shoot01.wav")
+      }
+    };
+    sound.sfx.blip.volume = 0.5;
+    sound.sfx.hit.volume = 0.1;
+    sound.sfx.explode.volume = 0.2;
+    sound.sfx.laser.volume = 0.2;
+    sound.sfx.shoot.volume = 0.2;
 
     let canvas = document.getElementById("game");
     let ctx = canvas.getContext("2d");
@@ -1285,20 +1492,26 @@
       ctx.drawPath(map);
 
       ctx.drawImage(document.fullscreenElement ? buttons.exitFullscreen : buttons.fullscreen, 15, 15, 30, 30);
-      ctx.drawImage(noAlerts ? buttons.showAlerts : buttons.noAlerts, 75, 15, 30, 30);
-      ctx.drawImage(buttons.pause, 135, 15, 30, 30);
-      if (difficulty == "normal") ctx.drawImage(fastForward ? buttons.play : buttons.fastForward, 195, 15, 30, 30); ////combine w/ onclick
       document.getElementById("r0c0").onclick = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
-      document.getElementById("r0c1").onclick = () => {
+      ctx.drawImage(sound.enabled ? buttons.sound : buttons.noSound, 75, 15, 30, 30);
+      document.getElementById("r0c1").onclick = () => sound.enabled = !sound.enabled;
+      ctx.drawImage(noAlerts ? buttons.noAlerts : buttons.showAlerts, 135, 15, 30, 30);
+      document.getElementById("r0c2").onclick = () => {
         if (noAlerts === undefined) gameAlert("No more alerts will be shown.");
         noAlerts = !noAlerts;
       };
-      document.getElementById("r0c2").onclick = () => {
+      ctx.drawImage(buttons.pause, 195, 15, 30, 30);
+      document.getElementById("r0c3").onclick = () => {
         paused = !paused;
         if (paused) {
           clearInterval(animate);
           document.getElementById("towers").classList.add("hidden");
-          ////prevent dropping
+          //Prevent placing towers while paused
+          grid.forEach((row, i) => row.forEach((square, j) => {
+            let squareEl = document.getElementById("r" + i + "c" + j);
+            if (squareEl.ondragleave) squareEl.ondragleave();
+          }));
+          for (let tower in towerTypes) if (towerTypes[tower].dragging) document.getElementById(tower).ondragend();
         } else {
           animate = setInterval(update, fastForward ? 10 : 40);
           document.getElementById("towers").classList.remove("hidden");
@@ -1306,18 +1519,22 @@
         let menuTower = towers.find(tower => tower?.menuOpen);
         menuTower?.closeMenu();
         if (document.getElementById("alert")) hideAlert(); //If there is an alert, hide it
-        ctx.clearRect(120, 0, 120, 60);
-        ctx.drawImage(buttons.play, 135, 15, 30, 30);
+        ctx.clearRect(180, 0, 120, 60);
+        ctx.drawImage(fastForward ? buttons.fastForward : buttons.play, 195, 15, 30, 30);
       };
-      if (difficulty == "normal") document.getElementById("r0c3").onclick = () => {
-        fastForward = !fastForward;
-        clearInterval(animate);
-        animate = setInterval(update, fastForward ? 10 : 40); //If fast forward is turned on, play at 4x the normal speed
-      };
+      if (difficulty == "normal") {
+        ctx.drawImage(fastForward ? buttons.play : buttons.fastForward, 255, 15, 30, 30);
+        document.getElementById("r0c4").onclick = () => {
+          fastForward = !fastForward;
+          clearInterval(animate);
+          animate = setInterval(update, fastForward ? 10 : 40); //If fast forward is turned on, play at 4x the normal speed
+        };
+      }
 
       if (!(frame % 25) && frame) seconds++; //Do this every 25 frames
 
       if (dragOver && dragOver[0].name != "Air Tower") {
+        ctx.lineWidth = 1;
         ctx.strokeStyle = "white";
         ctx.fillStyle = "#aaa5";
         ctx.drawCircle(dragOver[1] * 60 + 30, dragOver[2] * 60 + 30, dragOver[0].range * 60);
@@ -1366,25 +1583,27 @@
         //Otherwise, draw it in its new position
         if (enemy.distance >= mapArr.length) { //The enemy is at the end of the track
           player.lives -= enemy.type.health;
-          //Play sounds
-          if (sound.enabled) {
-            if (sound.td_hit01.currentTime >= sound.delay) {
-              sound.td_hit01.currentTime = 0;
-            } else {
-              sound.td_hit01.play();
-            }
-          }
+          if (sound.enabled && player.lives) sound.sfx.blip.play();
+          gameAchievements[0] = 0;
           enemies.splice(i, 1);
         } else {
-          if (enemy.stunned) enemy.stunned--;
-          else enemy.distance += enemy.speed * (enemy.slowed ? 2 : 4);
+          if (enemy.reverse) {
+            enemy.distance -= enemy.speed * (enemy.slowed ? 2 : 4);
+            enemy.reverse--;
+          } else if (enemy.stunned) {
+            enemy.stunned--;
+          } else {
+            enemy.distance += enemy.speed * (enemy.slowed ? 2 : 4);
+          }
           if (enemy.slowed) enemy.slowed--;
+          if (enemy.poisoned && --enemy.poisoned % (enemy.doublePoisoned ? 12.5 : 25) < 1) enemy.hit(0.4, null, "poison");
+          if (!enemy.poisoned) delete enemy.doublePoisoned;
 
           enemy.x = map.start[0] * 60;
           enemy.y = map.start[1] * 60;
-          let img;
-          for (let i = 0; i < Math.round(enemy.distance); i++) {
-            switch (mapArr[i]) {
+          let img = enemy.type.img;
+          for (let j = 0; j < Math.round(enemy.distance); j++) {
+            switch (mapArr[j]) {
               case "right":
                 enemy.x++;
                 break;
@@ -1396,12 +1615,13 @@
                 break;
               case "up":
                 enemy.y--;
-                break;
             }
             if (enemy.abilities.includes("split")) {
-              img = (enemy.type.boss && (mapArr[i] == "right" || mapArr[i] == "left")) ? enemy.type.imgSplitRotated : enemy.type.imgSplit; //If the enemy is a boss and moving horizontally, rotate it
+              img = (enemy.type.boss && (mapArr[j] == "right" || mapArr[j] == "left")) ? enemy.type.imgSplitRotated : enemy.type.imgSplit; //If the enemy is a boss and moving horizontally, rotate it
+            } else if (enemy.type.boss && (mapArr[j] == "right" || mapArr[j] == "left")) {
+              img = enemy.type.imgRotated;
             } else {
-              img = (enemy.type.boss && (mapArr[i] == "right" || mapArr[i] == "left")) ? enemy.type.imgRotated : enemy.type.img;
+              img = enemy.type.img;
             }
           }
           if (!enemy.visible) ctx.globalAlpha = 0.25; //If the enemy is hidden, make it semitransparent
@@ -1437,8 +1657,8 @@
 
           if (tower.name == "Air Tower") {
             tower.planeDistance += 8;
-            tower.planeX = tower.planeInitialX;
-            tower.planeY = tower.planeInitialY;
+            tower.planeX = tower.planeStartX;
+            tower.planeY = tower.planeStartY;
             let img;
             for (let i = 0; i < Math.round(tower.planeDistance); i++) {
               let j = i;
@@ -1455,7 +1675,6 @@
                   break;
                 case "up":
                   tower.planeY--;
-                  break;
               }
               img = planes[planePathArr[j]];
             }
@@ -1463,6 +1682,7 @@
           }
 
           if (tower.menuOpen) {
+            ctx.lineWidth = 1;
             ctx.strokeStyle = "white";
             ctx.fillStyle = "#aaa5";
             let x = (tower.name == "Air Tower") ? tower.planeX : tower.x;
@@ -1490,7 +1710,7 @@
             let range = tower.range;
             if (towers.find(owned => owned?.rangeBoosted == tower)) range *= 1.25; //Range boost from Air Tower
             if (tower.ultimateBoost) range *= 2;
-            let inRange = enemies.filter(enemy => Math.sqrt((x - enemy.x) ** 2 + (y - enemy.y) ** 2) < tower.range * 60); //Use the Pythagorean Theorem to determine if each enemy is inside the tower's range
+            let inRange = enemies.filter(enemy => Math.sqrt((x - enemy.x) ** 2 + (y - enemy.y) ** 2) < range * 60); //Use the Pythagorean Theorem to determine if each enemy is inside the tower's range
             if (!tower.seeInvisible) inRange = inRange.filter(enemy => enemy.visible);
             if (inRange.length) {
               let furthest = inRange.sort((a, b) => b.distance - a.distance)[0]; //Sort inRange from highest to lowest distance and get the first item
@@ -1504,6 +1724,10 @@
               target.hit(damage, tower);
               if (tower.slowing && !target.abilities.includes("acceleration")) target.slowed = tower.permSlow ? Infinity : 250;
               if (tower.abilityBlocking && !target.abilities.includes("acceleration")) target.noAbilities = tower.permSlow ? Infinity : 250;
+              if (tower.poison && !target.abilities.includes("healing")) {
+                target.poisoned = 125;
+                if (tower.doublePoison) target.doublePoisoned = true;
+              }
               if (tower.bounce) {
                 let bouncePath = [target]; //Make an array of all enemies hit so they aren't bounced to again
                 let close = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < 100 && !bouncePath.includes(enemy) && enemy.visible);
@@ -1511,7 +1735,16 @@
                 while (close.length && bouncesLeft) {
                   let closest = close.sort((a, b) => ((target.x - a.x) ** 2 + (target.y - a.y) ** 2) - ((target.x - b.x) ** 2 + (target.y - b.y) ** 2))[0];
                   let distance = Math.sqrt((target.x - closest.x) ** 2 + (target.y - closest.y) ** 2);
+                  let oldTarget = target;
                   target = closest;
+
+                  ctx.lineWidth = 4;
+                  ctx.strokeStyle = tower.color;
+                  ctx.beginPath();
+                  ctx.moveTo(oldTarget.x, oldTarget.y);
+                  ctx.lineTo(target.x, target.y);
+                  ctx.stroke();
+
                   damage = tower.strength;
                   if (tower.ultimateBoost) damage *= 2;
                   target.hit(damage, tower);
@@ -1520,16 +1753,30 @@
                   bouncesLeft--;
                 }
               }
+              if (tower.poisonSplash) {
+                let close = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < 100 && enemy != target && enemy.visible);
+                if (close.length) {
+                  let closest = close.sort((a, b) => ((target.x - a.x) ** 2 + (target.y - a.y) ** 2) - ((target.x - b.x) ** 2 + (target.y - b.y) ** 2))[0];
+                  let distance = Math.sqrt((target.x - closest.x) ** 2 + (target.y - closest.y) ** 2);
+                  target = closest;
+                  target.poisoned = 125;
+                  if (tower.doublePoison) target.doublePoisoned = true;
+                }
+              }
               if (tower.nextExplosion === 0) tower.explosionSize = 75;
               if (tower.explosionSize) {
                 //Create an explosion centered around the target enemy
                 let inExplosion = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < tower.explosionSize);
-                let explosionDamage = tower.powerfulExplosions ? tower.strength : tower.strength * 0.5;
-                inExplosion.forEach(enemy => enemy.hit(explosionDamage, tower, true)); //Do damage to every enemy inside the explosion
+                let explosionDamage = tower.powerfulExplosions ? tower.strength : 0.5;
+                inExplosion.forEach(enemy => enemy.hit(explosionDamage, tower, "explosion")); //Do damage to every enemy inside the explosion
                 //Draw the explosion as an orange circle
                 ctx.strokeStyle = "transparent";
                 ctx.fillStyle = "#ff8f4055";
                 ctx.drawCircle(target.x, target.y, tower.explosionSize);
+                if (sound.enabled) {
+                  sound.sfx.explode.currentTime = 0;
+                  sound.sfx.explode.play();
+                }
               }
               if (tower.nextExplosion) {
                 tower.nextExplosion--;
@@ -1538,7 +1785,7 @@
                 tower.nextExplosion = 5;
               }
 
-              //Play sounds
+              //Play hit sound
               if (sound.enabled) {
                 switch (tower.name) {
                   case 'Cannon Tower':
@@ -1557,27 +1804,25 @@
                 }
               }
 
-              //Show firing frame
-              ctx.drawImage(tower.activeImg, tower.x - 30, tower.y - 30);
+              ctx.drawImage(tower.activeImg, tower.x - 30, tower.y - 30); //Light up the firing tower for 1 frame
 
               //Draw line of fire
               ctx.lineWidth = 4;
-              ctx.strokeStyle = '#FF0000';
-              ctx.beginPath();       // Start a new path
-              if (tower.name == 'Air Tower') {
-                ctx.moveTo(tower.planeX, tower.planeY);
-
-              } else {
-                ctx.moveTo(tower.x, tower.y);
-              }
+              ctx.strokeStyle = tower.color;
+              ctx.beginPath(); //Start a new path
+              if (tower.name == "Air Tower") ctx.moveTo(tower.planeX, tower.planeY);
+              else ctx.moveTo(tower.x, tower.y);
               ctx.lineTo(target.x, target.y);
-              ctx.stroke();          // Render the path
+              ctx.stroke(); //Render the path
 
               tower.cooldown += 25 / tower.speed;
             }
           }
 
           if (tower.speedBoost) tower.speedBoost--;
+          if (tower.ultimateBoost) tower.ultimateBoost--;
+
+          if (tower.upgrades.range == 2 && tower.upgrades.speed == 2 && tower.upgrades.strength == 2 && tower.extra2.bought) gameAchievements[2] = 1;
         }
       });
 
@@ -1602,7 +1847,6 @@
                 break;
               case "up":
                 superPlane.y--;
-                break;
             }
             img = superPlanes[superPlanePathArr[i]];
           }
@@ -1615,6 +1859,19 @@
             if (inRange.length) {
               let target = inRange.sort((a, b) => b.distance - a.distance)[0];
               target.hit(superPlane.strength);
+
+              if (sound.enabled) {
+                sound.sfx.hit.currentTime = 0;
+                sound.sfx.hit.play();
+              }
+
+              ctx.lineWidth = 4;
+              ctx.strokeStyle = "#ff6860";
+              ctx.beginPath();
+              ctx.moveTo(superPlane.x, superPlane.y);
+              ctx.lineTo(target.x, target.y);
+              ctx.stroke();
+
               superPlane.cooldown += 25 / superPlane.speed;
             }
           }
@@ -1662,6 +1919,11 @@
                     let squareEl = document.getElementById("r" + i + "c" + j);
                     squareEl.classList.add("tower");
                     squareEl.onclick = () => newTower.showMenu();
+                    towerTypes[tower].placed = true;
+                    if (Object.values(towerTypes).every(tower => tower.placed)) gameAchievements[1] = 1;
+                    if (newTower.name == "Ultimate Tower") gameAchievements[4] = 0;
+                    if (newTower.name == "Basic Tower") gameAchievements[5] = 0;
+                    if (towers.length == 4) gameAchievements[6] = 0;
                   }
                 };
               }
@@ -1732,7 +1994,9 @@
       frame++;
     }
 
-    let progress = localStorage.getItem("tdProgress") || "00000"; //2 means map completed on hard, 1 means map completed on normal, 0 means map not completed
+    let progress = localStorage.getItem("tdProgress") || ""; //2 means map completed on hard, 1 means map completed on normal, 0 means map not completed
+    let achievements = localStorage.getItem("tdAchievements") || "0000000"; //1 means earned, 0 means not earned
+    achievements = achievements.split("");
     let player = {
       money: 80,
       lives: 100,
@@ -1745,6 +2009,7 @@
     let planePathArr;
     let superPlanePathArr;
     let difficulty = "normal";
+    let gameAchievements = [1, 0, 0, 0, 1, 1, 1];
     let enemies = [];
     let blinkingCount = 0; //Keep track of blinking enemies to alternate between visible and invisible
     let towers = [];
@@ -1759,341 +2024,137 @@
     let dragOver;
     let animate;
 
-    let maps = [
-      {
-        name: "Map #01",
-        author: "Oley Birkeland",
-        start: [6.5, -0.5],
-        lines: [
-          ["down", 13],
-          ["left", 3],
-          ["up", 3],
-          ["right", 7],
-          ["down", 2],
-          ["right", 2],
-          ["up", 6],
-          ["left", 3],
-          ["up", 3],
-          ["right", 7],
-          ["down", 8],
-          ["right", 6],
-          ["down", 3],
-          ["left", 3],
-          ["up", 8],
-          ["right", 9],
-          ["down", 4],
-          ["left", 4],
-          ["down", 2],
-          ["right", 8]
-        ]
-      },
-      {
-        name: "Map #02",
-        author: "Oley Birkeland",
-        start: [-0.5, 12.5],
-        lines: [
-          ["right", 9],
-          ["up", 10],
-          ["right", 13],
-          ["down", 8],
-          ["left", 2],
-          ["up", 6],
-          ["left", 9],
-          ["down", 8],
-          ["right", 2],
-          ["up", 6],
-          ["right", 5],
-          ["down", 6],
-          ["right", 6],
-          ["up", 10],
-          ["right", 9]
-        ]
-      },
-      {
-        name: "Map #03",
-        author: "Oley Birkeland",
-        start: [23.5, -0.5],
-        lines: [
-          ["down", 3],
-          ["right", 5],
-          ["down", 4],
-          ["left", 4],
-          ["down", 3],
-          ["right", 2],
-          ["down", 4],
-          ["left", 9],
-          ["up", 4],
-          ["right", 2],
-          ["down", 2],
-          ["left", 8],
-          ["down", 1],
-          ["left", 7],
-          ["up", 5],
-          ["right", 9],
-          ["up", 5],
-          ["left", 4],
-          ["down", 2],
-          ["right", 8],
-          ["up", 1],
-          ["right", 1],
-          ["up", 1],
-          ["right", 1],
-          ["up", 1],
-          ["right", 1],
-          ["up", 2]
-        ]
-      },
-      {
-        name: "Map #04",
-        author: "Oley Birkeland",
-        start: [8.5, -0.5],
-        lines: [
-          ["down", 13],
-          ["right", 6],
-          ["up", 5],
-          ["right", 4],
-          ["down", 4],
-          ["left", 9],
-          ["up", 6],
-          ["right", 7],
-          ["down", 4],
-          ["right", 9],
-          ["down", 3],
-          ["left", 5],
-          ["up", 7],
-          ["right", 2],
-          ["down", 2],
-          ["right", 4],
-          ["up", 3],
-          ["left", 9],
-          ["up", 1],
-          ["right", 4],
-          ["up", 1],
-          ["left", 22]
-        ]
-      },
-      {
-        name: "Map #05",
-        author: "Oley Birkeland",
-        start: [32.5, 7.5],
-        lines: [
-          ["left", 4],
-          ["down", 2],
-          ["left", 4],
-          ["up", 2],
-          ["left", 3],
-          ["up", 5],
-          ["left", 4],
-          ["down", 5],
-          ["left", 3],
-          ["down", 5],
-          ["left", 4],
-          ["up", 5],
-          ["left", 3],
-          ["up", 2],
-          ["left", 4],
-          ["down", 2],
-          ["left", 4]
-        ]
-      },
-      {
-        name: "Celtic Knot",
-        author: "Mr. Smith",
-        start: [-0.5, 12.5],
-        lines: [
-          ["right", 9],
-          ["up", 7],
-          ["left", 5],
-          ["down", 3],
-          ["right", 12],
-          ["up", 6],
-          ["left", 4],
-          ["down", 3],
-          ["right", 9],
-          ["up", 3],
-          ["left", 4],
-          ["down", 6],
-          ["right", 12],
-          ["up", 3],
-          ["left", 5],
-          ["down", 7],
-          ["right", 8]
-        ]
-      },
-      {
-        name: "Outer Loop",
-        author: "Mr. Smith",
-        start: [15.5, -0.5],
-        lines: [
-          ["down", 1],
-          ["left", 15],
-          ["down", 14],
-          ["right", 15],
-          ["up", 4],
-          ["left", 3],
-          ["down", 3],
-          ["right", 8],
-          ["up", 3],
-          ["left", 3],
-          ["down", 4],
-          ["right", 14],
-          ["up", 14],
-          ["left", 13],
-          ["up", 1]
-        ]
-      },
-      {
-        name: "Where'dja Go?",
-        author: "Mr. Smith",
-        start: [-0.5, 7.5],
-        lines: [
-          //jiggle
-          ["right", 4],
-          ["left", 2],
-          ["right", 10],
-          ["up", 8],
-          //loop
-          ["right", 2],
-          ["up", 1],
-          ["left", 1],
-          ["down", 1],
-          ["right", 1],
-          //loop
-          ["right", 2],
-          ["up", 1],
-          ["left", 1],
-          ["down", 1],
-          ["right", 1],
-          //loop
-          ["right", 2],
-          ["up", 1],
-          ["left", 1],
-          ["down", 1],
-          ["right", 1],
-          //loop
-          ["right", 2],
-          ["up", 1],
-          ["left", 1],
-          ["down", 1],
-          ["right", 1],
-          //loop
-          ["right", 2],
-          ["up", 1],
-          ["left", 1],
-          ["down", 1],
-          ["right", 1],
-
-          ["down", 8],
-          ["right", 4],
-          ["left", 2],
-          ["right", 9]
-
-        ]
-      },
-      {
-        name: "Jiggle'n'Juke",
-        author: "Mr. Smith",
-        start: [-0.5, 7.5],
-        lines: [
-          //jiggle
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2],
-          ["left", 1],
-          ["right", 2]
-
-        ]
-      }
-    ];
-
-    if (progress == "00000" && localStorage.getItem("tdComplete")) progress = "10000";
-    progress = progress.padEnd(maps.length, "0");
+    if (progress[0] == "0" && localStorage.getItem("tdComplete")) progress.splice(0, 1, "1"); ////
+    progress = progress.padEnd(maps.length, "0"); //Add zeroes to the end when maps are added
+    if (progress.length > maps.length) progress = progress.slice(0, maps.length - progress.length); //Remove numbers from the end if maps are deleted
     localStorage.setItem("tdProgress", progress);
     progress = progress.split(""); //Turn the string into an array
 
+    let achievementList = [
+      "Complete a game without losing any lives",
+      "Purchase every tower type in one game",
+      "Fully upgrade a tower",
+      "Use every tower ability in one game",
+      "Win a game without any Ultimate Towers",
+      "Win a game without any Basic Towers",
+      "Win a game without placing more than three towers"
+    ];
+
+    //Create the title
+    ctx.drawPreview({
+      start: [1, 3],
+      lines: [
+        ["right", 1],
+        ["up", 1],
+        ["down", 1],
+        ["right", 1],
+        ["left", 1],
+        ["down", 3],
+        ["right", 2],
+        ["up", 2],
+        ["right", 2],
+        ["down", 2],
+        ["left", 2],
+        ["up", 2],
+        ["right", 3],
+        ["down", 2],
+        ["right", 1],
+        ["up", 1],
+        ["down", 1],
+        ["right", 1],
+        ["up", 2],
+        ["right", 1],
+        ["down", 1],
+        ["right", 1],
+        ["up", 1],
+        ["left", 1],
+        ["down", 2],
+        ["right", 2],
+        ["up", 2],
+        ["right", 1],
+        ["down", 1],
+      ]
+    });
+    ctx.drawPreview({
+      start: [17, 2],
+      lines: [
+        ["down", 4],
+        ["left", 2],
+        ["up", 2],
+        ["right", 3],
+        ["down", 1],
+        ["right", 1],
+        ["up", 1],
+        ["left", 1],
+        ["down", 2],
+        ["right", 2],
+        ["up", 4],
+        ["right", 1],
+        ["down", 1],
+        ["up", 1],
+        ["left", 1],
+        ["down", 2],
+        ["right", 2],
+        ["down", 1],
+        ["right", 1],
+        ["up", 1],
+        ["left", 1],
+        ["down", 2],
+        ["right", 2],
+        ["up", 2],
+        ["right", 2],
+        ["down", 2],
+        ["right", 2],
+        ["up", 1],
+        ["left", 1],
+        ["up", 1],
+        ["right", 2],
+        ["down", 1],
+        ["right", 1],
+        ["up", 1],
+        ["left", 1],
+        ["down", 2],
+        ["right", 2]
+      ]
+    });
     ctx.fillStyle = "white";
-    ctx.font = "128px Segoe UI";
     ctx.textAlign = "center";
-    ctx.fillText("Tower Defense", 960, 300);
     ctx.font = "48px Segoe UI";
     ctx.fillText("Click to continue", 960, 600);
     ctx.font = "32px Segoe UI";
     ctx.fillText("Created by Oley Birkeland", 960, 1000);
-    let complete = progress.reduce((a, b) => +a + +b); //Convert every character to a number and add
-    let total = progress.length * 2;
+    let completeMaps = progress.reduce((a, b) => +a + +b); //Convert every character to a number and add
+    let totalMaps = progress.length * 2;
+    let completeAchv = achievements.reduce((a, b) => +a + +b);
+    let totalAchv = achievementList.length;
     let progressEl = document.getElementById("progress");
-    if (complete == total) {
-      progressEl.classList.add("complete");
-      let medal = document.createElement("img");
-      medal.id = "medal";
-      medal.src = "../static/img/towerdefense/medal.png";
-      progressEl.append(medal);
-    }
+    if (completeMaps == totalMaps && completeAchv == totalAchv) progressEl.classList.add("complete");
     let progressText = document.createElement("span");
     progressText.id = "progressText";
+    progressText.innerText = `${completeMaps}/${totalMaps} complete`;
     progressEl.append(progressText);
-    document.getElementById("progressText").innerText = `${complete}/${total} complete`;
+    let achvText = document.createElement("div");
+    achvText.id = "achievements";
+    achvText.innerHTML = `<span>${completeAchv}/${totalAchv} achievements</span>`;
+    let achvButton = document.createElement("button");
+    achvButton.id = "achvButton";;
+    achvButton.innerText = "Open list";
+    achvButton.onclick = () => {
+      let listText = "<ul>";
+      achievementList.forEach((achievement, i) => {
+        let earned = +achievements[i];
+        let tag = earned ? "s" : "b";
+        listText += `<li class=${earned ? "earned" : ""}><${tag}>${achievement}</${tag}></li>`;
+      });
+      listText += "</ul>";
+      gameAlert(listText);
+    }
+    achvText.append(achvButton);
+    progressEl.append(achvText);
 
     function showMaps() {
       document.getElementById("progress").classList.add("hidden");
+      if (document.getElementById("alert")) hideAlert();
       ctx.clearRect(0, 0, 1920, 1080); //Clear the canvas
 
       let container = document.getElementById("container");
@@ -2104,9 +2165,6 @@
       back.onclick = () => window.location.reload();
       container.appendChild(back);
 
-      ctx.font = "48px Segoe UI";
-      ctx.textAlign = "center";
-      ctx.fillText("Choose a map", 960, 75);
       let left = document.createElement("div");
       let right = document.createElement("div");
       left.id = "prevMap";
@@ -2147,6 +2205,7 @@
 
       let startButton = document.createElement("button");
       startButton.id = "startButton";
+      startButton.classList.add("hCentered");
       startButton.innerText = "Start game";
       container.appendChild(startButton);
 
@@ -2158,7 +2217,11 @@
 
     function switchMap() {
       map = maps[mapIndex];
-      ctx.clearRect(480, 120, 960, 450);
+      ctx.clearRect(480, 0, 960, 570);
+      ctx.fillStyle = "white";
+      ctx.font = "48px Segoe UI";
+      ctx.textAlign = "center";
+      ctx.fillText(`${map.name} by ${map.author}`, 960, 75);
       ctx.drawPreview(map); //Draw preview of map
       ctx.strokeStyle = "white";
       ctx.lineWidth = 2;
@@ -2171,15 +2234,14 @@
       let hard = document.getElementById("hard");
       let startButton = document.getElementById("startButton");
       let mapComplete = +progress[mapIndex];
-      ctx.font = "30px Segoe UI";
       ctx.clearRect(0, 675, 1920, 275);
       ctx.fillStyle = "white";
-      ctx.fillText("• " + maps[mapIndex].name + " by " + maps[mapIndex].author, 960, 700);
+      ctx.font = "30px Segoe UI";
       if (difficulty == "normal") {
         normal.classList.add("pressed");
         hard.classList.remove("pressed");
-        ctx.fillText("• 50 waves", 960, 750);
-        ctx.fillText("• 100 lives", 960, 800);
+        ctx.fillText("• 50 waves", 960, 700);
+        ctx.fillText("• 100 lives", 960, 750);
         if (mapComplete) {
           ctx.fillStyle = "#80ff80";
           ctx.fillText("✔️ Normal mode complete", 960, 935);
@@ -2187,10 +2249,10 @@
       } else {
         hard.classList.add("pressed");
         normal.classList.remove("pressed");
-        ctx.fillText("• 75 waves", 960, 750);
-        ctx.fillText("• 50 lives", 960, 800);
-        ctx.fillText("• No abilities", 960, 850);
-        ctx.fillText("• Fast forward permanently on", 960, 900);
+        ctx.fillText("• 75 waves", 960, 700);
+        ctx.fillText("• 50 lives", 960, 750);
+        ctx.fillText("• No abilities", 960, 800);
+        ctx.fillText("• Fast forward permanently on", 960, 850);
         if (mapComplete == 2) {
           ctx.fillStyle = "#80ff80";
           ctx.fillText("✔️ Hard mode complete", 960, 935);
@@ -2214,6 +2276,9 @@
       document.getElementById("difficulty").remove();
       document.getElementById("startButton").remove();
 
+      grid[0].fill("button", 0, (difficulty == "normal") ? 5 : 4); //Buttons in to top left
+      grid[0].fill("info", 26, 32); //Area for game info in the top right
+
       //Make an array with one item for each pixel of the path
       mapArr = [];
       map.lines.forEach(line => {
@@ -2235,7 +2300,6 @@
             break;
           case "up":
             planePathArr.push("down");
-            break;
         }
       }
 
@@ -2254,7 +2318,6 @@
             break;
           case "up":
             superPlanePathArr.push("down");
-            break;
         }
       }
 
@@ -2296,6 +2359,8 @@
           if (ability.bought && !ability.cooldown && towers.find(owned => owned?.name == towerTypes[tower].name) && difficulty == "normal") {
             ability.use();
             ability.cooldown = 3000;
+            ability.used = true;
+            if (Object.values(towerTypes).every(tower => tower.ability.used)) gameAchievements[3] = 1;
           }
         };
       }
@@ -2304,10 +2369,13 @@
     };
 
     function gameAlert(message) {
-      document.getElementById("r0c2").click(); //Pause the game
+      document.getElementById("r0c3")?.click(); //Pause the game
       let alertBox = document.createElement("div");
       alertBox.id = "alert";
-      alertBox.innerHTML = message;
+      let alertText = document.createElement("div");
+      alertText.id = "alertText";
+      alertText.innerHTML = message;
+      alertBox.appendChild(alertText);
       let okButton = document.createElement("button");
       okButton.id = "ok";
       okButton.innerText = "OK";
@@ -2319,16 +2387,24 @@
 
     function hideAlert() {
       document.getElementById("alert").remove(); //Hide the alert box
-      if (paused) document.getElementById("r0c2").click(); //Unpause the game
+      if (paused) document.getElementById("r0c3").click(); //Unpause the game
       document.removeEventListener("keydown", hideAlert);
     }
 
     function endGame(complete) {
       if (complete) {
+        if (sound.enabled) sound.sfx.success.play();
         let num = (difficulty == "hard") ? 2 : 1;
         if (progress[mapIndex] < num) progress.splice(mapIndex, 1, num); //Update progress
         localStorage.setItem("tdProgress", progress.join("")); //Save to local storage as string
+      } else {
+        if (sound.enabled) sound.sfx.shoot.play();
+        gameAchievements[4] = 0;
+        gameAchievements[5] = 0;
+        gameAchievements[6] = 0;
       }
+      let allAchievements = achievements.map((achievement, i) => +achievement || gameAchievements[i]); //New achievements + ones that were earned before
+      localStorage.setItem("tdAchievements", allAchievements.join(""));
       //If a tower has a menu open, close it
       let menuTower = towers.find(tower => tower?.menuOpen);
       menuTower?.closeMenu();
@@ -2339,25 +2415,17 @@
       ctx.fillStyle = "white";
       ctx.font = "128px Segoe UI";
       ctx.textAlign = "center";
-      ctx.fillText(complete ? "Congratulations!" : "Game over", 960, 300);
+      ctx.fillText(complete ? "Map complete!" : "Game over", 960, 300);
       ctx.font = "64px Segoe UI";
       ctx.fillStyle = "#80ffff";
-      ctx.fillText(complete ? "You have completed the game." : `Time: ${Math.floor(seconds / 60)}:${seconds % 60 < 10 ? "0" + seconds % 60 : seconds % 60}`, 960, 500);
+      ctx.fillText(complete ? `${map.name} cleared on ${difficulty} mode` : `Time: ${Math.floor(seconds / 60)}:${seconds % 60 < 10 ? "0" + seconds % 60 : seconds % 60}`, 960, 500);
+      ctx.fillStyle = "#ffdf40";
+      let newAchievements = achievements.filter((achievement, i) => !+achievement && gameAchievements[i]).length;
+      if (newAchievements) ctx.fillText(`${newAchievements} new ${(newAchievements == 1) ? "achievement" : "achievements"} earned`, 960, 600);
       ctx.font = "48px Segoe UI";
       ctx.fillStyle = "white";
       ctx.fillText("Click to return to the home screen", 960, 800);
       document.getElementById("game").onclick = () => window.location.reload();
     }
-
-    //Achievements will be added later
-    let achievements = [
-      "Complete a game without losing any lives",
-      "Fully upgrade a tower",
-      "Purchase every tower in one game",
-      "Use every ability in one game",
-      "Win a game without any Ultimate Towers",
-      "Win a game without any Basic Towers",
-      "Win a game without buying more than three towers"
-    ];
   </script>
 {% endblock %}

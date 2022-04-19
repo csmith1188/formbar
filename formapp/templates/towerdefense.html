@@ -1,4 +1,4 @@
-{% extends 'header.html' %}
+sound.sfx.td_{% extends 'header.html' %}
 <!-- ^^ This means add this file to the end of the contents of header.html -->
 <!-- This is where the title, top buttons, and stylesheet is located -->
 
@@ -1583,7 +1583,14 @@
         //Otherwise, draw it in its new position
         if (enemy.distance >= mapArr.length) { //The enemy is at the end of the track
           player.lives -= enemy.type.health;
-          if (sound.enabled && player.lives) sound.sfx.blip.play();
+          //Play sounds
+          if (sound.enabled&& player.lives) {
+            if (sound.sfx.td_hit01.currentTime >= sound.delay) {
+              sound.sfx.td_hit01.currentTime = 0;
+            } else {
+              sound.sfx.td_hit01.play();
+            }
+          }
           gameAchievements[0] = 0;
           enemies.splice(i, 1);
         } else {
@@ -1773,10 +1780,10 @@
                 ctx.strokeStyle = "transparent";
                 ctx.fillStyle = "#ff8f4055";
                 ctx.drawCircle(target.x, target.y, tower.explosionSize);
-                if (sound.enabled) {
-                  sound.sfx.explode.currentTime = 0;
-                  sound.sfx.explode.play();
-                }
+                // if (sound.enabled) {
+                //   sound.sfx.explode.currentTime = 0;
+                //   sound.sfx.explode.play();
+                // }
               }
               if (tower.nextExplosion) {
                 tower.nextExplosion--;
@@ -1789,17 +1796,17 @@
               if (sound.enabled) {
                 switch (tower.name) {
                   case 'Cannon Tower':
-                  if (sound.td_explode01.currentTime >= sound.delay) {
-                    sound.td_explode01.currentTime = 0;
+                  if (sound.sfx.td_explode01.currentTime >= sound.delay) {
+                    sound.sfx.td_explode01.currentTime = 0;
                   } else {
-                    sound.td_explode01.play();
+                    sound.sfx.td_explode01.play();
                   }
                     break;
                   default:
-                    if (sound.td_shoot01.currentTime >= sound.delay) {
-                      sound.td_shoot01.currentTime = 0;
+                    if (sound.sfx.td_shoot01.currentTime >= sound.delay) {
+                      sound.sfx.td_shoot01.currentTime = 0;
                     } else {
-                      sound.td_shoot01.play();
+                      sound.sfx.td_shoot01.play();
                     }
                 }
               }

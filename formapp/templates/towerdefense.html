@@ -557,10 +557,10 @@
           }
         },
         extra2: {
-          description: "Projectiles can bounce to up to five nearby enemies.",
-          price: 80,
+          description: "Projectiles can hit up to eight enemies.",
+          price: 120,
           add: function() {
-            this.bounce = 5;
+            this.bounce = 8;
           }
         },
         ability: {
@@ -577,10 +577,10 @@
         color: "#80ffff",
         description: "Weaker attacks, but hits slow down enemies for 10 seconds.",
         range: 1.64,
-        speed: 3,
-        strength: 0.1,
+        speed: 2.12,
+        strength: 0.4,
         slowing: true,
-        price: 25,
+        price: 30,
         extra1: {
           description: "Enemies lose all abilities while they are slowed down.",
           price: 45,
@@ -641,9 +641,9 @@
         color: "#ffdf40",
         description: "Infinite range and strong attacks, but fires slowly. Targets the strongest enemy onscreen.",
         range: Infinity,
-        speed: 0.2,
-        strength: 10,
-        price: 100,
+        speed: 0.34,
+        strength: 6,
+        price: 75,
         extra1: {
           description: "Can hit blinking enemies while they are hidden.",
           price: 15,
@@ -673,8 +673,8 @@
         color: "#ff8f40",
         description: "Every hit creates an explosion that damages nearby enemies.",
         range: 3.4,
-        speed: 0.72,
-        strength: 1,
+        speed: 0.66,
+        strength: 2,
         price: 80,
         explosionSize: 100,
         extra1: {
@@ -710,28 +710,28 @@
         description: "Gets 3× as much money from defeating enemies.",
         range: 3.32,
         speed: 0.88,
-        strength: 1,
+        strength: 0.7,
         extraMoney: true,
         price: 100,
         extra1: {
           description: "Adds an extra $5 every 10 seconds.",
-          price: 50,
+          price: 150,
           add: function() {
-            player.bonusMoney += 10;
+            player.bonusMoney += 5;
           }
         },
         extra2: {
           description: "Adds an extra life every 15 seconds.",
-          price: 100,
+          price: 220,
           add: function() {
             player.bonusLives += 1;
           }
         },
         ability: {
-          description: "Adds $50 to your total.",
-          price: 150,
+          description: "Adds $75 to your total.",
+          price: 160,
           use: function() {
-            player.money += 50;
+            player.money += 75;
             if (sound.enabled) sound.sfx.pickUp.play();
           }
         }
@@ -803,14 +803,14 @@
         price: 400,
         extra1: {
           description: "Attack power is slightly increased for each enemy on the screen.",
-          price: 80,
+          price: 135,
           add: function() {
             this.crowdBonus = true;
           }
         },
         extra2: {
           description: "Does 5× damage to boss enemies.",
-          price: 400,
+          price: 1000,
           add: function() {
             this.bossBonus = true;
           }

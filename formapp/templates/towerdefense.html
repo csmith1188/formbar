@@ -1,4 +1,4 @@
-sound.sfx.td_{% extends 'header.html' %}
+{% extends 'header.html' %}
 <!-- ^^ This means add this file to the end of the contents of header.html -->
 <!-- This is where the title, top buttons, and stylesheet is located -->
 
@@ -548,7 +548,7 @@ sound.sfx.td_{% extends 'header.html' %}
         range: 2.5,
         speed: 1,
         strength: 1,
-        price: 40,
+        price: 35,
         extra1: {
           description: "Projectiles can bounce to up to three nearby enemies.",
           price: 40,
@@ -580,7 +580,7 @@ sound.sfx.td_{% extends 'header.html' %}
         speed: 3,
         strength: 0.1,
         slowing: true,
-        price: 30,
+        price: 25,
         extra1: {
           description: "Enemies lose all abilities while they are slowed down.",
           price: 45,
@@ -641,8 +641,8 @@ sound.sfx.td_{% extends 'header.html' %}
         color: "#ffdf40",
         description: "Infinite range and strong attacks, but fires slowly. Targets the strongest enemy onscreen.",
         range: Infinity,
-        speed: 0.46,
-        strength: 4,
+        speed: 0.2,
+        strength: 10,
         price: 100,
         extra1: {
           description: "Can hit blinking enemies while they are hidden.",
@@ -675,7 +675,7 @@ sound.sfx.td_{% extends 'header.html' %}
         range: 3.4,
         speed: 0.72,
         strength: 1,
-        price: 100,
+        price: 80,
         explosionSize: 100,
         extra1: {
           description: "Explosions are increased in size.",
@@ -710,12 +710,12 @@ sound.sfx.td_{% extends 'header.html' %}
         description: "Gets 3× as much money from defeating enemies.",
         range: 3.32,
         speed: 0.88,
-        strength: 0.5,
+        strength: 1,
         extraMoney: true,
         price: 100,
         extra1: {
           description: "Adds an extra $5 every 10 seconds.",
-          price: 80,
+          price: 50,
           add: function() {
             player.bonusMoney += 10;
           }
@@ -729,7 +729,7 @@ sound.sfx.td_{% extends 'header.html' %}
         },
         ability: {
           description: "Adds $50 to your total.",
-          price: 250,
+          price: 150,
           use: function() {
             player.money += 50;
             if (sound.enabled) sound.sfx.pickUp.play();
@@ -1146,7 +1146,7 @@ sound.sfx.td_{% extends 'header.html' %}
     }
 
     class Enemy {
-      constructor(string) {
+      constructor(string, multiplier) {
         switch (string[0]) {
           case "g":
             this.type = enemyTypes.green;
@@ -1176,7 +1176,8 @@ sound.sfx.td_{% extends 'header.html' %}
             this.type = enemyTypes.purpleBoss;
         }
         this.speed = this.type.speed;
-        this.health = this.type.health;
+        if (multiplier) this.health = this.type.health * multiplier;
+        else this.health = this.type.health;
         this.abilities = [];
           switch (string[1]) {
             case "h":
@@ -1215,10 +1216,10 @@ sound.sfx.td_{% extends 'header.html' %}
             if (this.abilities.includes("split")) {
               let type;
               if (this.type == enemyTypes.boss) {
-                let new1 = new Enemy("p");
-                let new2 = new Enemy("p");
-                let new3 = new Enemy("b");
-                let new4 = new Enemy("b");
+                let new1 = new Enemy("p", (Math.floor(currentWave/10)));
+                let new2 = new Enemy("p", (Math.floor(currentWave/10)));
+                let new3 = new Enemy("b", (Math.floor(currentWave/10)));
+                let new4 = new Enemy("b", (Math.floor(currentWave/10)));
                 new1.distance = this.distance;
                 new2.distance = this.distance - 20;
                 new3.distance = this.distance - 40;
@@ -1239,8 +1240,8 @@ sound.sfx.td_{% extends 'header.html' %}
                   case enemyTypes.brown:
                     type = "r";
                 }
-                let new1 = new Enemy(type);
-                let new2 = new Enemy(type);
+                let new1 = new Enemy(type, (Math.floor(currentWave/10)));
+                let new2 = new Enemy(type, (Math.floor(currentWave/10)));
                 new1.distance = this.distance;
                 new2.distance = this.distance - 20;
                 enemies.splice(i, 1, new1, new2);
@@ -1557,7 +1558,7 @@ sound.sfx.td_{% extends 'header.html' %}
         }
         //Add next enemy
         if (next) {
-          let newEnemy = new Enemy(next);
+          let newEnemy = new Enemy(next, (Math.floor(currentWave/10)));
           enemies.push(newEnemy);
         }
 
@@ -1573,7 +1574,7 @@ sound.sfx.td_{% extends 'header.html' %}
               return;
             }
           }
-          currentWave++;
+          if (currentWave < waves.length) currentWave++;
           currentEnemy = 0;
         }
       }

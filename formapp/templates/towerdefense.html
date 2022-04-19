@@ -1146,7 +1146,7 @@
     }
 
     class Enemy {
-      constructor(string, multiplier) {
+      constructor(string, wave) {
         switch (string[0]) {
           case "g":
             this.type = enemyTypes.green;
@@ -1176,7 +1176,8 @@
             this.type = enemyTypes.purpleBoss;
         }
         this.speed = this.type.speed;
-        if (multiplier) this.health = this.type.health * multiplier;
+        let multi = Math.floor(wave / player.scaling);
+        if (multi) this.health = this.type.health * multi;
         else this.health = this.type.health;
         this.abilities = [];
           switch (string[1]) {
@@ -1216,10 +1217,10 @@
             if (this.abilities.includes("split")) {
               let type;
               if (this.type == enemyTypes.boss) {
-                let new1 = new Enemy("p", (Math.floor(currentWave/10)));
-                let new2 = new Enemy("p", (Math.floor(currentWave/10)));
-                let new3 = new Enemy("b", (Math.floor(currentWave/10)));
-                let new4 = new Enemy("b", (Math.floor(currentWave/10)));
+                let new1 = new Enemy("p", currentWave);
+                let new2 = new Enemy("p", currentWave);
+                let new3 = new Enemy("b", currentWave);
+                let new4 = new Enemy("b", currentWave);
                 new1.distance = this.distance;
                 new2.distance = this.distance - 20;
                 new3.distance = this.distance - 40;
@@ -1240,8 +1241,8 @@
                   case enemyTypes.brown:
                     type = "r";
                 }
-                let new1 = new Enemy(type, (Math.floor(currentWave/10)));
-                let new2 = new Enemy(type, (Math.floor(currentWave/10)));
+                let new1 = new Enemy(type, currentWave);
+                let new2 = new Enemy(type, currentWave);
                 new1.distance = this.distance;
                 new2.distance = this.distance - 20;
                 enemies.splice(i, 1, new1, new2);
@@ -1558,7 +1559,7 @@
         }
         //Add next enemy
         if (next) {
-          let newEnemy = new Enemy(next, (Math.floor(currentWave/10)));
+          let newEnemy = new Enemy(next, currentWave);
           enemies.push(newEnemy);
         }
 
@@ -2009,7 +2010,8 @@
       money: 80,
       lives: 100,
       bonusMoney: 0,
-      bonusLives: 0
+      bonusLives: 0,
+      scaling: 20     // Multiply the hp of enemies by the current wave divided by this number
     };
     let mapIndex = 0;
     let map;

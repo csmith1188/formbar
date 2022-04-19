@@ -459,7 +459,7 @@
     let towerTypes = {
       basic: {
         name: "Basic Tower",
-        color: "var(--light-gray)",
+        color: "#ccc",
         description: "A cheap tower with average stats.",
         range: 2.5,
         speed: 1,
@@ -484,12 +484,13 @@
           price: 75,
           use: function() {
             towers.filter(tower => tower.name == "Basic Tower").forEach(tower => tower.speedBoost = 250);
+            if (sound.enabled) sound.sfx.powerUp.play();
           }
         }
       },
       slowing: {
         name: "Slowing Tower",
-        color: "var(--light-cyan)",
+        color: "#80ffff",
         description: "Weaker attacks, but hits slow down enemies for 10 seconds.",
         range: 3.28,
         speed: 0.68,
@@ -515,12 +516,13 @@
           price: 60,
           use: function() {
             enemies.forEach(enemy => enemy.stunned = 75);
+            if (sound.enabled) sound.sfx.powerUp.play();
           }
         }
       },
       poison: {
         name: "Poison Tower",
-        color: "var(--light-purple)",
+        color: "#df80ff",
         description: "Enemies are poisoned when hit, taking 0.4 damage a second for 5 seconds.",
         range: 3.19,
         speed: 0.8,
@@ -546,12 +548,13 @@
           price: 55,
           use: function() {
             enemies.forEach(enemy => enemy.reverse = 75);
+            if (sound.enabled) sound.sfx.powerUp.play();
           }
         }
       },
       longRange: {
         name: "Long-Range Tower",
-        color: "var(--light-yellow)",
+        color: "#ffdf40",
         description: "Infinite range and strong attacks, but fires slowly. Targets the strongest enemy onscreen.",
         range: Infinity,
         speed: 0.46,
@@ -577,12 +580,13 @@
           use: function() {
             let strongest = enemies.sort((a, b) => b.health - a.health)[0];
             strongest?.hit(Infinity, this);
+            if (sound.enabled) sound.sfx.laser.play();
           }
         }
       },
       cannon: {
         name: "Cannon Tower",
-        color: "var(--light-orange)",
+        color: "#ff8f40",
         description: "Every hit creates an explosion that damages nearby enemies.",
         range: 3.4,
         speed: 0.72,
@@ -612,12 +616,13 @@
             ctx.strokeStyle = "transparent";
             ctx.fillStyle = "#ff8f4055";
             ctx.drawCircle(960, 450, 400);
+            if (sound.enabled) sound.sfx.explode.play();
           }
         }
       },
       money: {
         name: "Money Tower",
-        color: "var(--light-green)",
+        color: "#80ff80",
         description: "Gets 3× as much money from defeating enemies.",
         range: 3.32,
         speed: 0.88,
@@ -643,12 +648,13 @@
           price: 250,
           use: function() {
             player.money += 50;
+            if (sound.enabled) sound.sfx.pickUp.play();
           }
         }
       },
       air: {
         name: "Air Tower",
-        color: "var(--light-blue)",
+        color: "#bfcfff",
         large: true,
         description: "Moves back and forth above the track. Has a large range and attacks quickly.",
         range: 3.61,
@@ -704,7 +710,7 @@
       },
       ultimate: {
         name: "Ultimate Tower",
-        color: "var(--light-red)",
+        color: "#ff6860",
         large: true,
         description: "Can rapidly destroy many enemies across a wide range.",
         range: 4.65,
@@ -731,6 +737,7 @@
           use: function() {
             towers.forEach(tower => {
               if (tower) tower.ultimateBoost = 250;
+              if (sound.enabled) sound.sfx.powerUp.play();
             });
           }
         }
@@ -1116,7 +1123,8 @@
         this.poisoned = 0;
         this.hit = function(damage, tower, type) {
           if (this.stunned) damage *= 2;
-          if (!this.abilities.includes("shield") || type == "explosion" || type == "poison" || tower.name == "Long-Range Tower") this.health -= damage; //Only explosions, poison, and Long-Range Towers can damage shielded enemies
+          if (!this.abilities.includes("shield") || type == "explosion" || type == "poison" || tower?.name == "Long-Range Tower") this.health -= damage; //Only explosions, poison, and Long-Range Towers can damage shielded enemies
+
           if (this.health < 0.001) {
             let i = enemies.indexOf(this);
             player.money += (this.type.boss ? 10 : 1) * (tower?.extraMoney ? 3 : 1);
@@ -1246,17 +1254,17 @@
     waves.forEach(wave => wave.unshift([8, pause])); //Add a break at the start of each wave
 
     let grid = Array(15).fill().map(() => Array(32).fill(null)); //Array containing 15 arrays (rows), each containing 32 items (columns). Makes a deep copy of each array.
-    grid[0].fill("button", 0, 4); //Four buttons in to top left
-    grid[0].fill("info", 26, 32); //Area for game info in the top right
 
     let buttons = {
       fullscreen: new Image(),
       exitFullscreen: new Image(),
+      sound: new Image(),
+      noSound: new Image(),
+      showAlerts: new Image(),
+      noAlerts: new Image(),
       pause: new Image(),
       play: new Image(),
-      fastForward: new Image(),
-      noAlerts: new Image(),
-      showAlerts: new Image()
+      fastForward: new Image()
     };
     for (let button in buttons) buttons[button].src = `../static/img/towerdefense/${button}.png`;
 
@@ -1282,6 +1290,26 @@
       down: new Image(),
     };
     for (let plane in superPlanes) superPlanes[plane].src = `../static/img/towerdefense/superPlane-${plane}.png`;
+
+    let sound = {
+      enabled: true,
+      delay: 0.05,
+      sfx: {
+        blip: new Audio("../static/sound/sfx_blip01.wav"),
+        explode: new Audio("../static/sound/sfx_explode01.wav"),
+        hit: new Audio("../static/sound/sfx_hit01.wav"),
+        laser: new Audio("../static/sound/sfx_laser01.wav"),
+        pickUp: new Audio("../static/sound/sfx_pickup01.wav"),
+        powerUp: new Audio("../static/sound/sfx_powerup02.wav"),
+        shoot: new Audio("../static/sound/sfx_shoot01.wav"),
+        success: new Audio("../static/sound/sfx_success01.wav")
+      }
+    };
+    sound.sfx.blip.volume = 0.5;
+    sound.sfx.hit.volume = 0.1;
+    sound.sfx.explode.volume = 0.2;
+    sound.sfx.laser.volume = 0.2;
+    sound.sfx.shoot.volume = 0.2;
 
     let canvas = document.getElementById("game");
     let ctx = canvas.getContext("2d");
@@ -1374,13 +1402,15 @@
 
       ctx.drawImage(document.fullscreenElement ? buttons.exitFullscreen : buttons.fullscreen, 15, 15, 30, 30);
       document.getElementById("r0c0").onclick = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
-      ctx.drawImage(noAlerts ? buttons.showAlerts : buttons.noAlerts, 75, 15, 30, 30);
-      document.getElementById("r0c1").onclick = () => {
+      ctx.drawImage(sound.enabled ? buttons.sound : buttons.noSound, 75, 15, 30, 30);
+      document.getElementById("r0c1").onclick = () => sound.enabled = !sound.enabled;
+      ctx.drawImage(noAlerts ? buttons.noAlerts : buttons.showAlerts, 135, 15, 30, 30);
+      document.getElementById("r0c2").onclick = () => {
         if (noAlerts === undefined) gameAlert("No more alerts will be shown.");
         noAlerts = !noAlerts;
       };
-      ctx.drawImage(buttons.pause, 135, 15, 30, 30);
-      document.getElementById("r0c2").onclick = () => {
+      ctx.drawImage(buttons.pause, 195, 15, 30, 30);
+      document.getElementById("r0c3").onclick = () => {
         paused = !paused;
         if (paused) {
           clearInterval(animate);
@@ -1398,12 +1428,12 @@
         let menuTower = towers.find(tower => tower?.menuOpen);
         menuTower?.closeMenu();
         if (document.getElementById("alert")) hideAlert(); //If there is an alert, hide it
-        ctx.clearRect(120, 0, 120, 60);
-        ctx.drawImage(buttons.play, 135, 15, 30, 30);
+        ctx.clearRect(180, 0, 120, 60);
+        ctx.drawImage(fastForward ? buttons.fastForward : buttons.play, 195, 15, 30, 30);
       };
       if (difficulty == "normal") {
-        ctx.drawImage(fastForward ? buttons.play : buttons.fastForward, 195, 15, 30, 30);
-        document.getElementById("r0c3").onclick = () => {
+        ctx.drawImage(fastForward ? buttons.play : buttons.fastForward, 255, 15, 30, 30);
+        document.getElementById("r0c4").onclick = () => {
           fastForward = !fastForward;
           clearInterval(animate);
           animate = setInterval(update, fastForward ? 10 : 40); //If fast forward is turned on, play at 4x the normal speed
@@ -1413,6 +1443,7 @@
       if (!(frame % 25) && frame) seconds++; //Do this every 25 frames
 
       if (dragOver && dragOver[0].name != "Air Tower") {
+        ctx.lineWidth = 1;
         ctx.strokeStyle = "white";
         ctx.fillStyle = "#aaa5";
         ctx.drawCircle(dragOver[1] * 60 + 30, dragOver[2] * 60 + 30, dragOver[0].range * 60);
@@ -1461,6 +1492,7 @@
         //Otherwise, draw it in its new position
         if (enemy.distance >= mapArr.length) { //The enemy is at the end of the track
           player.lives -= enemy.type.health;
+          if (sound.enabled && player.lives) sound.sfx.blip.play();
           gameAchievements[0] = 0;
           enemies.splice(i, 1);
         } else {
@@ -1559,6 +1591,7 @@
           }
 
           if (tower.menuOpen) {
+            ctx.lineWidth = 1;
             ctx.strokeStyle = "white";
             ctx.fillStyle = "#aaa5";
             let x = (tower.name == "Air Tower") ? tower.planeX : tower.x;
@@ -1586,7 +1619,7 @@
             let range = tower.range;
             if (towers.find(owned => owned?.rangeBoosted == tower)) range *= 1.25; //Range boost from Air Tower
             if (tower.ultimateBoost) range *= 2;
-            let inRange = enemies.filter(enemy => Math.sqrt((x - enemy.x) ** 2 + (y - enemy.y) ** 2) < tower.range * 60); //Use the Pythagorean Theorem to determine if each enemy is inside the tower's range
+            let inRange = enemies.filter(enemy => Math.sqrt((x - enemy.x) ** 2 + (y - enemy.y) ** 2) < range * 60); //Use the Pythagorean Theorem to determine if each enemy is inside the tower's range
             if (!tower.seeInvisible) inRange = inRange.filter(enemy => enemy.visible);
             if (inRange.length) {
               let furthest = inRange.sort((a, b) => b.distance - a.distance)[0]; //Sort inRange from highest to lowest distance and get the first item
@@ -1611,7 +1644,16 @@
                 while (close.length && bouncesLeft) {
                   let closest = close.sort((a, b) => ((target.x - a.x) ** 2 + (target.y - a.y) ** 2) - ((target.x - b.x) ** 2 + (target.y - b.y) ** 2))[0];
                   let distance = Math.sqrt((target.x - closest.x) ** 2 + (target.y - closest.y) ** 2);
+                  let oldTarget = target;
                   target = closest;
+
+                  ctx.lineWidth = 4;
+                  ctx.strokeStyle = tower.color;
+                  ctx.beginPath();
+                  ctx.moveTo(oldTarget.x, oldTarget.y);
+                  ctx.lineTo(target.x, target.y);
+                  ctx.stroke();
+
                   damage = tower.strength;
                   if (tower.ultimateBoost) damage *= 2;
                   target.hit(damage, tower);
@@ -1640,6 +1682,10 @@
                 ctx.strokeStyle = "transparent";
                 ctx.fillStyle = "#ff8f4055";
                 ctx.drawCircle(target.x, target.y, tower.explosionSize);
+                if (sound.enabled) {
+                  sound.sfx.explode.currentTime = 0;
+                  sound.sfx.explode.play();
+                }
               }
               if (tower.nextExplosion) {
                 tower.nextExplosion--;
@@ -1647,12 +1693,30 @@
                 delete tower.explosionSize;
                 tower.nextExplosion = 5;
               }
-              ctx.drawImage(tower.activeImg, tower.x - 30, tower.y - 30);
+
+              //Play hit sound
+              if (sound.enabled) {
+                sound.sfx.hit.currentTime = 0;
+                sound.sfx.hit.play();
+              }
+
+              ctx.drawImage(tower.activeImg, tower.x - 30, tower.y - 30); //Light up the firing tower for 1 frame
+
+              //Draw line of fire
+              ctx.lineWidth = 4;
+              ctx.strokeStyle = tower.color;
+              ctx.beginPath(); //Start a new path
+              if (tower.name == "Air Tower") ctx.moveTo(tower.planeX, tower.planeY);
+              else ctx.moveTo(tower.x, tower.y);
+              ctx.lineTo(target.x, target.y);
+              ctx.stroke(); //Render the path
+
               tower.cooldown += 25 / tower.speed;
             }
           }
 
           if (tower.speedBoost) tower.speedBoost--;
+          if (tower.ultimateBoost) tower.ultimateBoost--;
 
           if (tower.upgrades.range == 2 && tower.upgrades.speed == 2 && tower.upgrades.strength == 2 && tower.extra2.bought) gameAchievements[2] = 1;
         }
@@ -1691,6 +1755,19 @@
             if (inRange.length) {
               let target = inRange.sort((a, b) => b.distance - a.distance)[0];
               target.hit(superPlane.strength);
+
+              if (sound.enabled) {
+                sound.sfx.hit.currentTime = 0;
+                sound.sfx.hit.play();
+              }
+
+              ctx.lineWidth = 4;
+              ctx.strokeStyle = "#ff6860";
+              ctx.beginPath();
+              ctx.moveTo(superPlane.x, superPlane.y);
+              ctx.lineTo(target.x, target.y);
+              ctx.stroke();
+
               superPlane.cooldown += 25 / superPlane.speed;
             }
           }
@@ -2093,6 +2170,9 @@
       document.getElementById("difficulty").remove();
       document.getElementById("startButton").remove();
 
+      grid[0].fill("button", 0, (difficulty == "normal") ? 5 : 4); //Buttons in to top left
+      grid[0].fill("info", 26, 32); //Area for game info in the top right
+
       //Make an array with one item for each pixel of the path
       mapArr = [];
       map.lines.forEach(line => {
@@ -2183,7 +2263,7 @@
     };
 
     function gameAlert(message) {
-      document.getElementById("r0c2")?.click(); //Pause the game
+      document.getElementById("r0c3")?.click(); //Pause the game
       let alertBox = document.createElement("div");
       alertBox.id = "alert";
       let alertText = document.createElement("div");
@@ -2201,16 +2281,18 @@
 
     function hideAlert() {
       document.getElementById("alert").remove(); //Hide the alert box
-      if (paused) document.getElementById("r0c2").click(); //Unpause the game
+      if (paused) document.getElementById("r0c3").click(); //Unpause the game
       document.removeEventListener("keydown", hideAlert);
     }
 
     function endGame(complete) {
       if (complete) {
+        if (sound.enabled) sound.sfx.success.play();
         let num = (difficulty == "hard") ? 2 : 1;
         if (progress[mapIndex] < num) progress.splice(mapIndex, 1, num); //Update progress
         localStorage.setItem("tdProgress", progress.join("")); //Save to local storage as string
       } else {
+        if (sound.enabled) sound.sfx.shoot.play();
         gameAchievements[4] = 0;
         gameAchievements[5] = 0;
         gameAchievements[6] = 0;

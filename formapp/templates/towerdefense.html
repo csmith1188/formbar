@@ -420,19 +420,19 @@
         range: 2.5,
         speed: 1,
         strength: 1,
-        price: 25,
+        price: 40,
         extra1: {
           description: "Projectiles can bounce to up to three nearby enemies.",
-          price: 30,
+          price: 40,
           add: function() {
             this.bounce = 3;
           }
         },
         extra2: {
-          description: "Projectiles will keep bouncing as long as there are enemies nearby.",
-          price: 100,
+          description: "Projectiles can bounce to up to five nearby enemies.",
+          price: 80,
           add: function() {
-            this.bounce = Infinity;
+            this.bounce = 5;
           }
         },
         ability: {
@@ -447,14 +447,14 @@
         name: "Slowing Tower",
         color: "var(--light-purple)",
         description: "Weaker attacks, but hits slow down enemies for 10 seconds.",
-        range: 3.28,
-        speed: 0.68,
-        strength: 0.75,
+        range: 1.64,
+        speed: 3,
+        strength: 0.1,
         slowing: true,
-        price: 20,
+        price: 30,
         extra1: {
           description: "Slowing affects enemies permanently.",
-          price: 35,
+          price: 50,
           add: function() {
             this.permSlow = true;
           }
@@ -481,7 +481,7 @@
         range: Infinity,
         speed: 0.46,
         strength: 4,
-        price: 60,
+        price: 100,
         extra1: {
           description: "Can hit blinking enemies while they are hidden.",
           price: 15,
@@ -511,8 +511,8 @@
         description: "Every hit creates an explosion that damages nearby enemies.",
         range: 3.4,
         speed: 0.72,
-        strength: 2,
-        price: 75,
+        strength: 1,
+        price: 100,
         explosionSize: 100,
         extra1: {
           description: "Explosions are increased in size.",
@@ -551,14 +551,14 @@
         price: 100,
         extra1: {
           description: "Adds an extra $5 every 10 seconds.",
-          price: 160,
+          price: 80,
           add: function() {
             player.bonusMoney += 10;
           }
         },
         extra2: {
           description: "Adds an extra life every 15 seconds.",
-          price: 300,
+          price: 100,
           add: function() {
             player.bonusLives += 1;
           }
@@ -580,7 +580,7 @@
         speed: 2.79,
         strength: 1,
         movable: true,
-        price: 100,
+        price: 150,
         extra1: {
           description: "Every fifth hit creates a small explosion.",
           price: 25,
@@ -636,7 +636,7 @@
         range: 4.65,
         speed: 9.38,
         strength: 2,
-        price: 250,
+        price: 400,
         extra1: {
           description: "Attack power is slightly increased for each enemy on the screen.",
           price: 80,
@@ -646,7 +646,7 @@
         },
         extra2: {
           description: "Does 5× damage to boss enemies.",
-          price: 600,
+          price: 400,
           add: function() {
             this.bossBonus = true;
           }
@@ -1067,7 +1067,13 @@
     let sound = {
       enabled: false,
       delay: 0.05,
-      sfx_explode01: new Audio("../static/sound/sfx_explode01.wav")
+      td_coin01: new Audio("../static/sound/td/td_coin01.wav"),
+      td_explode01: new Audio("../static/sound/td/td_explode01.wav"),
+      td_explode02: new Audio("../static/sound/td/td_explode02.wav"),
+      td_explode03: new Audio("../static/sound/td/td_explode03.wav"),
+      td_hit01: new Audio("../static/sound/td/td_hit01.wav"),
+      td_powerup01: new Audio("../static/sound/td/td_powerup01.wav"),
+      td_shoot01: new Audio("../static/sound/td/td_shoot01.wav")
     }
 
     let pause = [10, null];
@@ -1360,6 +1366,14 @@
         //Otherwise, draw it in its new position
         if (enemy.distance >= mapArr.length) { //The enemy is at the end of the track
           player.lives -= enemy.type.health;
+          //Play sounds
+          if (sound.enabled) {
+            if (sound.td_hit01.currentTime >= sound.delay) {
+              sound.td_hit01.currentTime = 0;
+            } else {
+              sound.td_hit01.play();
+            }
+          }
           enemies.splice(i, 1);
         } else {
           if (enemy.stunned) enemy.stunned--;
@@ -1510,7 +1524,7 @@
               if (tower.explosionSize) {
                 //Create an explosion centered around the target enemy
                 let inExplosion = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < tower.explosionSize);
-                let explosionDamage = tower.powerfulExplosions ? tower.strength : 1;
+                let explosionDamage = tower.powerfulExplosions ? tower.strength : tower.strength * 0.5;
                 inExplosion.forEach(enemy => enemy.hit(explosionDamage, tower, true)); //Do damage to every enemy inside the explosion
                 //Draw the explosion as an orange circle
                 ctx.strokeStyle = "transparent";
@@ -1526,10 +1540,20 @@
 
               //Play sounds
               if (sound.enabled) {
-                if (sound.sfx_explode01.currentTime >= sound.delay) {
-                  sound.sfx_explode01.currentTime = 0;
-                } else {
-                  sound.sfx_explode01.play();
+                switch (tower.name) {
+                  case 'Cannon Tower':
+                  if (sound.td_explode01.currentTime >= sound.delay) {
+                    sound.td_explode01.currentTime = 0;
+                  } else {
+                    sound.td_explode01.play();
+                  }
+                    break;
+                  default:
+                    if (sound.td_shoot01.currentTime >= sound.delay) {
+                      sound.td_shoot01.currentTime = 0;
+                    } else {
+                      sound.td_shoot01.play();
+                    }
                 }
               }
 
@@ -1693,6 +1717,8 @@
       ctx.textAlign = "left";
       if (player.lives > 0) {
         //Display time, money, and lives in the top-right corner
+        ctx.fillStyle = "#ff0000";
+        ctx.fillText(`Waves Out: ${currentWave}`, 1300, 40); //Show minutes and seconds since
         ctx.fillStyle = "#ddd";
         ctx.fillText(`${Math.floor(seconds / 60).toString().padStart(2, "0")}:${(seconds % 60).toString().padStart(2, "0")}`, 1564, 40); //Show minutes and seconds since the game started
         ctx.fillStyle = "#80ff80";
@@ -1708,7 +1734,7 @@
 
     let progress = localStorage.getItem("tdProgress") || "00000"; //2 means map completed on hard, 1 means map completed on normal, 0 means map not completed
     let player = {
-      money: 50,
+      money: 80,
       lives: 100,
       bonusMoney: 0,
       bonusLives: 0

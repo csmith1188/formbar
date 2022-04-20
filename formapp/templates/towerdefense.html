@@ -1192,7 +1192,7 @@
             this.type = enemyTypes.purpleBoss;
         }
         this.speed = this.type.speed;
-        this.health = this.type.health * Math.ceil(currentWave / 10); //Increase enemies' HP every 10 rounds
+        //this.health = this.type.health * Math.ceil((currentWave + 1) / 10); //Increase enemies' HP every 10 rounds
         this.abilities = [];
         //Give the enemy an ability is there is a second character
         //Despite this.abilities being an array, an enemy can only have one ability in the current version of the game
@@ -2015,7 +2015,6 @@
     let dragOver;
     let animate;
 
-    if (progress[0] == "0" && localStorage.getItem("tdComplete")) progress.splice(0, 1, "1"); ////
     progress = progress.padEnd(maps.length, "0"); //Add zeroes to the end when maps are added
     if (progress.length > maps.length) progress = progress.slice(0, maps.length - progress.length); //Remove numbers from the end if maps are deleted
     localStorage.setItem("tdProgress", progress);

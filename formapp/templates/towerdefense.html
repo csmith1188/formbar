@@ -468,6 +468,7 @@
         speed: 1,
         strength: 1,
         price: 35,
+        hitSound: "td_shoot01",
         extra1: {
           description: "Projectiles can bounce to up to three nearby enemies.",
           price: 40,
@@ -500,6 +501,7 @@
         strength: 0.4,
         slowing: true,
         price: 30,
+        hitSound: "td_slow_hit",
         extra1: {
           description: "Enemies lose all abilities while they are slowed down.",
           price: 45,
@@ -532,6 +534,7 @@
         strength: 0.6,
         poison: true,
         price: 60,
+        hitSound: "td_poison_hit",
         extra1: {
           description: "Poison can splash to a nearby enemy.",
           price: 30,
@@ -563,6 +566,7 @@
         speed: 0.34,
         strength: 6,
         price: 80,
+        hitSound: "td_longrange_hit",
         extra1: {
           description: "Can hit blinking enemies while they are hidden.",
           price: 15,
@@ -595,6 +599,7 @@
         speed: 0.66,
         strength: 2,
         price: 100,
+        hitSound: "td_explode01",
         explosionSize: 100,
         extra1: {
           description: "Explosions are increased in size.",
@@ -634,6 +639,7 @@
         strength: 0.7,
         extraMoney: true,
         price: 150,
+        hitSound: "td_money_hit",
         extra1: {
           description: "Adds an extra $5 every 10 seconds.",
           price: 250,
@@ -667,6 +673,7 @@
         strength: 1,
         movable: true,
         price: 150,
+        hitSound: "td_plane_hit",
         extra1: {
           description: "Every fifth hit creates a small explosion.",
           price: 25,
@@ -722,6 +729,7 @@
         speed: 7.38,
         strength: 2,
         price: 400,
+        hitSound: "td_ultimate_hit",
         extra1: {
           description: "Attack power is slightly increased for each enemy on the screen.",
           price: 135,
@@ -1323,15 +1331,43 @@
         powerUp: new Audio("../static/sound/td/td_powerup02.wav"),
         shoot: new Audio("../static/sound/td/td_shoot01.wav"),
         success: new Audio("../static/sound/td/td_success01.wav"),
+        td_coin01: new Audio("../static/sound/td/td_coin01.wav"),
+        td_explode01: new Audio("../static/sound/td/td_explode01.wav"),
+        td_explode02: new Audio("../static/sound/td/td_explode02.wav"),
+        td_explode03: new Audio("../static/sound/td/td_explode03.wav"),
+        td_hit01: new Audio("../static/sound/td/td_hit01.wav"),
+        td_powerup01: new Audio("../static/sound/td/td_powerup01.wav"),
+        td_shoot01: new Audio("../static/sound/td/td_shoot01.wav"),
+        td_ability_ready: new Audio("../static/sound/td/td_ability_ready.wav"),
+        td_coin02: new Audio("../static/sound/td/td_coin02.wav"),
+        td_money_hit: new Audio("../static/sound/td/td_money_hit.wav"),
+        td_plane_hit: new Audio("../static/sound/td/td_plane_hit.wav"),
+        td_poison_hit: new Audio("../static/sound/td/td_poison_hit.wav"),
+        td_slow_hit: new Audio("../static/sound/td/td_slow_hit.wav"),
+        td_ultimate_hit: new Audio("../static/sound/td/td_ultimate_hit.wav"),
+        td_longrange_hit: new Audio("../static/sound/td/td_longrange_hit.wav")
       },
-      playSFX: function(name) {
-        if (this.enabled) (this.sfx[name].currentTime >= this.delay) ? this.sfx[name].currentTime = 0 : this.sfx[name].play();
+      playSFX: function(name, towerName='default') {
+        if (this.enabled) {
+          let tempDelay = sound.delay;
+          if (towerName == "Ultimate Tower") {
+              let tempDelay = sound.delay / 2;
+          }
+          if (sound.sfx[name].currentTime >= sound.delay) {
+              sound.sfx[name].currentTime = 0;
+          } else {
+              sound.sfx[name].play();
+          }
+        }
       }
     };
+    //Turn down the volume of each of the sound effects
+    for (const effect in sound.sfx) {
+        sound.sfx[effect].volume = 0.2
+    }
+    //manual adjust a few volumes
     sound.sfx.blip.volume = 0.5;
-    sound.sfx.hit.volume = 0.1;
-    sound.sfx.explode.volume = 0.2;
-    sound.sfx.laser.volume = 0.2;
+    sound.sfx.td_slow_hit.volume = 0.15;
 
     let canvas = document.getElementById("game");
     let ctx = canvas.getContext("2d");
@@ -1657,7 +1693,7 @@
               if (tower.ultimateBoost) damage *= 2;
               target.hit(damage, tower);
 
-              sound.playSFX("hit"); //Play hit sound
+              sound.playSFX(tower.hitSound, tower.name); //Play hit sound
 
               if (tower.slowing && !target.abilities.includes("acceleration")) target.slowed = tower.permSlow ? Infinity : 250;
               if (tower.abilityBlocking && !target.abilities.includes("acceleration")) target.noAbilities = tower.permSlow ? Infinity : 250;

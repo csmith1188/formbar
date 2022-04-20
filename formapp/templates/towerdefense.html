@@ -331,8 +331,6 @@
 
     #alert {
       position: absolute;
-      left: 35%;
-      top: 35%;
       width: 30%;
       height: 30%;
       padding: 1.5%;
@@ -340,7 +338,12 @@
       background: #cccc;
       color: var(--bg-dark);
       font-size: 150%;
+      text-align: left;
       filter: drop-shadow(10px 10px 5px black);
+    }
+
+    #alert.large {
+      height: 50%;
     }
 
     #alertText {
@@ -557,10 +560,10 @@
           }
         },
         extra2: {
-          description: "Projectiles can bounce to up to five nearby enemies.",
-          price: 80,
+          description: "Projectiles can hit up to eight enemies.",
+          price: 120,
           add: function() {
-            this.bounce = 5;
+            this.bounce = 8;
           }
         },
         ability: {
@@ -568,7 +571,7 @@
           price: 75,
           use: function() {
             towers.filter(tower => tower.name == "Basic Tower").forEach(tower => tower.speedBoost = 250);
-            if (sound.enabled) sound.sfx.powerUp.play();
+            sound.playSFX("powerUp");
           }
         }
       },
@@ -577,10 +580,10 @@
         color: "#80ffff",
         description: "Weaker attacks, but hits slow down enemies for 10 seconds.",
         range: 1.64,
-        speed: 3,
-        strength: 0.1,
+        speed: 2.12,
+        strength: 0.4,
         slowing: true,
-        price: 25,
+        price: 30,
         extra1: {
           description: "Enemies lose all abilities while they are slowed down.",
           price: 45,
@@ -600,7 +603,7 @@
           price: 60,
           use: function() {
             enemies.forEach(enemy => enemy.stunned = 75);
-            if (sound.enabled) sound.sfx.powerUp.play();
+            sound.playSFX("powerUp");
           }
         }
       },
@@ -612,7 +615,7 @@
         speed: 0.8,
         strength: 0.6,
         poison: true,
-        price: 50,
+        price: 60,
         extra1: {
           description: "Poison can splash to a nearby enemy.",
           price: 30,
@@ -632,7 +635,7 @@
           price: 55,
           use: function() {
             enemies.forEach(enemy => enemy.reverse = 75);
-            if (sound.enabled) sound.sfx.powerUp.play();
+            sound.playSFX("powerUp");
           }
         }
       },
@@ -641,9 +644,9 @@
         color: "#ffdf40",
         description: "Infinite range and strong attacks, but fires slowly. Targets the strongest enemy onscreen.",
         range: Infinity,
-        speed: 0.2,
-        strength: 10,
-        price: 100,
+        speed: 0.34,
+        strength: 6,
+        price: 80,
         extra1: {
           description: "Can hit blinking enemies while they are hidden.",
           price: 15,
@@ -664,7 +667,7 @@
           use: function() {
             let strongest = enemies.sort((a, b) => b.health - a.health)[0];
             strongest?.hit(Infinity, this);
-            if (sound.enabled) sound.sfx.laser.play();
+            sound.playSFX("laser");
           }
         }
       },
@@ -673,9 +676,9 @@
         color: "#ff8f40",
         description: "Every hit creates an explosion that damages nearby enemies.",
         range: 3.4,
-        speed: 0.72,
-        strength: 1,
-        price: 80,
+        speed: 0.66,
+        strength: 2,
+        price: 100,
         explosionSize: 100,
         extra1: {
           description: "Explosions are increased in size.",
@@ -695,12 +698,14 @@
           description: "Creates a giant explosion at the center of the screen that does significant damage to all enemies inside of it.",
           price: 100,
           use: function() {
+            //Create an explosion centered around the target enemy
             let inExplosion = enemies.filter(enemy => Math.sqrt((960 - enemy.x) ** 2 + (450 - enemy.y) ** 2) < 400);
-            inExplosion.forEach(enemy => enemy.hit(25, this, "explosion"));
+            inExplosion.forEach(enemy => enemy.hit(25, this, "explosion")); //Do damage to every enemy inside the explosion
+            //Draw the explosion as an orange circle
             ctx.strokeStyle = "transparent";
             ctx.fillStyle = "#ff8f4055";
             ctx.drawCircle(960, 450, 400);
-            if (sound.enabled) sound.sfx.explode.play();
+            sound.playSFX("explode");
           }
         }
       },
@@ -710,29 +715,29 @@
         description: "Gets 3× as much money from defeating enemies.",
         range: 3.32,
         speed: 0.88,
-        strength: 1,
+        strength: 0.7,
         extraMoney: true,
-        price: 100,
+        price: 150,
         extra1: {
           description: "Adds an extra $5 every 10 seconds.",
-          price: 50,
+          price: 250,
           add: function() {
-            player.bonusMoney += 10;
+            player.bonusMoney += 5;
           }
         },
         extra2: {
           description: "Adds an extra life every 15 seconds.",
-          price: 100,
+          price: 300,
           add: function() {
             player.bonusLives += 1;
           }
         },
         ability: {
-          description: "Adds $50 to your total.",
-          price: 150,
+          description: "Adds $100 to your total.",
+          price: 380,
           use: function() {
-            player.money += 50;
-            if (sound.enabled) sound.sfx.pickUp.play();
+            player.money += 100;
+            sound.playSFX("coin");
           }
         }
       },
@@ -798,19 +803,19 @@
         large: true,
         description: "Can rapidly destroy many enemies across a wide range.",
         range: 4.65,
-        speed: 9.38,
+        speed: 7.38,
         strength: 2,
         price: 400,
         extra1: {
           description: "Attack power is slightly increased for each enemy on the screen.",
-          price: 80,
+          price: 135,
           add: function() {
             this.crowdBonus = true;
           }
         },
         extra2: {
           description: "Does 5× damage to boss enemies.",
-          price: 400,
+          price: 1000,
           add: function() {
             this.bossBonus = true;
           }
@@ -821,7 +826,7 @@
           use: function() {
             towers.forEach(tower => {
               if (tower) tower.ultimateBoost = 250;
-              if (sound.enabled) sound.sfx.powerUp.play();
+              sound.playSFX("powerUp");
             });
           }
         }
@@ -834,6 +839,7 @@
         strength: 0
       };
 
+      //Create images for each tower type
       towerTypes[type].img = new Image();
       towerTypes[type].img.src = `../static/img/towerdefense/${type}${type == "air" ? "-b" : ""}.png`;
       towerTypes[type].icon = new Image();
@@ -908,6 +914,7 @@
         this.extra1 = Object.create(this.extra1);
         this.extra2 = Object.create(this.extra2);
         this.value = type.price;
+        //Convert the tower's position from squares to pixels
         this.x = col * 60 + 30;
         this.y = row * 60 + 30;
         if (type.name == "Air Tower") {
@@ -957,7 +964,8 @@
           }
         }
         this.i = towers.length;
-        this.cooldown = 0;
+        this.cooldown = 0; //Time until the tower can attack again
+        //Display a menu with information and upgrade buttons
         this.showMenu = function() {
           if (!paused) {
             this.menuOpen = true;
@@ -1018,6 +1026,7 @@
             let extraButton = document.getElementById("extra");
             let abilityButton = document.getElementById("ability");
 
+            //Gray out upgrades that can't be bought
             if (player.money < this.upgradePrice("range") || this.range == Infinity) rangeButton.classList.add("unselectable");
             if (player.money < this.upgradePrice("speed")) speedButton.classList.add("unselectable");
             if (player.money < this.upgradePrice("strength")) strengthButton.classList.add("unselectable");
@@ -1030,6 +1039,7 @@
             if (this.extra2.bought) extraButton.classList.add("bought");
             if (this.ability.bought || difficulty == "hard") abilityButton.classList.add("bought");
 
+            //Center the menu horizontally
             menu.style.left = this.x / 1920 * 100 + "%";
             menu.style.transform = "translateX(-50%)";
             let menuRect = menu.getBoundingClientRect();
@@ -1051,6 +1061,7 @@
               menu.style.top = this.y / 1080 * 100 + 10 + "%";
             }
 
+            //Remove the tower and give back 75% of all money spent on it
             sellButton.onclick = () => {
               towers[this.i] = null;
               player.money += this.sellValue;
@@ -1080,6 +1091,7 @@
                 this.value += this.upgradePrice("speed");
                 this.upgrades.speed++;
                 this.speed *= 1.5;
+                //Update the menu
                 menu.remove();
                 this.showMenu();
               }
@@ -1090,6 +1102,7 @@
                 this.value += this.upgradePrice("strength");
                 this.upgrades.strength++;
                 this.strength *= 2;
+                //Update the menu
                 menu.remove();
                 this.showMenu();
               }
@@ -1100,6 +1113,7 @@
                 this.value += this.nextExtra.price;
                 this.nextExtra.add.bind(this)();
                 this.nextExtra.bought = true;
+                //Update the menu
                 menu.remove();
                 this.showMenu();
               }
@@ -1109,6 +1123,7 @@
                 player.money -= this.ability.price;
                 this.value += this.ability.price;
                 this.ability.bought = true;
+                //Update the menu
                 menu.remove();
                 this.showMenu();
               }
@@ -1146,7 +1161,8 @@
     }
 
     class Enemy {
-      constructor(string, wave) {
+      constructor(string) {
+        //Set the enemy type based on the first letter
         switch (string[0]) {
           case "g":
             this.type = enemyTypes.green;
@@ -1176,26 +1192,26 @@
             this.type = enemyTypes.purpleBoss;
         }
         this.speed = this.type.speed;
-        let multi = Math.floor(wave / player.scaling);
-        if (multi) this.health = this.type.health * multi;
-        else this.health = this.type.health;
+        this.health = this.type.health * Math.ceil(currentWave / 10); //Increase enemies' HP every 10 rounds
         this.abilities = [];
-          switch (string[1]) {
-            case "h":
-              this.abilities.push("healing");
-              break;
-            case "a":
-              this.abilities.push("acceleration");
-              break;
-            case "s":
-              this.abilities.push("split");
-              break;
-            case "k":
-              this.abilities.push("blink");
-              break;
-            case "d":
-              this.abilities.push("shield");
-          }
+        //Give the enemy an ability is there is a second character
+        //Despite this.abilities being an array, an enemy can only have one ability in the current version of the game
+        switch (string[1]) {
+          case "h":
+            this.abilities.push("healing");
+            break;
+          case "a":
+            this.abilities.push("acceleration");
+            break;
+          case "s":
+            this.abilities.push("split");
+            break;
+          case "k":
+            this.abilities.push("blink");
+            break;
+          case "d":
+            this.abilities.push("shield");
+        }
         this.id = Math.random(); //Give the enemy a random ID so that no two enemy objects are identical
         this.distance = 0;
         if (this.abilities.includes("blink")) {
@@ -1217,10 +1233,10 @@
             if (this.abilities.includes("split")) {
               let type;
               if (this.type == enemyTypes.boss) {
-                let new1 = new Enemy("p", currentWave);
-                let new2 = new Enemy("p", currentWave);
-                let new3 = new Enemy("b", currentWave);
-                let new4 = new Enemy("b", currentWave);
+                let new1 = new Enemy("p");
+                let new2 = new Enemy("p");
+                let new3 = new Enemy("b");
+                let new4 = new Enemy("b");
                 new1.distance = this.distance;
                 new2.distance = this.distance - 20;
                 new3.distance = this.distance - 40;
@@ -1241,8 +1257,8 @@
                   case enemyTypes.brown:
                     type = "r";
                 }
-                let new1 = new Enemy(type, currentWave);
-                let new2 = new Enemy(type, currentWave);
+                let new1 = new Enemy(type);
+                let new2 = new Enemy(type);
                 new1.distance = this.distance;
                 new2.distance = this.distance - 20;
                 enemies.splice(i, 1, new1, new2);
@@ -1251,7 +1267,7 @@
               enemies.splice(i, 1); //Remove the enemy
             }
           } else {
-            if (this.abilities.includes("acceleration") && !this.noAbilities) this.speed = this.type.speed + this.type.speed * (1 - (this.health / this.type.health)) * 3;
+            if (this.abilities.includes("acceleration") && !this.noAbilities) this.speed = this.type.speed + this.type.speed * (1 - (this.health / this.type.health)) * 3; //Normal speed + (normal speed * portion of health lost * 3)
             if (tower?.removeAbilities) this.abilities = [];
           }
         }
@@ -1268,7 +1284,7 @@
       [[10, "y"], [4, "o", pause], "o"],
       [[6, "g", "y", "o", pause], "g", "y", "o"],
       [[9, "y"], [7, "o"]],
-      [[50, "g"]],
+      [[50, "g"], ["alert", "All enemy types gain health every 10 rounds."]],
       [["alert", "<h1>New enemy ability: <b>Healing</b></h1>Enemies with this ability gradually regain health, so you need to destroy them quickly. They're also immune to poison."], [9, "oh", pause], "oh"],
       [[7, [6, "y", pause]], [6, "y"]],
       [[20, "oh"]],
@@ -1311,6 +1327,7 @@
       [[50, "ra"], [125, "bk"], pause, [67, "bh"], [999, "yk"], "z"],
       [[10, "g"], pause, [20, "y"], pause, [30, "o"], pause, [40, "r"], pause, [100, "p"], pause, [100, "b"], pause, [15, "x"], pause, [5, "z"]],
 
+      //Hard mode only
       [[150, "bs"], [15, "bd"]],
       [[7, "x"], [80, "oa", "p"]],
       [[10, "za"]],
@@ -1341,68 +1358,64 @@
 
     let grid = Array(15).fill().map(() => Array(32).fill(null)); //Array containing 15 arrays (rows), each containing 32 items (columns). Makes a deep copy of each array.
 
-    let buttons = {
-      fullscreen: new Image(),
-      exitFullscreen: new Image(),
-      sound: new Image(),
-      noSound: new Image(),
-      showAlerts: new Image(),
-      noAlerts: new Image(),
-      pause: new Image(),
-      play: new Image(),
-      fastForward: new Image()
+    //All images used in the game except towers & enemies
+    let images = {
+      buttons: {
+        fullscreen: new Image(),
+        exitFullscreen: new Image(),
+        sound: new Image(),
+        noSound: new Image(),
+        showAlerts: new Image(),
+        noAlerts: new Image(),
+        pause: new Image(),
+        play: new Image(),
+        fastForward: new Image()
+      },
+      abilitySymbols: {
+        healing: new Image(),
+        shield: new Image(),
+        acceleration: new Image()
+      },
+      planes: {
+        left: new Image(),
+        right: new Image(),
+        up: new Image(),
+        down: new Image(),
+      },
+      superPlanes: {
+        left: new Image(),
+        right: new Image(),
+        up: new Image(),
+        down: new Image(),
+      }
     };
-    for (let button in buttons) buttons[button].src = `../static/img/towerdefense/${button}.png`;
+    for (let button in images.buttons) images.buttons[button].src = `../static/img/towerdefense/${button}.png`;
+    for (let symbol in images.abilitySymbols) images.abilitySymbols[symbol].src = `../static/img/towerdefense/${symbol}.png`;
+    for (let plane in images.planes) images.planes[plane].src = `../static/img/towerdefense/air-${plane}.png`;
+    for (let plane in images.superPlanes) images.superPlanes[plane].src = `../static/img/towerdefense/superPlane-${plane}.png`;
 
-    let abilitySymbols = {
-      healing: new Image(),
-      shield: new Image(),
-      acceleration: new Image()
-    };
-    for (let symbol in abilitySymbols) abilitySymbols[symbol].src = `../static/img/towerdefense/${symbol}.png`;
-
-    let planes = {
-      left: new Image(),
-      right: new Image(),
-      up: new Image(),
-      down: new Image(),
-    };
-    for (let plane in planes) planes[plane].src = `../static/img/towerdefense/air-${plane}.png`;
-
-    let superPlanes = {
-      left: new Image(),
-      right: new Image(),
-      up: new Image(),
-      down: new Image(),
-    };
-    for (let plane in superPlanes) superPlanes[plane].src = `../static/img/towerdefense/superPlane-${plane}.png`;
-
+    //Sound settings and list of sound effects
     let sound = {
       enabled: true,
       delay: 0.05,
       sfx: {
-        blip: new Audio("../static/sound/sfx_blip01.wav"),
-        explode: new Audio("../static/sound/sfx_explode01.wav"),
+        blip: new Audio("../static/sound/td/td_blip01.wav"),
+        coin: new Audio("../static/sound/td/td_coin01.wav"),
+        explode: new Audio("../static/sound/td/td_explode01.wav"),
         hit: new Audio("../static/sound/sfx_hit01.wav"),
         laser: new Audio("../static/sound/sfx_laser01.wav"),
-        pickUp: new Audio("../static/sound/sfx_pickup01.wav"),
-        powerUp: new Audio("../static/sound/sfx_powerup02.wav"),
+        powerUp: new Audio("../static/sound/td/td_powerup02.wav"),
         shoot: new Audio("../static/sound/sfx_shoot01.wav"),
-        success: new Audio("../static/sound/sfx_success01.wav"),
-        td_coin01: new Audio("../static/sound/td/td_coin01.wav"),
-        td_explode01: new Audio("../static/sound/td/td_explode01.wav"),
-        td_explode02: new Audio("../static/sound/td/td_explode02.wav"),
-        td_explode03: new Audio("../static/sound/td/td_explode03.wav"),
-        td_hit01: new Audio("../static/sound/td/td_hit01.wav"),
-        td_powerup01: new Audio("../static/sound/td/td_powerup01.wav"),
-        td_shoot01: new Audio("../static/sound/td/td_shoot01.wav")
+        success: new Audio("../static/sound/td/td_success01.wav"),
+      },
+      playSFX: function(name) {
+        if (this.enabled) (this.sfx[name].currentTime >= this.delay) ? this.sfx[name].currentTime = 0 : this.sfx[name].play();
       }
     };
     sound.sfx.blip.volume = 0.5;
     sound.sfx.hit.volume = 0.1;
     sound.sfx.explode.volume = 0.2;
     sound.sfx.laser.volume = 0.2;
-    sound.sfx.shoot.volume = 0.2;
 
     let canvas = document.getElementById("game");
     let ctx = canvas.getContext("2d");
@@ -1490,19 +1503,25 @@
     }
 
     function update() {
-      ctx.clearRect(0, 0, 1920, 1080);
+      ctx.clearRect(0, 0, 1920, 1080); //Clear the canvas
       ctx.drawPath(map);
 
-      ctx.drawImage(document.fullscreenElement ? buttons.exitFullscreen : buttons.fullscreen, 15, 15, 30, 30);
+      //Buttons in the top-left corner
+
+      //Fullscreen button
+      ctx.drawImage(document.fullscreenElement ? images.buttons.exitFullscreen : images.buttons.fullscreen, 15, 15, 30, 30);
       document.getElementById("r0c0").onclick = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
-      ctx.drawImage(sound.enabled ? buttons.sound : buttons.noSound, 75, 15, 30, 30);
+      //Sound button
+      ctx.drawImage(sound.enabled ? images.buttons.sound : images.buttons.noSound, 75, 15, 30, 30);
       document.getElementById("r0c1").onclick = () => sound.enabled = !sound.enabled;
-      ctx.drawImage(noAlerts ? buttons.noAlerts : buttons.showAlerts, 135, 15, 30, 30);
+      //Alerts button
+      ctx.drawImage(noAlerts ? images.buttons.noAlerts : images.buttons.showAlerts, 135, 15, 30, 30);
       document.getElementById("r0c2").onclick = () => {
         if (noAlerts === undefined) gameAlert("No more alerts will be shown.");
         noAlerts = !noAlerts;
       };
-      ctx.drawImage(buttons.pause, 195, 15, 30, 30);
+      //Pause/play button
+      ctx.drawImage(images.buttons.pause, 195, 15, 30, 30);
       document.getElementById("r0c3").onclick = () => {
         paused = !paused;
         if (paused) {
@@ -1522,18 +1541,17 @@
         menuTower?.closeMenu();
         if (document.getElementById("alert")) hideAlert(); //If there is an alert, hide it
         ctx.clearRect(180, 0, 120, 60);
-        ctx.drawImage(fastForward ? buttons.fastForward : buttons.play, 195, 15, 30, 30);
+        ctx.drawImage(fastForward ? images.buttons.fastForward : images.buttons.play, 195, 15, 30, 30);
       };
+      //Fast forward button (normal mode only)
       if (difficulty == "normal") {
-        ctx.drawImage(fastForward ? buttons.play : buttons.fastForward, 255, 15, 30, 30);
+        ctx.drawImage(fastForward ? images.buttons.play : images.buttons.fastForward, 255, 15, 30, 30);
         document.getElementById("r0c4").onclick = () => {
           fastForward = !fastForward;
           clearInterval(animate);
           animate = setInterval(update, fastForward ? 10 : 40); //If fast forward is turned on, play at 4x the normal speed
         };
       }
-
-      if (!(frame % 25) && frame) seconds++; //Do this every 25 frames
 
       if (dragOver && dragOver[0].name != "Air Tower") {
         ctx.lineWidth = 1;
@@ -1543,7 +1561,7 @@
       }
 
       //Spawn enemies
-      if (!(frame % 4)) {
+      if (!(frame % 4)) { //Do this every 4 frames
         let next = waves[currentWave][currentEnemy];
         while (Array.isArray(next)) {
           if (next[0] == "alert") {
@@ -1559,14 +1577,14 @@
         }
         //Add next enemy
         if (next) {
-          let newEnemy = new Enemy(next, currentWave);
+          let newEnemy = new Enemy(next);
           enemies.push(newEnemy);
         }
 
-        if (waves[currentWave][currentEnemy + 1] !== undefined) { //There are enemies left in the wave
+        if (waves[currentWave][currentEnemy + 1] !== undefined) { //If there are enemies left in the wave
           currentEnemy++;
         } else {
-          if (!waves[currentWave + 1]) { //There are no waves left
+          if (!waves[currentWave + 1]) { //If there are no waves left
             //Once all enemies are defeated, end the game
             if (enemies.length) {
               waves[currentWave + 1] = [null];
@@ -1581,18 +1599,11 @@
       }
 
       enemies.forEach((enemy, i) => {
-        //If enemy is offscreen, subtract a life and remove it from the array
+        //If the enemy is at the end of the track, subtract a life and remove it from the array
         //Otherwise, draw it in its new position
-        if (enemy.distance >= mapArr.length) { //The enemy is at the end of the track
+        if (enemy.distance >= mapArr.length) {
           player.lives -= enemy.type.health;
-          //Play sounds
-          if (sound.enabled&& player.lives) {
-            if (sound.sfx.td_hit01.currentTime >= sound.delay) {
-              sound.sfx.td_hit01.currentTime = 0;
-            } else {
-              sound.sfx.td_hit01.play();
-            }
-          }
+          if (player.lives) sound.playSFX("blip");
           gameAchievements[0] = 0;
           enemies.splice(i, 1);
         } else {
@@ -1612,6 +1623,7 @@
           enemy.y = map.start[1] * 60;
           let img = enemy.type.img;
           for (let j = 0; j < Math.round(enemy.distance); j++) {
+            //Move the enemy forward
             switch (mapArr[j]) {
               case "right":
                 enemy.x++;
@@ -1634,21 +1646,17 @@
             }
           }
           if (!enemy.visible) ctx.globalAlpha = 0.25; //If the enemy is hidden, make it semitransparent
-          ////
-          try {
-            ctx.drawImage(img, enemy.x - 40, enemy.y - 40);
-          } catch (error) {
-            console.log(currentWave, currentEnemy);
-          }
+          ctx.drawImage(img, enemy.x - 40, enemy.y - 40);
           ctx.globalAlpha = 1;
-          if (enemy.abilities.includes("healing")) ctx.drawImage(abilitySymbols.healing, enemy.x - 40, enemy.y - 40);
-          if (enemy.abilities.includes("shield")) ctx.drawImage(abilitySymbols.shield, enemy.x - 40, enemy.y - 40);
-          if (enemy.abilities.includes("acceleration")) ctx.drawImage(abilitySymbols.acceleration, enemy.x - 40, enemy.y - 40);
+          //Draw ability symbols inside the enemy
+          if (enemy.abilities.includes("healing")) ctx.drawImage(images.abilitySymbols.healing, enemy.x - 40, enemy.y - 40);
+          if (enemy.abilities.includes("shield")) ctx.drawImage(images.abilitySymbols.shield, enemy.x - 40, enemy.y - 40);
+          if (enemy.abilities.includes("acceleration")) ctx.drawImage(images.abilitySymbols.acceleration, enemy.x - 40, enemy.y - 40);
         }
 
         if (enemy.abilities.includes("healing") && enemy.health < enemy.type.health && !enemy.noAbilities) {
           enemy.health += 1 / 75;
-          if (enemy.health > enemy.type.health) enemy.health = enemy.type.health;
+          if (enemy.health > enemy.type.health) enemy.health = enemy.type.health; //Don't let the enemy's health go above the initial value
         }
         if (enemy.abilities.includes("blink")) {
           if (!(frame % 100)) enemy.visible = !enemy.visible;
@@ -1661,7 +1669,7 @@
       });
 
       towers.forEach(tower => {
-        if (tower) {
+        if (tower) { //If the tower has not been sold
           ctx.drawImage(tower.img, tower.x - 30, tower.y - 30);
 
           if (tower.name == "Air Tower") {
@@ -1685,12 +1693,13 @@
                 case "up":
                   tower.planeY--;
               }
-              img = planes[planePathArr[j]];
+              img = images.planes[planePathArr[j]];
             }
             ctx.drawImage(img, tower.planeX - 30, tower.planeY - 30);
           }
 
           if (tower.menuOpen) {
+            //Show the tower's range
             ctx.lineWidth = 1;
             ctx.strokeStyle = "white";
             ctx.fillStyle = "#aaa5";
@@ -1725,23 +1734,26 @@
               let furthest = inRange.sort((a, b) => b.distance - a.distance)[0]; //Sort inRange from highest to lowest distance and get the first item
               let strong = inRange.sort((a, b) => b.type.health - a.type.health); //Sort inRange from highest to lowest health
               let strongest = strong.find(enemy => enemy.abilities.includes("shield")) || strong[0]; //Target shielded enemies
-              let target = (tower.range == Infinity) ? strongest : furthest;
+              let target = (tower.name == "Long-Range tower") ? strongest : furthest;
               let damage = tower.strength;
-              if (tower.crowdBonus) damage *= 1 + enemies.length / 100;
+              if (tower.crowdBonus) damage *= 1 + enemies.length / 100; //Increase the damage by 1% for each enemy onscreen
               if (tower.bossBonus && target.boss) damage *= 5;
               if (tower.ultimateBoost) damage *= 2;
               target.hit(damage, tower);
+
+              sound.playSFX("hit"); //Play hit sound
+
               if (tower.slowing && !target.abilities.includes("acceleration")) target.slowed = tower.permSlow ? Infinity : 250;
               if (tower.abilityBlocking && !target.abilities.includes("acceleration")) target.noAbilities = tower.permSlow ? Infinity : 250;
               if (tower.poison && !target.abilities.includes("healing")) {
-                target.poisoned = 125;
+                target.poisoned = 125; //Poison the target for 125 frames
                 if (tower.doublePoison) target.doublePoisoned = true;
               }
               if (tower.bounce) {
                 let bouncePath = [target]; //Make an array of all enemies hit so they aren't bounced to again
                 let close = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < 100 && !bouncePath.includes(enemy) && enemy.visible);
                 let bouncesLeft = tower.bounce;
-                while (close.length && bouncesLeft) {
+                while (close.length && bouncesLeft) { //While the projectile can still bounce and there are enemies to bounce to
                   let closest = close.sort((a, b) => ((target.x - a.x) ** 2 + (target.y - a.y) ** 2) - ((target.x - b.x) ** 2 + (target.y - b.y) ** 2))[0];
                   let distance = Math.sqrt((target.x - closest.x) ** 2 + (target.y - closest.y) ** 2);
                   let oldTarget = target;
@@ -1773,44 +1785,22 @@
                 }
               }
               if (tower.nextExplosion === 0) tower.explosionSize = 75;
-              if (tower.explosionSize) {
+              if (tower.explosionSize) { //If the hit causes an explosion
                 //Create an explosion centered around the target enemy
                 let inExplosion = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < tower.explosionSize);
-                let explosionDamage = tower.powerfulExplosions ? tower.strength : 0.5;
+                let explosionDamage = tower.powerfulExplosions ? tower.strength : 1;
                 inExplosion.forEach(enemy => enemy.hit(explosionDamage, tower, "explosion")); //Do damage to every enemy inside the explosion
                 //Draw the explosion as an orange circle
                 ctx.strokeStyle = "transparent";
                 ctx.fillStyle = "#ff8f4055";
                 ctx.drawCircle(target.x, target.y, tower.explosionSize);
-                // if (sound.enabled) {
-                //   sound.sfx.explode.currentTime = 0;
-                //   sound.sfx.explode.play();
-                // }
+                sound.playSFX("explode");
               }
               if (tower.nextExplosion) {
                 tower.nextExplosion--;
               } else if (tower.nextExplosion === 0) {
                 delete tower.explosionSize;
                 tower.nextExplosion = 5;
-              }
-
-              //Play hit sound
-              if (sound.enabled) {
-                switch (tower.name) {
-                  case 'Cannon Tower':
-                  if (sound.sfx.td_explode01.currentTime >= sound.delay) {
-                    sound.sfx.td_explode01.currentTime = 0;
-                  } else {
-                    sound.sfx.td_explode01.play();
-                  }
-                    break;
-                  default:
-                    if (sound.sfx.td_shoot01.currentTime >= sound.delay) {
-                      sound.sfx.td_shoot01.currentTime = 0;
-                    } else {
-                      sound.sfx.td_shoot01.play();
-                    }
-                }
               }
 
               ctx.drawImage(tower.activeImg, tower.x - 30, tower.y - 30); //Light up the firing tower for 1 frame
@@ -1857,7 +1847,7 @@
               case "up":
                 superPlane.y--;
             }
-            img = superPlanes[superPlanePathArr[i]];
+            img = images.superPlanes[superPlanePathArr[i]];
           }
           ctx.drawImage(img, superPlane.x - 45, superPlane.y - 45);
 
@@ -1868,12 +1858,7 @@
             if (inRange.length) {
               let target = inRange.sort((a, b) => b.distance - a.distance)[0];
               target.hit(superPlane.strength);
-
-              if (sound.enabled) {
-                sound.sfx.hit.currentTime = 0;
-                sound.sfx.hit.play();
-              }
-
+              sound.playSFX("hit");
               ctx.lineWidth = 4;
               ctx.strokeStyle = "#ff6860";
               ctx.beginPath();
@@ -1909,7 +1894,7 @@
                 squareEl.ondragover = () => {
                   event.preventDefault();
                   squareEl.classList.add("droppable");
-                  dragOver = [towerTypes[tower], j, i];
+                  dragOver = [towerTypes[tower], j, i]; //Save the tower being sragges, the column, and the row
                 };
                 squareEl.ondragleave = () => {
                   squareEl.classList.remove("droppable");
@@ -1956,7 +1941,7 @@
 
         let ability = towerTypes[tower].ability;
         let abilityButton = document.getElementById(tower + "Ability");
-        if (ability.bought && towers.find(owned => owned?.name == towerTypes[tower].name) && difficulty == "normal") {
+        if (ability.bought && towers.find(owned => owned?.name == towerTypes[tower].name)) {
           abilityButton.classList.remove("invisible");
           if (ability.cooldown) {
             abilityButton.classList.add("unselectable");
@@ -1988,10 +1973,8 @@
       ctx.textAlign = "left";
       if (player.lives > 0) {
         //Display time, money, and lives in the top-right corner
-        ctx.fillStyle = "#ff0000";
-        ctx.fillText(`Waves Out: ${currentWave}`, 1300, 40); //Show minutes and seconds since
         ctx.fillStyle = "#ddd";
-        ctx.fillText(`${Math.floor(seconds / 60).toString().padStart(2, "0")}:${(seconds % 60).toString().padStart(2, "0")}`, 1564, 40); //Show minutes and seconds since the game started
+        ctx.fillText(`${(currentWave + 1).toString().padStart(2, "0")}/${waves.length}`, 1564, 40); //Show current and total waves
         ctx.fillStyle = "#80ff80";
         ctx.fillText("$" + player.money.toString().padStart(5, "0"), 1684, 40);
         ctx.fillStyle = "#ff6860";
@@ -2007,11 +1990,10 @@
     let achievements = localStorage.getItem("tdAchievements") || "0000000"; //1 means earned, 0 means not earned
     achievements = achievements.split("");
     let player = {
-      money: 80,
+      money: 75,
       lives: 100,
       bonusMoney: 0,
-      bonusLives: 0,
-      scaling: 20     // Multiply the hp of enemies by the current wave divided by this number
+      bonusLives: 0
     };
     let mapIndex = 0;
     let map;
@@ -2027,7 +2009,6 @@
     let currentWave = 0;
     let currentEnemy = 0;
     let superPlane;
-    let seconds = 0;
     let noAlerts;
     let paused;
     let fastForward;
@@ -2378,10 +2359,12 @@
       this.onclick = null;
     };
 
-    function gameAlert(message) {
+    function gameAlert(message, large) {
       document.getElementById("r0c3")?.click(); //Pause the game
       let alertBox = document.createElement("div");
       alertBox.id = "alert";
+      alertBox.classList.add("centered");
+      if (large) alertBox.classList.add("large");
       let alertText = document.createElement("div");
       alertText.id = "alertText";
       alertText.innerHTML = message;
@@ -2403,12 +2386,12 @@
 
     function endGame(complete) {
       if (complete) {
-        if (sound.enabled) sound.sfx.success.play();
+        sound.playSFX("success");
         let num = (difficulty == "hard") ? 2 : 1;
         if (progress[mapIndex] < num) progress.splice(mapIndex, 1, num); //Update progress
         localStorage.setItem("tdProgress", progress.join("")); //Save to local storage as string
       } else {
-        if (sound.enabled) sound.sfx.shoot.play();
+        sound.playSFX("shoot");
         gameAchievements[4] = 0;
         gameAchievements[5] = 0;
         gameAchievements[6] = 0;
@@ -2419,7 +2402,7 @@
       let menuTower = towers.find(tower => tower?.menuOpen);
       menuTower?.closeMenu();
       clearInterval(animate);
-      ctx.clearRect(0, 0, 1920, 1080);
+      ctx.clearRect(0, 0, 1920, 1080); //Clear the canvas
       document.getElementById("grid").classList.add("hidden");
       document.getElementById("towers").classList.add("hidden");
       ctx.fillStyle = "white";
@@ -2428,7 +2411,7 @@
       ctx.fillText(complete ? "Map complete!" : "Game over", 960, 300);
       ctx.font = "64px Segoe UI";
       ctx.fillStyle = "#80ffff";
-      ctx.fillText(complete ? `${map.name} cleared on ${difficulty} mode` : `Time: ${Math.floor(seconds / 60)}:${seconds % 60 < 10 ? "0" + seconds % 60 : seconds % 60}`, 960, 500);
+      ctx.fillText(complete ? `${map.name} cleared on ${difficulty} mode` : `You lost on wave ${currentWave + 1}`, 960, 500);
       ctx.fillStyle = "#ffdf40";
       let newAchievements = achievements.filter((achievement, i) => !+achievement && gameAchievements[i]).length;
       if (newAchievements) ctx.fillText(`${newAchievements} new ${(newAchievements == 1) ? "achievement" : "achievements"} earned`, 960, 600);

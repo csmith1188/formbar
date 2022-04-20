@@ -342,6 +342,10 @@
       filter: drop-shadow(10px 10px 5px black);
     }
 
+    #alert.large {
+      height: 50%;
+    }
+
     #alertText {
       position: absolute;
       top: calc(5% * 16 / 9);
@@ -2134,7 +2138,7 @@
         listText += `<li class=${earned ? "earned" : ""}><${tag}>${achievement}</${tag}></li>`;
       });
       listText += "</ul>";
-      gameAlert(listText, true);
+      gameAlert(listText);
     }
     achvText.append(achvButton);
     progressEl.append(achvText);
@@ -2360,7 +2364,7 @@
       let alertBox = document.createElement("div");
       alertBox.id = "alert";
       alertBox.classList.add("centered");
-      if (large) alertBox.style.height = "50%";
+      if (large) alertBox.classList.add("large");
       let alertText = document.createElement("div");
       alertText.id = "alertText";
       alertText.innerHTML = message;

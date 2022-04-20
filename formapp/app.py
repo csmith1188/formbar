@@ -760,7 +760,7 @@ def updateStep():
 
 '''
     /
-    Redirect to either basic or advanced mode based on the user's preference
+    Redirect to the user's preferred homepage
 '''
 @app.route('/')
 def endpoint_root():
@@ -776,10 +776,12 @@ def endpoint_root():
         if len(dbData):
             pm = dbData[0][6]
             sD.studentDict[request.remote_addr]['preferredHomepage'] = pm
+    if sD.studentDict[request.remote_addr]['preferredHomepage'] == 'standard':
+        return redirect('/home')
     if sD.studentDict[request.remote_addr]['preferredHomepage'] == 'advanced':
         return redirect('/advanced')
-    if sD.studentDict[request.remote_addr]['preferredHomepage'] == 'basic':
-        return redirect('/basic')
+    if sD.studentDict[request.remote_addr]['preferredHomepage'] == 'quickpanel':
+        return redirect('/quickpanel')
     return redirect('/setdefault')
 
 @app.route('/2048')
@@ -897,23 +899,6 @@ def endpoint_api():
 # ██████
 # ██   ██
 # ██████
-
-
-'''
-    /basic
-    A simplified homepage for beginners
-'''
-@app.route('/basic')
-def endpoint_basic():
-    if not request.remote_addr in sD.studentDict:
-        return redirect('/login?forward=' + request.path)
-    sounds = []
-    music = []
-    for key, value in sfx.sound.items():
-        sounds.append(key)
-    for key, value in bgm.bgm.items():
-        music.append(key)
-    return render_template("basic.html", sfx = sounds, bgm = music)
 
 
 '''
@@ -1413,6 +1398,14 @@ def endpoint_help():
         else:
             return render_template("help.html")
 
+@app.route('/home')
+def endpoint_home():
+    print("home")
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    else:
+        return render_template("index.html")
+
 # ██
 # ██
 # ██
@@ -1850,6 +1843,23 @@ def endpoint_progress():
 #     ▀▀
 
 
+'''
+    /quickpanel
+    The most commonly-used features
+'''
+@app.route('/quickpanel')
+def endpoint_quickpanel():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    sounds = []
+    music = []
+    for key, value in sfx.sound.items():
+        sounds.append(key)
+    for key, value in bgm.bgm.items():
+        music.append(key)
+    return render_template("basic.html", sfx = sounds, bgm = music)
+
+
 #takes you to a quiz(literally)
 @app.route('/quiz', methods = ['POST', 'GET'])
 def endpoint_quiz():
@@ -1999,13 +2009,13 @@ def endpoint_sendblock():
         return "Bad Arguments. Requires 'id' and 'data'"
 '''
 
-#Choose whether you want to use basic or expert mode
+#Choose the user's default homepage
 @app.route('/setdefault', methods = ['POST', 'GET'])
 def endpoint_setdefault():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     if request.method == 'POST':
-        if request.form['mode'] == 'basic' or request.form['mode'] == 'advanced':
+        if request.form['mode'] == 'standard' or request.form['mode'] == 'advanced' or request.form['mode'] == 'quickpanel':
             sD.studentDict[request.remote_addr]['preferredHomepage'] = request.form['mode']
             db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
             dbcmd = db.cursor()

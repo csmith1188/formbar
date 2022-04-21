@@ -5,8 +5,105 @@
 <!-- Change title here -->
 {% block title %}Formbar Thumbspanel{% endblock %}
 
+{% block color %}blue{% endblock %}
+
 <!-- Extra style declarations here -->
-{% block style %}{% endblock %}
+{% block style %}
+<style>
+  body {
+      background-color: var(--bg-dark-blue);
+  }
+  h1 {
+    text-align: center;
+  }
+
+  h2 {
+    margin-top: 32px;
+  }
+
+  #quickmenu {
+      text-align: center;
+      justify-content: center;
+      margin: auto;
+  }
+
+  #content, #homebutton{
+      border-radius: 10px;
+      margin: auto;
+      padding: 10px;
+      max-width: 600px;
+      background-color: var(--light-blue);
+      text-align: center;
+  }
+
+  .container1-flex {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+  }
+
+  .container2-flex {
+      display: flex;
+      justify-content: space-around;
+      flex-grow: 1;
+  }
+
+
+  .bigbutton, .smallbutton {
+      margin: auto;
+      padding: 10px;
+      width: 100px;
+      height: 100px;
+      border-radius: 20px;
+      border: 2px solid black;
+      background-color: var(--dark-gray);
+      font-size: 1.2em;
+      font-weight: bolder;
+      text-align: center;
+      box-shadow: 8px 8px var(--dark-gray);
+      cursor: pointer;
+  }
+
+  .smallbutton {
+    width: 25px;
+    height: 25px;
+    border-radius: 10px;
+    font-size: 0.6em;
+  }
+
+  .bigbutton a {
+    margin: auto;
+    vertical-align: middle;
+  }
+
+  .bb-green {
+      background-color: #bfb;
+  }
+
+  .bb-yellow {
+      background-color: #ffb;
+  }
+
+  .bb-blue {
+      background-color: #bff;
+  }
+
+  .bb-red {
+      background-color: #fbb;
+  }
+
+  .bigbutton:hover, .smallbutton:hover {
+      background-color: #ffffff;
+  }
+
+  .user {
+     background-color: #cccccc;
+     border: 1px solid #000000;
+     border-radius: 5px;
+     overflow-x:auto;
+  }
+</style>
+{% endblock %}
 
 <!-- Extra javascript here -->
 {% block script %}{% endblock %}
@@ -15,38 +112,52 @@
 <!-- Main content here -->
 {% block main %}
 {{ prompt|safe }}
-<h2>Thumbs</h2>
-<div class="container1-flex">
-    <div class="bigbutton bb-green" onclick="window.location = '/tutd?thumb=up';">
-        Up
+<div id="content" class="light">
+  <h2>Thumbs</h2>
+  <div class="container1-flex">
+      <div class="bigbutton bb-green" onclick="window.location = '/tutd?thumb=up';">
+          Up
+      </div>
+      <div class="bigbutton bb-blue" onclick="window.location = '/tutd?thumb=wiggle';">
+          Wiggle
+      </div>
+      <div class="bigbutton bb-red" onclick="window.location = '/tutd?thumb=down';">
+          Down
+      </div>
+      <div class="bigbutton bb-yellow" onclick="window.location = '/tutd?thumb=oops';">
+          Remove
+      </div>
+  </div>
+  <h2>Letters</h2>
+  <div class="container1-flex">
+      <div class="bigbutton bb-green" onclick="window.location = '/abcd?vote=a';">
+          A
+      </div>
+      <div class="bigbutton bb-blue" onclick="window.location = '/abcd?vote=b';">
+          B
+      </div>
+      <div class="bigbutton bb-red" onclick="window.location = '/abcd?vote=c';">
+          C
+      </div>
+      <div class="bigbutton bb-yellow" onclick="window.location = '/abcd?vote=d';">
+          D
+      </div>
+  </div>
+  <h2>Text response</h2>
+  <div class="container1-flex">
+    <form action="/textresponse" method="POST">
+      <textarea id="response" name="response" rows="4" cols="40" placeholder="Type your response here" oninput="checkResponse();"></textarea><br><br>
+      <input type="submit" id="submitResponse" class="button">
+    </form>
+  </div>
+  <h2>Other</h2>
+  <div class="container1-flex" style="width: 50%; transform: translateX(50%);">
+    <div class="bigbutton bb-red" onclick="window.location = '/help';">
+        Help!<br>(/help)
     </div>
-    <div class="bigbutton bb-blue" onclick="window.location = '/tutd?thumb=wiggle';">
-        Wiggle
+    <div class="bigbutton bb-yellow" onclick="window.location = '/break';">
+        Bathroom!<br>(/break)
     </div>
-    <div class="bigbutton bb-red" onclick="window.location = '/tutd?thumb=down';">
-        Down
-    </div>
-    <div class="bigbutton bb-yellow" onclick="window.location = '/tutd?thumb=oops';">
-        Remove
-    </div>
-</div>
-<h2>Survey</h2>
-<div class="container1-flex">
-    <div class="bigbutton bb-green" onclick="window.location = '/survey?vote=a';">
-        A
-    </div>
-    <div class="bigbutton bb-blue" onclick="window.location = '/survey?vote=b';">
-        B
-    </div>
-    <div class="bigbutton bb-red" onclick="window.location = '/survey?vote=c';">
-        C
-    </div>
-    <div class="bigbutton bb-yellow" onclick="window.location = '/survey?vote=d';">
-        D
-    </div>
-</div>
-<h2>Help</h2>
-<div class="bigbutton bb-red" onclick="window.location = '/help';">
-    Help!<br>(/help)
+  </div>
 </div>
 {% endblock %}

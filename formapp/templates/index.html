@@ -4,92 +4,245 @@
 
 <!-- Change title here -->
 {% block title %}Formbar Home{% endblock %}
+{% block color %}blue{% endblock %}
 {% block style %}
-<link rel="stylesheet" href="../static/css/tabs.css">
+<style>
+  body {
+      background-color: var(--bg-dark-blue);
+  }
+  h1 {
+    text-align: center;
+  }
+
+  h2 {
+    margin-top: 32px;
+  }
+
+  #quickmenu {
+      text-align: center;
+      justify-content: center;
+      margin: auto;
+  }
+
+  #content, #homebutton{
+      border-radius: 10px;
+      margin: auto;
+      padding: 10px;
+      max-width: 600px;
+      background-color: var(--light-blue);
+  }
+
+  .container1-flex {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+  }
+
+  .container2-flex {
+      display: flex;
+      justify-content: space-around;
+      flex-grow: 1;
+  }
+
+
+  .bigbutton, .smallbutton {
+      margin: auto;
+      padding: 10px;
+      width: 100px;
+      height: 100px;
+      border-radius: 20px;
+      border: 2px solid black;
+      background-color: var(--dark-gray);
+      font-size: 1.2em;
+      font-weight: bolder;
+      text-align: center;
+      box-shadow: 8px 8px var(--dark-gray);
+      cursor: pointer;
+  }
+
+  .smallbutton {
+    width: 25px;
+    height: 25px;
+    border-radius: 10px;
+    font-size: 0.6em;
+  }
+
+  .bigbutton a {
+    margin: auto;
+    vertical-align: middle;
+  }
+
+  .bb-green {
+      background-color: #bfb;
+  }
+
+  .bb-yellow {
+      background-color: #ffb;
+  }
+
+  .bb-blue {
+      background-color: #bdf;
+  }
+
+  .bb-red {
+      background-color: #fbb;
+  }
+
+  .bigbutton:hover, .smallbutton:hover {
+      background-color: #ffffff;
+  }
+
+  .user {
+     background-color: #cccccc;
+     border: 1px solid #000000;
+     border-radius: 5px;
+     overflow-x:auto;
+  }
+
+  #tabcontainer {
+    background-color: gray;
+    border-radius: 5px;
+    border: solid black 2px;
+    padding: 5px;
+  }
+
+  .tab {
+    background-color: black;
+    color: white;
+    border-radius: 5px;
+    margin: 5px;
+    padding: 5px;
+    cursor: pointer;
+  }
+
+  .entry {
+  }
+
+  .entrylink {
+    color: black;
+    border-radius: 5px;
+    border: solid black 2px;
+    margin: 5px;
+    padding: 5px;
+    cursor: pointer;
+  }
+
+  .entrylink:hover {
+    background-color: white;
+  }
+
+  .-green {
+      background-color: #bfb;
+  }
+
+  .-yellow {
+      background-color: #ffb;
+  }
+
+  .-blue {
+      background-color: #bff;
+  }
+
+  .-red {
+      background-color: #fbb;
+  }
+
+</style>
 {% endblock %}
 {% block script %}
 <script src="../static/jquery/external/jquery/jquery.js" charset="utf-8"></script>
 <script src="../static/jquery/jquery-ui.min.js" charset="utf-8"></script>
 <script>
     $(function() {
-        $("#tabcontainer").accordion();
+        $("#tabcontainer").accordion({
+          heightStyle: "content"
+        });
     });
 </script>
 {% endblock %}
 {% block main %}
-<h1>Formbar</h1>
-<div id="tabcontainer">
+<div id="content" class="light">
+  <h1>Formbar</h1>
+  <div id="tabcontainer" class="dark blue">
 
-    <h3 class="tab">Students</h3>
-    <div class="entry">
-        <div class="entrylink -green" onclick="window.location = '/tutd';">
-            Thumbspanel (/tutd)
-        </div>
-        <div class="entrylink -blue" onclick="window.location = '/chat';">
-            Chat (/chat)
-        </div>
-        <div class="entrylink -red" onclick="window.location = '/help';">
-            Help! (/help)
-        </div>
-        <div class="entrylink -yellow" onclick="window.location = '/wawd';">
-            What Are We Doing? (/wawd)
-        </div>
-    </div>
-    <h3 class="tab">Formbar</h3>
-    <div class="entry">
-        <div class="entrylink -green" onclick="window.location = '/bgm';">
-            Background Music (/bgm)
-        </div>
-        <div class="entrylink -blue" onclick="window.location = '/sfx';">
-            Sound Effects (/sfx)
-        </div>
-        <div class="entrylink -red" onclick="window.location = '/expert';">
-            Expert Mode (/expert)
-        </div>
-        <div class="entrylink -yellow" onclick="window.location = '/virtualbar';">
-            VirtualBar (/virtualbar)
-        </div>
-    </div>
-    <h3 class="tab">Games</h3>
-    <div class="entry">
-        <div class="entrylink -green" onclick="window.location = '/2048';">
-            2048 (/2048)
-        </div>
-        <div class="entrylink -blue" onclick="window.location = '/hangman';">
-            Hang Man (/hangman)
-        </div>
-        <div class="entrylink -red" onclick="window.location = '/ttt';">
-            Tic-Tac-Toe (/ttt)
-        </div>
-        <div class="entrylink -yellow" onclick="window.location = '/towerdefense';">
-            Tower Defense (/towerdefense)
-        </div>
-    </div>
-    <h3 class="tab">Teacher</h3>
-    <div class="entry">
-        <div class="entrylink -green" onclick="window.location = '/settings';">
-            Settings (/settings)
-        </div>
-        <div class="entrylink -blue" onclick="window.location = '/lesson';">
-            Lesson (/lesson)
-        </div>
-        <div class="entrylink -red" onclick="window.location = '/needshelp';">
-            Help Tickets (/needshelp)
-        </div>
-        <div class="entrylink -red" onclick="window.location = '/debug';">
-            API Debug (/debug)
-        </div>
-    </div>
+      <h3 class="tab">Students</h3>
+      <div class="entry">
+          <div class="entrylink -green light" onclick="window.location = '/tutd';">
+              Thumbspanel (/tutd)
+          </div>
+          <div class="entrylink -blue light" onclick="window.location = '/chat';">
+              Chat (/chat)
+          </div>
+          <div class="entrylink -red light" onclick="window.location = '/help';">
+              Help! (/help)
+          </div>
+          <div class="entrylink -yellow light" onclick="window.location = '/break';">
+              Request bathroom break (/break)
+          </div>
+          <div class="entrylink -green light" onclick="window.location = '/wawd';">
+              What Are We Doing? (/wawd)
+          </div>
+      </div>
+      <h3 class="tab">Formbar</h3>
+      <div class="entry">
+          <div class="entrylink -green light" onclick="window.location = '/bgm';">
+              Background Music (/bgm)
+          </div>
+          <div class="entrylink -blue light" onclick="window.location = '/sfx';">
+              Sound Effects (/sfx)
+          </div>
+          <div class="entrylink -red light" onclick="window.location = '/advanced';">
+              Advanced homepage (/advanced)
+          </div>
+          <div class="entrylink -yellow light" onclick="window.location = '/quickpanel';">
+              Quick panel (/quickpanel)
+          </div>
+          <div class="entrylink -green light" onclick="window.location = '/setdefault';">
+              Set default homepage (/setdefault)
+          </div>
+          <div class="entrylink -blue light" onclick="window.location = '/virtualbar';">
+              VirtualBar (/virtualbar)
+          </div>
+      </div>
+      <h3 class="tab">Games</h3>
+      <div class="entry">
+          <div class="entrylink -green light" onclick="window.location = '/2048';">
+              2048 (/2048)
+          </div>
+          <div class="entrylink -blue light" onclick="window.location = '/bitshifter';">
+              Bitshifter (/bitshifter)
+          </div>
+          <div class="entrylink -red light" onclick="window.location = '/hangman';">
+              Hang Man (/hangman)
+          </div>
+          <div class="entrylink -yellow light" onclick="window.location = '/minesweeper';">
+              Minesweeper (/minesweeper)
+          </div>
+          <div class="entrylink -green light" onclick="window.location = '/speedtype';">
+              Speed Typer (/speedtype)
+          </div>
+          <div class="entrylink -blue light" onclick="window.location = '/towerdefense';">
+              Tower Defense (/towerdefense)
+          </div>
+          <div class="entrylink -red light" onclick="window.location = '/leaderboards';">
+              Leaderboards (/leaderboards)
+          </div>
+      </div>
+      <h3 class="tab">Teacher</h3>
+      <div class="entry">
+          <div class="entrylink -green light" onclick="window.location = '/settings';">
+              Settings (/settings)
+          </div>
+          <div class="entrylink -blue light" onclick="window.location = '/lesson';">
+              Lesson (/lesson)
+          </div>
+          <div class="entrylink -red light" onclick="window.location = '/needshelp';">
+              Help Tickets (/needshelp)
+          </div>
+          <div class="entrylink -yellow light" onclick="window.location = '/debug';">
+              API Debug (/debug)
+          </div>
+      </div>
+  </div>
 </div>
-
-<script>
-  //ep will be true if user made expert mode their default
-  let ep = localStorage.getItem("expertPreference");
-  let urlParams = new URLSearchParams(window.location.search);
-  let nr = urlParams.get('noRedirect');
-
-  //Redirect to /expert if ep is true, unless url parameter "noRedirect" is true
-  if (ep && !nr) window.location = "/expert";
-</script>
-
 {% endblock %}

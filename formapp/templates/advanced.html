@@ -11,52 +11,23 @@
   h1 {
     margin: 0 0 12px;
     font-size: 26px;
-    color: var(--color-blue);
-    text-align: center;
+    color: var(--theme-color);
   }
 
   h2 {
-    margin: 48px 0 12px;
+    margin: 48px 0 4px;
     font-size: 23px;
-    color: var(--color-blue);
+    color: var(--theme-color);
   }
 
   h3 {
     margin: 0 0 10px;
     font-size: 20px;
-    color: var(--color-blue);
+    color: var(--theme-color);
   }
 
   button, .button {
     margin-top: 8px;
-  }
-
-  input[type="text"],
-  input[type="number"] {
-    background: transparent;
-    border-color: black;
-    border-style: none none solid;
-    font-size: 16px;
-    font-family: "Segoe UI", sans-serif;
-    outline: none;
-  }
-
-  input[type="text"] {
-    width: 144px;
-  }
-
-  input[type="range"] {
-    width: 96px;
-    vertical-align: middle;
-  }
-
-  input[type="number"] {
-    width: 48px;
-  }
-
-  input[type="color"] {
-    width: 80px;
-    height: 20px;
   }
 
   a:active {
@@ -65,51 +36,14 @@
 
   .thumbButton,
   .letterButton {
-    width: 144px;
-    margin: 12px;
-    border-radius: 48px !important;
+    height: 80px;
+    margin: 8px;
+    border-radius: 40px !important;
   }
 
   .highlight:hover {
     transform: none !important;
     box-shadow: none !important;
-  }
-
-  button:active,
-  input[type="color"]:active,
-  .thumbButton:active,
-  .letterButton:active {
-    transform: initial;
-    box-shadow: initial;
-    background: var(--light-gray);
-  }
-
-  .redColor {
-    color: var(--color-red) !important;
-  }
-
-  .yellowColor {
-    color: var(--color-yellow) !important;
-  }
-
-  .greenColor {
-    color: var(--color-green) !important;
-  }
-
-  .cyanColor {
-    color: var(--color-cyan) !important;
-  }
-
-  .blueColor {
-    color: var(--color-blue) !important;
-  }
-
-  .smallImg {
-    width: 24px;
-    margin-left: 4px;
-    border-radius: 12px;
-    vertical-align: middle;
-    cursor: pointer;
   }
 
   #sidebar {
@@ -119,13 +53,26 @@
     width: 250px;
     height: 100%;
     box-sizing: border-box;
-    padding: 8px;
+    padding: 0 8px 8px;
     overflow: auto;
+  }
+
+  #sidebarButtons {
+    display: flex;
+    justify-content: space-around;
+    padding: 8px 0 16px;
   }
 
   #tutdDiv, #abcdDiv {
     width: 100%;
-    text-align: center;
+  }
+
+  #randomMusic {
+    margin: 0 4px 0 0;
+  }
+
+  #playPauseMusic, #restartMusic, #stopMusic {
+    margin: 0;
   }
 
   #text {
@@ -137,24 +84,26 @@
     display: inline-block;
   }
 
-  #randomMusic {
-    margin: 0 4px 0 0;
-    border-radius: 0;
+  #excluded {
+    color: var(--color-red);
   }
 
-  #bottom {
+  #otherSidebar {
+    text-align: center;
+  }
+
+  #otherSidebar button {
+    width: 75%;
+  }
+
+  #chatSidebar {
     position: absolute;
     left: 0;
     bottom: 0;
     width: 100%;
-    box-sizing: border-box;
-    margin-top: 48px;
-    padding: inherit;
-  }
-
-  .alert {
-    font-weight: bold;
-    color: #ff8040;
+    height: calc(100% - 64px);
+    border: 1px solid var(--dark-gray);
+    border-style: solid none none;
   }
 
   #rightSide {
@@ -205,6 +154,7 @@
     box-sizing: border-box;
     border: 1px var(--dark-gray);
     border-style: none solid solid;
+    background: var(--bg-darker);
     z-index: 2;
     outline: none;
   }
@@ -213,7 +163,7 @@
     padding: 4.5px 16px;
   }
 
-  .tab:not(.open):hover, .tab.menuOpen {
+  .tab:not(.open):not(.unselectable):hover, .tab.menuOpen {
     background: var(--bg-dark-highlight);
   }
 
@@ -231,10 +181,6 @@
 
   #wawdTab.open {
     background: var(--color-purple);
-  }
-
-  #quizTab.open {
-    background: var(--color-pink);
   }
 
   #gamesTab.open, #gamesMenu > .open {
@@ -273,9 +219,14 @@
 <!-- Main content here -->
 {% block main %}
 <div id="sidebar" class="light">
-  <div id="sidebarContent">
-    <h1>Formbar Features</h1>
-    <div style="text-align: center;">Features will appear when the teacher makes them available.</div>
+  <div id="sidebarButtons">
+    <button id="formbarButton" class="pressed" onclick="changeSidebar('formbar')">Formbar</button>
+    <button id="chatButton" onclick="changeSidebar('chat')">Chat</button>
+    <button id="otherButton" onclick="changeSidebar('other')">Other</button>
+  </div>
+
+  <div id="formbarSidebar">
+    <div>Features will appear when the teacher makes them available.</div>
 
     <div id="tutdDiv" class="hidden">
       <h2>Thumbs</h2>
@@ -297,28 +248,39 @@
       <img src="{{ url_for('static', filename='img/advanced/letterButton3.png') }}" id="letterButton3" class="letterButton button inline popOut moreDepth greenColor" title="Vote D" onclick="letterVote(3);" tabindex="0">
     </div>
 
+    <div id="responseDiv" class="hidden">
+      <h2>Text response</h2>
+      <textarea id="response" rows="6" cols="25" placeholder="Type your response here" oninput="checkResponse();"></textarea><br>
+      <button id="submitResponse" class="inline popOut unselectable">Submit</button>
+    </div>
+
     <div id="soundDiv" class="hidden">
       <h2>Sound effects</h2>
-      <input type="text" id="sound" placeholder="Filename" list="sfxFiles">
+      <input type="text" id="sound" class="line" placeholder="Filename" list="sfxFiles">
       <datalist id="sfxFiles"></datalist>
       <img src="{{ url_for('static', filename='img/advanced/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendSound();">
     </div>
 
     <div id="musicDiv" class="hidden">
       <h2>Play music</h2>
-      <label for="volume">Volume: </label><input type="range" id="volume" value="0.5" max="1" step="0.1">
-      <span id="volNumber">0.5</span>
-      <br>
-      <img src="{{ url_for('static', filename='img/advanced/random.png') }}" id="randomMusic" class="smallImg" title="Random" onclick="randomBGM()"><input type="text" id="music" placeholder="Filename" list="bgmFiles">
+      <img src="{{ url_for('static', filename='img/advanced/random.png') }}" id="randomMusic" class="smallImg" title="Random" onclick="randomBGM()"><input type="text" id="music" class="line" placeholder="Filename" list="bgmFiles">
       <datalist id="bgmFiles"></datalist>
       <img src="{{ url_for('static', filename='img/advanced/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendMusic();"><br>
+      <label for="volume">Volume: </label><input type="range" id="volume" min="0.1" max="1" step="0.1">
+      <span id="volNumber"></span>
       <div id="nowPlaying" class="hidden">Now playing: <b id="nowPlayingTitle" title="Song"></b></div>
-      <button id="stopMusicButton" class="inline popOut" style="margin-top: 12px;" onclick="stopMusic();">Stop music</button>
+      <div id="musicControls" class="hidden">
+        <img src="{{ url_for('static', filename='img/advanced/pause.png') }}" class="smallImg" id="playPauseMusic" title="Pause" onclick="playPauseMusic();">
+        <img src="{{ url_for('static', filename='img/advanced/restart.png') }}" class="smallImg" id="restartMusic" title="Restart" onclick="restartMusic();">
+        <img src="{{ url_for('static', filename='img/advanced/stop.png') }}" class="smallImg" id="stopMusic" title="Stop" onclick="stopMusic();">
+      </div>
     </div>
 
     <div id="textDiv" class="hidden">
       <h2>Change text</h2>
-      <input type="text" id="text" placeholder="Phrase">
+      Text color: <input type="color" id="fgColor" class="button inline popOut" value="#404040"><br>
+      Background: <input type="color" id="bgColor" class="button inline popOut"><br>
+      <input type="text" id="text" class="line" placeholder="Phrase">
       <img src="{{ url_for('static', filename='img/advanced/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendText();">
     </div>
 
@@ -328,8 +290,8 @@
       <input type="radio" id="showSegment" name="segment" style="margin-left: 8px;" onclick="showSegment();"><label for="showSegment">Segment</label>
       <br>
       <div id="segment" class="hidden" style="margin-bottom: 8px;">
-        <input type="number" id="segmentStart" min="0" value="0" onchange="validNumber(this);"> –
-        <input type="number" id="segmentEnd" min="0" onchange="validNumber(this);">
+        <input type="number" id="segmentStart" class="line" min="0" value="0" onchange="validNumber(this);"> –
+        <input type="number" id="segmentEnd" class="line" min="0" onchange="validNumber(this);">
       </div>
       <input type="radio" id="hideColor2" name="gradient" checked onclick="hideColor2();" style="margin-left: 0;"><label for="hideColor2">Single color</label>
       <input type="radio" id="showColor2" name="gradient" style="margin-left: 8px;" onclick="showColor2();"><label for="showColor2">Gradient</label>
@@ -344,55 +306,55 @@
       </div>
       <img src="{{ url_for('static', filename='img/advanced/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendColor();">
     </div>
-
-    <div id="percentDiv" class="hidden">
-      <h2>Fill percentage</h2>
-      <input type="number" id="percent" value="0" min="0" max="100" onchange="validNumber(this);"><label for="percent">%</label>
-      <img src="{{ url_for('static', filename='img/advanced/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendPercent();">
-    </div>
   </div>
 
-  <div id="bottom">
-    Name: <span id="name"></span> <span id="guest"></span><br>
-    <button class="inline popOut" onclick="window.location = '/logout';">Log out</button><br>
-    <button id="logOut" class="inline popOut" onclick="window.location = '/basic';">Use basic mode</button><br>
-    <button class="inline popOut" onclick="window.location = '/setdefault';">Set default mode</button>
-    <button class="inline popOut" onclick="feedback();">Send feedback</button>
+  <iframe id="chatSidebar" class="hidden" src="/chat?sidebar=true"></iframe>
+
+  <div id="otherSidebar" class="hidden">
+    Name: <a id="name"></a><span id="excluded"></span><br>
+    <button class="inline popOut" onclick="window.location = '/login';">Log out</button><br>
+    <button class="inline popOut" onclick="window.open('https://github.com/csmith1188/formbar/issues/new');">Send feedback</button><br>
+    <button class="inline popOut" onclick="window.location = '/quickpanel';">Go to the quick panel</button><br>
+    <button class="inline popOut" onclick="window.location = '/home';">Go to the standard homepage</button><br>
+    <button class="inline popOut" onclick="window.location = '/setdefault';">Set default homepage</button>
   </div>
 </div>
 
 <div id="rightSide">
   <div id="tabs">
-    <div id="chatTab" class="tab" onclick="openPage('chat');"><img src="{{ url_for('static', filename='img/advanced/chat.png') }}" class="icon"> <b id="newMessages" style="color: var(--light-red);"></b> Chat</div>
-    <div id="studentsTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/advanced/students.png') }}" class="icon"> Students</div>
+    <div id="chatTab" class="tab" onclick="openPage('chat');"><img src="{{ url_for('static', filename='img/advanced/chat.png') }}" class="icon"> <b id="newMessages" style="color: var(--light-red);"></b> <span class="tabText">Chat</span></div>
+    <div id="studentsTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/advanced/students.png') }}" class="icon"> <span class="tabText">Students</span></div>
     <div id="studentsMenu" class="menu hidden" tabindex="-1">
       <div id="helpTab" class="tab" onclick="openPage('help');">Help!</div>
       <div id="breakTab" class="tab" onclick="openPage('break');">Bathroom break</div>
+      <div id="wawdTab" class="tab" onclick="openPage('wawd');">What are we doing?</div>
     </div>
-    <div id="wawdTab" class="tab" onclick="openPage('wawd');"><img src="{{ url_for('static', filename='img/advanced/wawd.png') }}" class="icon"> What are we doing?</div>
-    <div id="quizTab" class="tab" onclick="openPage('quiz');"><img src="{{ url_for('static', filename='img/advanced/quiz.png') }}" class="icon"> Quiz</div>
-    <div id="gamesTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/advanced/games.png') }}" class="icon"> Games</div>
+    <div id="gamesTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/advanced/games.png') }}" class="icon"> <span class="tabText">Games</span></div>
     <div id="gamesMenu" class="menu hidden" tabindex="-1">
       <div id="2048Tab" class="tab" onclick="openPage('2048');">2048</div>
+      <div id="bitshifterTab" class="tab" onclick="openPage('bitshifter');">Bitshifter</div>
       <div id="hangmanTab" class="tab" onclick="openPage('hangman');">Hangman</div>
       <div id="minesweeperTab" class="tab" onclick="openPage('minesweeper');">Minesweeper</div>
       <div id="speedtypeTab" class="tab" onclick="openPage('speedtype');">Speed Typer</div>
-      <div id="tttTab" class="tab" onclick="openPage('ttt');">Tic-tac-toe</div>
-      <div id="fighterTab" class="tab" onclick="openPage('fighter');">Turn-Based Fighter</div>
+      <div id="tttTab" class="tab hidden" onclick="openPage('ttt');">Tic-tac-toe</div>
+      <div id="towerdefenseTab" class="tab" onclick="openPage('towerdefense');">Tower Defense</div>
+      <div id="fighterTab" class="tab hidden" onclick="openPage('fighter');">Turn-Based Fighter</div>
+      <div id="leaderboardsTab" class="tab" onclick="openPage('leaderboards');">Leaderboards</div>
     </div>
-    <div id="teacherTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/advanced/teacher.png') }}" class="icon"> Teacher</div>
+    <div id="teacherTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/advanced/teacher.png') }}" class="icon"> <span class="tabText">Teacher</span></div>
     <div id="teacherMenu" class="menu hidden" tabindex="-1">
       <div id="needshelpTab" class="tab" onclick="openPage('needshelp');">Help tickets</div>
       <div id="settingsTab" class="tab" onclick="openPage('settings');">Settings</div>
       <div id="usersTab" class="tab" onclick="openPage('users');">User list</div>
       <div id="lessonTab" class="tab" onclick="openPage('lesson');">Lesson</div>
+      <div id="virtualbarTab" class="tab" onclick="openPage('virtualbar');">Virtual bar</div>
     </div>
-    <div id="debugTab" class="tab" onclick="openPage('debug');"><img src="{{ url_for('static', filename='img/advanced/debug.png') }}" class="icon"> API debugging</div>
-    <div id="reload" class="tab" style="margin-left: auto;" onclick="document.getElementById('innerPage').contentWindow.location.reload();"><img src="{{ url_for('static', filename='img/advanced/reload.png') }}" class="icon"> Reload inner page</div>
+    <div id="debugTab" class="tab" onclick="openPage('debug');"><img src="{{ url_for('static', filename='img/advanced/debug.png') }}" class="icon"> <span class="tabText">Debug data</span></div>
+    <div id="reload" class="tab" style="margin-left: auto;" onclick="document.getElementById('innerPage').requestFullscreen();"><img src="{{ url_for('static', filename='img/advanced/fullscreen.png') }}" class="icon"> <span class="tabText">Fullscreen</span></div>
   </div>
 
   <div>
-    <iframe src="/chat" id="innerPage" onload="pageOpened(this.contentWindow.location.pathname);"></iframe>
+    <iframe id="innerPage" onload="if (this.contentWindow.location.pathname.startsWith('/')) pageOpened(this.contentWindow.location.pathname);"></iframe>
   </div>
 </div>
 {% endblock %}
@@ -401,32 +363,63 @@
 {% block script %}
 <script src="{{ url_for('static', filename='js/home.js') }}"></script>
 <script>
-  let bottom = document.getElementById("bottom");
+  let other = document.getElementById("otherSidebar");
+  let sbSections = ["formbar", "chat", "other"];
+  let tabLabels = Array.from(document.querySelectorAll(".tabText"));
   let menus = ["students", "games", "teacher"];
   let innerPage = document.getElementById("innerPage");
+  let sidebar = "formbar";
   let innerPageTitle;
-  let segment;
-  let gradient;
   let urlOpen;
-  let newMessages = 0;
   let username = "{{ username }}";
-  let pixRes = getResponse("/getpix");
-  let barpix = eval(pixRes.pixels);
 
-  menuPositions();
-  updateVotes();
-  nowPlaying();
-  getUsername();
-  showEnabled();
-  bottomPosition();
-  openPage("chat");
-  setInterval(() => {
+  function init() {
+    menuPositions();
+    minimizeTabs();
+    nowPlaying();
+    updateVolume();
+    getUsername();
+    showEnabled();
+    grayOutTabs();
+    updateVotes();
+    listSounds("{{ sfx }}");
+    listMusic("{{ bgm }}");
+    segmentNumbers();
+  }
+  getApiData(true);
+
+  function update() {
     checkIfRemoved();
-    //updateVotes();
-    //nowPlaying();
-    //showEnabled();
-    //bottomPosition();
-  }, 1000);
+    updateVotes();
+    showEnabled();
+    grayOutTabs();
+    nowPlaying();
+    updateVolume();
+    checkIfExcluded();
+  };
+  setInterval(getApiData, 1000);
+
+  window.addEventListener("resize", minimizeTabs);
+
+  openPage("{{ page }}" || "chat"); //If there is no "page" param, go to the main page
+
+  function changeSidebar(id) {
+    sidebar = id;
+    sbSections.forEach(section => {
+      if (section == id) {
+        document.getElementById(section + "Sidebar").classList.remove("hidden");
+        document.getElementById(section + "Button").classList.add("pressed");
+      } else {
+        document.getElementById(section + "Sidebar").classList.add("hidden");
+        document.getElementById(section + "Button").classList.remove("pressed");
+      }
+    });
+    if (id == "chat") {
+      document.title = `${innerPageTitle} - Formbar`;
+      document.getElementById("newMessages").innerText = null;
+      newMessages = 0;
+    }
+  }
 
   function showEnabled() {
     let tutdDiv = document.getElementById("tutdDiv");
@@ -436,19 +429,19 @@
     let textDiv = document.getElementById("textDiv");
     let colorDiv = document.getElementById("colorDiv");
 
-    let modeRes = getResponse("/getmode");
     let mode = modeRes.mode;
+    let myPerms = meRes.perms;
+    let studentPerms = permsRes.student;
 
-    if (mode == "tutd") tutdDiv.classList.remove("hidden");
+    if (mode == "tutd" && myPerms == permsRes.student) tutdDiv.classList.remove("hidden");
     else tutdDiv.classList.add("hidden");
 
-    if (mode == "abcd") abcdDiv.classList.remove("hidden");
+    if (mode == "abcd" && myPerms == permsRes.student) abcdDiv.classList.remove("hidden");
     else abcdDiv.classList.add("hidden");
 
-    let meRes = getResponse("/getme");
-    let myPerms = meRes.perms;
+    if (mode == "text" && myPerms == permsRes.student) responseDiv.classList.remove("hidden");
+    else responseDiv.classList.add("hidden");
 
-    let permsRes = getResponse("/getpermissions");
     let sfxPerm = permsRes.sfx;
     let bgmPerm = permsRes.bgm;
     let ledPerm = permsRes.bar;
@@ -466,18 +459,28 @@
     }
   }
 
-  function bottomPosition() {
-    let sbc = document.getElementById("sidebarContent");
-    if (sbc.clientHeight > window.innerHeight - bottom.clientHeight) {
-      bottom.style.position = "static";
-      bottom.style.padding = 0;
-    } else {
-      bottom.style.position = "absolute";
-      bottom.style.padding = "inherit";
-    }
+  function grayOutTabs() {
+    ["help", "break"].forEach(tab => {
+      let cl = document.getElementById(tab + "Tab").classList;
+      meRes.perms === permsRes.teacher ? cl.add("unselectable") : cl.remove("unselectable");
+    });
+    ["2048", "bitshifter", "hangman", "minesweeper", "speedtype", "ttt", "towerdefense", "fighter"].forEach(tab => {
+      let cl = document.getElementById(tab + "Tab").classList;
+      meRes.perms > permsRes.games ? cl.add("unselectable") : cl.remove("unselectable");
+    });
+    ["needshelp", "settings", "users", "lesson"].forEach(tab => {
+      let cl = document.getElementById(tab + "Tab").classList;
+      meRes.perms > permsRes.teacher ? cl.add("unselectable") : cl.remove("unselectable");
+    });
   }
 
-  window.addEventListener("resize", bottomPosition);
+  function minimizeTabs() {
+    let container = document.getElementById("tabs");
+    tabLabels.forEach(label => label.classList.remove("hidden"));
+    //If container has overflow, show only icons
+    if (container.scrollHeight > container.clientHeight) tabLabels.forEach(label => label.classList.add("hidden"));
+
+  }
 
   function menuPositions() {
     menus.forEach(menu => {
@@ -490,168 +493,29 @@
 
   function getUsername() {
     let nameBox = document.getElementById("name");
-    let oldHeight = bottom.clientHeight;
+    let oldHeight = other.clientHeight;
     nameBox.innerText = username;
-    let meRes = getResponse("/getme");
+    nameBox.onclick = () => openPage("profile");
     let myPerms = meRes.perms;
-    let guestBox = document.getElementById("guest");
-    myPerms == 3 ? guestBox.innerText = "(guest)" : guestBox.innerText = null;
-    if (bottom.clientHeight > oldHeight) shorten(bottom, oldHeight, nameBox);
-    else nameBox.removeAttribute("title");
-  }
-
-  function checkIfRemoved() {
-    //If the user is removed by the teacher, send them back to the login page
-    let res = getResponse("/getme");
-    if (res.error == "You are not logged in.") window.location = "/login?alert=You have been logged out.";
-  }
-
-  function shorten(container, maxHeight, text) {
-    //Set title to original string
-    let original = text.innerText;
-    //Remove characters while string is too long
-    while (container.clientHeight > maxHeight) text.innerText = text.innerText.substring(0, text.innerText.length - 2) + "…";
-    text.title = original;
-    text.style.cursor = "help";
-  }
-
-  let sfx = eval("{{ sfx }}".replaceAll("&#39;", "'"));
-
-  sfx.forEach(sound => document.getElementById("sfxFiles").innerHTML += "<option value='" + sound + "'></option>");
-
-  function sendSound() {
-    let soundFile = document.getElementById("sound").value;
-    request.open("GET", "/sfx?file=" + soundFile);
-    request.send();
-    if (sfx.includes(soundFile)) document.getElementById("sound").value = null;
-    else alert("File does not exist");
-  }
-
-  document.getElementById("sound").addEventListener("keydown", event => {
-    if (event.code == "Enter") sendSound();
-  });
-
-  document.getElementById("volume").addEventListener("input", () => {
-    let volume = document.getElementById("volume").value;
-    if (volume == 0 || volume == 1) volume += ".0";
-    document.getElementById("volNumber").innerText = volume;
-  });
-
-  let bgm = eval("{{ bgm }}".replaceAll("&#39;", "'"));
-
-  bgm.forEach(song => document.getElementById("bgmFiles").innerHTML += "<option value='" + song + "'></option>");
-
-  function randomBGM() {
-    document.getElementById("music").value = bgm[Math.floor(Math.random() * bgm.length)];
-  }
-
-  function sendMusic() {
-    let musicFile = document.getElementById("music").value;
-    let volume = document.getElementById("volume").value;
-    if (volume == 0 || volume == 1) volume += ".0";
-    request.open("GET", "/bgm?file=" + musicFile + "&volume=" + volume);
-    request.send();
-    if (bgm.includes(musicFile)) document.getElementById("music").value = null;
-    else alert("File does not exist");
-  }
-
-  document.getElementById("music").addEventListener("keydown", event => {
-    if (event.code == "Enter") sendMusic();
-  });
-
-  function nowPlaying() {
-    //Get current song from server
-    let res = getResponse("/getbgm");
-    let songName = res.bgm;
-
-    let np = document.getElementById("nowPlaying");
-    let npTitle = document.getElementById("nowPlayingTitle");
-
-    //If a song is currently playing
-    if (songName) {
-      //Show "Now Playing"
-      np.classList.remove("hidden");
-      npTitle.innerText = songName;
-      if (np.clientHeight > 21) shorten(np, 21, npTitle);
-      else np.removeAttribute("title");
+    if (other.clientHeight > oldHeight) {
+      shorten(other, oldHeight, nameBox);
+    } else {
+      nameBox.removeAttribute("title");
+      nameBox.style.cursor = null;
     }
-    //If no song is playing, hide
-    else np.classList.add("hidden");
   }
 
-  function stopMusic() {
-    request.open("GET", "/bgmstop");
-    request.send();
-  }
-
-  function sendText() {
-    let text = document.getElementById("text").value;
-    //Replace spaces with underscores
-    text = text.replace(/\s/g, "_");
-    //If input is blank, replace with underscore
-    if (!text) text = "_";
-    request.open("GET", "/say?phrase=" + text);
-    request.send();
-    document.getElementById("text").value = null;
-  }
-
-  document.getElementById("text").addEventListener("keydown", event => {
-    if (event.code == "Enter") sendText();
-  });
-
-  function hideSegment() {
-    segment = false;
-    document.getElementById("segment").classList.add("hidden");
-  }
-
-  function showSegment() {
-    segment = true;
-    document.getElementById("segment").classList.remove("hidden");
-  }
-
-  function validNumber(el) {
-    //Convert value to integer within range
-    let number = parseInt(el.value);
-    if (number < el.min || isNaN(number)) el.value = el.min;
-    else if (number > el.max) el.value = el.max;
-    else el.value = number;
-  }
-
-  document.getElementById("segmentStart").max = barpix.length;
-  document.getElementById("segmentEnd").max = barpix.length;
-  document.getElementById("segmentEnd").value = barpix.length;
-
-  function hideColor2() {
-    gradient = false;
-    document.getElementById("color1Heading").classList.add("hidden");
-    document.getElementById("color2Div").classList.add("hidden");
-  }
-
-  function showColor2() {
-    gradient = true;
-    document.getElementById("color1Heading").classList.remove("hidden");
-    document.getElementById("color2Div").classList.remove("hidden");
-  }
-
-  function sendColor() {
-    let start = document.getElementById("segmentStart").value;
-    let end = document.getElementById("segmentEnd").value;
-    let hex1 = document.getElementById("color1").value.slice(1);
-    let hex2 = document.getElementById("color2").value.slice(1);
-    if (!segment) {
-      start = 0;
-      end = barpix.length;
+  function checkIfExcluded() {
+    let exclBox = document.getElementById("excluded");
+    let nameBox = document.getElementById("name");
+    let oldHeight = other.clientHeight;
+    if (meRes.excluded) exclBox.innerText = " (excluded)";
+    if (other.clientHeight > oldHeight) {
+      shorten(other, oldHeight, nameBox);
+    } else {
+      nameBox.removeAttribute("title");
+      nameBox.style.cursor = null;
     }
-    if (!gradient) hex2 = hex1;
-    request.open("GET", "/segment?start=" + start + "&end=" + end + "&hex=" + hex1 + "&hex2=" + hex2);
-    request.send();
-    document.getElementById("segmentStart").value = 0;
-    document.getElementById("segmentEnd").value = barpix.length;
-  }
-
-  function feedback() {
-    let addresses = "csmith@ytech.edu,john2022026@live.ytech.edu,chris2023608@live.ytech.edu,john2023219@live.ytech.edu,jaysi2023227@live.ytech.edu";
-    window.open(`mailto:${addresses}?subject=Formbar Feedback`);
   }
 
   function openPage(page) {
@@ -666,21 +530,22 @@
     let content = innerPage.contentWindow.document.body.innerHTML;
     innerPageTitle = innerPage.contentWindow.document.title;
     document.title = `${innerPageTitle} - Formbar`;
+    window.history.pushState({}, '', "?page=" + path.slice(1)); //Update the URL to include the title
     let tabs = document.querySelectorAll(".tab");
     let tabEl = document.getElementById(path.substring(1) + "Tab");
     if (!content) openPage("chat?alert='Page does not exist.'");
     Array.from(tabs).forEach(tab => tab.classList.remove("open"));
-    if (["/break", "/help"].includes(path)) document.getElementById("studentsTab").classList.add("open");
-    if (["/2048", "/hangman", "/minesweeper", "/speedtype", "/ttt", "/fighter"].includes(path)) document.getElementById("gamesTab").classList.add("open");
-    else if (["/needshelp", "/lesson", "/settings", "/users"].includes(path)) document.getElementById("teacherTab").classList.add("open");
+    if (["/help", "/break"].includes(path)) document.getElementById("studentsTab").classList.add("open");
+    if (["/2048", "/bitshifter", "/hangman", "/minesweeper", "/speedtype", "/ttt", "/towerdefense", "/fighter", "/leaderboards"].includes(path)) document.getElementById("gamesTab").classList.add("open");
+    if (["/needshelp", "/settings", "/users", "/lesson", "/virtualbar"].includes(path)) document.getElementById("teacherTab").classList.add("open");
     if (tabEl) tabEl.classList.add("open");
-    if (path == "/advanced" || path == "/basic") openPage("chat");
+    if (["/abcd", "/advanced", "/home", "/mobile", "/quickpanel", "/textresponse", "/tutd"].includes(path)) openPage("chat");
     if (path == "/chat") {
       newMessages = 0;
       document.getElementById("newMessages").innerText = null;
+      newMessages = 0;
       menuPositions();
     }
-    /*Change page title here*/
   }
 
   function showMenu(name) {
@@ -722,8 +587,8 @@
 
   ws.onmessage = message => {
     let data = JSON.parse(message.data);
-    if (data.type == 'message' || data.type == 'alert') {
-      if (document.hidden || !innerPage.contentWindow.location.pathname == "/chat") {
+    if (data.type == "message") {
+      if (document.hidden || (innerPage.contentWindow.location.pathname != "/chat" && sidebar != "chat")) {
         newMessages++;
         document.title = `(${newMessages}) ${innerPageTitle} - Formbar`;
         if (innerPage.contentWindow.location.pathname != "chat") {
@@ -732,8 +597,203 @@
         }
       }
     }
+  };
+
+  //When user goes to this page, if chat is open, remove number of new messages from title
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && (innerPage.contentWindow.location.pathname == "/chat" || sidebar == "chat")) {
+      document.title = `${innerPageTitle} - Formbar`;
+      document.getElementById("newMessages").innerText = null;
+      newMessages = 0;
+    }
+  });
+
+  function listSounds(files) {
+    sfx = eval(files.replaceAll("&#39;", "'"));
+    sfx = sfx.filter(file => !file.startsWith("sfx_"));
+    sfx.forEach(sound => document.getElementById("sfxFiles").innerHTML += "<option value='" + sound + "'></option>");
   }
 
-  document.addEventListener("visibilitychange", () => {if (!document.hidden && innerPage.contentWindow.location.pathname == "chat") document.title = `${innerPageTitle} - Formbar`}); //When user goes to this page, if chat is open, remove number of new messages from title
+  async function sendSound() {
+    let soundFile = document.getElementById("sound").value;
+    let res = await getResponse("/sfx?file=" + soundFile, false);
+    if (sfx.includes(soundFile)) res == permsError ? alert(res) : document.getElementById("sound").value = null;
+    else alert("File does not exist");
+  }
+
+  document.getElementById("sound").addEventListener("keydown", event => {
+    if (event.code == "Enter") sendSound();
+  });
+
+  document.getElementById("volume").addEventListener("input", () => {
+    let volume = document.getElementById("volume").value;
+    if (volume == 1) volume += ".0";
+    document.getElementById("volNumber").innerText = volume;
+  });
+
+  document.getElementById("volume").addEventListener("change", () => {
+    let volume = document.getElementById("volume").value;
+    if (volume == 1) volume += ".0";
+    request.open("GET", "/bgm?voladj=" + volume);
+    request.send();
+  });
+
+  function disableVolume() {
+    let el = document.getElementById("volume");
+    meRes.perms > permsRes.bgm ? el.disabled = true : el.disabled = false;
+  }
+
+  function listMusic(files) {
+    bgm = eval(files.replaceAll("&#39;", "'"));
+    bgm.forEach(song => document.getElementById("bgmFiles").innerHTML += "<option value='" + song + "'></option>");
+  }
+
+  function randomBGM() {
+    document.getElementById("music").value = bgm[Math.floor(Math.random() * bgm.length)];
+  }
+
+  async function sendMusic() {
+    let musicFile = document.getElementById("music").value;
+    let volume = document.getElementById("volume").value;
+    if (volume == 1) volume = "1.0";
+    let res = await getResponse("/bgm?file=" + musicFile + "&volume=" + volume, false);
+    if (bgm.includes(musicFile)) {
+      (res.startsWith("It has only been") || res == permsError) ? alert(res) : document.getElementById("music").value = null;
+    } else {
+      alert("File does not exist");
+    }
+  }
+
+  document.getElementById("music").addEventListener("keydown", event => {
+    if (event.code == "Enter") sendMusic();
+  });
+
+  function nowPlaying() {
+    //Get current song from server
+    let songName = bgmRes.bgm;
+    let paused = bgmRes.paused;
+
+    let md = document.getElementById("musicDiv");
+    let np = document.getElementById("nowPlaying");
+    let npTitle = document.getElementById("nowPlayingTitle");
+    let controls = document.getElementById("musicControls");
+    let playPause = document.getElementById("playPauseMusic");
+
+    //If a song is currently playing
+    if (songName) {
+      //Show "Now Playing"
+      if (songName != npTitle.innerText) {
+        np.classList.remove("hidden");
+        let oldHeight = np.clientHeight;
+        let oldWidth = md.clientWidth;
+        npTitle.innerText = songName;
+        if (np.clientHeight > oldHeight || md.clientWidth > oldWidth) {
+          shorten(np, oldHeight, npTitle, oldWidth);
+        } else {
+          np.removeAttribute("title");
+          np.cursor = null;
+        }
+        controls.classList.remove("hidden");
+      }
+    } else {
+      //If no song is playing, hide
+      np.classList.add("hidden");
+      controls.classList.add("hidden");
+    }
+
+    if (paused) {
+      playPause.title = "Play";
+    } else {
+      playPause.title = "Pause";
+    }
+  }
+
+  function updateVolume() {
+    if (document.getElementById("volume") != document.activeElement) {
+      let volume = bgmRes.volume;
+      document.getElementById("volume").value = volume;
+      document.getElementById("volNumber").innerText = volume;
+    }
+  }
+
+  async function playPauseMusic() {
+    let res = await getResponse("/bgm?playpause=true", false);
+    if (res == permsError) alert(res);
+  }
+
+  async function restartMusic() {
+    let res = await getResponse("/bgm?rewind=true", false);
+    if (res == permsError) alert(res);
+  }
+
+  async function stopMusic() {
+    let res = await getResponse("/bgmstop", false);
+    if (res == permsError) alert(res);
+  }
+
+  async function sendText() {
+    let text = document.getElementById("text").value;
+    let fg = document.getElementById("fgColor").value.slice(1);
+    let bg = document.getElementById("bgColor").value.slice(1);
+    //If input is blank, replace with underscore
+    text ||= "_";
+    let res = await getResponse("/say?phrase=" + text + "&fg=" + fg + "&bg=" + bg, false);
+    res == permsError ? alert(res) : document.getElementById("text").value = null;
+  }
+
+  document.getElementById("text").addEventListener("keydown", event => {
+    if (event.code == "Enter") sendText();
+  });
+
+  function segmentNumbers() {
+    barpix = eval(pixRes.pixels);
+    document.getElementById("segmentStart").max = barpix.length;
+    document.getElementById("segmentEnd").max = barpix.length;
+    document.getElementById("segmentEnd").value = barpix.length;
+  }
+
+  function hideSegment() {
+    segment = false;
+    document.getElementById("segment").classList.add("hidden");
+  }
+
+  function showSegment() {
+    segment = true;
+    document.getElementById("segment").classList.remove("hidden");
+  }
+
+  function validNumber(el) {
+    //Convert value to integer within range
+    let number = parseInt(el.value);
+    if (number < el.min || isNaN(number)) el.value = el.min;
+    else if (number > el.max) el.value = el.max;
+    else el.value = number;
+  }
+
+  function hideColor2() {
+    gradient = false;
+    document.getElementById("color1Heading").classList.add("hidden");
+    document.getElementById("color2Div").classList.add("hidden");
+  }
+
+  function showColor2() {
+    gradient = true;
+    document.getElementById("color1Heading").classList.remove("hidden");
+    document.getElementById("color2Div").classList.remove("hidden");
+  }
+
+  async function sendColor() {
+    let start = document.getElementById("segmentStart").value;
+    let end = document.getElementById("segmentEnd").value;
+    let hex1 = document.getElementById("color1").value.slice(1);
+    let hex2 = document.getElementById("color2").value.slice(1);
+    if (!segment) {
+      start = 0;
+      end = barpix.length;
+    }
+    if (!gradient) hex2 = hex1;
+    let res = await getResponse("/segment?start=" + start + "&end=" + end + "&hex=" + hex1 + "&hex2=" + hex2, false);
+    if (res == permsError) alert(res);
+  }
 </script>
 {% endblock %}

@@ -13,6 +13,7 @@
   body {
       background-color: var(--bg-dark-blue);
   }
+
   h1 {
     text-align: center;
   }
@@ -27,7 +28,8 @@
       margin: auto;
   }
 
-  #content, #homebutton{
+  #content{
+      position: relative;
       border-radius: 10px;
       margin: auto;
       padding: 10px;
@@ -102,6 +104,21 @@
      border-radius: 5px;
      overflow-x:auto;
   }
+
+  #home {
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    color: var(--color-red);
+    font-size: 20px;
+    font-weight: bold;
+    text-decoration: none;
+    position: cursor;
+  }
+
+  #home:hover {
+    color: black;
+  }
 </style>
 {% endblock %}
 
@@ -113,6 +130,7 @@
 {% block main %}
 {{ prompt|safe }}
 <div id="content" class="light">
+  <a href="/home" id="home">🡄 Home</a>
   <h2>Thumbs</h2>
   <div class="container1-flex">
       <div class="bigbutton bb-green" onclick="window.location = '/tutd?thumb=up';">

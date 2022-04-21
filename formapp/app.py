@@ -2195,7 +2195,7 @@ def endpoint_textresponse():
             else:
                 return "Not in text response mode."
         else:
-            return render_template('textresponse.html')
+            return render_template('thumbsrental.html')
 
 @app.route('/towerdefense')
 def endpoint_towerdefense():

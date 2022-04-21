@@ -154,7 +154,9 @@
 <script src="../static/jquery/jquery-ui.min.js" charset="utf-8"></script>
 <script>
     $(function() {
-        $("#tabcontainer").accordion();
+        $("#tabcontainer").accordion({
+          heightStyle: "content"
+        });
     });
 </script>
 {% endblock %}
@@ -219,10 +221,13 @@
           <div class="entrylink -yellow light" onclick="window.location = '/minesweeper';">
               Minesweeper (/minesweeper)
           </div>
-          <div class="entrylink -green light" onclick="window.location = '/towerdefense';">
+          <div class="entrylink -green light" onclick="window.location = '/speedtype';">
+              Speed Typer (/speedtype)
+          </div>
+          <div class="entrylink -blue light" onclick="window.location = '/towerdefense';">
               Tower Defense (/towerdefense)
           </div>
-          <div class="entrylink -blue light" onclick="window.location = '/leaderboards';">
+          <div class="entrylink -red light" onclick="window.location = '/leaderboards';">
               Leaderboards (/leaderboards)
           </div>
       </div>

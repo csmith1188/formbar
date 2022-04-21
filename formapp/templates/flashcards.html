@@ -63,14 +63,12 @@
       left: 25%;
       position: absolute;
       width: 350px; */
-      text-align: left;
-      margin: auto;
-      padding-top: 50px;
+      padding-top: 0px;
       padding-bottom: 50px;
       top: 100px;
       left: 25%;
       text-align: center;
-      width: 50%;
+      width: 100%;
     }
 
     #cardPrompt {
@@ -82,8 +80,10 @@
     }
 
     #button {
-      text-align: center;
+      position: relative;
+      bottom: 30px;
     }
+
     #results {
       text-align: center;
       margin: auto;
@@ -539,7 +539,6 @@
       results.innerHTML = '';
       score.innerHTML = `Draw Pile: ${data.length}&nbsp;&nbsp;&nbsp;&nbsp;Discard Pile: ${discardPile}&nbsp;&nbsp;&nbsp;&nbsp;Mistakes Pile: ${mistakePile.length}`;
       document.getElementById("button").innerText = "Submit";
-      document.getElementById("button").onclick = submitCard;
     }
 
     function submitCard() {
@@ -573,39 +572,37 @@
     }
 
     function submitChoice() {
-      if (cardSubmitted) {
-        results.innerHTML = 'You already submitted this card!'
-      } else {
-        cardSubmitted = true;
-        var ele = document.getElementsByName('choice')
-        for (i = 0; i < ele.length; i++) {
-          if (ele[i].checked)
-            var eleValue = +ele[i].value
+      cardSubmitted = true;
+      var ele = document.getElementsByName('choice')
+      for (i = 0; i < ele.length; i++) {
+        if (ele[i].checked)
+          var eleValue = +ele[i].value
+      }
+      if (data.length) {
+        if (data[cardIndex].key === eleValue) {
+          console.log("Correct")
+          results.innerHTML = `<span style="color: var(--light-green); font-family: system, consolas;">` + data[cardIndex].answers[data[cardIndex].key - 1] + `</span>`;
+          discardPile++;
+          data.splice(cardIndex, 1)
+        } else {
+          console.log("You SUCK")
+          results.innerHTML = `<span style="color: var(--light-red); font-family: system, consolas;">` + data[cardIndex].answers[data[cardIndex].key - 1] + `</span>`;
+          mistakePile.push(data.splice(cardIndex, 1)[0]);
         }
-        if (data.length) {
-          if (data[cardIndex].key === eleValue) {
-            console.log("Correct")
-            results.innerHTML = `<span style="color: var(--light-green); font-family: system, consolas;">` + data[cardIndex].answers[data[cardIndex].key - 1] + `</span>`;
-            discardPile++;
-            data.splice(cardIndex, 1)
-          } else {
-            console.log("You SUCK")
-            results.innerHTML = `<span style="color: var(--light-red); font-family: system, consolas;">` + data[cardIndex].answers[data[cardIndex].key - 1] + `</span>`;
-            mistakePile.push(data.splice(cardIndex, 1)[0]);
-          }
-        } else if (mistakePile.length) {
-          if (mistakePile[cardIndex].key === eleValue) {
-            console.log("Correct")
-            results.innerHTML = `<span style="color: var(--light-green); font-family: system, consolas;">` + mistakePile[cardIndex].answers[mistakePile[cardIndex].key - 1] + `</span>`;
-            discardPile++;
-            mistakePile.splice(cardIndex, 1)
-          } else {
-            console.log("You SUCK")
-            results.innerHTML = `<span style="color: var(--light-red); font-family: system, consolas;">` + mistakePile[cardIndex].author[2][mistakePile[cardIndex].author[4] - 1] + `</span>`;
-            mistakePile.push(mistakePile.splice(cardIndex, 1)[0]);
-          }
+      } else if (mistakePile.length) {
+        if (mistakePile[cardIndex].key === eleValue) {
+          console.log("Correct")
+          results.innerHTML = `<span style="color: var(--light-green); font-family: system, consolas;">` + mistakePile[cardIndex].answers[mistakePile[cardIndex].key - 1] + `</span>`;
+          discardPile++;
+          mistakePile.splice(cardIndex, 1)
+        } else {
+          console.log("You SUCK")
+          results.innerHTML = `<span style="color: var(--light-red); font-family: system, consolas;">` + mistakePile[cardIndex].author[2][mistakePile[cardIndex].author[4] - 1] + `</span>`;
+          mistakePile.push(mistakePile.splice(cardIndex, 1)[0]);
         }
       }
+      document.getElementById("button").innerText = "Next card";
+      document.getElementById("button").onclick = nextCard;
     }
 
     function questionType(questionList) {
@@ -618,6 +615,7 @@
       if (questionList[cardIndex].type === 'text') {
         answerBox.style.display = "block"
         multChoiceBtn.style.display = "none"
+        document.getElementById("button").onclick = submitCard;
       } else if (questionList[cardIndex].type === 'multi') {
         answerBox.style.display = "none"
         multChoiceBtn.style.display = "block"
@@ -626,6 +624,7 @@
         multchoice2.innerHTML = xyz[1];
         multchoice3.innerHTML = xyz[2];
         multchoice4.innerHTML = xyz[3];
+        document.getElementById("button").onclick = submitChoice;
       }
     }
 

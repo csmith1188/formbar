@@ -49,19 +49,19 @@
   <form method="post">
     <label>
       <div>
-        <input type="radio" id="standard" name="mode" value="standard"><h3>Standard</h3><br>
+        <input type="radio" id="standard" name="page" value="standard"><h3>Standard</h3><br>
         <span>A menu with links to other pages. Recommended for new users.</span><br>
       </div>
     </label><br>
     <label>
       <div>
-        <input type="radio" id="advanced" name="mode" value="advanced"><h3>Advanced</h3><br>
+        <input type="radio" id="advanced" name="page" value="advanced"><h3>Advanced</h3><br>
         <span>A compact page that includes all features.</span><br>
       </div>
     </label><br>
     <label>
       <div>
-        <input type="radio" id="quickpanel" name="mode" value="quickpanel"><h3>Quick panel</h3><br>
+        <input type="radio" id="quickpanel" name="page" value="quickpanel"><h3>Quick panel</h3><br>
         <span>A page where you can easily access the most-used features. There are separate versions for students and teachers.</span><br>
       </div>
     </label><br>
@@ -72,6 +72,7 @@
 <!-- Extra JavaScript here -->
 {% block script %}
   <script>
-    "{{ pm }}" == "advanced" ? document.getElementById("advanced").checked = true : document.getElementById("basic").checked = true;
+    let checked = ("{{ pm }}" == "None") ? "standard" : "{{ pm }}";
+    document.getElementById(checked).checked = true;
   </script>
 {% endblock %}

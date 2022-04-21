@@ -4,6 +4,7 @@
 
 <!-- Change title here -->
 {% block title %}Formbar Home{% endblock %}
+{% block color %}blue{% endblock %}
 {% block style %}
 <style>
   body {
@@ -11,6 +12,10 @@
   }
   h1 {
     text-align: center;
+  }
+
+  h2 {
+    margin-top: 32px;
   }
 
   #quickmenu {
@@ -25,7 +30,6 @@
       padding: 10px;
       max-width: 600px;
       background-color: var(--light-blue);
-      color: var(--bg-darker);
   }
 
   .container1-flex {
@@ -47,12 +51,13 @@
       width: 100px;
       height: 100px;
       border-radius: 20px;
-      border: 5px outset #eeeeee;
+      border: 2px solid black;
       background-color: var(--dark-gray);
       font-size: 1.2em;
       font-weight: bolder;
       text-align: center;
-      box-shadow: 5px 5px #333333;
+      box-shadow: 8px 8px var(--dark-gray);
+      cursor: pointer;
   }
 
   .smallbutton {
@@ -68,27 +73,22 @@
   }
 
   .bb-green {
-      border: 5px outset #eeffee;
-      background-color: #ccffcc;
+      background-color: #bfb;
   }
 
   .bb-yellow {
-      border: 5px outset #ffffee;
-      background-color: #ffffcc;
+      background-color: #ffb;
   }
 
   .bb-blue {
-      border: 5px outset #eeeeff;
-      background-color: #ccccff;
+      background-color: #bdf;
   }
 
   .bb-red {
-      border: 5px outset #ffeeee;
-      background-color: #ffcccc;
+      background-color: #fbb;
   }
 
   .bigbutton:hover, .smallbutton:hover {
-      border: 5px outset #eeeeee;
       background-color: #ffffff;
   }
 
@@ -132,19 +132,19 @@
   }
 
   .-green {
-      background-color: #ccffcc;
+      background-color: #bfb;
   }
 
   .-yellow {
-      background-color: #ffffcc;
+      background-color: #ffb;
   }
 
   .-blue {
-      background-color: #ccccff;
+      background-color: #bdf;
   }
 
   .-red {
-      background-color: #ffcccc;
+      background-color: #fbb;
   }
 
 </style>
@@ -159,9 +159,9 @@
 </script>
 {% endblock %}
 {% block main %}
-<div id="content">
+<div id="content" class="light">
   <h1>Formbar</h1>
-  <div id="tabcontainer">
+  <div id="tabcontainer" class="dark blue">
 
       <h3 class="tab">Students</h3>
       <div class="entry">
@@ -174,7 +174,13 @@
           <div class="entrylink -red" onclick="window.location = '/help';">
               Help! (/help)
           </div>
-          <div class="entrylink -yellow" onclick="window.location = '/wawd';">
+          <div class="entrylink -yellow" onclick="window.location = '/break';">
+              Request bathroom break (/break)
+          </div>
+          <div class="entrylink -green" onclick="window.location = '/textresponse';">
+              Text response (/textresponse)
+          </div>
+          <div class="entrylink -blue" onclick="window.location = '/wawd';">
               What Are We Doing? (/wawd)
           </div>
       </div>
@@ -186,10 +192,16 @@
           <div class="entrylink -blue" onclick="window.location = '/sfx';">
               Sound Effects (/sfx)
           </div>
-          <div class="entrylink -red" onclick="window.location = '/expert';">
-              Expert Mode (/expert)
+          <div class="entrylink -red" onclick="window.location = '/advanced';">
+              Advanced homepage (/advanced)
           </div>
-          <div class="entrylink -yellow" onclick="window.location = '/virtualbar';">
+          <div class="entrylink -yellow" onclick="window.location = '/quickpanel';">
+              Quick panel (/quickpanel)
+          </div>
+          <div class="entrylink -green" onclick="window.location = '/setdefault';">
+              Set default homepage (/setdefault)
+          </div>
+          <div class="entrylink -blue" onclick="window.location = '/virtualbar';">
               VirtualBar (/virtualbar)
           </div>
       </div>
@@ -198,14 +210,20 @@
           <div class="entrylink -green" onclick="window.location = '/2048';">
               2048 (/2048)
           </div>
-          <div class="entrylink -blue" onclick="window.location = '/hangman';">
+          <div class="entrylink -blue" onclick="window.location = '/bitshifter';">
+              Bitshifter (/bitshifter)
+          </div>
+          <div class="entrylink -red" onclick="window.location = '/hangman';">
               Hang Man (/hangman)
           </div>
-          <div class="entrylink -red" onclick="window.location = '/ttt';">
-              Tic-Tac-Toe (/ttt)
+          <div class="entrylink -yellow" onclick="window.location = '/minesweeper';">
+              Minesweeper (/minesweeper)
           </div>
-          <div class="entrylink -yellow" onclick="window.location = '/fighter';">
-              Turn-Based Fighter (/fighter)
+          <div class="entrylink -green" onclick="window.location = '/towerdefense';">
+              Tower Defense (/towerdefense)
+          </div>
+          <div class="entrylink -blue" onclick="window.location = '/leaderboards';">
+              Leaderboards (/leaderboards)
           </div>
       </div>
       <h3 class="tab">Teacher</h3>
@@ -219,21 +237,10 @@
           <div class="entrylink -red" onclick="window.location = '/needshelp';">
               Help Tickets (/needshelp)
           </div>
-          <div class="entrylink -red" onclick="window.location = '/debug';">
+          <div class="entrylink -yellow" onclick="window.location = '/debug';">
               API Debug (/debug)
           </div>
       </div>
   </div>
 </div>
-
-<script>
-  //ep will be true if user made expert mode their default
-  let ep = localStorage.getItem("expertPreference");
-  let urlParams = new URLSearchParams(window.location.search);
-  let nr = urlParams.get('noRedirect');
-
-  //Redirect to /expert if ep is true, unless url parameter "noRedirect" is true
-  if (ep && !nr) window.location = "/expert";
-</script>
-
 {% endblock %}

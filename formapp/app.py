@@ -844,7 +844,7 @@ def endpoint_abcd():
             else:
                 return "Not in ABCD mode."
         else:
-            return redirect("/")
+            return render_template("thumbsrental.html")
 
 '''
     /addfighteropponent
@@ -899,6 +899,11 @@ def endpoint_api():
 # ██████
 # ██   ██
 # ██████
+
+
+@app.route('/basic')
+def endpoint_basic():
+    return redirect('/quickpanel')
 
 
 '''
@@ -1185,6 +1190,11 @@ def endpoint_emptyblocks():
         pixels.show()
     return "Emptied blocks"
 '''
+
+
+@app.route('/expert')
+def endpoint_expert():
+    return redirect('/advanced')
 
 # ███████
 # ██
@@ -1677,6 +1687,11 @@ def endpoint_minesweeper():
             bestTime = 0
         return render_template("mnsw.html", cols=cols, rows=rows, dense=dense, bestTime=bestTime)
 
+
+@app.route('/mnsw')
+def endpoint_mnsw():
+    return redirect('/minesweeper')
+
 '''
     /mobile
     Homepage for mobile devices
@@ -1802,6 +1817,7 @@ def endpoint_profile():
                     "hangman": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='hangman' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
                     "minesweeper": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='minesweeper' ORDER BY score ASC", {"uname": user['name']}).fetchone(),
                     "speedtype": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='speedtype' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
+                    "towerdefense": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='towerdefense' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
                 }
                 db.close()
                 return render_template("profile.html", username = user['name'], perms = sD.settings['permname'][user['perms']], bot = user['bot'], highScores = json.dumps(highScores))
@@ -1857,7 +1873,7 @@ def endpoint_quickpanel():
         sounds.append(key)
     for key, value in bgm.bgm.items():
         music.append(key)
-    return render_template("basic.html", sfx = sounds, bgm = music)
+    return render_template("quickpanel.html", sfx = sounds, bgm = music)
 
 
 #takes you to a quiz(literally)
@@ -2015,15 +2031,15 @@ def endpoint_setdefault():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     if request.method == 'POST':
-        if request.form['mode'] == 'standard' or request.form['mode'] == 'advanced' or request.form['mode'] == 'quickpanel':
-            sD.studentDict[request.remote_addr]['preferredHomepage'] = request.form['mode']
+        if request.form['page'] == 'standard' or request.form['page'] == 'advanced' or request.form['page'] == 'quickpanel':
+            sD.studentDict[request.remote_addr]['preferredHomepage'] = request.form['page']
             db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
             dbcmd = db.cursor()
-            dbcmd.execute("UPDATE users SET preferredHomepage=:mode WHERE username=:uname", {"uname": sD.studentDict[request.remote_addr]['name'], "mode": request.form['mode']})
+            dbcmd.execute("UPDATE users SET preferredHomepage=:page WHERE username=:uname", {"uname": sD.studentDict[request.remote_addr]['name'], "page": request.form['page']})
             db.commit()
             db.close()
         else:
-            return 'Invalid mode.'
+            return 'Invalid page.'
         return redirect('/')
     else:
         return render_template('setdefault.html', pm = sD.studentDict[request.remote_addr]['preferredHomepage'])
@@ -2125,6 +2141,11 @@ def endpoint_speedtype():
             highScore = 0
         return render_template("speedtype.html", highScore = highScore)
 
+
+@app.route('/standard')
+def endpoint_standard():
+    return redirect('/home')
+
 #Start a thumbs poll
 @app.route('/startpoll')
 def endpoint_startpoll():
@@ -2148,24 +2169,33 @@ def endpoint_startpoll():
 #    ██
 #    ██
 
+
+@app.route('/td')
+def endpoint_td():
+    return redirect('/towerdefense')
+
+
 '''
 /textresponse
 '''
-@app.route('/textresponse')
+@app.route('/textresponse', methods = ['POST', 'GET'])
 def endpoint_textresponse():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     else:
-        response = request.args.get('response')
-        if sD.settings['barmode'] == 'text':
-            if not response and sD.studentDict[request.remote_addr]['textRes']:
-                #Response unsubmitted
-                playSFX("sfx_hit01")
-            sD.studentDict[request.remote_addr]['textRes'] = response
-            textBar()
-            return "Response submitted."
+        if request.method == 'POST':
+            response = request.args.get('response')
+            if sD.settings['barmode'] == 'text':
+                if not response and sD.studentDict[request.remote_addr]['textRes']:
+                    #Response unsubmitted
+                    playSFX("sfx_hit01")
+                sD.studentDict[request.remote_addr]['textRes'] = response
+                textBar()
+                return "Response submitted."
+            else:
+                return "Not in text response mode."
         else:
-            return "Not in text response mode."
+            return render_template('textresponse.html')
 
 @app.route('/towerdefense')
 def endpoint_towerdefense():
@@ -2240,7 +2270,7 @@ def endpoint_tutd():
             else:
                 return "Not in TUTD mode."
         else:
-            return redirect("/")
+            return render_template("thumbsrental.html")
 
 # ██    ██
 # ██    ██

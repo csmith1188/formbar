@@ -1,0 +1,121 @@
+{% extends 'header.html' %}
+<!-- ^^ This means add this file to the end of the contents of header.html -->
+<!-- This is where the title, top buttons, and stylesheet is located -->
+
+<!-- Change title here -->
+{% block title %}Text response{% endblock %}
+
+<!-- Extra style declarations here -->
+{% block style %}
+<style>
+    body {
+        background-color: var(--bg-dark-blue);
+    }
+    h1 {
+      text-align: center;
+    }
+
+    h2 {
+      margin-top: 32px;
+    }
+
+    #quickmenu {
+        text-align: center;
+        justify-content: center;
+        margin: auto;
+    }
+
+    #content, #homebutton{
+        border-radius: 10px;
+        margin: auto;
+        padding: 10px;
+        max-width: 600px;
+        background-color: var(--light-blue);
+        text-align: center;
+    }
+
+    .container1-flex {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+    }
+
+    .container2-flex {
+        display: flex;
+        justify-content: space-around;
+        flex-grow: 1;
+    }
+
+
+    .bigbutton, .smallbutton {
+        margin: auto;
+        padding: 10px;
+        width: 100px;
+        height: 100px;
+        border-radius: 20px;
+        border: 2px solid black;
+        background-color: var(--dark-gray);
+        font-size: 1.2em;
+        font-weight: bolder;
+        text-align: center;
+        box-shadow: 8px 8px var(--dark-gray);
+        cursor: pointer;
+    }
+
+    .smallbutton {
+      width: 25px;
+      height: 25px;
+      border-radius: 10px;
+      font-size: 0.6em;
+    }
+
+    .bigbutton a {
+      margin: auto;
+      vertical-align: middle;
+    }
+
+    .bb-green {
+        background-color: #bfb;
+    }
+
+    .bb-yellow {
+        background-color: #ffb;
+    }
+
+    .bb-blue {
+        background-color: #bdf;
+    }
+
+    .bb-red {
+        background-color: #fbb;
+    }
+
+    .bigbutton:hover, .smallbutton:hover {
+        background-color: #ffffff;
+    }
+
+    .user {
+       background-color: #cccccc;
+       border: 1px solid #000000;
+       border-radius: 5px;
+       overflow-x:auto;
+    }
+  </style>
+{% endblock %}
+
+<!-- Change theme color here -->
+{% block color %}blue{% endblock %}
+
+<!-- Main content here -->
+{% block main %}
+  <div id="content" class="light">
+    <h1>Text response</h1>
+    <form method="POST">
+      <textarea id="response" name="response" rows="4" cols="40" placeholder="Type your response here" oninput="checkResponse();"></textarea><br><br>
+      <input type="submit" id="submitResponse" class="button">
+    </form>
+  </div>
+{% endblock %}
+
+<!-- Extra JavaScript here -->
+{% block script %}{% endblock %}

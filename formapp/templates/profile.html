@@ -30,11 +30,12 @@
     document.body.innerHTML += `
       <h2>High scores</h2>
       <ul>
-          <li><b>2048:</b> ${highScores["2048"] ? highScores["2048"][3] : 0}</li>
-          <li><b>Bitshifter:</b> ${highScores["bitshifter"] ? highScores["bitshifter"][3] : 0}</li>
-          <li><b>Hangman:</b> ${highScores["hangman"] ? highScores["hangman"][3] : 0}</li>
-          <li><b>Minesweeper:</b> ${highScores["minesweeper"] ? highScores["minesweeper"][3] : 0}</li>
-          <li><b>Speed Typer:</b> ${highScores["speedtype"] ? highScores["speedtype"][3] : 0}</li>
+          <li><b>2048:</b> ${highScores["2048"]?.[3] || 0}</li>
+          <li><b>Bitshifter:</b> ${highScores["bitshifter"]?.[3] || 0}</li>
+          <li><b>Hangman:</b> ${highScores["hangman"]?.[3] || 0}</li>
+          <li><b>Minesweeper:</b> ${highScores["minesweeper"]?.[3] || 0}</li>
+          <li><b>Speed Typer:</b> ${highScores["speedtype"]?.[3] || 0}</li>
+          <li><b>Tower Defense objectives:</b> ${highScores["towerdefense"]?.[3] || 0}</li>
       </ul>
     `;
   </script>

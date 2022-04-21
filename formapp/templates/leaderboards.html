@@ -82,6 +82,7 @@
       ["minesweeper", "Minesweeper"],
       ["speedtype", "Speed Typer"],
       //["ttt", "Tic-tac-toe"],
+      ["towerdefense", "Tower Defense"],
       //["fighter", "Turn-Based Fighter"]
     ];
     let game;
@@ -99,13 +100,16 @@
         switch (newGame[0]) {
           case "fighter":
           case "ttt":
-            metric = "Wins"
+            metric = "Wins";
+            break;
+          case "towerdefense":
+            metric = "Maps & achievements";
             break;
           case "minesweeper":
-            metric = "Time"
+            metric = "Time";
             break;
           default:
-            metric = "Score"
+            metric = "Score";
         }
         if (metric == "Time") {
           gameData.reverse();
@@ -121,13 +125,17 @@
           </table>
         `;
 
+        let alreadyInList = [];
         gameData.forEach(score => {
-          document.getElementById("table").innerHTML += `
-            <tr>
-              <td>${score[2]}</td>
-              <td>${score[3]}</td>
-            </tr>
-          `;
+          if (!(newGame[0] == "towerdefense" && alreadyInList.includes(score[2]))) { //One Tower Defense score per username
+            document.getElementById("table").innerHTML += `
+              <tr>
+                <td>${score[2]}</td>
+                <td>${score[3]}</td>
+              </tr>
+            `;
+            alreadyInList.push(score[2]);
+          }
         });
       } else {
         document.getElementById("scores").innerHTML = "<h2>No scores for this game yet</h2>";

@@ -3,7 +3,7 @@
 <!-- This is where the title, top buttons, and stylesheet is located -->
 
 <!-- Change title here -->
-{% block title %}Formbar (Basic Homepage){% endblock %}
+{% block title %}Formbar Quick Panel{% endblock %}
 
 <!-- Extra style declarations here -->
 {% block style %}
@@ -128,23 +128,7 @@
     border-radius: 9999px !important;
   }
 
-  #more {
-    position: absolute;
-    width: 100%;
-    left: 0;
-    top: 25%;
-    display: flex;
-    justify-content: center;
-    font-size: 22px;
-  }
-
-  #more > div {
-    display: inline-block;
-    vertical-align: top;
-    margin: 0 48px;
-  }
-
-  #teacherPanel h1, #more h1 {
+  #teacherPanel h1 {
     font-size: 32px;
     margin: 0 0 4px;
   }
@@ -152,41 +136,6 @@
   #teacherPanel button, #teacherPanel select {
     font-size: 20px;
     margin: 8px 4px;
-  }
-
-  #more .smallImg {
-    width: 33px;
-  }
-
-  #more input[type="color"] {
-    height: 23px;
-  }
-
-  #more h3 {
-    margin: 0 0 10px;
-    font-size: 26px;
-    color: var(--theme-color);
-  }
-
-  #randomMusic {
-    margin: 0 4px 0 0;
-  }
-
-  #nowPlaying {
-    font-size: 18px;
-  }
-
-  #playPauseMusic, #restartMusic, #stopMusic {
-    margin: 0;
-  }
-
-  #text {
-    text-transform: uppercase;
-    font-family: monospace;
-  }
-
-  #color2Div:not(.hidden) {
-    display: inline-block;
   }
 
   #chat {
@@ -209,7 +158,6 @@
 {% block main %}
   <div id="topButtons" class="hidden">
     <button id="panelButton"></button>
-    <button id="moreButton">More</button>
     <button id="chatButton"><b id="newMessages" style="margin: 0;"></b> Chat</button>
   </div>
 
@@ -251,7 +199,7 @@
         <button class="inline popOut" onclick="startPoll('tutd')">Thumbs</button>
         <button class="inline popOut" onclick="startPoll('abcd')">Letters</button>
         <button class="inline popOut" onclick="startPoll('text')">Text response</button><br>
-        <span id="textLink" class="hidden">Click <a onclick="window.open('/advanced?page=users')">here</a> to see responses</span>
+        <span id="textLink" class="hidden">Click <a href="/advanced?page=users">here</a> to see responses</span>
       </div>
       <button class="inline popOut" onclick="window.open('/advanced?page=settings');">All settings 🡆</button>
     </div>
@@ -266,61 +214,6 @@
       <h1>Users</h1>
       <span id="usersText"></span><br>
       <button class="inline popOut" onclick="window.open('/advanced?page=users');">All users 🡆</button>
-    </div>
-  </div>
-
-  <div id="more" class="hidden">
-    <div id="soundDiv">
-      <h1>Sound effects</h1>
-      <input type="text" class="line" id="sound" placeholder="Filename" list="sfxFiles">
-      <datalist id="sfxFiles"></datalist>
-      <img src="{{ url_for('static', filename='img/advanced/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendSound();">
-    </div>
-
-    <div id="musicDiv">
-      <h1>Play music</h1>
-      <img src="{{ url_for('static', filename='img/advanced/random.png') }}" id="randomMusic" class="smallImg" title="Random" onclick="randomBGM()"><input type="text" id="music" class="line" placeholder="Filename" list="bgmFiles">
-      <datalist id="bgmFiles"></datalist>
-      <img src="{{ url_for('static', filename='img/advanced/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendMusic();"><br>
-      <label for="volume">Volume: </label><input type="range" id="volume" min="0.1" max="1" step="0.1">
-      <span id="volNumber"></span>
-      <div id="nowPlaying" class="hidden">Now playing: <b id="nowPlayingTitle" title="Song"></b></div>
-      <div id="musicControls" class="hidden">
-        <img src="{{ url_for('static', filename='img/advanced/pause.png') }}" class="smallImg" id="playPauseMusic" title="Pause" onclick="playPauseMusic();">
-        <img src="{{ url_for('static', filename='img/advanced/restart.png') }}" class="smallImg" id="restartMusic" title="Restart" onclick="restartMusic();">
-        <img src="{{ url_for('static', filename='img/advanced/stop.png') }}" class="smallImg" id="stopMusic" title="Stop" onclick="stopMusic();">
-      </div>
-    </div>
-
-    <div id="textDiv">
-      <h1>Change text</h1>
-      Text color: <input type="color" id="fgColor" class="button inline popOut" value="#404040"><br>
-      Background: <input type="color" id="bgColor" class="button inline popOut"><br>
-      <input type="text" class="line" id="text" placeholder="Phrase">
-      <img src="{{ url_for('static', filename='img/advanced/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendText();">
-    </div>
-
-    <div id="colorDiv">
-      <h1>Change color</h1>
-      <input type="radio" id="hideSegment" name="segment" checked onclick="hideSegment();" style="margin-left: 0;"><label for="hideSegment">Entire bar</label>
-      <input type="radio" id="showSegment" name="segment" style="margin-left: 8px;" onclick="showSegment();"><label for="showSegment">Segment</label>
-      <br>
-      <div id="segment" class="hidden" style="margin-bottom: 8px;">
-        <input type="number" id="segmentStart" class="line" min="0" value="0" onchange="validNumber(this);"> –
-        <input type="number" id="segmentEnd" class="line" min="0" onchange="validNumber(this);">
-      </div>
-      <input type="radio" id="hideColor2" name="gradient" checked onclick="hideColor2();" style="margin-left: 0;"><label for="hideColor2">Single color</label>
-      <input type="radio" id="showColor2" name="gradient" style="margin-left: 8px;" onclick="showColor2();"><label for="showColor2">Gradient</label>
-      <br>
-      <div style="display: inline-block;">
-        <h3 id="color1Heading" class="hidden" style="margin-bottom: 0;">Color 1</h3>
-        <input type="color" id="color1" class="button inline popOut">
-      </div>
-      <div id="color2Div" class="hidden" style="margin-left: 8px;">
-        <h3 style="margin-bottom: 0;">Color 2</h3>
-        <input type="color" id="color2" class="button inline popOut">
-      </div>
-      <img src="{{ url_for('static', filename='img/advanced/checkMark.png') }}" class="smallImg" title="Submit" onclick="sendColor();">
     </div>
   </div>
 
@@ -347,12 +240,6 @@
       updateMode();
       usersText();
       ticketsText();
-      nowPlaying();
-      updateVolume();
-      disableVolume();
-      listSounds("{{ sfx }}");
-      listMusic("{{ bgm }}");
-      segmentNumbers();
     };
     getApiData(true);
 
@@ -364,9 +251,6 @@
       updateMode();
       usersText();
       ticketsText();
-      nowPlaying();
-      updateVolume();
-      disableVolume();
     };
     setInterval(getApiData, 1000);
 
@@ -387,18 +271,16 @@
     }
 
     function showSection(toShow) {
-      ["studentPanel", "teacherPanel", "more", "chat"].forEach(section => {
+      ["studentPanel", "teacherPanel", "chat"].forEach(section => {
         let cl = document.getElementById(section).classList;
         section == toShow ? cl.remove("hidden") : cl.add("hidden");
       });
 
       if (toShow == "studentPanel" || toShow == "teacherPanel") {
         document.getElementById("panelButton").classList.add("pressed");
-        document.getElementById("moreButton").classList.remove("pressed");
         document.getElementById("chatButton").classList.remove("pressed");
       } else {
         document.getElementById("panelButton").classList.remove("pressed");
-        document.getElementById("moreButton").classList.remove("pressed");
         document.getElementById("chatButton").classList.remove("pressed");
         document.getElementById(toShow + "Button").classList.add("pressed");
       }
@@ -406,7 +288,7 @@
       if (toShow == "chat") {
         document.body.classList.remove("light");
         document.body.classList.add("blue");
-        document.title = "Formbar (Basic Mode)";
+        document.title = "Formbar Quick Panel";
         document.getElementById("newMessages").innerText = null;
         newMessages = 0;
       } else {
@@ -417,7 +299,6 @@
       visibleSection = toShow;
     }
 
-    document.getElementById("moreButton").onclick = () => showSection("more");
     document.getElementById("chatButton").onclick = () => showSection("chat");
 
     document.getElementById("help").onclick = requestHelp;
@@ -520,7 +401,7 @@
       if (data.type == "message") {
         if (document.hidden || visibleSection != "chat") {
           newMessages++;
-          document.title = `(${newMessages}) Formbar (Basic Homepage)`;
+          document.title = `(${newMessages}) Formbar Quick Panel`;
           if (visibleSection != "chat") document.getElementById("newMessages").innerText = "(" + newMessages + ")";
         }
       }
@@ -529,7 +410,7 @@
     //When user goes to this page, if chat is open, remove number of new messages from title
     document.addEventListener("visibilitychange", () => {
       if (!document.hidden && visibleSection == "chat") {
-        document.title = "Formbar (Basic Mode)";
+        document.title = "Formbar Quick Panel";
         document.getElementById("newMessages").innerText = null;
         newMessages = 0;
       }

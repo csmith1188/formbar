@@ -3,7 +3,7 @@ class Session():
         self.refresh()
         self.ip = ip
         self.studentDict = {}
-        self.mainPage = '/chat'
+        self.mainPage = '/home'
         self.bgm = {
             'nowplaying': '',
             'lastTime': 0,

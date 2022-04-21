@@ -1216,6 +1216,17 @@ def endpoint_fighter():
         return render_template('fighter.html', username = sD.studentDict[request.remote_addr]['name'])
         #return redirect(sD.mainPage + "?alert=Fighter will be ready to play soon.")
 
+
+'''
+    /flashcards
+'''
+@app.route('/flashcards')
+def endpoint_flashcards():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    else:
+        return render_template('flashcards.html')
+
 '''
     /flush
 '''

@@ -48,11 +48,6 @@
       --highlight-color: var(--bg-dark-highlight);
     }
 
-    * {
-      font-family: inherit;
-      color: inherit;
-    }
-
     body {
       background: var(--bg-darker);
       user-select: none;
@@ -468,7 +463,6 @@
         speed: 1,
         strength: 1,
         price: 35,
-        hitSound: "td_shoot01",
         extra1: {
           description: "Projectiles can bounce to up to three nearby enemies.",
           price: 40,
@@ -488,7 +482,7 @@
           price: 75,
           use: function() {
             towers.filter(tower => tower.name == "Basic Tower").forEach(tower => tower.speedBoost = 250);
-            sound.playSFX("powerUp");
+            sound.playSFX("powerUp2");
           }
         }
       },
@@ -501,7 +495,6 @@
         strength: 0.4,
         slowing: true,
         price: 30,
-        hitSound: "td_slow_hit",
         extra1: {
           description: "Enemies lose all abilities while they are slowed down.",
           price: 45,
@@ -521,7 +514,7 @@
           price: 60,
           use: function() {
             enemies.forEach(enemy => enemy.stunned = 75);
-            sound.playSFX("powerUp");
+            sound.playSFX("powerUp2");
           }
         }
       },
@@ -534,7 +527,6 @@
         strength: 0.6,
         poison: true,
         price: 60,
-        hitSound: "td_poison_hit",
         extra1: {
           description: "Poison can splash to a nearby enemy.",
           price: 30,
@@ -554,7 +546,7 @@
           price: 55,
           use: function() {
             enemies.forEach(enemy => enemy.reverse = 75);
-            sound.playSFX("powerUp");
+            sound.playSFX("powerUp2");
           }
         }
       },
@@ -566,7 +558,6 @@
         speed: 0.34,
         strength: 6,
         price: 80,
-        hitSound: "td_longrange_hit",
         extra1: {
           description: "Can hit blinking enemies while they are hidden.",
           price: 15,
@@ -599,7 +590,6 @@
         speed: 0.66,
         strength: 2,
         price: 100,
-        hitSound: "td_explode01",
         explosionSize: 100,
         extra1: {
           description: "Explosions are increased in size.",
@@ -626,7 +616,7 @@
             ctx.strokeStyle = "transparent";
             ctx.fillStyle = "#ff8f4055";
             ctx.drawCircle(960, 450, 400);
-            sound.playSFX("explode");
+            sound.playSfx("explode1");
           }
         }
       },
@@ -639,7 +629,6 @@
         strength: 0.7,
         extraMoney: true,
         price: 150,
-        hitSound: "td_money_hit",
         extra1: {
           description: "Adds an extra $5 every 10 seconds.",
           price: 250,
@@ -659,7 +648,7 @@
           price: 380,
           use: function() {
             player.money += 100;
-            sound.playSFX("coin");
+            sound.playSFX("coin1");
           }
         }
       },
@@ -673,7 +662,6 @@
         strength: 1,
         movable: true,
         price: 150,
-        hitSound: "td_plane_hit",
         extra1: {
           description: "Every fifth hit creates a small explosion.",
           price: 25,
@@ -729,7 +717,6 @@
         speed: 7.38,
         strength: 2,
         price: 400,
-        hitSound: "td_ultimate_hit",
         extra1: {
           description: "Attack power is slightly increased for each enemy on the screen.",
           price: 135,
@@ -750,7 +737,7 @@
           use: function() {
             towers.forEach(tower => {
               if (tower) tower.ultimateBoost = 250;
-              sound.playSFX("powerUp");
+              sound.playSFX("powerUp2");
             });
           }
         }
@@ -1323,29 +1310,25 @@
       enabled: true,
       delay: 0.05,
       sfx: {
+        abilityReady: new Audio("../static/sound/td/td_ability_ready.wav"),
         blip: new Audio("../static/sound/td/td_blip01.wav"),
-        coin: new Audio("../static/sound/td/td_coin01.wav"),
-        explode: new Audio("../static/sound/td/td_explode01.wav"),
+        coin1: new Audio("../static/sound/td/td_coin01.wav"),
+        coin2: new Audio("../static/sound/td/td_coin02.wav"),
+        explode1: new Audio("../static/sound/td/td_explode01.wav"),
+        explode2: new Audio("../static/sound/td/td_explode02.wav"),
+        explode3: new Audio("../static/sound/td/td_explode03.wav"),
         hit: new Audio("../static/sound/td/td_hit01.wav"),
         laser: new Audio("../static/sound/td/td_laser01.wav"),
-        powerUp: new Audio("../static/sound/td/td_powerup02.wav"),
-        shoot: new Audio("../static/sound/td/td_shoot01.wav"),
+        powerUp1: new Audio("../static/sound/td/td_powerup01.wav"),
+        powerUp2: new Audio("../static/sound/td/td_powerup02.wav"),
         success: new Audio("../static/sound/td/td_success01.wav"),
-        td_coin01: new Audio("../static/sound/td/td_coin01.wav"),
-        td_explode01: new Audio("../static/sound/td/td_explode01.wav"),
-        td_explode02: new Audio("../static/sound/td/td_explode02.wav"),
-        td_explode03: new Audio("../static/sound/td/td_explode03.wav"),
-        td_hit01: new Audio("../static/sound/td/td_hit01.wav"),
-        td_powerup01: new Audio("../static/sound/td/td_powerup01.wav"),
-        td_shoot01: new Audio("../static/sound/td/td_shoot01.wav"),
-        td_ability_ready: new Audio("../static/sound/td/td_ability_ready.wav"),
-        td_coin02: new Audio("../static/sound/td/td_coin02.wav"),
-        td_money_hit: new Audio("../static/sound/td/td_money_hit.wav"),
-        td_plane_hit: new Audio("../static/sound/td/td_plane_hit.wav"),
-        td_poison_hit: new Audio("../static/sound/td/td_poison_hit.wav"),
-        td_slow_hit: new Audio("../static/sound/td/td_slow_hit.wav"),
-        td_ultimate_hit: new Audio("../static/sound/td/td_ultimate_hit.wav"),
-        td_longrange_hit: new Audio("../static/sound/td/td_longrange_hit.wav")
+        basicHit: new Audio("../static/sound/td/td_shoot01.wav"),
+        slowingHit: new Audio("../static/sound/td/td_slow_hit.wav"),
+        poisonHit: new Audio("../static/sound/td/td_poison_hit.wav"),
+        moneyHit: new Audio("../static/sound/td/td_money_hit.wav"),
+        planeHit: new Audio("../static/sound/td/td_plane_hit.wav"),
+        ultimateHit: new Audio("../static/sound/td/td_ultimate_hit.wav"),
+        longRangeHit: new Audio("../static/sound/td/td_longrange_hit.wav")
       },
       playSFX: function(name, towerName='default') {
         if (this.enabled) {
@@ -1363,11 +1346,12 @@
     };
     //Turn down the volume of each of the sound effects
     for (const effect in sound.sfx) {
-        sound.sfx[effect].volume = 0.2
+        sound.sfx[effect].volume = 0.2;
     }
     //manual adjust a few volumes
     sound.sfx.blip.volume = 0.5;
-    sound.sfx.td_slow_hit.volume = 0.15;
+    sound.sfx.slowingHit.volume = 0.15;
+    for (let type in towerTypes) towerTypes[type].hitSound = type + "Hit"; //Give all towers except for Cannon Towers different hit sounds
 
     let canvas = document.getElementById("game");
     let ctx = canvas.getContext("2d");
@@ -1693,7 +1677,7 @@
               if (tower.ultimateBoost) damage *= 2;
               target.hit(damage, tower);
 
-              sound.playSFX(tower.hitSound, tower.name); //Play hit sound
+              if (tower.hitSound) sound.playSFX(tower.hitSound, tower.name); //Play hit sound
 
               if (tower.slowing && !target.abilities.includes("acceleration")) target.slowed = tower.permSlow ? Infinity : 250;
               if (tower.abilityBlocking && !target.abilities.includes("acceleration")) target.noAbilities = tower.permSlow ? Infinity : 250;
@@ -1746,7 +1730,7 @@
                 ctx.strokeStyle = "transparent";
                 ctx.fillStyle = "#ff8f4055";
                 ctx.drawCircle(target.x, target.y, tower.explosionSize);
-                sound.playSFX("explode");
+                sound.playSfx("explode1");
               }
               if (tower.nextExplosion) {
                 tower.nextExplosion--;

@@ -179,10 +179,6 @@
     background: var(--color-gold);
   }
 
-  #wawdTab.open {
-    background: var(--color-purple);
-  }
-
   #gamesTab.open, #gamesMenu > .open {
     background: var(--color-green);
   }
@@ -328,6 +324,7 @@
       <div id="helpTab" class="tab" onclick="openPage('help');">Help!</div>
       <div id="breakTab" class="tab" onclick="openPage('break');">Bathroom break</div>
       <div id="wawdTab" class="tab" onclick="openPage('wawd');">What are we doing?</div>
+      <div id="flashcardsTab" class="tab" onclick="openPage('flashcards');">Flashcards</div>
     </div>
     <div id="gamesTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/advanced/games.png') }}" class="icon"> <span class="tabText">Games</span></div>
     <div id="gamesMenu" class="menu hidden" tabindex="-1">
@@ -535,7 +532,7 @@
     let tabEl = document.getElementById(path.substring(1) + "Tab");
     if (!content) openPage("chat?alert='Page does not exist.'");
     Array.from(tabs).forEach(tab => tab.classList.remove("open"));
-    if (["/help", "/break"].includes(path)) document.getElementById("studentsTab").classList.add("open");
+    if (["/help", "/break", "/wawd", "/flashcards"].includes(path)) document.getElementById("studentsTab").classList.add("open");
     if (["/2048", "/bitshifter", "/hangman", "/minesweeper", "/speedtype", "/ttt", "/towerdefense", "/fighter", "/leaderboards"].includes(path)) document.getElementById("gamesTab").classList.add("open");
     if (["/needshelp", "/settings", "/users", "/lesson", "/virtualbar"].includes(path)) document.getElementById("teacherTab").classList.add("open");
     if (tabEl) tabEl.classList.add("open");

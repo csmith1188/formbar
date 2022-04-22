@@ -213,6 +213,7 @@
   var score = 0;
   var highscore = {{ highScore }};
   var lives = 10;
+  var guessed = [];
   var word;
   var letters;
   var displayWord = "";
@@ -252,6 +253,7 @@
   if (!(wordObj.place == "your" && wordObj.words == "here")) createList();
 
   function getNewWord() {
+    guessed = [];
     var wordRequest = new XMLHttpRequest();
     wordRequest.open('GET', "/getword");
     wordRequest.onload = function() {
@@ -260,7 +262,7 @@
       definitionRequest.open('GET', "https://api.dictionaryapi.dev/api/v2/entries/en_US/" + newWord);
       definitionRequest.onload = function() {
         newDefinition = JSON.parse(definitionRequest.response);
-        if (newDefinition.title == "No Definitions Found" || newDefinition[0].word != newWord) {
+        if (newDefinition.title == "No Definitions Found") {
           getNewWord();
         } else {
           newDefinition = newDefinition[0].meanings[0].definitions[0].definition;
@@ -360,7 +362,7 @@
       document.getElementById("highscore").innerHTML = highscore;
       document.getElementById("lives").innerHTML = lives;
 
-    } else {
+    } else if (!guessed.includes(l)) {
       //they guessed a wrong letter
 
       lives--;
@@ -370,16 +372,19 @@
           request.open("POST", "/savescore?game=hangman&score=" + score);
           request.send();
           score = 0;
-          randomize();
-          resetLetters();
           let lastword = word;
           document.getElementById("last").innerHTML = lastword;
+          randomize();
+          resetLetters();
+          getNewWord();
         }
       }
       document.getElementById("score").innerHTML = score;
       document.getElementById("lives").innerHTML = lives;
       if (lives == 1) document.getElementById("lives").style.color = "var(--light-red)";
     }
+
+    guessed.push(l);
   }
 
   function closeLetter(letter, correct) {

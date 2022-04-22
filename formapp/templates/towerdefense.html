@@ -613,7 +613,7 @@
             ctx.strokeStyle = "transparent";
             ctx.fillStyle = "#ff8f4055";
             ctx.drawCircle(960, 450, 400);
-            sound.playSfx("explode1");
+            sound.playSFX("explode1");
           }
         }
       },
@@ -1315,16 +1315,16 @@
         explode1: new Audio("../static/sound/td/td_explode01.wav"),
         explode2: new Audio("../static/sound/td/td_explode02.wav"),
         explode3: new Audio("../static/sound/td/td_explode03.wav"),
-        hit: new Audio("../static/sound/td/td_hit01.wav"),
         laser: new Audio("../static/sound/td/td_laser01.wav"),
         powerUp1: new Audio("../static/sound/td/td_powerup01.wav"),
         powerUp2: new Audio("../static/sound/td/td_powerup02.wav"),
+        shoot: new Audio("../static/sound/td/td_shoot02.wav"),
         success: new Audio("../static/sound/td/td_success01.wav"),
-        basicHit: new Audio("../static/sound/td/td_shoot01.wav"),
+        basicHit: new Audio("../static/sound/td/td_hit01.wav"),
         slowingHit: new Audio("../static/sound/td/td_slow_hit.wav"),
         poisonHit: new Audio("../static/sound/td/td_poison_hit.wav"),
         moneyHit: new Audio("../static/sound/td/td_money_hit.wav"),
-        planeHit: new Audio("../static/sound/td/td_plane_hit.wav"),
+        airHit: new Audio("../static/sound/td/td_plane_hit.wav"),
         ultimateHit: new Audio("../static/sound/td/td_ultimate_hit.wav"),
         longRangeHit: new Audio("../static/sound/td/td_longrange_hit.wav")
       },
@@ -1675,7 +1675,7 @@
               if (tower.ultimateBoost) damage *= 2;
               target.hit(damage, tower);
 
-              if (tower.hitSound) sound.playSFX(tower.hitSound, tower.name); //Play hit sound
+              if (sound.sfx[tower.hitSound]) sound.playSFX(tower.hitSound, tower.name); //Play hit sound
 
               if (tower.slowing && !target.abilities.includes("acceleration")) target.slowed = tower.permSlow ? Infinity : 250;
               if (tower.abilityBlocking && !target.abilities.includes("acceleration")) target.noAbilities = tower.permSlow ? Infinity : 250;
@@ -1728,7 +1728,7 @@
                 ctx.strokeStyle = "transparent";
                 ctx.fillStyle = "#ff8f4055";
                 ctx.drawCircle(target.x, target.y, tower.explosionSize);
-                sound.playSfx("explode1");
+                sound.playSFX("explode1");
               }
               if (tower.nextExplosion) {
                 tower.nextExplosion--;
@@ -1792,7 +1792,7 @@
             if (inRange.length) {
               let target = inRange.sort((a, b) => b.distance - a.distance)[0];
               target.hit(superPlane.strength);
-              sound.playSFX("hit");
+              sound.playSFX("airHit");
               ctx.lineWidth = 4;
               ctx.strokeStyle = "#ff6860";
               ctx.beginPath();
@@ -2331,8 +2331,8 @@
       }
       let allAchievements = achievements.map((achievement, i) => +achievement || gameAchievements[i]); //New achievements + ones that were earned before
       localStorage.setItem("tdAchievements", allAchievements.join(""));
-      let completeMaps = progress.reduce((a, b) => +a + +b);
-      let completeAchv = achievements.reduce((a, b) => +a + +b);
+      completeMaps = progress.reduce((a, b) => +a + +b);
+      completeAchv = achievements.reduce((a, b) => +a + +b);
       let totalComplete = completeMaps + completeAchv;
       if (totalComplete) {
         request.open("POST", "/savescore?game=towerdefense&score=" + totalComplete);

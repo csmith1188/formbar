@@ -54,13 +54,10 @@
     }
 
     #container {
-      position: fixed;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
       aspect-ratio: 16 / 9;
       outline: 1px solid var(--dark-gray);
       overflow: hidden;
+      text-align: left;
     }
 
     @media (max-aspect-ratio: 16/9) {
@@ -439,7 +436,7 @@
 
 <!-- Main content here -->
 {% block main %}
-  <div id="container">
+  <div id="container" class="centered">
     <canvas id="game" width="1920" height="1080"></canvas>
     <div id="progress"></div>
     <table id="grid" class="hidden"></table>

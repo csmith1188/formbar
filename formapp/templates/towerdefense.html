@@ -2331,8 +2331,8 @@
       }
       let allAchievements = achievements.map((achievement, i) => +achievement || gameAchievements[i]); //New achievements + ones that were earned before
       localStorage.setItem("tdAchievements", allAchievements.join(""));
-      let completeMaps = progress.reduce((a, b) => +a + +b);
-      let completeAchv = achievements.reduce((a, b) => +a + +b);
+      completeMaps = progress.reduce((a, b) => +a + +b);
+      completeAchv = achievements.reduce((a, b) => +a + +b);
       let totalComplete = completeMaps + completeAchv;
       if (totalComplete) {
         request.open("POST", "/savescore?game=towerdefense&score=" + totalComplete);

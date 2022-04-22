@@ -168,6 +168,7 @@
       let container = document.getElementById('answerboxcontainer');
       let controlsBox = document.getElementById('controlsbox');
       let checkButton = document.getElementById("checkbutt");
+      let reloadButton = document.getElementById("reload");
       let difficulty = document.getElementById("difficulty").value;
       document.getElementById("scores").classList.remove("hidden");
       document.getElementById("timeLimit").classList.remove("hidden");
@@ -197,6 +198,7 @@
         container.classList.add("hidden");
         controlsBox.classList.remove("hidden");
         checkButton.innerText = "==";
+        reloadButton.classList.add("hidden");
         gameData = newTarget();
         draw();
       } else {
@@ -230,6 +232,7 @@
       document.getElementById("answerbox").innerHTML = "You winn't!";
       request.open("POST", "/savescore?game=bitshifter&score=" + score);
       request.send();
+      score = 0;
       document.getElementById("checkbutt").innerText = "OK";
       document.getElementById("reload").classList.remove("hidden");
     }

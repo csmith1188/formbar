@@ -242,13 +242,13 @@
     }
 
     document.getElementById("addUser").addEventListener("click", () => {
-      let username;
-      let password;
-      do {username = prompt("New user's name:")} while (username === "");
-      do {password = prompt("New user's password:")} while (password === "");
-      if (username && password) {
-        request.open("POST", `/createaccount?name=${username}&password=${password}`);
-        request.send();
+      let username = prompt("New user's name:");
+      if (username) {
+        let password = prompt("New user's password:");
+        if (password) {
+          request.open("POST", `/createaccount?name=${username}&password=${password}`);
+          request.send();
+        }
       }
     });
 </script>

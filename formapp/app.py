@@ -1410,12 +1410,12 @@ def endpoint_help():
         name = sD.studentDict[request.remote_addr]['name']
         name = name.strip()
         if name in helpList:
-            return redirect("/help?alert=You already have a help ticket or break request in. If your problem is time-sensitive, or your last ticket was not cleared, please get the teacher's attention manually." )
+            return redirect(sD.mainPage + "?alert=You already have a help ticket or break request in. If your problem is time-sensitive, or your last ticket was not cleared, please get the teacher's attention manually." )
         elif request.method == 'POST':
             helpList[name] = request.args.get('message') or '<i>Sent a help ticket</i>'
             sD.studentDict[request.remote_addr]['help'] = True
             playSFX("sfx_up04")
-            return redirect("/help?alert=Your ticket was sent. Keep working on the problem the best you can while you wait." )
+            return redirect(sD.mainPage + "?alert=Your ticket was sent. Keep working on the problem the best you can while you wait." )
         else:
             return render_template("help.html")
 

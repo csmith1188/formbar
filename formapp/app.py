@@ -1763,9 +1763,10 @@ def endpoint_needshelp():
                         sD.studentDict[student]['excluded'] = True
                         sD.studentDict[student]['oldPerms'] = sD.studentDict[request.remote_addr]['perms'] #Get the student's current permissions so they can be restored later
                         sD.studentDict[student]['perms'] = sD.settings['perms']['anyone']
-                        server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', name, 'server', 'The teacher accepted your break request.')))
-                    elif helpList[name] == "<i>Requested a bathroom break</i>":
-                        server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', name, 'server', 'The teacher rejected your break request.')))
+                    #Disabled until chat works
+                        #server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', name, 'server', 'The teacher accepted your break request.')))
+                    #elif helpList[name] == "<i>Requested a bathroom break</i>":
+                        #server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', name, 'server', 'The teacher rejected your break request.')))
             del helpList[remove]
             return redirect("/needshelp")
         else:

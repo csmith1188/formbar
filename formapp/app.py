@@ -2068,25 +2068,26 @@ def endpoint_settings():
         resString = ''
         #Loop through every arg that was sent as a query parameter
         for arg in request.args:
-            #See if you save the
-            argVal = str2bool(request.args.get(arg))
-            #if the argVal resolved to a boolean value
-            if isinstance(argVal, bool):
-                if arg in sD.settings:
-                    sD.settings[arg] = argVal
-                    resString += 'Set <i>' + arg + '</i> to: <i>' + str(argVal) + "</i>"
+            if arg != "advanced":
+                #See if you save the
+                argVal = str2bool(request.args.get(arg))
+                #if the argVal resolved to a boolean value
+                if isinstance(argVal, bool):
+                    if arg in sD.settings:
+                        sD.settings[arg] = argVal
+                        resString += 'Set <i>' + arg + '</i> to: <i>' + str(argVal) + "</i>"
+                    else:
+                        resString += 'There is no setting that takes \'true\' or \'false\' named: <i>' + arg + "</i>"
                 else:
-                    resString += 'There is no setting that takes \'true\' or \'false\' named: <i>' + arg + "</i>"
-            else:
-                try:
-                    argInt = int(request.args.get(arg))
-                    if arg in sD.settings['perms']:
-                        if argInt > 4 or argInt < 0:
-                            resString += "Permission value out of range! "
-                        else:
-                            sD.settings['perms'][arg] = argInt
-                except:
-                    pass
+                    try:
+                        argInt = int(request.args.get(arg))
+                        if arg in sD.settings['perms']:
+                            if argInt > 4 or argInt < 0:
+                                resString += "Permission value out of range! "
+                            else:
+                                sD.settings['perms'][arg] = argInt
+                    except:
+                        pass
 
         ###
         ### Everything past this point uses the old method of changing settings. Needs updated

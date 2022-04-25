@@ -516,7 +516,7 @@
   }
 
   function openPage(page) {
-    innerPage.contentWindow.location = "/" + page;
+    innerPage.contentWindow.location = `/${page}?advanced=true`;
     menus.forEach(menu => {
       document.getElementById(menu + "Menu").classList.add("hidden");
       document.getElementById(menu + "Tab").classList.remove("menuOpen");

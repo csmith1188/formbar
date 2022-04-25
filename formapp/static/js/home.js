@@ -261,7 +261,7 @@ function ticketSent(type) {
 
 function requestHelp() {
   let el = document.getElementById("help");
-  request.open("GET", "/help?action=send");
+  request.open("POST", "/help");
   request.send();
   ticketSent("help");
 }

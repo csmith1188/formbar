@@ -1400,29 +1400,28 @@ def endpoint_hangman():
             highScore = 0
         return render_template("hangman.html", wordObj=wordObj, highScore = highScore)
 
-@app.route('/help')
+@app.route('/help', methods = ['POST', 'GET'])
 def endpoint_help():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     if sD.studentDict[request.remote_addr]['perms'] == sD.settings['perms']['teacher']:
         return redirect(sD.mainPage + "?alert=Teachers can't send help tickets.")
     else:
-        if request.args.get('action') == "send":
-            name = sD.studentDict[request.remote_addr]['name']
-            name = name.strip()
-            if name in helpList:
-                return redirect("/help?alert=You already have a help ticket or break request in. If your problem is time-sensitive, or your last ticket was not cleared, please get the teacher's attention manually." )
-            else:
-                helpList[name] = request.args.get('message') or '<i>Sent a help ticket</i>'
-                sD.studentDict[request.remote_addr]['help'] = True
-                playSFX("sfx_up04")
-                return redirect("/help?alert=Your ticket was sent. Keep working on the problem the best you can while you wait." )
+        name = sD.studentDict[request.remote_addr]['name']
+        name = name.strip()
+        if name in helpList:
+            return redirect(sD.mainPage + "?alert=You already have a help ticket or break request in. If your problem is time-sensitive, or your last ticket was not cleared, please get the teacher's attention manually." )
+        elif request.method == 'POST':
+            helpList[name] = request.args.get('message') or '<i>Sent a help ticket</i>'
+            sD.studentDict[request.remote_addr]['help'] = True
+            playSFX("sfx_up04")
+            return redirect(sD.mainPage + "?alert=Your ticket was sent. Keep working on the problem the best you can while you wait." )
         else:
             return render_template("help.html")
 
+
 @app.route('/home')
 def endpoint_home():
-    print("home")
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     else:
@@ -1763,9 +1762,10 @@ def endpoint_needshelp():
                         sD.studentDict[student]['excluded'] = True
                         sD.studentDict[student]['oldPerms'] = sD.studentDict[request.remote_addr]['perms'] #Get the student's current permissions so they can be restored later
                         sD.studentDict[student]['perms'] = sD.settings['perms']['anyone']
-                        server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', name, 'server', 'The teacher accepted your break request.')))
-                    elif helpList[name] == "<i>Requested a bathroom break</i>":
-                        server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', name, 'server', 'The teacher rejected your break request.')))
+                    #Disabled until chat works
+                        #server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', name, 'server', 'The teacher accepted your break request.')))
+                    #elif helpList[name] == "<i>Requested a bathroom break</i>":
+                        #server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', name, 'server', 'The teacher rejected your break request.')))
             del helpList[remove]
             return redirect("/needshelp")
         else:
@@ -2067,25 +2067,26 @@ def endpoint_settings():
         resString = ''
         #Loop through every arg that was sent as a query parameter
         for arg in request.args:
-            #See if you save the
-            argVal = str2bool(request.args.get(arg))
-            #if the argVal resolved to a boolean value
-            if isinstance(argVal, bool):
-                if arg in sD.settings:
-                    sD.settings[arg] = argVal
-                    resString += 'Set <i>' + arg + '</i> to: <i>' + str(argVal) + "</i>"
+            if arg != 'advanced':
+                #See if you save the
+                argVal = str2bool(request.args.get(arg))
+                #if the argVal resolved to a boolean value
+                if isinstance(argVal, bool):
+                    if arg in sD.settings:
+                        sD.settings[arg] = argVal
+                        resString += 'Set <i>' + arg + '</i> to: <i>' + str(argVal) + "</i>"
+                    else:
+                        resString += 'There is no setting that takes \'true\' or \'false\' named: <i>' + arg + "</i>"
                 else:
-                    resString += 'There is no setting that takes \'true\' or \'false\' named: <i>' + arg + "</i>"
-            else:
-                try:
-                    argInt = int(request.args.get(arg))
-                    if arg in sD.settings['perms']:
-                        if argInt > 4 or argInt < 0:
-                            resString += "Permission value out of range! "
-                        else:
-                            sD.settings['perms'][arg] = argInt
-                except:
-                    pass
+                    try:
+                        argInt = int(request.args.get(arg))
+                        if arg in sD.settings['perms']:
+                            if argInt > 4 or argInt < 0:
+                                resString += "Permission value out of range! "
+                            else:
+                                sD.settings['perms'][arg] = argInt
+                    except:
+                        pass
 
         ###
         ### Everything past this point uses the old method of changing settings. Needs updated

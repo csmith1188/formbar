@@ -213,6 +213,12 @@ def newStudent(remote, username, bot=False):
                 else:
                     sD.studentDict[remote]['perms'] = int(user[3])
 
+        #Check if the user has a help ticket or break request in
+        if username in helpList:
+            sD.studentDict[request.remote_addr]['help'] = True
+            if helpList[username] == "<i>Requested a bathroom break</i>":
+                sD.studentDict[request.remote_addr]['breakReq'] = True
+
         playSFX("sfx_up02")
 
 def flushUsers():

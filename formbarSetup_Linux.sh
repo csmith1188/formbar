@@ -12,6 +12,7 @@ sudo apt-get -y install screen
 sudo pip3 install rpi_ws281x adafruit-circuitpython-neopixel
 sudo python3 -m pip install --force-reinstall adafruit-blinka
 sudo pip3 install flask
+sudo pip3 install flask_socketio
 sudo pip3 install websocket_server
 sudo pip3 install pygame
 sudo pip3 install openpyxl

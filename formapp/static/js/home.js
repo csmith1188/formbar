@@ -231,7 +231,6 @@ function usersText() {
 }
 
 function checkForHelpTicket() {
-  console.log(meRes);
   if (meRes.breakReq) {
     ticketSent("break");
   } else if (meRes.help) {

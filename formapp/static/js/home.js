@@ -231,10 +231,11 @@ function usersText() {
 }
 
 function checkForHelpTicket() {
-  if (meRes.help) {
-    ticketSent("help");
-  } else if (meRes.breakReq) {
+  console.log(meRes);
+  if (meRes.breakReq) {
     ticketSent("break");
+  } else if (meRes.help) {
+    ticketSent("help");
   } else {
     document.getElementById("help").onclick = requestHelp;
     document.getElementById("break").onclick = requestBreak;
@@ -271,4 +272,192 @@ function requestBreak() {
   request.open("GET", "/break?action=request");
   request.send();
   ticketSent("break");
+}
+
+function listSounds(files) {
+  sfx = eval(files.replaceAll("&#39;", "'"));
+  sfx = sfx.filter(file => !file.startsWith("sfx_"));
+  sfx.forEach(sound => document.getElementById("sfxFiles").innerHTML += "<option value='" + sound + "'></option>");
+}
+
+async function sendSound() {
+  let soundFile = document.getElementById("sound").value;
+  let res = await getResponse("/sfx?file=" + soundFile, false);
+  if (sfx.includes(soundFile)) res == permsError ? alert(res) : document.getElementById("sound").value = null;
+  else alert("File does not exist");
+}
+
+if (document.getElementById("sound")) document.getElementById("sound").addEventListener("keydown", event => {
+  if (event.code == "Enter") sendSound();
+});
+
+if (document.getElementById("volume")) document.getElementById("volume").addEventListener("input", () => {
+  let volume = document.getElementById("volume").value;
+  if (volume == 1) volume += ".0";
+  document.getElementById("volNumber").innerText = volume;
+});
+
+if (document.getElementById("volume")) document.getElementById("volume").addEventListener("change", () => {
+  let volume = document.getElementById("volume").value;
+  if (volume == 1) volume += ".0";
+  request.open("GET", "/bgm?voladj=" + volume);
+  request.send();
+});
+
+function disableVolume() {
+  let el = document.getElementById("volume");
+  meRes.perms > permsRes.bgm ? el.disabled = true : el.disabled = false;
+}
+
+function listMusic(files) {
+  bgm = eval(files.replaceAll("&#39;", "'"));
+  bgm.forEach(song => document.getElementById("bgmFiles").innerHTML += "<option value='" + song + "'></option>");
+}
+
+function randomBGM() {
+  document.getElementById("music").value = bgm[Math.floor(Math.random() * bgm.length)];
+}
+
+async function sendMusic() {
+  let musicFile = document.getElementById("music").value;
+  let volume = document.getElementById("volume").value;
+  if (volume == 1) volume = "1.0";
+  let res = await getResponse("/bgm?file=" + musicFile + "&volume=" + volume, false);
+  if (bgm.includes(musicFile)) {
+    (res.startsWith("It has only been") || res == permsError) ? alert(res) : document.getElementById("music").value = null;
+  } else {
+    alert("File does not exist");
+  }
+}
+
+if (document.getElementById("music")) document.getElementById("music").addEventListener("keydown", event => {
+  if (event.code == "Enter") sendMusic();
+});
+
+function nowPlaying() {
+  //Get current song from server
+  let songName = bgmRes.bgm;
+  let paused = bgmRes.paused;
+
+  let md = document.getElementById("musicDiv");
+  let np = document.getElementById("nowPlaying");
+  let npTitle = document.getElementById("nowPlayingTitle");
+  let controls = document.getElementById("musicControls");
+  let playPause = document.getElementById("playPauseMusic");
+
+  //If a song is currently playing
+  if (songName) {
+    //Show "Now Playing"
+    if (songName != npTitle.innerText) {
+      np.classList.remove("hidden");
+      let oldHeight = np.clientHeight;
+      let oldWidth = md.clientWidth;
+      npTitle.innerText = songName;
+      if (np.clientHeight > oldHeight || md.clientWidth > oldWidth) {
+        shorten(np, oldHeight, npTitle, oldWidth);
+      } else {
+        np.removeAttribute("title");
+        np.cursor = null;
+      }
+      controls.classList.remove("hidden");
+    }
+  } else {
+    //If no song is playing, hide
+    np.classList.add("hidden");
+    controls.classList.add("hidden");
+  }
+
+  if (paused) {
+    playPause.title = "Play";
+  } else {
+    playPause.title = "Pause";
+  }
+}
+
+function updateVolume() {
+  if (document.getElementById("volume") != document.activeElement) {
+    let volume = bgmRes.volume;
+    document.getElementById("volume").value = volume;
+    document.getElementById("volNumber").innerText = volume;
+  }
+}
+
+async function playPauseMusic() {
+  let res = await getResponse("/bgm?playpause=true", false);
+  if (res == permsError) alert(res);
+}
+
+async function restartMusic() {
+  let res = await getResponse("/bgm?rewind=true", false);
+  if (res == permsError) alert(res);
+}
+
+async function stopMusic() {
+  let res = await getResponse("/bgmstop", false);
+  if (res == permsError) alert(res);
+}
+
+async function sendText() {
+  let text = document.getElementById("text").value;
+  let fg = document.getElementById("fgColor").value.slice(1);
+  let bg = document.getElementById("bgColor").value.slice(1);
+  //If input is blank, replace with underscore
+  text ||= "_";
+  let res = await getResponse("/say?phrase=" + text + "&fg=" + fg + "&bg=" + bg, false);
+  res == permsError ? alert(res) : document.getElementById("text").value = null;
+}
+
+if (document.getElementById("text")) document.getElementById("text").addEventListener("keydown", event => {
+  if (event.code == "Enter") sendText();
+});
+
+function segmentNumbers() {
+  barpix = eval(pixRes.pixels);
+  document.getElementById("segmentStart").max = barpix.length;
+  document.getElementById("segmentEnd").max = barpix.length;
+  document.getElementById("segmentEnd").value = barpix.length;
+}
+
+function hideSegment() {
+  segment = false;
+  document.getElementById("segment").classList.add("hidden");
+}
+
+function showSegment() {
+  segment = true;
+  document.getElementById("segment").classList.remove("hidden");
+}
+
+function validNumber(el) {
+  //Convert value to integer within range
+  let number = parseInt(el.value);
+  if (number < el.min || isNaN(number)) el.value = el.min;
+  else if (number > el.max) el.value = el.max;
+  else el.value = number;
+}
+
+function hideColor2() {
+  gradient = false;
+  document.getElementById("color1Heading").classList.add("hidden");
+  document.getElementById("color2Div").classList.add("hidden");
+}
+
+function showColor2() {
+  gradient = true;
+  document.getElementById("color1Heading").classList.remove("hidden");
+  document.getElementById("color2Div").classList.remove("hidden");
+}
+
+async function sendColor() {
+  let start = document.getElementById("segmentStart").value;
+  let end = document.getElementById("segmentEnd").value;
+  let hex1 = document.getElementById("color1").value.slice(1);
+  let hex2 = document.getElementById("color2").value.slice(1);
+  if (!segment) {
+    start = 0;
+    end = barpix.length;
+  }
+  if (!gradient) hex2 = hex1;
+  let res = await getResponse("/segment?start=" + start + "&end=" + end + "&hex=" + hex1 + "&hex2=" + hex2, false);
+  if (res == permsError) alert(res);
 }

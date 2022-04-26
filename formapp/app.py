@@ -97,6 +97,7 @@ else:
     pixels = [(0,0,0)]*MAXPIX
 
 async_mode = None
+#Start a new flask server for http service
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socket_ = SocketIO(app, async_mode=async_mode)

@@ -1,252 +1,55 @@
-{% extends 'header.html' %}
-<!-- ^^ This means add this file to the end of the contents of header.html -->
-<!-- This is where the title, top buttons, and stylesheet is located -->
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Socket-Test</title>
+    <script src="{{url_for('static', filename='jquery.js')}}"></script>
+    <script src="{{url_for('static', filename='socket.io.min.js')}}"></script>
+    <script type="text/javascript" charset="utf-8">
+        $(document).ready(function() {
 
-<!-- Change title here -->
-{% block title %}Formbar Home{% endblock %}
-{% block color %}blue{% endblock %}
-{% block style %}
-<style>
-  body {
-      background-color: var(--bg-dark-blue);
-  }
-  h1 {
-    text-align: center;
-    margin-top: 12px;
-  }
+            namespace = '/apisocket';
+            var socket = io(namespace);
 
-  h2 {
-    margin-top: 32px;
-  }
+            socket.on('connect', function() {
+                socket.emit('my_event', {data: 'connected to the SocketServer...'});
+            });
 
-  #quickmenu {
-      text-align: center;
-      justify-content: center;
-      margin: auto;
-  }
-
-  #content, #homebutton{
-      border-radius: 10px;
-      margin: auto;
-      padding: 10px;
-      max-width: 600px;
-      background-color: var(--light-blue);
-  }
-
-  .container1-flex {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-around;
-  }
-
-  .container2-flex {
-      display: flex;
-      justify-content: space-around;
-      flex-grow: 1;
-  }
-
-
-  .bigbutton, .smallbutton {
-      margin: auto;
-      padding: 10px;
-      width: 100px;
-      height: 100px;
-      border-radius: 20px;
-      border: 2px solid black;
-      background-color: var(--dark-gray);
-      font-size: 1.2em;
-      font-weight: bolder;
-      text-align: center;
-      box-shadow: 8px 8px var(--dark-gray);
-      cursor: pointer;
-  }
-
-  .smallbutton {
-    width: 25px;
-    height: 25px;
-    border-radius: 10px;
-    font-size: 0.6em;
-  }
-
-  .bigbutton a {
-    margin: auto;
-    vertical-align: middle;
-  }
-
-  .bb-green {
-      background-color: #bfb;
-  }
-
-  .bb-yellow {
-      background-color: #ffb;
-  }
-
-  .bb-blue {
-      background-color: #bdf;
-  }
-
-  .bb-red {
-      background-color: #fbb;
-  }
-
-  .bigbutton:hover, .smallbutton:hover {
-      background-color: #ffffff;
-  }
-
-  .user {
-     background-color: #cccccc;
-     border: 1px solid #000000;
-     border-radius: 5px;
-     overflow-x:auto;
-  }
-
-  #tabcontainer {
-    background-color: gray;
-    border-radius: 5px;
-    border: solid black 2px;
-    padding: 5px;
-  }
-
-  .tab {
-    background-color: black;
-    color: white;
-    border-radius: 5px;
-    margin: 5px;
-    padding: 5px;
-    cursor: pointer;
-  }
-
-  .entry {
-  }
-
-  .entrylink {
-    color: black;
-    border-radius: 5px;
-    border: solid black 2px;
-    margin: 5px;
-    padding: 5px;
-    cursor: pointer;
-  }
-
-  .entrylink:hover {
-    background-color: white;
-  }
-
-  .-green {
-      background-color: #bfb;
-  }
-
-  .-yellow {
-      background-color: #ffb;
-  }
-
-  .-blue {
-      background-color: #bff;
-  }
-
-  .-red {
-      background-color: #fbb;
-  }
-
-</style>
-{% endblock %}
-{% block script %}
-<script src="../static/jquery/external/jquery/jquery.js" charset="utf-8"></script>
-<script src="../static/jquery/jquery-ui.min.js" charset="utf-8"></script>
-<script>
-    $(function() {
-        $("#tabcontainer").accordion({
-          heightStyle: "content"
+            socket.on('my_response', function(msg, cb) {
+                $('#log').append('<br>' + $('<div/>').text('logs #' + msg.count + ': ' + msg.data).html());
+                if (cb)
+                    cb();
+            });
+            $('form#emit').submit(function(event) {
+                socket.emit('my_event', {data: $('#emit_data').val()});
+                return false;
+            });
+            $('form#broadcast').submit(function(event) {
+                socket.emit('my_broadcast_event', {data: $('#broadcast_data').val()});
+                return false;
+            });
+            $('form#disconnect').submit(function(event) {
+                socket.emit('disconnect_request');
+                return false;
+            });
         });
-    });
-</script>
-{% endblock %}
-{% block main %}
-<div id="content" class="light">
-  <h1>Formbar</h1>
-  <div id="tabcontainer" class="dark blue">
+    </script>
+</head>
+<body style="background-color:white;">
 
-      <h3 class="tab">Students</h3>
-      <div class="entry">
-          <div class="entrylink -green light" onclick="window.location = '/tutd';">
-              Thumbspanel (/tutd)
-          </div>
-          <div class="entrylink -blue light" onclick="window.location = '/chat';">
-              Chat (/chat)
-          </div>
-          <div class="entrylink -red light" onclick="window.location = '/help';">
-              Help! (/help)
-          </div>
-          <div class="entrylink -yellow light" onclick="window.location = '/break';">
-              Request bathroom break (/break)
-          </div>
-          <div class="entrylink -green light" onclick="window.location = '/wawd';">
-              What Are We Doing? (/wawd)
-          </div>
-          <div class="entrylink -blue light" onclick="window.location = '/flashcards';">
-              Flashcards (/flashcards)
-          </div>
-      </div>
-      <h3 class="tab">Formbar</h3>
-      <div class="entry">
-          <div class="entrylink -green light" onclick="window.location = '/bgm';">
-              Background Music (/bgm)
-          </div>
-          <div class="entrylink -blue light" onclick="window.location = '/sfx';">
-              Sound Effects (/sfx)
-          </div>
-          <div class="entrylink -red light" onclick="window.location = '/advanced';">
-              Advanced homepage (/advanced)
-          </div>
-          <div class="entrylink -yellow light" onclick="window.location = '/quickpanel';">
-              Quick panel (/quickpanel)
-          </div>
-          <div class="entrylink -green light" onclick="window.location = '/setdefault';">
-              Set default homepage (/setdefault)
-          </div>
-          <div class="entrylink -blue light" onclick="window.location = '/virtualbar';">
-              VirtualBar (/virtualbar)
-          </div>
-      </div>
-      <h3 class="tab">Games</h3>
-      <div class="entry">
-          <div class="entrylink -green light" onclick="window.location = '/2048';">
-              2048 (/2048)
-          </div>
-          <div class="entrylink -blue light" onclick="window.location = '/bitshifter';">
-              Bitshifter (/bitshifter)
-          </div>
-          <div class="entrylink -red light" onclick="window.location = '/hangman';">
-              Hang Man (/hangman)
-          </div>
-          <div class="entrylink -yellow light" onclick="window.location = '/minesweeper';">
-              Minesweeper (/minesweeper)
-          </div>
-          <div class="entrylink -green light" onclick="window.location = '/speedtype';">
-              Speed Typer (/speedtype)
-          </div>
-          <div class="entrylink -blue light" onclick="window.location = '/towerdefense';">
-              Tower Defense (/towerdefense)
-          </div>
-          <div class="entrylink -red light" onclick="window.location = '/leaderboards';">
-              Leaderboards (/leaderboards)
-          </div>
-      </div>
-      <h3 class="tab">Teacher</h3>
-      <div class="entry">
-          <div class="entrylink -green light" onclick="window.location = '/settings';">
-              Settings (/settings)
-          </div>
-          <div class="entrylink -blue light" onclick="window.location = '/lesson';">
-              Lesson (/lesson)
-          </div>
-          <div class="entrylink -red light" onclick="window.location = '/needshelp';">
-              Help Tickets (/needshelp)
-          </div>
-          <div class="entrylink -yellow light" onclick="window.location = '/debug';">
-              API Debug (/debug)
-          </div>
-      </div>
-  </div>
-</div>
-{% endblock %}
+    <h1 style="background-color:white;">Socket</h1>
+    <form id="emit" method="POST" action='#'>
+        <input type="text" name="emit_data" id="emit_data" placeholder="Message">
+        <input type="submit" value="Send Message">
+    </form>
+    <form id="broadcast" method="POST" action='#'>
+        <input type="text" name="broadcast_data" id="broadcast_data" placeholder="Message">
+        <input type="submit" value="Send Broadcast Message">
+    </form>
+
+    <form id="disconnect" method="POST" action="#">
+        <input type="submit" value="Disconnect Server">
+    </form>
+    <h2 style="background-color:white;">Logs</h2>
+    <div id="log" ></div>
+</body>
+</html>

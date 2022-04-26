@@ -3,7 +3,6 @@ class Session():
         self.refresh()
         self.ip = ip
         self.studentDict = {}
-        self.mainPage = '/home'
         self.bgm = {
             'nowplaying': '',
             'lastTime': 0,
@@ -21,7 +20,7 @@ class Session():
                 'api' : 3,
                 'sfx' : 1,
                 'bgm' : 1,
-                'say' : 2,
+                'say' : 3,
                 'bar' : 1,
                 'games': 2,
                 'teacher': 0,
@@ -41,8 +40,8 @@ class Session():
             'upcolor': 'green',
             'wigglecolor': 'blue',
             'downcolor': 'red',
-            'barmode': 'playtime',
-            'modes': ['poll', 'tutd', 'abcd', 'text', 'quiz', 'essay', 'progress', 'playtime'],
+            'barmode': 'tutd',
+            'modes': ['tutd', 'survey', 'quiz', 'essay', 'progress', 'playtime'],
             'whitelist': [
                 '127.0.0.1',
                 '172.21.3.5'
@@ -51,7 +50,7 @@ class Session():
 
     def refresh(self):
         self.currentStep = 0
-        self.wawdLink = ''
+        self.wawdLink = '/'
         self.agendaStep = 0
         self.activePhrase = ''
         self.activePrompt = ''
@@ -66,14 +65,11 @@ class Student():
     def __init__(self, username):
         self.name = username
         self.help = False
-        self.breakReq = False
         self.thumb = ''
-        self.letter = ''
-        self.textRes = ''
+        self.survey = ''
         self.progress = []
         self.perms = 2
         self.quizResults = {}
-        self.preferredHomepage = None
 
 
 class TTTGame():

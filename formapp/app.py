@@ -36,6 +36,8 @@ NEWACCOUNTPERMISSIONS = 3
 
 #Importing external modules
 from flask import Flask, redirect, url_for, request, render_template
+from flask_socketio import SocketIO, emit, disconnect
+from threading import Lock
 from werkzeug.utils import secure_filename
 from websocket_server import WebsocketServer
 from cryptography.fernet import Fernet
@@ -94,9 +96,16 @@ else:
     #Create an empty list as long as our MAXPIX if not on RPi
     pixels = [(0,0,0)]*MAXPIX
 
-
+async_mode = None
 #Start a new flask server for http service
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'secret!'
+socket_ = SocketIO(app, async_mode=async_mode)
+thread = None
+thread_lock = Lock()
+
+apinamespace = '/apisocket'
+chatnamespace = '/chat'
 
 sD = sessions.Session(ip)
 
@@ -212,6 +221,12 @@ def newStudent(remote, username, bot=False):
                     sD.studentDict[remote]['perms'] = sD.settings['perms']['admin']
                 else:
                     sD.studentDict[remote]['perms'] = int(user[3])
+
+        #Check if the user has a help ticket or break request in
+        if username in helpList:
+            sD.studentDict[request.remote_addr]['help'] = True
+            if helpList[username] == "<i>Requested a bathroom break</i>":
+                sD.studentDict[request.remote_addr]['breakReq'] = True
 
         playSFX("sfx_up02")
 

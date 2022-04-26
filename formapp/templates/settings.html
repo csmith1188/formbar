@@ -158,6 +158,20 @@
         document.getElementById("playtime").checked = true;
       }
     })();
+
+    function restart() {
+      if (confirm("Are you sure you want to restart the Formbar?")) {
+        request.open("GET", "/flush");
+        request.send();
+      }
+    }
+
+    function clearTable(table) {
+      if (confirm(`Are you sure you want to remove all data in the table "${table}"?`)) {
+        request.open("GET", `/cleartable?table=${table}`);
+        request.send();
+      }
+    }
 </script>
 {% endblock %}
 
@@ -290,11 +304,11 @@ When votes are missing, there will be empty spaces on the bar.<br>
 <input type="checkBox" id="showMissing" checked onchange="request.open('GET', `/settings?showinc=${this.value}`); request.send();"><label for="showMissing">Show</label><br>
 
 <h2>Restart session</h2>
-<button class="inline popOut" onclick="request.open('GET', '/flush'); request.send();">Remove all students and restart</button><br>
+<button class="inline popOut" onclick="restart();">Remove all students and restart</button><br>
 
 <h2>Clear data</h2>
-<b>Warning: Deleting this data is permanent.</b><br>
-<button class="inline popOut" style="margin-top: 12px;" onclick="request.open('GET', '/cleartable?table=messages'); request.send();">Clear all chat messages</button>
-<button class="inline popOut" style="margin-top: 12px;" onclick="request.open('GET', '/cleartable?table=scores'); request.send();">Clear all game scores</button>
-<button class="inline popOut" style="margin-top: 12px;" onclick="request.open('GET', '/cleartable?table=users'); request.send();">Clear all user accounts</button>
+<b>Warning: These buttons will permanently delete data.</b><br>
+<button class="inline popOut" style="margin-top: 12px;" onclick="clearTable('messages');">Clear all chat messages</button><br>
+<button class="inline popOut" style="margin-top: 12px;" onclick="clearTable('scores');">Clear all game scores</button><br>
+<button class="inline popOut" style="margin-top: 12px;" onclick="clearTable('users');">Clear all user accounts</button>
 {% endblock %}

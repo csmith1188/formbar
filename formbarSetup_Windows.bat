@@ -12,6 +12,7 @@ REM apt-get -y install python3-sdl2
 REM apt-get -y install screen
 REM install modules
 pip install flask
+pip install flask_socketio
 pip install websocket_server
 pip install pygame
 pip install openpyxl

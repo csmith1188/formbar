@@ -1492,7 +1492,7 @@
 
       if (rematchCode) sendPlayerReady();
 
-      request.open("GET", "/createfightermatch?code=" + matchCode + "&name=" + me.name);
+      request.open("POST", "/createfightermatch?code=" + matchCode + "&name=" + me.name);
       request.send();
 
       let tips = [
@@ -1529,7 +1529,7 @@
       if (me.team == 1) {
         fighter2a = opponent.fighters[0];
         fighter2b = opponent.fighters[1];
-        request.open("GET", "/addfighteropponent?code=" + matchCode + "&name=" + player.name);
+        request.open("POST", "/addfighteropponent?code=" + matchCode + "&name=" + player.name);
         request.send();
         sendPlayerReady();
       } else {

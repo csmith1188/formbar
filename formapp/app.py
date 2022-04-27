@@ -1052,7 +1052,8 @@ def endpoint_break():
                     if sD.studentDict[student]['excluded']:
                         sD.studentDict[student]['excluded'] = False
                         sD.studentDict[student]['perms'] = sD.studentDict[request.remote_addr]['oldPerms']
-                        server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', student, 'server', 'Your break was ended.')))
+                        #Disabled until chat works
+                        #server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', student, 'server', 'Your break was ended.')))
                         return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'], ticket = ticket)
                     else:
                         return redirect(request.path + "?alert=This student is not currently taking a bathroom break.")

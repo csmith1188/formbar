@@ -1051,7 +1051,7 @@ def endpoint_break():
                 if sD.studentDict[student]['name'].strip() == name:
                     if sD.studentDict[student]['excluded']:
                         sD.studentDict[student]['excluded'] = False
-                        sD.studentDict[student]['perms'] = sD.studentDict[request.remote_addr]['oldPerms']
+                        sD.studentDict[student]['perms'] = sD.studentDict[student]['oldPerms']
                         #Disabled until chat works
                         #server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', student, 'server', 'Your break was ended.')))
                         return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'], ticket = ticket)
@@ -1776,7 +1776,7 @@ def endpoint_needshelp():
                     sD.studentDict[student]['help'] = False
                     if request.args.get('acceptBreak'):
                         sD.studentDict[student]['excluded'] = True
-                        sD.studentDict[student]['oldPerms'] = sD.studentDict[request.remote_addr]['perms'] #Get the student's current permissions so they can be restored later
+                        sD.studentDict[student]['oldPerms'] = sD.studentDict[student]['perms'] #Get the student's current permissions so they can be restored later
                         sD.studentDict[student]['perms'] = sD.settings['perms']['anyone']
                     #Disabled until chat works
                         #server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', name, 'server', 'The teacher accepted your break request.')))

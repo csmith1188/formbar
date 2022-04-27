@@ -111,10 +111,7 @@
           default:
             metric = "Score";
         }
-        if (metric == "Time") {
-          gameData.reverse();
-          gameData.forEach(item => item[3] = `${Math.floor(+item[3] / 60)}:${+item[3] % 60 < 10 ? "0" + +item[3] % 60 : +item[3] % 60}`);
-        }
+        if (metric == "Time") gameData.reverse();
         gameData = gameData.slice(0, 10); //Get the first 10 items
         document.getElementById("scores").innerHTML = `
           <table id="table">
@@ -131,7 +128,7 @@
             document.getElementById("table").innerHTML += `
               <tr>
                 <td>${score[2]}</td>
-                <td>${score[3]}</td>
+                <td>${(metric == "Time") ? `${Math.floor(score[3] / 60)}:${score[3] % 60 < 10 ? "0" + score[3] % 60 : score[3] % 60}` : score[3]}</td>
               </tr>
             `;
             alreadyInList.push(score[2]);

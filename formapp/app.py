@@ -892,7 +892,7 @@ def endpoint_addfile():
 @app.route('/advanced')
 def endpoint_advanced():
     if not request.remote_addr in sD.studentDict:
-        return redirect('/login')
+        return redirect('/login?forward=' + request.path)
     page = request.args.get('page') or ''
     mainPage = sD.mainPage.lstrip("/")
     username = sD.studentDict[request.remote_addr]['name']
@@ -954,6 +954,8 @@ def endpoint_bgm():
                         startBGM(bgm_file)
                     return render_template("message.html", message = 'Playing: ' + bgm_file, forward = '/bgm')
                 else:
+                    if request.args.get('return') == 'json':
+                        return '{error: "It has only been ' + str(int(time.time() - sD.bgm['lastTime'])) + ' seconds since the last song started. Please wait at least 60 seconds."}'
                     return render_template("message.html", message = "It has only been " + str(int(time.time() - sD.bgm['lastTime'])) + " seconds since the last song started. Please wait at least 60 seconds.", forward = '/bgm')
             else:
                 return render_template("message.html", message = "Cannot find that filename!", forward = '/bgm')
@@ -1676,6 +1678,10 @@ def endpoint_login():
                 return redirect('/', code=302)
             return render_template("login.html")
 
+@app.route('/logout')
+def endpoint_logout():
+    return redirect('/login')
+
 # ███    ███
 # ████  ████
 # ██ ████ ██
@@ -1888,7 +1894,7 @@ def endpoint_progress():
 
 '''
     /quickpanel
-    The most commonly-used features
+    Only the most-used features
 '''
 @app.route('/quickpanel')
 def endpoint_quickpanel():
@@ -1975,7 +1981,7 @@ def endpoint_say():
                     pixels.show()
             return render_template("message.html", message = "Set phrase to: " + str(sD.activePhrase) + ".")
         else:
-            return render_template("message.html", message = "<b>phrase</b> must contain a string. \'/say?phrase=<b>\'hello\'</b>\'")
+            return render_template("message.html", message = "<b>phrase</b> must contain a string. \'/say?phrase=<b>\'hello\'</b>\'", forward = '/home')
 
 @app.route('/segment')
 def endpoint_segment():

@@ -278,11 +278,15 @@ function listSounds(files) {
   sfx.forEach(sound => document.getElementById("sfxFiles").innerHTML += "<option value='" + sound + "'></option>");
 }
 
-async function sendSound() {
+function sendSound() {
   let soundFile = document.getElementById("sound").value;
-  let res = await getResponse("/sfx?file=" + soundFile);
-  if (sfx.includes(soundFile)) document.getElementById("sound").value = null;
-  else alert("File does not exist");
+  if (sfx.includes(soundFile)) {
+    request.open("GET", "/sfx?file=" + soundFile);
+    request.send();
+    document.getElementById("sound").value = null;
+  } else {
+    alert("File does not exist");
+  }
 }
 
 if (document.getElementById("sound")) document.getElementById("sound").addEventListener("keydown", event => {
@@ -320,9 +324,13 @@ async function sendMusic() {
   let musicFile = document.getElementById("music").value;
   let volume = document.getElementById("volume").value;
   if (volume == 1) volume = "1.0";
-  let res = await getResponse("/bgm?file=" + musicFile + "&volume=" + volume);
-  if (bgm.includes(musicFile)) document.getElementById("music").value = null;
-  else alert("File does not exist");
+  if (bgm.includes(musicFile)) {
+    let res = await getResponse("/bgm?file=" + musicFile + "&volume=" + volume);
+    if (res.error) alert(res.error);
+    else document.getElementById("music").value = null;
+  } else {
+    alert("File does not exist");
+  }
 }
 
 if (document.getElementById("music")) document.getElementById("music").addEventListener("keydown", event => {
@@ -377,29 +385,29 @@ function updateVolume() {
   }
 }
 
-async function playPauseMusic() {
-  let res = await getResponse("/bgm?playpause=true");
-  if (res.error) alert(res.error);
+function playPauseMusic() {
+  request.open("GET", "/bgm?playpause=true");
+  request.send();
 }
 
-async function restartMusic() {
-  let res = await getResponse("/bgm?rewind=true");
-  if (res.error) alert(res.error);
+function restartMusic() {
+  request.open("GET", "/bgm?rewind=true");
+  request.send();
 }
 
-async function stopMusic() {
-  let res = await getResponse("/bgmstop");
-  if (res.error) alert(res.error);
+function stopMusic() {
+  request.open("GET", "/bgmstop");
+  request.send();
 }
 
-async function sendText() {
+function sendText() {
   let text = document.getElementById("text").value;
   let fg = document.getElementById("fgColor").value.slice(1);
   let bg = document.getElementById("bgColor").value.slice(1);
   //If input is blank, replace with underscore
   text ||= "_";
-  let res = await getResponse("/say?phrase=" + text + "&fg=" + fg + "&bg=" + bg);
-  res.error ? alert(res.error) : document.getElementById("text").value = null;
+  request.open("GET", "/say?phrase=" + text + "&fg=" + fg + "&bg=" + bg);
+  request.send();
 }
 
 if (document.getElementById("text")) document.getElementById("text").addEventListener("keydown", event => {
@@ -443,7 +451,7 @@ function showColor2() {
   document.getElementById("color2Div").classList.remove("hidden");
 }
 
-async function sendColor() {
+function sendColor() {
   let start = document.getElementById("segmentStart").value;
   let end = document.getElementById("segmentEnd").value;
   let hex1 = document.getElementById("color1").value.slice(1);
@@ -453,6 +461,6 @@ async function sendColor() {
     end = barpix.length;
   }
   if (!gradient) hex2 = hex1;
-  let res = await getResponse("/segment?start=" + start + "&end=" + end + "&hex=" + hex1 + "&hex2=" + hex2);
-  if (res.error) alert(res.error);
+  request.open("GET", "/segment?start=" + start + "&end=" + end + "&hex=" + hex1 + "&hex2=" + hex2);
+  request.send();
 }

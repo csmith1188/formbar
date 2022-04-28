@@ -126,6 +126,11 @@ body, .light, .dark {
   transform: translateY(-50%);
 }
 
+.unselectable {
+  opacity: 50%;
+  cursor: not-allowed;
+}
+
 ::selection {
   background: var(--theme-color);
   color: var(--bg-color);
@@ -178,11 +183,6 @@ input, button, textarea, select {
   font-size: inherit;
 }
 
-.unselectable {
-  opacity: 50%;
-  cursor: not-allowed;
-}
-
 /*Text inputs should be given class "line" or "box"*/
 
 .line {
@@ -212,7 +212,7 @@ textarea:focus, .box:focus {
 
 /*Use class "button" for button-like inputs, such as submit and file*/
 
-button, .button {
+button:not(.inline), .button:not(.inline) {
   padding: 3px 9px;
   border-radius: 9999px;
   background: var(--emphasis-color);
@@ -223,79 +223,69 @@ button, .button {
   user-select: none;
 }
 
-button:hover, .button:hover {
+button:where(:not(.popOut):where(:not(.unselectable):not(.pressed))):hover,
+.button:where(:not(.popOut):where(:not(.unselectable):not(.pressed))):hover {
   background: var(--highlight-color);
 }
 
 /*Use class "inline" for buttons that are within the flow of text. "inline" should always be used with "popOut" (but not vice versa)*/
 
-.inline {
-  padding: 1px 2px;
+button.inline, .button.inline {
   background: var(--emphasis-color);
-  color: var(--theme-color);
   border: 1px solid;
   border-radius: 6px;
-  font-size: 16px;
+  color: var(--theme-color);
   font-weight: bold;
   cursor: pointer;
   user-select: none;
-}
-
-.inline, .popOut {
-  transition-duration: 0.2s;
 }
 
 img.button.inline {
   border: none;
 }
 
-button.unselectable:hover, .button.unselectable:hover {
-  background: var(--emphasis-color);
+.popOut {
+  transition-duration: 0.2s;
 }
 
-.pressed:hover {
-  background: var(--theme-color);
-}
-
-.popOut:hover {
-  background: var(--emphasis-color);
+.popOut:hover:where(:not(.unselectable):not(.pressed)) {
   transform: translate(2px, -2px);
   box-shadow: -1px 1px, -2px 2px;
 }
 
-.moreDepth:hover {
+.popOut.moreDepth:where(:not(.unselectable):not(.pressed)):hover:not(:active) {
   transform: translate(4px, -4px);
   box-shadow: -1px 1px, -2px 2px, -3px 3px, -4px 4px;
 }
 
-.popOut:active {
+.popOut:where(:not(.unselectable):not(.pressed)):active {
   transform: initial;
   box-shadow: initial;
   background: var(--highlight-color);
 }
 
-.pressed {
+button.pressed, .button.pressed {
   background: var(--theme-color);
   border-color: var(--theme-color);
   color: var(--bg-color);
   cursor: default;
 }
 
-[type="number"] {
+input[type="number"] {
   width: 48px;
 }
 
-[type="color"] {
+input[type="color"] {
   width: 80px;
   height: 20px;
 }
 
-[type="range"] {
+input[type="range"] {
   width: 96px;
   vertical-align: middle;
 }
 
-[type="radio"] {
+input[type="radio"] {
   -webkit-appearance: none;
   width: 14px;
   height: 14px;
@@ -307,13 +297,13 @@ button.unselectable:hover, .button.unselectable:hover {
   vertical-align: middle;
 }
 
-[type="radio"]:checked {
+input[type="radio"]:checked {
   background: var(--theme-color);
   box-shadow: 0 0 0 2px var(--emphasis-color) inset;
   color: var(--theme-color);
 }
 
-[type="checkbox"] {
+input[type="checkbox"] {
   -webkit-appearance: none;
   width: 14px;
   height: 14px;
@@ -325,38 +315,30 @@ button.unselectable:hover, .button.unselectable:hover {
   vertical-align: text-bottom;
 }
 
-[type="checkbox"]:checked {
+input[type="checkbox"]:checked {
   background: var(--theme-color) url("../img/checkMark.png") no-repeat;
   background-size: 100%;
   color: var(--theme-color);
 }
 
-.light [type="checkbox"]:checked {
+.light input[type="checkbox"]:checked {
   background: var(--theme-color) url("../img/checkMarkLight.png") no-repeat;
 }
 
-[type="radio"]:hover, [type="checkbox"]:hover {
+input[type="radio"]:hover:not([disabled]), input[type="checkbox"]:hover:not([disabled]) {
   box-shadow: 0 0 4px;
 }
 
-[type="radio"]:checked:hover {
+input[type="radio"]:checked:hover:not([disabled]) {
   box-shadow: 0 0 0 2px var(--emphasis-color) inset, 0 0 4px;
 }
 
-[disabled] {
-  background: var(--highlight-color);
+input[type="radio"][disabled], input[type="checkbox"]:not([checked])[disabled] {
+  background-color: var(--highlight-color);
   opacity: 50%;
 }
 
-[type="radio"][disabled]:hover {
-  box-shadow: 0 0 0 2px var(--emphasis-color) inset;
-}
-
-[type="checkbox"][disabled]:hover {
-  box-shadow: initial;
-}
-
-[disabled]:checked {
+input[type="checkbox"][checked][disabled] {
   opacity: 50%;
 }
 

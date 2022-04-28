@@ -1374,7 +1374,7 @@ def endpoint_getword():
             wordlist = []
             for i in range(number):
                 wordlist.append(random.choice(list(words.keys())))
-                return json.dumps(wordlist)
+            return json.dumps(wordlist)
         except Exception as e:
             print("[error] " + "Could not convert number. " + str(e))
             return render_template("message.html", message = "Could not convert number. " + str(e))
@@ -2445,6 +2445,16 @@ def endpoint_wawd():
     if not content:
         content = 'There is no active lesson right now.'
     return render_template('general.html', content = content)
+
+#This will take the student to the current "What are we doing?" link
+@app.route('/wordle')
+def endpoint_wordle():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
+    else:
+        return render_template('wordle.html', wordList = str(words.keys()))
 
 
 # ██     ██ ███████ ██████  ███████  ██████   ██████ ██   ██ ███████ ████████ ███████

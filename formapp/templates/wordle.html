@@ -1,0 +1,110 @@
+{% extends 'header.html' %}
+<!-- ^^ This means add this file to the end of the contents of header.html -->
+<!-- This is where the title, top buttons, and stylesheet is located -->
+
+<!-- Change title here -->
+{% block title %}Wordle{% endblock %}
+
+<!-- Extra style declarations here -->
+{% block style %}
+<style>
+  #boxes {
+    border-collapse: separate;
+    border-spacing: 15px;
+    border: none;
+  }
+
+  td {
+    width: 75px;
+    height: 75px;
+  }
+
+
+</style>
+{% endblock %}
+
+<!-- Change theme color here -->
+{% block color %}purple{% endblock %}
+
+<!-- Main content here -->
+{% block main %}
+<table id="boxes" class="hCentered">
+  <tr>
+    <td id="r0c0"></td>
+    <td id="r0c1"></td>
+    <td id="r0c2"></td>
+    <td id="r0c3"></td>
+    <td id="r0c4"></td>
+  </tr>
+  <tr>
+    <td id="r1c0"></td>
+    <td id="r1c1"></td>
+    <td id="r1c2"></td>
+    <td id="r1c3"></td>
+    <td id="r1c4"></td>
+  </tr>
+  <tr>
+    <td id="r2c0"></td>
+    <td id="r2c1"></td>
+    <td id="r2c2"></td>
+    <td id="r2c3"></td>
+    <td id="r2c4"></td>
+  </tr>
+  <tr>
+    <td id="r3c0"></td>
+    <td id="r3c1"></td>
+    <td id="r3c2"></td>
+    <td id="r3c3"></td>
+    <td id="r3c4"></td>
+  </tr>
+  <tr>
+    <td id="r4c0"></td>
+    <td id="r4c1"></td>
+    <td id="r4c2"></td>
+    <td id="r4c3"></td>
+    <td id="r4c4"></td>
+  </tr>
+  <tr>
+    <td id="r4c0"></td>
+    <td id="r4c1"></td>
+    <td id="r4c2"></td>
+    <td id="r4c3"></td>
+    <td id="r4c4"></td>
+  </tr>
+</table>
+{% endblock %}
+
+<!-- Extra JavaScript here -->
+{% block script %}
+<script>
+  let wordList = eval("{{ wordList }}".replaceAll("&#39;", "'").slice(10, -1));
+  let word;
+  let guessed = 0;
+
+  async function newWord() {
+    while (!word) {
+      let words = await getResponse("/getword?number=100");
+      word = words.find(item => item.length == 5);
+      //Check if it's in the dictionary to filter out obscure words
+    }
+  }
+  newWord();
+
+  function guessWord(guess) {
+    while (!word) {} //Wait until a word is chosen
+    if (!wordList.includes(guess)) {
+      console.log("Not in word list");
+    } else if (guess == word) {
+      console.log("Correct");
+    } else {
+      for (let i = 0; i < guess.length; i++) {
+        let el = document.getElementById(`r${guessed}c${i}`);
+        if (guess[i] == word[i]) el.style.background = "green";
+        else if (word.includes(guess[i])) el.style.background = "yellow";
+        else  el.style.background = "gray";
+      }
+      guessed++;
+    }
+  }
+</script>
+{% endblock %}

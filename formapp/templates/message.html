@@ -27,8 +27,11 @@
     el.innerHTML = message;
     message =  el.value;
 
+    let lastPage = new URL(document.referrer);
+
     alert(message);
     if (forward) location.href = forward;
+    else if (lastPage.pathname == "/login") location.href = "/";
     else window.history.back();
   </script>
 {% endblock %}

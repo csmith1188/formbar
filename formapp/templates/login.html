@@ -58,15 +58,13 @@
     let pb = document.getElementById("passwordBox");
     let ut = document.getElementById("userTypeBox");
     let sb = document.getElementById("submitButton");
+    let liButton = document.getElementById("logInButton");
+    let naButton = document.getElementById("newAccountButton");
+    let gButton = document.getElementById("guestButton");
 
     function changeUserType(el) {
-      let liButton = document.getElementById("logInButton");
-      let naButton = document.getElementById("newAccountButton");
-      let gButton = document.getElementById("guestButton");
-
-      [liButton, naButton, gButton].forEach(button => button == el ? button.classList.add("pressed") : button.classList.remove("pressed"));
+      [liButton, naButton, gButton].forEach(button => (button == el) ? button.classList.add("pressed") : button.classList.remove("pressed"));
       if (el == gButton) {
-        ub.value = null;
         pb.value = null;
         pb.classList.add("hidden");
         pb.required = false;
@@ -76,8 +74,6 @@
         pb.required = true;
         if (el == liButton) sb.value = "Log in";
         else if (el == naButton) {
-          ub.value = null;
-          pb.value = null;
           sb.value = "Create account";
         }
       }
@@ -87,6 +83,8 @@
       else if (el == gButton) ut.value = "guest";
 
       checkIfBlank();
+
+      document.getElementById("usernameBox").focus();
     }
 
     function checkIfBlank() {
@@ -101,5 +99,7 @@
 
     ub.oninput = checkIfBlank;
     pb.oninput = checkIfBlank;
+
+    changeUserType(liButton);
 </script>
 {% endblock %}

@@ -126,11 +126,6 @@ body, .light, .dark {
   transform: translateY(-50%);
 }
 
-.unselectable {
-  opacity: 50%;
-  cursor: not-allowed;
-}
-
 ::selection {
   background: var(--theme-color);
   color: var(--bg-color);
@@ -210,6 +205,11 @@ textarea:focus, .box:focus {
   outline: 1px solid;
 }
 
+button, .button {
+  cursor: pointer;
+  user-select: none;
+}
+
 /*Use class "button" for button-like inputs, such as submit and file*/
 
 button:not(.inline), .button:not(.inline) {
@@ -219,8 +219,6 @@ button:not(.inline), .button:not(.inline) {
   color: var(--theme-color);
   border: 1px solid;
   font-size: 18px;
-  cursor: pointer;
-  user-select: none;
 }
 
 button:where(:not(.popOut):where(:not(.unselectable):not(.pressed))):hover,
@@ -236,8 +234,6 @@ button.inline, .button.inline {
   border-radius: 6px;
   color: var(--theme-color);
   font-weight: bold;
-  cursor: pointer;
-  user-select: none;
 }
 
 img.button.inline {
@@ -262,6 +258,11 @@ img.button.inline {
   transform: initial;
   box-shadow: initial;
   background: var(--highlight-color);
+}
+
+.unselectable {
+  opacity: 50%;
+  cursor: not-allowed;
 }
 
 button.pressed, .button.pressed {

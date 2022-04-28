@@ -1851,6 +1851,7 @@ def endpoint_profile():
                     "minesweeper": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='minesweeper' ORDER BY score ASC", {"uname": user['name']}).fetchone(),
                     "speedtype": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='speedtype' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
                     "towerdefense": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='towerdefense' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
+                    "wordle": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='wordle' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
                 }
                 db.close()
                 return render_template("profile.html", username = user['name'], perms = sD.settings['permname'][user['perms']], bot = user['bot'], highScores = json.dumps(highScores))
@@ -2453,7 +2454,16 @@ def endpoint_wordle():
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
     else:
-        return render_template('wordle.html', wordList = str(words.keys()))
+        username = sD.studentDict[request.remote_addr]['name']
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        highScore = dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='wordle' ORDER BY score DESC", {"uname": username}).fetchone()
+        db.close()
+        if highScore:
+            highScore = highScore[3]
+        else:
+            highScore = 0
+        return render_template('wordle.html', wordList = str(words.keys()), highScore = highScore)
 
 
 # ██     ██ ███████ ██████  ███████  ██████   ██████ ██   ██ ███████ ████████ ███████

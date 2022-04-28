@@ -402,7 +402,7 @@
     }
   }
 
-  document.addEventListener("keypress", event => {
+  document.addEventListener("keydown", event => {
     if (/^[a-z]{1}$/.test(event.key)) guess(event.key); //If a letter key is pressed, guess that letter
   });
 </script>

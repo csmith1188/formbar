@@ -8,7 +8,13 @@
 <!-- Extra style declarations here -->
 {% block style %}
 <style>
+  #scoreBox {
+    font-size: 40px;
+    top: 20px;
+  }
+
   #boxes {
+    top: 90px;
     border-collapse: separate;
     border-spacing: 15px;
     border: none;
@@ -17,61 +23,53 @@
   td {
     width: 75px;
     height: 75px;
+    font-size: 40px;
+    font-weight: 600;
   }
 
+  #keys {
+    bottom: 15px;
+    width: 800px;
+  }
 
+  .key {
+    position: relative;
+    display: inline-block;
+    border-radius: 5px;
+    color: var(--bg-dark);
+    margin: 5px;
+    font-size: 40px;
+    font-weight: 600;
+    line-height: 70px;
+    width: 50px;
+    height: 70px;
+    text-align: center;
+    user-select: none;
+    background-color: white;
+    cursor: pointer;
+  }
+
+  .key:hover {
+    background-color: var(--light-gray);
+  }
+
+  .key.unselectable {
+    opacity: 75%;
+  }
 </style>
 {% endblock %}
 
 <!-- Change theme color here -->
-{% block color %}purple{% endblock %}
+{% block color %}green{% endblock %}
 
 <!-- Main content here -->
 {% block main %}
-<table id="boxes" class="hCentered">
-  <tr>
-    <td id="r0c0"></td>
-    <td id="r0c1"></td>
-    <td id="r0c2"></td>
-    <td id="r0c3"></td>
-    <td id="r0c4"></td>
-  </tr>
-  <tr>
-    <td id="r1c0"></td>
-    <td id="r1c1"></td>
-    <td id="r1c2"></td>
-    <td id="r1c3"></td>
-    <td id="r1c4"></td>
-  </tr>
-  <tr>
-    <td id="r2c0"></td>
-    <td id="r2c1"></td>
-    <td id="r2c2"></td>
-    <td id="r2c3"></td>
-    <td id="r2c4"></td>
-  </tr>
-  <tr>
-    <td id="r3c0"></td>
-    <td id="r3c1"></td>
-    <td id="r3c2"></td>
-    <td id="r3c3"></td>
-    <td id="r3c4"></td>
-  </tr>
-  <tr>
-    <td id="r4c0"></td>
-    <td id="r4c1"></td>
-    <td id="r4c2"></td>
-    <td id="r4c3"></td>
-    <td id="r4c4"></td>
-  </tr>
-  <tr>
-    <td id="r4c0"></td>
-    <td id="r4c1"></td>
-    <td id="r4c2"></td>
-    <td id="r4c3"></td>
-    <td id="r4c4"></td>
-  </tr>
-</table>
+<div id="scoreBox" class="hCentered">
+  <b>Score:</b> <span id="score">0</span>
+  <b style="margin-left: 20px;">Best:</b> <span id="highScore"></span>
+</div>
+<table id="boxes" class="hCentered"></table>
+<div id="keys" class="hCentered"></div>
 {% endblock %}
 
 <!-- Extra JavaScript here -->
@@ -79,36 +77,146 @@
 <script>
   let wordList = eval("{{ wordList }}".replaceAll("&#39;", "'").slice(10, -1)).filter(item => item.length == 5);
   let word;
+  let guess = "";
   let guessed = 0;
+  let score = 0;
+  let highScore = {{ highScore }};
+
+  document.getElementById("highScore").innerHTML = highScore;
+
+  let boxes = "";
+  for (let row = 0; row < 6; row++) {
+    boxes += "<tr>";
+    for (let col = 0; col < 5; col++) boxes += `<td id="r${row}c${col}"></td>`;
+    boxes += "</tr>";
+  }
+  document.getElementById("boxes").innerHTML = boxes;
+
+  let letterList = "abcdefghijklmnopqrstuvwxyz";
+  for (let i = 0; i < letterList.length; i++) {
+    let key = document.createElement("div");
+    key.id = letterList[i];
+    key.classList.add("key");
+    key.onclick = () => addLetter(letterList[i]);
+    key.innerText = letterList[i];
+    document.getElementById("keys").append(key);
+  }
+  let backspaceKey = document.createElement("div");
+  backspaceKey.id = "Enter";
+  backspaceKey.classList.add("key");
+  backspaceKey.style.width = "250px";
+  backspaceKey.onclick = () => backspace();
+  backspaceKey.innerText = "Backspace";
+  document.getElementById("keys").append(backspaceKey);
+  let enterKey = document.createElement("div");
+  enterKey.id = "Enter";
+  enterKey.classList.add("key");
+  enterKey.style.width = "250px";
+  enterKey.onclick = () => guessWord();
+  enterKey.innerText = "Guess";
+  document.getElementById("keys").append(enterKey);
+
+  /*wordList = [list of five-letter words];*/
 
   async function newWord() {
+    guessed = 0;
+    let boxes = Array.from(document.querySelectorAll("td"));
+    let keys = Array.from(document.querySelectorAll(".key"));
+    boxes.forEach(box => {
+      box.style.background = null;
+      box.innerText = null;
+    });
+    keys.forEach(key => key.style.background = null);
+    word = "";
     while (!word) {
       let randomWord = wordList[Math.floor(Math.random() * wordList.length)]; //Get a random word
       //Check if it's in the dictionary to filter out obscure words
       let definition = await getResponse("https://api.dictionaryapi.dev/api/v2/entries/en_US/" + randomWord);
       if (definition.title != "No Definitions Found") word = randomWord;
     }
-    console.log(word);
   }
   newWord();
 
-  function guessWord(guess) {
-    //while (!word) {} //Wait until a word is chosen
-    if (!wordList.includes(guess)) {
-      console.log("Not in word list");
-    } else if (guess == word) {
-      console.log("Correct");
-    } else {
-      for (let i = 0; i < guess.length; i++) {
-        let el = document.getElementById(`r${guessed}c${i}`);
-        if (guess[i] == word[i]) el.style.background = "green";
-        else if (word.includes(guess[i])) el.style.background = "yellow";
-        else  el.style.background = "gray";
-      }
-      guessed++;
+  function addLetter(letter) {
+    if (guess.length < 5) {
+      let box = document.getElementById(`r${guessed}c${guess.length}`);
+      box.innerText = letter;
+      guess += letter;
     }
   }
 
-  guessWord("adieu");
+  function backspace() {
+    if (guess.length) {
+      let box = document.getElementById(`r${guessed}c${guess.length - 1}`);
+      box.innerText = null;
+      guess = guess.slice(0, -1);
+    }
+  }
+
+  document.addEventListener("keydown", e => {
+    if (/^[a-z]{1}$/.test(e.key)) addLetter(e.key); //If a letter key is pressed, guess that letter
+    if (e.key == "Backspace") backspace();
+    if (e.key == "Enter") guessWord();
+  });
+
+  function guessWord() {
+    if (guess.length == 5) {
+      if (!word) {
+        alert("Still getting a word. Try again in a few seconds.");
+      } else {
+        if (!wordList.includes(guess)) {
+          alert("Not in word list");
+        } else {
+          let greenList = guess.split("").filter((letter, i) => letter == word[i]);
+
+          for (let i = 0; i < guess.length; i++) {
+            let box = document.getElementById(`r${guessed}c${i}`);
+            let key = document.getElementById(guess[i]);
+            box.innerText = guess[i];
+
+            let instancesOfLetter = word.split("").filter(letter => letter == guess[i]);
+            let instancesFound = greenList.filter(letter => letter == guess[i]);
+            let everyInstanceFound = instancesOfLetter.length == instancesFound.length;
+
+            if (guess[i] == word[i]) {
+              box.style.background = "var(--color-green)";
+              key.style.background = "var(--light-green)";
+              greenList.push(i);
+            } else if (word.includes(guess[i]) && !everyInstanceFound) {
+              box.style.background = "var(--color-yellow)";
+              if (key.style.background != "var(--light-green)") key.style.background = "var(--light-yellow)";
+            } else {
+              box.style.background = "gray";
+              key.style.background = "gray";
+            }
+          }
+
+          guessed++;
+          setTimeout(() => {
+            if (guess == word) {
+              alert("Correct!");
+              score += 7 - guessed;
+              if (score > highScore) {
+                highScore = score;
+                document.getElementById("highScore").style.color = "var(--light-purple)";
+              }
+              newWord();
+            } else if (guessed == 6) {
+              alert("Game over");
+              request.open("POST", "/savescore?game=wordle&score=" + score);
+              request.send();
+              score = 0;
+              newWord();
+            }
+            document.getElementById("score").innerText = score;
+            document.getElementById("highScore").innerText = highScore;
+            guess = "";
+          }, 0);
+        }
+      }
+    } else {
+      alert("Not enough letters");
+    }
+  }
 </script>
 {% endblock %}

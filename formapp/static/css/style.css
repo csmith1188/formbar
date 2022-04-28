@@ -178,6 +178,11 @@ input, button, textarea, select {
   font-size: inherit;
 }
 
+.unselectable {
+  opacity: 50%;
+  cursor: not-allowed;
+}
+
 /*Text inputs should be given class "line" or "box"*/
 
 .line {
@@ -207,7 +212,7 @@ textarea:focus, .box:focus {
 
 /*Use class "button" for button-like inputs, such as submit and file*/
 
-button:not(.inline), .button:not(.inline) {
+button, .button {
   padding: 3px 9px;
   border-radius: 9999px;
   background: var(--emphasis-color);
@@ -218,74 +223,79 @@ button:not(.inline), .button:not(.inline) {
   user-select: none;
 }
 
-button:not(.popOut):not(.unselectable):not(.pressed):hover,
-.button:not(.popOut):not(.unselectable):not(.pressed):hover {
+button:hover, .button:hover {
   background: var(--highlight-color);
 }
 
 /*Use class "inline" for buttons that are within the flow of text. "inline" should always be used with "popOut" (but not vice versa)*/
 
-button.inline, .button.inline {
+.inline {
+  padding: 1px 2px;
   background: var(--emphasis-color);
+  color: var(--theme-color);
   border: 1px solid;
   border-radius: 6px;
-  color: var(--theme-color);
+  font-size: 16px;
   font-weight: bold;
   cursor: pointer;
   user-select: none;
+}
+
+.inline, .popOut {
+  transition-duration: 0.2s;
 }
 
 img.button.inline {
   border: none;
 }
 
-.popOut {
-  transition-duration: 0.2s;
+button.unselectable:hover, .button.unselectable:hover {
+  background: var(--emphasis-color);
 }
 
-.popOut:hover:not(.unselectable):not(.pressed) {
+.pressed:hover {
+  background: var(--theme-color);
+}
+
+.popOut:hover {
+  background: var(--emphasis-color);
   transform: translate(2px, -2px);
   box-shadow: -1px 1px, -2px 2px;
 }
 
-.popOut.moreDepth:not(.unselectable):not(.pressed):hover:not(:active) {
+.moreDepth:hover {
   transform: translate(4px, -4px);
   box-shadow: -1px 1px, -2px 2px, -3px 3px, -4px 4px;
 }
 
-.popOut:not(.unselectable):not(.pressed):active {
+.popOut:active {
   transform: initial;
   box-shadow: initial;
   background: var(--highlight-color);
 }
 
-button.pressed, .button.pressed {
+.pressed {
   background: var(--theme-color);
   border-color: var(--theme-color);
   color: var(--bg-color);
   cursor: default;
 }
 
-.unselectable.unselectable {
-  opacity: 50%;
-  cursor: not-allowed;
-}
-
-input[type="number"] {
+[type="number"] {
   width: 48px;
 }
 
-input[type="color"] {
+[type="color"] {
   width: 80px;
   height: 20px;
 }
 
-input[type="range"] {
+[type="range"] {
   width: 96px;
   vertical-align: middle;
 }
 
-input[type="radio"] {
+[type="radio"] {
   -webkit-appearance: none;
   width: 14px;
   height: 14px;
@@ -297,13 +307,13 @@ input[type="radio"] {
   vertical-align: middle;
 }
 
-input[type="radio"]:checked {
+[type="radio"]:checked {
   background: var(--theme-color);
   box-shadow: 0 0 0 2px var(--emphasis-color) inset;
   color: var(--theme-color);
 }
 
-input[type="checkbox"] {
+[type="checkbox"] {
   -webkit-appearance: none;
   width: 14px;
   height: 14px;
@@ -315,30 +325,38 @@ input[type="checkbox"] {
   vertical-align: text-bottom;
 }
 
-input[type="checkbox"]:checked {
+[type="checkbox"]:checked {
   background: var(--theme-color) url("../img/checkMark.png") no-repeat;
   background-size: 100%;
   color: var(--theme-color);
 }
 
-.light input[type="checkbox"]:checked {
+.light [type="checkbox"]:checked {
   background: var(--theme-color) url("../img/checkMarkLight.png") no-repeat;
 }
 
-input[type="radio"]:hover:not([disabled]), input[type="checkbox"]:hover:not([disabled]) {
+[type="radio"]:hover, [type="checkbox"]:hover {
   box-shadow: 0 0 4px;
 }
 
-input[type="radio"]:checked:hover:not([disabled]) {
+[type="radio"]:checked:hover {
   box-shadow: 0 0 0 2px var(--emphasis-color) inset, 0 0 4px;
 }
 
-input[type="radio"][disabled], input[type="checkbox"]:not([checked])[disabled] {
-  background-color: var(--highlight-color);
+[disabled] {
+  background: var(--highlight-color);
   opacity: 50%;
 }
 
-input[type="checkbox"][checked][disabled] {
+[type="radio"][disabled]:hover {
+  box-shadow: 0 0 0 2px var(--emphasis-color) inset;
+}
+
+[type="checkbox"][disabled]:hover {
+  box-shadow: initial;
+}
+
+[disabled]:checked {
   opacity: 50%;
 }
 

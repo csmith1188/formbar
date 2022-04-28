@@ -77,16 +77,18 @@
 <!-- Extra JavaScript here -->
 {% block script %}
 <script>
-  let wordList = eval("{{ wordList }}".replaceAll("&#39;", "'").slice(10, -1));
+  let wordList = eval("{{ wordList }}".replaceAll("&#39;", "'").slice(10, -1)).filter(item => item.length == 5);
   let word;
   let guessed = 0;
 
   async function newWord() {
     while (!word) {
-      let words = await getResponse("/getword?number=100");
-      word = words.find(item => item.length == 5);
+      let randomWord = wordList[Math.floor(Math.random() * wordList.length)]; //Get a random word
       //Check if it's in the dictionary to filter out obscure words
+      let definition = await getResponse("https://api.dictionaryapi.dev/api/v2/entries/en_US/" + randomWord);
+      if (definition.title != "No Definitions Found") word = randomWord;
     }
+    console.log(word);
   }
   newWord();
 
@@ -106,5 +108,7 @@
       guessed++;
     }
   }
+
+  guessWord("adieu");
 </script>
 {% endblock %}

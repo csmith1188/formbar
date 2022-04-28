@@ -2446,7 +2446,6 @@ def endpoint_wawd():
         content = 'There is no active lesson right now.'
     return render_template('general.html', content = content)
 
-#This will take the student to the current "What are we doing?" link
 @app.route('/wordle')
 def endpoint_wordle():
     if not request.remote_addr in sD.studentDict:

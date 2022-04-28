@@ -92,7 +92,7 @@
   }
   document.getElementById("boxes").innerHTML = boxes;
 
-  let letterList = "abcdefghijklmnopqrstuvwxyz";
+  let letterList = "qwertyuiopasdfghjklzxcvbnm";
   for (let i = 0; i < letterList.length; i++) {
     let key = document.createElement("div");
     key.id = letterList[i];
@@ -202,7 +202,7 @@
               }
               newWord();
             } else if (guessed == 6) {
-              alert("Game over");
+              alert("Game over\nCorrect word: " + word);
               request.open("POST", "/savescore?game=wordle&score=" + score);
               request.send();
               score = 0;

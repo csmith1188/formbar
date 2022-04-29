@@ -187,10 +187,10 @@
               greenList.push(i);
             } else if (word.includes(guess[i]) && !allGreen && !tooMany) {
               box.style.background = "var(--color-yellow)";
-              if (key.style.background != "var(--light-green)") key.style.background = "var(--light-yellow)";
+              if (!key.style.background) key.style.background = "var(--light-yellow)";
             } else {
               box.style.background = "gray";
-              key.style.background = "gray";
+              if (!key.style.background) key.style.background = "gray";
             }
           }
 

@@ -18,7 +18,6 @@
     border-collapse: separate;
     border-spacing: 15px;
     border: none;
-    user-select: none;
   }
 
   td {
@@ -93,7 +92,7 @@
   }
   document.getElementById("boxes").innerHTML = boxes;
 
-  let letterList = "abcdefghijklmnopqrstuvwxyz";
+  let letterList = "qwertyuiopasdfghjklzxcvbnm";
   for (let i = 0; i < letterList.length; i++) {
     let key = document.createElement("div");
     key.id = letterList[i];
@@ -176,19 +175,21 @@
             box.innerText = guess[i];
 
             let instancesOfLetter = word.split("").filter(letter => letter == guess[i]);
-            let instancesFound = greenList.filter(letter => letter == guess[i]);
-            let everyInstanceFound = instancesOfLetter.length == instancesFound.length;
+            let instancesGreen = greenList.filter(letter => letter == guess[i]);
+            let allGreen = instancesGreen.length == instancesOfLetter.length;
+            let instancesYellow = guess.slice(0, i).split("").filter(letter => letter == guess[i]);
+            let allYellow = instancesYellow.length >= instancesOfLetter.length;
 
             if (guess[i] == word[i]) {
               box.style.background = "var(--color-green)";
               key.style.background = "var(--light-green)";
               greenList.push(i);
-            } else if (word.includes(guess[i]) && !everyInstanceFound) {
+            } else if (word.includes(guess[i]) && !allGreen && !allYellow) {
               box.style.background = "var(--color-yellow)";
               if (key.style.background != "var(--light-green)") key.style.background = "var(--light-yellow)";
             } else {
               box.style.background = "gray";
-              if (key.style.background != "var(--light-green)") key.style.background = "gray";
+              key.style.background = "gray";
             }
           }
 

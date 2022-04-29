@@ -25,6 +25,7 @@
     height: 75px;
     font-size: 40px;
     font-weight: 600;
+    user-select: none;
   }
 
   #keys {
@@ -92,7 +93,7 @@
   }
   document.getElementById("boxes").innerHTML = boxes;
 
-  let letterList = "qwertyuiopasdfghjklzxcvbnm";
+  let letterList = "abcdefghijklmnopqrstuvwxyz";
   for (let i = 0; i < letterList.length; i++) {
     let key = document.createElement("div");
     key.id = letterList[i];

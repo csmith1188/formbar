@@ -178,14 +178,14 @@
             let instancesOfLetter = word.split("").filter(letter => letter == guess[i]);
             let instancesGreen = greenList.filter(letter => letter == guess[i]);
             let allGreen = instancesGreen.length == instancesOfLetter.length;
-            let instancesYellow = guess.slice(0, i).split("").filter(letter => letter == guess[i]);
-            let allYellow = instancesYellow.length >= instancesOfLetter.length;
+            let instancesFound = guess.slice(0, i).split("").filter(letter => letter == guess[i]);
+            let tooMany = instancesYellow.length >= instancesOfLetter.length;
 
             if (guess[i] == word[i]) {
               box.style.background = "var(--color-green)";
               key.style.background = "var(--light-green)";
               greenList.push(i);
-            } else if (word.includes(guess[i]) && !allGreen && !allYellow) {
+            } else if (word.includes(guess[i]) && !allGreen && !tooMany) {
               box.style.background = "var(--color-yellow)";
               if (key.style.background != "var(--light-green)") key.style.background = "var(--light-yellow)";
             } else {

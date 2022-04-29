@@ -179,7 +179,7 @@
             let instancesGreen = greenList.filter(letter => letter == guess[i]);
             let allGreen = instancesGreen.length == instancesOfLetter.length;
             let instancesFound = guess.slice(0, i).split("").filter(letter => letter == guess[i]);
-            let tooMany = instancesYellow.length >= instancesOfLetter.length;
+            let tooMany = instancesFound.length >= instancesOfLetter.length;
 
             if (guess[i] == word[i]) {
               box.style.background = "var(--color-green)";

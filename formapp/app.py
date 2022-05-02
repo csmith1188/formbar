@@ -2478,6 +2478,17 @@ def endpoint_wordle():
 # ███████  ██████   ██████ ██   ██ ███████    ██ ██ ████████  ██████
 
 
+block = {
+    'users': [{
+        'name': 'ur mum',
+        'perm': True
+    },
+    {
+        'name': 'dem mums',
+        'perm': True
+    }]
+}
+
 @socket_.on('loadUsers', namespace=apinamespace)
 def api_loadUsers():
     #Check permissions here

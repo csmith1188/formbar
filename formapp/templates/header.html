@@ -33,11 +33,14 @@
   </body>
 
   <script>
-    let request = new XMLHttpRequest();
+    const request = new XMLHttpRequest();
     request.open("GET", '/getip', false);
     request.send(null);
-    let serverIp = JSON.parse(request.responseText).ip;
-    let ws = new WebSocket(`ws://${serverIp}:9001`);
+    const serverIp = JSON.parse(request.responseText).ip;
+    const ws = new WebSocket(`ws://${serverIp}:9001`);
+
+    const apiSocket = io("/apinamespace");
+    const chatSocket = io("/chat");
 
     function getResponse(endpoint, parse = true) {
       return new Promise((resolve, reject) => {
@@ -60,7 +63,7 @@
       });
     }
 
-    let urlParams = new URLSearchParams(window.location.search);
+    const urlParams = new URLSearchParams(window.location.search);
 
     //If the user is on a mobile device, take them to /mobile
     if (

@@ -2155,7 +2155,6 @@ def endpoint_sfx():
             resString += '</ul> You can play them by using \'/sfx?file=<b>&lt;sound file name&gt;</b>\''
             return render_template("general.html", content = resString, style = '<style>ul {columns: 2; -webkit-columns: 2; -moz-columns: 2;}</style>')
 
-
 @app.route('/socket')
 def endpoint_socket():
     return render_template('socket.html', async_mode=socket_.async_mode)
@@ -2506,6 +2505,7 @@ def api_changeperm():
 
 @socket_.on('my_event', namespace=chatnamespace)
 def chat_message(message):
+    print("event")
     session['receive_count'] = session.get('receive_count', 0) + 1
     emit('my_response',
          {'data': message['data'], 'count': session['receive_count']})
@@ -2527,9 +2527,6 @@ def disconnect_request():
     emit('my_response',
          {'data': 'Disconnected!', 'count': session['receive_count']},
          callback=can_disconnect)
-
-#if __name__ == '__main__':
-    #socket_.run(app, debug=True)
 
 
 # ██     ██ ███████ ██████  ███████  ██████   ██████ ██   ██ ███████ ████████ ███████
@@ -2709,3 +2706,4 @@ if __name__ == '__main__':
     # flaskApp.start()
     # flaskApp.join()
     start_flask()
+    socket_.run(app, debug=DEBUG)

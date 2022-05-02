@@ -2,8 +2,8 @@
 <html>
 <head>
     <title>Socket-Test</title>
-    <script src="{{url_for('static', filename='jquery.js')}}"></script>
-    <script src="{{url_for('static', filename='socket.io.min.js')}}"></script>
+    <script src="{{url_for('static', filename='js/jquery.js')}}"></script>
+    <script src="{{url_for('static', filename='js/socket.io.min.js')}}"></script>
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function() {
 
@@ -15,6 +15,7 @@
             });
 
             socket.on('my_response', function(msg, cb) {
+                console.log("res");
                 $('#log').append('<br>' + $('<div/>').text('logs #' + msg.count + ': ' + msg.data).html());
                 if (cb)
                     cb();

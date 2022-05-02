@@ -2155,6 +2155,11 @@ def endpoint_sfx():
             resString += '</ul> You can play them by using \'/sfx?file=<b>&lt;sound file name&gt;</b>\''
             return render_template("general.html", content = resString, style = '<style>ul {columns: 2; -webkit-columns: 2; -moz-columns: 2;}</style>')
 
+
+@app.route('/socket')
+def endpoint_socket():
+    return render_template('socket.html', async_mode=socket_.async_mode)
+
 '''
     /speedtype
 '''
@@ -2464,6 +2469,20 @@ def endpoint_wordle():
         else:
             highScore = 0
         return render_template('wordle.html', wordList = str(words.keys()), highScore = highScore)
+
+
+# ███████  ██████   ██████ ██   ██ ███████ ████████ ████████  ██████
+# ██      ██    ██ ██      ██  ██  ██         ██       ██    ██    ██
+# ███████ ██    ██ ██      █████   █████      ██       ██    ██    ██
+#      ██ ██    ██ ██      ██  ██  ██         ██       ██    ██    ██
+# ███████  ██████   ██████ ██   ██ ███████    ██ ██ ████████  ██████
+
+
+@socket_.on('my_event', namespace=chatnamespace)
+def my_event(message):
+    session['receive_count'] = session.get('receive_count', 0) + 1
+    emit('my_response',
+         {'data': message['data'], 'count': session['receive_count']})
 
 
 # ██     ██ ███████ ██████  ███████  ██████   ██████ ██   ██ ███████ ████████ ███████

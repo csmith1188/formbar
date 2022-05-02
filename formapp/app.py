@@ -2505,7 +2505,6 @@ def api_changeperm():
 
 @socket_.on('my_event', namespace=chatnamespace)
 def chat_message(message):
-    print("event")
     session['receive_count'] = session.get('receive_count', 0) + 1
     emit('my_response',
          {'data': message['data'], 'count': session['receive_count']})

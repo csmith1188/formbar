@@ -2480,45 +2480,45 @@ def endpoint_wordle():
 
 @socket_.on('loadUsers', namespace=apinamespace)
 def api_loadUsers():
-#Check permissions here
-#Check to see if block is active to select users
-emit( 'api_userList', {'data': block['users'], 'message': ''} )
+    #Check permissions here
+    #Check to see if block is active to select users
+    emit( 'api_userList', {'data': block['users'], 'message': ''} )
 
 @socket_.on('changeperm', namespace=apinamespace)
 def api_changeperm():
-#Check permissions here
-#Check to see if block is active to select users
-block['users'][0]['perm'] = not block['users'][0]['perm']
-print(block['users'][0]['perm'])
-emit( 'api_userList', {'data': block['users'], 'message': ''} )
+    #Check permissions here
+    #Check to see if block is active to select users
+    block['users'][0]['perm'] = not block['users'][0]['perm']
+    print(block['users'][0]['perm'])
+    emit( 'api_userList', {'data': block['users'], 'message': ''} )
 
 
 @socket_.on('my_event', namespace=chatnamespace)
 def chat_message(message):
-session['receive_count'] = session.get('receive_count', 0) + 1
-emit('my_response',
-     {'data': message['data'], 'count': session['receive_count']})
+    session['receive_count'] = session.get('receive_count', 0) + 1
+    emit('my_response',
+         {'data': message['data'], 'count': session['receive_count']})
 
 @socket_.on('my_broadcast_event', namespace=chatnamespace)
 def chat_broadcast_message(message):
-session['receive_count'] = session.get('receive_count', 0) + 1
-emit('my_response',
-     {'data': message['data'], 'count': session['receive_count']},
-     broadcast=True)
+    session['receive_count'] = session.get('receive_count', 0) + 1
+    emit('my_response',
+         {'data': message['data'], 'count': session['receive_count']},
+         broadcast=True)
 
 @socket_.on('disconnect_request', namespace=chatnamespace)
 def disconnect_request():
-@copy_current_request_context
-def can_disconnect():
-    disconnect()
+    @copy_current_request_context
+    def can_disconnect():
+        disconnect()
 
-session['receive_count'] = session.get('receive_count', 0) + 1
-emit('my_response',
-     {'data': 'Disconnected!', 'count': session['receive_count']},
-     callback=can_disconnect)
+    session['receive_count'] = session.get('receive_count', 0) + 1
+    emit('my_response',
+         {'data': 'Disconnected!', 'count': session['receive_count']},
+         callback=can_disconnect)
 
-if __name__ == '__main__':
-socket_.run(app, debug=True)
+#if __name__ == '__main__':
+    #socket_.run(app, debug=True)
 
 
 # ██     ██ ███████ ██████  ███████  ██████   ██████ ██   ██ ███████ ████████ ███████

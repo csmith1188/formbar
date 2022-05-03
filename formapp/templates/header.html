@@ -32,6 +32,8 @@
     {% block main %}{% endblock %}
   </body>
 
+  <script src="{{url_for('static', filename='js/jquery.js')}}"></script>
+  <script src="{{url_for('static', filename='js/socket.io.min.js')}}"></script>
   <script>
     const request = new XMLHttpRequest();
     request.open("GET", '/getip', false);

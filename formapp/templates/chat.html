@@ -315,11 +315,10 @@
       }
     });
 
-
     //When the connection opens.
-    ws.onopen = function() {};
+    chatSocket.on("connect", function() {});
 
-    ws.onmessage = function(message) {
+    chatSocket.on("message", message => {
         let data = JSON.parse(message.data);
         if (data.type == 'message' || data.type == 'alert') {
             console.log(data);
@@ -351,24 +350,24 @@
                 }
             }
         }
-    };
+    });
 
     //When the connection closes
-    ws.onclose = function() {
+    chatSocket.on("disconnect", () => {
         output({
             from: 'server',
             content: 'Disconnected...'
         });
-    };
+    });
 
     //When there is an error
-    ws.onerror = function(e) {
+    chatSocket.on("error", e => {
         output({
             from: 'server',
             content: 'Critical Error. See console...'
         });
         console.log(e)
-    };
+    });
 
     function packMSG(type, rx, tx, content) {
         let msgOUT = {
@@ -422,9 +421,9 @@
                 // text.splice(0, 2);
                 // args = text.split(" ");
                 // args.shift();
-                ws.send(JSON.stringify(packMSG('help', receiver, username, text)));
+                chatSocket.emit("help", JSON.stringify(packMSG('help', receiver, username, text)));
             } else {
-                ws.send(JSON.stringify(packMSG('message', receiver, username, text)));
+                chatSocket.emit("message", JSON.stringify(packMSG('message', receiver, username, text)));
             }
             boxes.inputBox.value = "";
             boxes.inputBox.focus();
@@ -432,7 +431,7 @@
     }
 
     function onCloseClick() {
-        ws.close();
+        chatSocket.emit("disconnect_request");
     }
 
     function dateString(time) {

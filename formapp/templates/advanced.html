@@ -336,6 +336,7 @@
       <div id="tttTab" class="tab hidden" onclick="openPage('ttt');">Tic-tac-toe</div>
       <div id="towerdefenseTab" class="tab" onclick="openPage('towerdefense');">Tower Defense</div>
       <div id="fighterTab" class="tab hidden" onclick="openPage('fighter');">Turn-Based Fighter</div>
+      <div id="wordleTab" class="tab" onclick="openPage('wordle');">Wordle</div>
       <div id="leaderboardsTab" class="tab" onclick="openPage('leaderboards');">Leaderboards</div>
     </div>
     <div id="teacherTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/advanced/teacher.png') }}" class="icon"> <span class="tabText">Teacher</span></div>
@@ -461,7 +462,7 @@
       let cl = document.getElementById(tab + "Tab").classList;
       meRes.perms === permsRes.teacher ? cl.add("unselectable") : cl.remove("unselectable");
     });
-    ["2048", "bitshifter", "hangman", "minesweeper", "speedtype", "ttt", "towerdefense", "fighter"].forEach(tab => {
+    ["2048", "bitshifter", "hangman", "minesweeper", "speedtype", "ttt", "towerdefense", "fighter", "wordle"].forEach(tab => {
       let cl = document.getElementById(tab + "Tab").classList;
       meRes.perms > permsRes.games ? cl.add("unselectable") : cl.remove("unselectable");
     });
@@ -533,7 +534,7 @@
     if (!content) openPage("chat?alert='Page does not exist.'");
     Array.from(tabs).forEach(tab => tab.classList.remove("open"));
     if (["/help", "/break", "/wawd", "/flashcards"].includes(path)) document.getElementById("studentsTab").classList.add("open");
-    if (["/2048", "/bitshifter", "/hangman", "/minesweeper", "/speedtype", "/ttt", "/towerdefense", "/fighter", "/leaderboards"].includes(path)) document.getElementById("gamesTab").classList.add("open");
+    if (["/2048", "/bitshifter", "/hangman", "/minesweeper", "/speedtype", "/ttt", "/towerdefense", "/fighter", "/wordle", "/leaderboards"].includes(path)) document.getElementById("gamesTab").classList.add("open");
     if (["/needshelp", "/settings", "/users", "/lesson", "/virtualbar"].includes(path)) document.getElementById("teacherTab").classList.add("open");
     if (tabEl) tabEl.classList.add("open");
     if (["/abcd", "/advanced", "/home", "/mobile", "/quickpanel", "/textresponse", "/tutd"].includes(path)) openPage("chat");

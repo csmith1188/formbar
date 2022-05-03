@@ -25,7 +25,7 @@ block = {
 
 @app.route('/')
 def index():
-    return render_template('index.html', async_mode=socket_.async_mode)
+    return render_template('socket.html', async_mode=socket_.async_mode)
 
 def handle_manage_users():
     pass

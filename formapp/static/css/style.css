@@ -205,6 +205,11 @@ textarea:focus, .box:focus {
   outline: 1px solid;
 }
 
+button, .button {
+  cursor: pointer;
+  user-select: none;
+}
+
 /*Use class "button" for button-like inputs, such as submit and file*/
 
 button:not(.inline), .button:not(.inline) {
@@ -214,12 +219,10 @@ button:not(.inline), .button:not(.inline) {
   color: var(--theme-color);
   border: 1px solid;
   font-size: 18px;
-  cursor: pointer;
-  user-select: none;
 }
 
-button:not(.popOut):not(.unselectable):not(.pressed):hover,
-.button:not(.popOut):not(.unselectable):not(.pressed):hover {
+button:where(:not(.popOut):where(:not(.unselectable):not(.pressed))):hover,
+.button:where(:not(.popOut):where(:not(.unselectable):not(.pressed))):hover {
   background: var(--highlight-color);
 }
 
@@ -231,8 +234,6 @@ button.inline, .button.inline {
   border-radius: 6px;
   color: var(--theme-color);
   font-weight: bold;
-  cursor: pointer;
-  user-select: none;
 }
 
 img.button.inline {
@@ -243,20 +244,25 @@ img.button.inline {
   transition-duration: 0.2s;
 }
 
-.popOut:hover:not(.unselectable):not(.pressed) {
+.popOut:hover:where(:not(.unselectable):not(.pressed)) {
   transform: translate(2px, -2px);
   box-shadow: -1px 1px, -2px 2px;
 }
 
-.popOut.moreDepth:not(.unselectable):not(.pressed):hover:not(:active) {
+.popOut.moreDepth:where(:not(.unselectable):not(.pressed)):hover:not(:active) {
   transform: translate(4px, -4px);
   box-shadow: -1px 1px, -2px 2px, -3px 3px, -4px 4px;
 }
 
-.popOut:not(.unselectable):not(.pressed):active {
+.popOut:where(:not(.unselectable):not(.pressed)):active {
   transform: initial;
   box-shadow: initial;
   background: var(--highlight-color);
+}
+
+.unselectable {
+  opacity: 50%;
+  cursor: not-allowed;
 }
 
 button.pressed, .button.pressed {
@@ -264,11 +270,6 @@ button.pressed, .button.pressed {
   border-color: var(--theme-color);
   color: var(--bg-color);
   cursor: default;
-}
-
-.unselectable.unselectable {
-  opacity: 50%;
-  cursor: not-allowed;
 }
 
 input[type="number"] {

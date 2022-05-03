@@ -7,7 +7,6 @@ let letterButtons = Array.from(document.querySelectorAll(".letterButton"));
 let chosenThumb = false;
 let chosenLetter = false;
 let newMessages = 0;
-let permsError = "You do not have high enough permissions to do this right now.";
 let bgm;
 let sfx;
 let segment;
@@ -58,7 +57,7 @@ letterButtons.forEach((button, i) => {
 
 function checkIfRemoved() {
   //If the user is removed by the teacher, send them back to the login page
-  if (meRes.error == "You are not logged in.") window.location = "/login?alert=You have been logged out.";
+  if (meRes == "You are not logged in.") window.location = "/login?alert=You have been logged out.";
 }
 
 thumbButtons.concat(letterButtons).forEach(el => {
@@ -279,11 +278,15 @@ function listSounds(files) {
   sfx.forEach(sound => document.getElementById("sfxFiles").innerHTML += "<option value='" + sound + "'></option>");
 }
 
-async function sendSound() {
+function sendSound() {
   let soundFile = document.getElementById("sound").value;
-  let res = await getResponse("/sfx?file=" + soundFile, false);
-  if (sfx.includes(soundFile)) res == permsError ? alert(res) : document.getElementById("sound").value = null;
-  else alert("File does not exist");
+  if (sfx.includes(soundFile)) {
+    request.open("GET", "/sfx?file=" + soundFile);
+    request.send();
+    document.getElementById("sound").value = null;
+  } else {
+    alert("File does not exist");
+  }
 }
 
 if (document.getElementById("sound")) document.getElementById("sound").addEventListener("keydown", event => {
@@ -321,9 +324,10 @@ async function sendMusic() {
   let musicFile = document.getElementById("music").value;
   let volume = document.getElementById("volume").value;
   if (volume == 1) volume = "1.0";
-  let res = await getResponse("/bgm?file=" + musicFile + "&volume=" + volume, false);
   if (bgm.includes(musicFile)) {
-    (res.startsWith("It has only been") || res == permsError) ? alert(res) : document.getElementById("music").value = null;
+    let res = await getResponse("/bgm?file=" + musicFile + "&volume=" + volume);
+    if (res.error) alert(res.error);
+    else document.getElementById("music").value = null;
   } else {
     alert("File does not exist");
   }
@@ -381,29 +385,29 @@ function updateVolume() {
   }
 }
 
-async function playPauseMusic() {
-  let res = await getResponse("/bgm?playpause=true", false);
-  if (res == permsError) alert(res);
+function playPauseMusic() {
+  request.open("GET", "/bgm?playpause=true");
+  request.send();
 }
 
-async function restartMusic() {
-  let res = await getResponse("/bgm?rewind=true", false);
-  if (res == permsError) alert(res);
+function restartMusic() {
+  request.open("GET", "/bgm?rewind=true");
+  request.send();
 }
 
-async function stopMusic() {
-  let res = await getResponse("/bgmstop", false);
-  if (res == permsError) alert(res);
+function stopMusic() {
+  request.open("GET", "/bgmstop");
+  request.send();
 }
 
-async function sendText() {
+function sendText() {
   let text = document.getElementById("text").value;
   let fg = document.getElementById("fgColor").value.slice(1);
   let bg = document.getElementById("bgColor").value.slice(1);
   //If input is blank, replace with underscore
   text ||= "_";
-  let res = await getResponse("/say?phrase=" + text + "&fg=" + fg + "&bg=" + bg, false);
-  res == permsError ? alert(res) : document.getElementById("text").value = null;
+  request.open("GET", "/say?phrase=" + text + "&fg=" + fg + "&bg=" + bg);
+  request.send();
 }
 
 if (document.getElementById("text")) document.getElementById("text").addEventListener("keydown", event => {
@@ -447,7 +451,7 @@ function showColor2() {
   document.getElementById("color2Div").classList.remove("hidden");
 }
 
-async function sendColor() {
+function sendColor() {
   let start = document.getElementById("segmentStart").value;
   let end = document.getElementById("segmentEnd").value;
   let hex1 = document.getElementById("color1").value.slice(1);
@@ -457,6 +461,6 @@ async function sendColor() {
     end = barpix.length;
   }
   if (!gradient) hex2 = hex1;
-  let res = await getResponse("/segment?start=" + start + "&end=" + end + "&hex=" + hex1 + "&hex2=" + hex2, false);
-  if (res == permsError) alert(res);
+  request.open("GET", "/segment?start=" + start + "&end=" + end + "&hex=" + hex1 + "&hex2=" + hex2);
+  request.send();
 }

@@ -33,11 +33,14 @@
   </body>
 
   <script>
-    let request = new XMLHttpRequest();
+    const request = new XMLHttpRequest();
     request.open("GET", '/getip', false);
     request.send(null);
-    let serverIp = JSON.parse(request.responseText).ip;
-    let ws = new WebSocket(`ws://${serverIp}:9001`);
+    const serverIp = JSON.parse(request.responseText).ip;
+    const ws = new WebSocket(`ws://${serverIp}:9001`);
+
+    const apiSocket = io("/apinamespace");
+    const chatSocket = io("/chat");
 
     function getResponse(endpoint, parse = true) {
       return new Promise((resolve, reject) => {
@@ -46,20 +49,21 @@
         endpoint += "return=json";
         newRequest.open("GET", endpoint);
         newRequest.onload = () => {
-          parse ? resolve(JSON.parse(newRequest.responseText)) : resolve(newRequest.responseText);
+          if (parse) {
+            try {
+              resolve(JSON.parse(newRequest.responseText));
+            } catch {
+              resolve({});
+            }
+          } else {
+            resolve(newRequest.responseText);
+          }
         };
         newRequest.send(null);
       });
     }
 
-    let urlParams = new URLSearchParams(window.location.search);
-
-    //If URL param "message" is present, display as alert
-    if (urlParams.get("alert")) {
-      alert(urlParams.get("alert"));
-      ////To do: only remove alert, keep other params
-      window.location = window.location.pathname; //Remove message so it doesn't appear again if page is reloaded
-    }
+    const urlParams = new URLSearchParams(window.location.search);
 
     //If the user is on a mobile device, take them to /mobile
     if (

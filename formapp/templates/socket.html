@@ -2,12 +2,12 @@
 <html>
 <head>
     <title>Socket-Test</title>
-    <script src="{{url_for('static', filename='jquery.js')}}"></script>
-    <script src="{{url_for('static', filename='socket.io.min.js')}}"></script>
+    <script src="{{url_for('static', filename='js/jquery.js')}}"></script>
+    <script src="{{url_for('static', filename='js/socket.io.min.js')}}"></script>
     <script type="text/javascript" charset="utf-8">
         $(document).ready(function() {
 
-            namespace = '/apisocket';
+            namespace = '/chat';
             var socket = io(namespace);
 
             socket.on('connect', function() {

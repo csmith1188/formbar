@@ -1070,7 +1070,7 @@ def endpoint_bgm():
             rewindBGM()
             return render_template("message.html", message = 'Music rewound.', forward = '/bgm')
         else:
-            resString = '<a href="/home" id="home">🡄 Home</a><br><br>'
+            resString = '<a href="/home" id="homeLink">🡄 Home</a><br><br>'
             resString += '<a href="/bgmstop">Stop Music</a>'
             resString += '<h2>Now playing: ' + sD.bgm['nowplaying'] + '</h2>'
             resString += '<h2>List of available background music files:</h2><ul>'
@@ -2297,7 +2297,7 @@ def endpoint_sfx():
             playSFX(sfx_file)
             return render_template("message.html", message = 'Playing: ' + sfx_file)
         else:
-            resString = '<a href="/home" id="home">🡄 Home</a><br>'
+            resString = '<a href="/home" id="homeLink">🡄 Home</a><br>'
             resString += '<h2>List of available sound files:</h2><ul>'
             for key, value in sfx.sound.items():
                 resString += '<li><a href="/sfx?file=' + key + '">' + key + '</a></li>'
@@ -2717,6 +2717,19 @@ def message():
                                     server.send_message(toClient, json.dumps(messageOut))
                                     break
                 print("[info] " + message['from'] + " said to " + message['to'] + ": " + message['content'])
+    except Exception as e:
+        print("[error] " + 'Error: ' + str(e))
+
+@socket_.on('fighter', namespace = chatnamespace)
+def fighter():
+    try:
+        message = json.loads(message)
+        for student in sD.studentDict:
+            if sD.studentDict[student]['name'] == message['to'] or sD.studentDict[student]['name'] == message['from']:
+                for toClient in server.clients:
+                    if toClient['id'] == sD.studentDict[student]['wsID']:
+                        emit('message', toClient, json.dumps(message))
+                        break
     except Exception as e:
         print("[error] " + 'Error: ' + str(e))
 

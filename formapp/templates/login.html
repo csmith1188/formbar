@@ -28,6 +28,14 @@
     box-sizing: border-box;
     margin-top: 16px;
   }
+
+  #forgotPassword {
+    display: block;
+    margin: auto;
+    margin-top: 8px;
+    width: 256px;
+    text-align: left;
+  }
 </style>
 {% endblock %}
 
@@ -39,6 +47,7 @@
 <form action="login" method="post">
     <input type="text" id="usernameBox" name="username" class="box" placeholder="Name" value="" autocomplete="off" required>
     <input type="password" id="passwordBox" name="password" class="box" placeholder="Password" value="" required>
+    <a href="/changepassword" id="forgotPassword">Forgot password</a>
     <input type="hidden" id="userTypeBox" name="userType" value="login">
     <input type="hidden" id="forwardBox" name="forward">
     <input type="hidden" id="botBox" name="bot" value="False">
@@ -54,33 +63,40 @@
     else document.getElementById('forwardBox').value = null;
 
     //Prevent submission if a field is blank
-    let ub = document.getElementById("usernameBox");
-    let pb = document.getElementById("passwordBox");
-    let ut = document.getElementById("userTypeBox");
-    let sb = document.getElementById("submitButton");
     let liButton = document.getElementById("logInButton");
     let naButton = document.getElementById("newAccountButton");
     let gButton = document.getElementById("guestButton");
+    let ub = document.getElementById("usernameBox");
+    let pb = document.getElementById("passwordBox");
+    let fp = document.getElementById("forgotPassword");
+    let ut = document.getElementById("userTypeBox");
+    let sb = document.getElementById("submitButton");
 
     function changeUserType(el) {
       [liButton, naButton, gButton].forEach(button => (button == el) ? button.classList.add("pressed") : button.classList.remove("pressed"));
-      if (el == gButton) {
-        pb.value = null;
-        pb.classList.add("hidden");
-        pb.required = false;
-        sb.value = "Go";
-      } else {
-        pb.classList.remove("hidden");
-        pb.required = true;
-        if (el == liButton) sb.value = "Log in";
-        else if (el == naButton) {
+      switch (el) {
+        case liButton:
+          pb.classList.remove("hidden");
+          pb.required = true;
+          fp.classList.remove("hidden");
+          sb.value = "Log in";
+          ut.value = "login";
+          break;
+        case naButton:
+          pb.classList.remove("hidden");
+          pb.required = true;
+          fp.classList.add("hidden");
           sb.value = "Create account";
-        }
+          ut.value = "new";
+          break;
+        case gButton:
+          pb.value = null;
+          pb.classList.add("hidden");
+          pb.required = false;
+          fp.classList.add("hidden");
+          sb.value = "Go";
+          ut.value = "guest";
       }
-
-      if (el == liButton) ut.value = "login";
-      else if (el == naButton) ut.value = "new";
-      else if (el == gButton) ut.value = "guest";
 
       checkIfBlank();
 

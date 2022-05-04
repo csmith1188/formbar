@@ -419,7 +419,7 @@
 {% block script %}
   <script src="{{ url_for('static', filename='js/tdMaps.js') }}"></script>
   <script>
-    (() => {
+    {
       let towerTypes = {
         basic: {
           name: "Basic Tower",
@@ -2329,6 +2329,6 @@
         ctx.fillText("Click to return to the home screen", 960, 800);
         document.getElementById("game").onclick = () => window.location.reload();
       }
-    })();
+    }
   </script>
 {% endblock %}

@@ -1501,14 +1501,14 @@ def endpoint_games_speedtype():
             highScore = 0
         return render_template("games/speedtype.html", highScore = highScore)
 
-    @app.route('/games/towerdefense')
-    def endpoint_games_towerdefense():
-        if not request.remote_addr in sD.studentDict:
-            return redirect('/login?forward=' + request.path)
-        if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
-            return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
-        else:
-            return render_template('games/towerdefense.html')
+@app.route('/games/towerdefense')
+def endpoint_games_towerdefense():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
+    else:
+        return render_template('games/towerdefense.html')
 
 #Tic Tac Toe
 @app.route('/games/ttt')

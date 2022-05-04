@@ -117,6 +117,7 @@ words = json.loads(open(os.path.dirname(os.path.abspath(__file__)) + "/data/word
 
 banList = []
 helpList = {}
+newPasswords = {}
 blockList = []
 colorDict = {
         '14': (255, 255, 0),
@@ -1078,6 +1079,54 @@ def endpoint_changemode():
     print(direction)
     return changeMode(newMode, direction)
 
+@app.route('/changepassword', methods = ['POST', 'GET'])
+def endpoint_changepassword():
+    if request.method == 'POST':
+        if 'username' in request.form:
+            username = request.form['username']
+        else:
+            username = sD.studentDict[request.remote_addr]['name']
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        userFound = dbcmd.execute("SELECT * FROM users WHERE username=:uname", {"uname": username}).fetchall()
+        db.close()
+        oldPassword = request.form['oldPassword']
+        newPassword = request.form['newPassword']
+        if userFound:
+            if oldPassword:
+                for user in userFound:
+                    if username in user:
+                        #Check if the password is correct
+                        if oldPassword == cipher.decrypt(user[2]).decode():
+                            passwordCrypt = cipher.encrypt(newPassword.encode())
+                            db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+                            dbcmd = db.cursor()
+                            dbcmd.execute("UPDATE users SET password=:pw WHERE username=:uname", {"uname": username, "pw": passwordCrypt})
+                            db.commit()
+                            db.close()
+                            return render_template("message.html", message = "Password changed.", forward = '/')
+                        else:
+                            return render_template("message.html", message = "Your password is incorrect.")
+            else:
+                if username in helpList:
+                    return render_template("message.html", message = "There is already a help ticket in under this username.")
+                helpList[username] = '<i>Requested a password change from the login page. Before you accept, confirm that this request is legitimate.</i>'
+                newPasswords[username] = newPassword
+                playSFX("sfx_powerup01")
+                return render_template("message.html", message = "Your password change needs to be approved by the teacher. You can use the Formbar as a guest while you wait.", forward = '/login')
+        else:
+            return render_template("message.html", message = "No users found with that username.")
+    else:
+        #If the user is logged in, check of they are a guest
+        if request.remote_addr in sD.studentDict:
+            username = sD.studentDict[request.remote_addr]['name']
+            db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+            dbcmd = db.cursor()
+            userFound = dbcmd.execute("SELECT * FROM users WHERE username=:uname", {"uname": username}).fetchall()
+            if not userFound:
+                return render_template("message.html", message = "You are logged in as a guest.")
+        return render_template('changepassword.html', loggedIn = request.remote_addr in sD.studentDict)
+
 '''
     /chat
     This endpoint allows students and teacher to chat realTime.
@@ -1787,6 +1836,13 @@ def endpoint_needshelp():
                         #server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', name, 'server', 'The teacher accepted your break request.')))
                     #elif helpList[name] == "<i>Requested a bathroom break</i>":
                         #server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', name, 'server', 'The teacher rejected your break request.')))
+            if request.args.get('newPassword'):
+                passwordCrypt = cipher.encrypt(request.args.get('newPassword').encode())
+                db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+                dbcmd = db.cursor()
+                dbcmd.execute("UPDATE users SET password=:pw WHERE username=:uname", {"uname": remove, "pw": passwordCrypt})
+                db.commit()
+                db.close()
             del helpList[remove]
             return redirect("/needshelp")
         else:
@@ -1800,6 +1856,8 @@ def endpoint_needshelp():
                 resString += "<span class='ticket'><b>" + ticket + ":</b> " + helpList[ticket]
                 if helpList[ticket] == '<i>Requested a bathroom break</i>':
                     resString += " <button class='inline popOut' onclick='window.location = \"/needshelp?remove=" + ticket + "&acceptBreak=true\"'>Accept</button> <button class='inline popOut' onclick='window.location = \"/needshelp?remove=" + ticket + "\"'>Reject</button>"
+                elif helpList[ticket] == '<i>Requested a password change from the login page. Before you accept, confirm that this request is legitimate.</i>':
+                    resString += " <button class='inline popOut' onclick='window.location = \"/needshelp?remove=" + ticket + "&newPassword=" + newPasswords[ticket] + "\"'>Accept</button> <button class='inline popOut' onclick='window.location = \"/needshelp?remove=" + ticket + "\"'>Reject</button>"
                 else:
                     resString += " <button class='inline popOut' onclick='window.location = \"/needshelp?remove=" + ticket + "\"'>Remove</button>"
                 resString += "</span>"
@@ -1920,7 +1978,7 @@ def endpoint_quiz():
     else:
         if request.method == 'POST':
             messageOut = packMSG('alert', 'all', 'server', 'The teacher started a quiz.<br><button onclick="window.location=\"/quiz\"">Open quiz</button>')
-            server.send_message_to_all(json.dumps(messageOut))
+            socket_.emit('message', json.dumps(messageOut))
             resString = '<ul>'
             for i, answer in enumerate(request.form):
                 resString += '<li>' + str(i) + ': '
@@ -2476,6 +2534,7 @@ def endpoint_wordle():
 #      ██ ██    ██ ██      ██  ██  ██         ██       ██    ██    ██
 # ███████  ██████   ██████ ██   ██ ███████    ██ ██ ████████  ██████
 
+'''
 
 block = {
     'users': [{
@@ -2527,18 +2586,9 @@ def disconnect_request():
          {'data': 'Disconnected!', 'count': session['receive_count']},
          callback=can_disconnect)
 
-
-# ██     ██ ███████ ██████  ███████  ██████   ██████ ██   ██ ███████ ████████ ███████
-# ██     ██ ██      ██   ██ ██      ██    ██ ██      ██  ██  ██         ██    ██
-# ██  █  ██ █████   ██████  ███████ ██    ██ ██      █████   █████      ██    ███████
-# ██ ███ ██ ██      ██   ██      ██ ██    ██ ██      ██  ██  ██         ██         ██
-#  ███ ███  ███████ ██████  ███████  ██████   ██████ ██   ██ ███████    ██    ███████
-
+'''
 
 '''
-    Websocket Setup
-    https://github.com/Pithikos/python-websocket-server
-
     A message to or from the server should be a stringified JSON object:
     {
         type: <alert|userlist|help|message|fighter>,
@@ -2558,29 +2608,35 @@ def packMSG(type, rx, tx, content):
         }
     return msgOUT
 
-# Called for every client connecting (after handshake)
-def new_client(client, server):
+'''
+@socket_.on('connection', namespace = chatnamespace)
+def connection():
+    print("SOCKET: " + socket)
     try:
         sD.studentDict[client['address'][0]]['wsID'] = client['id']
         print("[info] " + sD.studentDict[client['address'][0]]['name'] + " connected and was given id %d" % client['id'])
-        server.send_message_to_all(json.dumps(packMSG('alert', 'all', 'server', sD.studentDict[client['address'][0]]['name'] + " has joined the server...")))
-        server.send_message_to_all(json.dumps(packMSG('userlist', 'all', 'server', chatUsers())))
+        emit('message', json.dumps(packMSG('alert', 'all', 'server', sD.studentDict[client['address'][0]]['name'] + " has joined the server...")))
+        emit('message', json.dumps(packMSG('userlist', 'all', 'server', chatUsers())))
     except Exception as e:
         print("[error] " + "Error finding user in list: " + str(e))
 
-# Called for every client disconnecting
-def client_left(client, server):
-    if client['address'][0] in sD.studentDict and 'wsID' in sD.studentDict[client['address'][0]]: #Do nothing is user has already disconnected or logged out
-        print("[info] " + sD.studentDict[client['address'][0]]['name'] + " disconnected")
-        del sD.studentDict[client['address'][0]]['wsID']
-        #Send a message to every client that isn't THIS disconnecting client, telling them the user disconnected
-        for i, user in enumerate(server.clients):
-            if not server.clients[i] == client:
-                server.send_message(server.clients[i], json.dumps(packMSG('alert', 'all', 'server', sD.studentDict[client['address'][0]]['name'] + " has left the server...")))
-                server.send_message(server.clients[i], json.dumps(packMSG('userlist', 'all', 'server', chatUsers())))
+@socket_.on('disconnect', namespace = chatnamespace)
+def disconnect():
+    try:
+        if client['address'][0] in sD.studentDict and 'wsID' in sD.studentDict[client['address'][0]]: #Do nothing is user has already disconnected or logged out
+            print("[info] " + sD.studentDict[client['address'][0]]['name'] + " disconnected")
+            del sD.studentDict[client['address'][0]]['wsID']
+            #Send a message to every client that isn't THIS disconnecting client, telling them the user disconnected
+            for i, user in enumerate(server.clients):
+                if not server.clients[i] == client:
+                    emit('message', server.clients[i], json.dumps(packMSG('alert', 'all', 'server', sD.studentDict[client['address'][0]]['name'] + " has left the server...")))
+                    emit('message', server.clients[i], json.dumps(packMSG('userlist', 'all', 'server', chatUsers())))
+    except Exception as e:
+        print("[error] " + "Error finding user in list: " + str(e))
+'''
 
-# Called when a client sends a message
-def message_received(client, server, message):
+@socket_.on('message', namespace = chatnamespace)
+def message():
     try:
         message = json.loads(message)
         if message['type'] == 'fighter':
@@ -2588,7 +2644,7 @@ def message_received(client, server, message):
                 if sD.studentDict[student]['name'] == message['to'] or sD.studentDict[student]['name'] == message['from']:
                     for toClient in server.clients:
                         if toClient['id'] == sD.studentDict[student]['wsID']:
-                            server.send_message(toClient, json.dumps(message))
+                            emit('message', toClient, json.dumps(message))
                             break
         elif message['type'] == 'ttt':
             #For now, this will only forward the gamestate. We'll do validation later.
@@ -2622,7 +2678,7 @@ def message_received(client, server, message):
                 #Check recipients here
                 if message['to'] == 'all':
                     messageOut =  packMSG('message', 'all', sD.studentDict[client['address'][0]]['name'], message['content'])
-                    server.send_message_to_all(json.dumps(messageOut))
+                    emit('message', json.dumps(messageOut))
                 else:
                     for student in sD.studentDict:
                         if sD.studentDict[student]['name'] == message['to'] or sD.studentDict[student]['name'] == message['from']:
@@ -2654,14 +2710,6 @@ if '--silent' not in str(sys.argv):
 def start_flask():
     global DEBUG
     app.run(host='0.0.0.0', port=420, use_reloader=False, debug=DEBUG)
-
-#This function activate chat and let students chat with one another.
-def start_chat():
-    server = WebsocketServer('0.0.0.0', WSPORT)
-    server.set_fn_new_client(new_client)
-    server.set_fn_client_left(client_left)
-    server.set_fn_message_received(message_received)
-    server.run_forever()
 
 def start_IR():
     while True:
@@ -2697,8 +2745,6 @@ def start_IR():
                     playSFX("sfx_pickup01")
 
 if __name__ == '__main__':
-    chatApp = threading.Thread(target=start_chat, daemon=True)
-    chatApp.start()#Starts up the chat feature
     #irApp = threading.Thread(target=start_IR, daemon=True)
     #irApp.start()#Starts up the chat feature
     # flaskApp = threading.Thread(target=start_flask)

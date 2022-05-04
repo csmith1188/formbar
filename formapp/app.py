@@ -2668,14 +2668,7 @@ def disconnect():
 def message():
     try:
         message = json.loads(message)
-        if message['type'] == 'fighter':
-            for student in sD.studentDict:
-                if sD.studentDict[student]['name'] == message['to'] or sD.studentDict[student]['name'] == message['from']:
-                    for toClient in server.clients:
-                        if toClient['id'] == sD.studentDict[student]['wsID']:
-                            emit('message', toClient, json.dumps(message))
-                            break
-        elif message['type'] == 'ttt':
+        if message['type'] == 'ttt':
             #For now, this will only forward the gamestate. We'll do validation later.
             #server.send_message(message.to, json.dumps(message))
             pass

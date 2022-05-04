@@ -1110,7 +1110,7 @@ def endpoint_changepassword():
             else:
                 if username in helpList:
                     return render_template("message.html", message = "There is already a help ticket in under this username.")
-                helpList[username] = '<i>Requested a password change. Before you accept, confirm that this request is legitimate.</i>'
+                helpList[username] = '<i>Requested a password change from the login page. Before you accept, confirm that this request is legitimate.</i>'
                 newPasswords[username] = newPassword
                 playSFX("sfx_powerup01")
                 return render_template("message.html", message = "Your password change needs to be approved by the teacher. You can use the Formbar as a guest while you wait.", forward = '/login')
@@ -1856,7 +1856,7 @@ def endpoint_needshelp():
                 resString += "<span class='ticket'><b>" + ticket + ":</b> " + helpList[ticket]
                 if helpList[ticket] == '<i>Requested a bathroom break</i>':
                     resString += " <button class='inline popOut' onclick='window.location = \"/needshelp?remove=" + ticket + "&acceptBreak=true\"'>Accept</button> <button class='inline popOut' onclick='window.location = \"/needshelp?remove=" + ticket + "\"'>Reject</button>"
-                elif helpList[ticket] == '<i>Requested a password change. Before you accept, confirm that this request is legitimate.</i>':
+                elif helpList[ticket] == '<i>Requested a password change from the login page. Before you accept, confirm that this request is legitimate.</i>':
                     resString += " <button class='inline popOut' onclick='window.location = \"/needshelp?remove=" + ticket + "&newPassword=" + newPasswords[ticket] + "\"'>Accept</button> <button class='inline popOut' onclick='window.location = \"/needshelp?remove=" + ticket + "\"'>Reject</button>"
                 else:
                     resString += " <button class='inline popOut' onclick='window.location = \"/needshelp?remove=" + ticket + "\"'>Remove</button>"

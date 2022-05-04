@@ -67,7 +67,7 @@
 
     async function updateStudents() {
         if (document.getElementById("autoStudents").checked) {
-          let res = await getResponse("/getstudents");
+          let res = await getResponse("/api/students");
           document.getElementById("studentNum").value = Object.keys(res).length;
         }
     }
@@ -104,6 +104,7 @@
       if (document.getElementById("thumbs").checked) document.getElementById("pollDescription").innerText = "Students can choose between thumbs up, thumbs down, and wiggle.";
       else if (document.getElementById("letters").checked) document.getElementById("pollDescription").innerText = "Students can choose between A, B, C, and D.";
       else if (document.getElementById("textResponse").checked) document.getElementById("pollDescription").innerHTML = "Students will type out short answers. View responses <a href='/users'>here</a>.";
+      downloadButton();
     }
 
     function startPoll() {
@@ -132,32 +133,68 @@
 
 
     (async () => {
-      let modeRes = await getResponse("/getmode");
+      let modeRes = await getResponse("/api/mode");
       let mode = modeRes.mode;
-      if (mode == "tutd" || mode == "poll") {
-        document.getElementById("poll").checked = true;
-        document.getElementById("pollType").classList.remove("hidden");
-        document.getElementById("thumbs").checked = true;
-        changePollType();
-      } else if (mode == "abcd") {
-        document.getElementById("poll").checked = true;
-        document.getElementById("pollType").classList.remove("hidden");
-        document.getElementById("letters").checked = true;
-        changePollType();
-      } else if (mode == "text") {
-        document.getElementById("poll").checked = true;
-        document.getElementById("pollType").classList.remove("hidden");
-        document.getElementById("textResponse").checked = true;
-        changePollType();
-      } else if (mode == "progress") {
-        document.getElementById("progress").checked = true;
-      } else if (mode == "countdown") {
-        document.getElementById("countdown").checked = true;
-        document.getElementById("countdownTime").classList.remove("hidden");
-      } else if (mode == "playtime") {
-        document.getElementById("playtime").checked = true;
+      switch (mode) {
+        case "tutd":
+        case "poll":
+          document.getElementById("poll").checked = true;
+          document.getElementById("pollType").classList.remove("hidden");
+          document.getElementById("thumbs").checked = true;
+          changePollType();
+          break;
+        case "abcd":
+          document.getElementById("poll").checked = true;
+          document.getElementById("pollType").classList.remove("hidden");
+          document.getElementById("letters").checked = true;
+          changePollType();
+          break;
+        case "text":
+          document.getElementById("poll").checked = true;
+          document.getElementById("pollType").classList.remove("hidden");
+          document.getElementById("textResponse").checked = true;
+          changePollType();
+          break;
+        case "progress":
+          document.getElementById("progress").checked = true;
+          break;
+        case "countdown":
+          document.getElementById("countdownTime").classList.remove("hidden");
+          break;
+        case "playtime":
+          document.getElementById("playtime").checked = true;
       }
     })();
+
+    async function downloadButton() {
+      let modeRes = await getResponse("/api/mode");
+      let mode = modeRes.mode;
+      if (mode == "text" && document.getElementById("textResponse").checked) document.getElementById("drButton").classList.remove("hidden");
+      else document.getElementById("drButton").classList.add("hidden");
+    }
+
+    downloadButton();
+    setInterval(downloadButton, 1000);
+
+    async function downloadResponses() {
+      let students = await getResponse("/api/students");
+      let responses = Object.values(students).map(student => [student.name, student.textRes]);
+      let csv = "data:text/csv;charset=utf-8,";
+      csv += responses.map(e => e.join(",")).join("\n");
+      let link = document.createElement("a");
+      link.href = encodeURI(csv);
+
+      let date = new Date();
+      let y = date.getFullYear();
+      let mo = date.getMonth() + 1;
+      let d = date.getDate();
+      let h = date.getHours();
+      let mi = date.getMinutes();
+      let s = date.getSeconds();
+
+      link.download = `responses_${y}_${mo}_${d}_${h}_${mi}_${s}.csv`;
+      link.click();
+    }
 
     function restart() {
       if (confirm("Are you sure you want to restart the Formbar?")) {
@@ -198,6 +235,7 @@
       <input type="radio" id="textResponse" name="type" style="margin-left: 8px;"><label for="textResponse">Text response</label><br>
       <span id="pollDescription">Students can choose between thumbs up, thumbs down, and wiggle</span><br>
       <input type="button" class="button inline popOut" value="Start new poll" style="margin-top: 8px;" onclick="startPoll();">
+      <input type="button" id="drButton" class="button inline popOut hidden" value="Download responses" style="margin-top: 8px;" onclick="downloadResponses();">
     </form>
     <br>
 

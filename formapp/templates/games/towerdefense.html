@@ -718,11 +718,11 @@
 
         //Create images for each tower type
         towerTypes[type].img = new Image();
-        towerTypes[type].img.src = `../static/img/towerdefense/${type}${type == "air" ? "-b" : ""}.png`;
+        towerTypes[type].img.src = `../../static/img/towerdefense/${type}${type == "air" ? "-b" : ""}.png`;
         towerTypes[type].icon = new Image();
-        towerTypes[type].icon.src = `../static/img/towerdefense/${type}.png`;
+        towerTypes[type].icon.src = `../../static/img/towerdefense/${type}.png`;
         towerTypes[type].activeImg = new Image();
-        towerTypes[type].activeImg.src = `../static/img/towerdefense/${type}-active.png`;
+        towerTypes[type].activeImg.src = `../../static/img/towerdefense/${type}-active.png`;
       }
 
       let enemyTypes = {
@@ -768,17 +768,17 @@
       };
       for (let type in enemyTypes) {
         enemyTypes[type].img = new Image();
-        enemyTypes[type].img.src = `../static/img/towerdefense/${type}.png`;
+        enemyTypes[type].img.src = `../../static/img/towerdefense/${type}.png`;
         if (type != "green" && type != "brownBoss" && type != "purpleBoss") {
           enemyTypes[type].imgSplit = new Image();
-          enemyTypes[type].imgSplit.src = `../static/img/towerdefense/${type}-split.png`;
+          enemyTypes[type].imgSplit.src = `../../static/img/towerdefense/${type}-split.png`;
         }
         if (enemyTypes[type].boss) {
           enemyTypes[type].imgRotated = new Image();
-          enemyTypes[type].imgRotated.src = `../static/img/towerdefense/${type}-r.png`;
+          enemyTypes[type].imgRotated.src = `../../static/img/towerdefense/${type}-r.png`;
           if (type == "boss") {
             enemyTypes[type].imgSplitRotated = new Image();
-            enemyTypes[type].imgSplitRotated.src = `../static/img/towerdefense/boss-split-r.png`;
+            enemyTypes[type].imgSplitRotated.src = `../../static/img/towerdefense/boss-split-r.png`;
           }
         }
       }
@@ -1267,35 +1267,35 @@
           down: new Image(),
         }
       };
-      for (let button in images.buttons) images.buttons[button].src = `../static/img/towerdefense/${button}.png`;
-      for (let symbol in images.abilitySymbols) images.abilitySymbols[symbol].src = `../static/img/towerdefense/${symbol}.png`;
-      for (let plane in images.planes) images.planes[plane].src = `../static/img/towerdefense/air-${plane}.png`;
-      for (let plane in images.superPlanes) images.superPlanes[plane].src = `../static/img/towerdefense/superPlane-${plane}.png`;
+      for (let button in images.buttons) images.buttons[button].src = `../../static/img/towerdefense/${button}.png`;
+      for (let symbol in images.abilitySymbols) images.abilitySymbols[symbol].src = `../../static/img/towerdefense/${symbol}.png`;
+      for (let plane in images.planes) images.planes[plane].src = `../../static/img/towerdefense/air-${plane}.png`;
+      for (let plane in images.superPlanes) images.superPlanes[plane].src = `../../static/img/towerdefense/superPlane-${plane}.png`;
 
       //Sound settings and list of sound effects
       let sound = {
         enabled: true,
         delay: 0.05,
         sfx: {
-          abilityReady: new Audio("../static/sound/td/td_ability_ready.wav"),
-          blip: new Audio("../static/sound/td/td_blip01.wav"),
-          coin1: new Audio("../static/sound/td/td_coin01.wav"),
-          coin2: new Audio("../static/sound/td/td_coin02.wav"),
-          explode1: new Audio("../static/sound/td/td_explode01.wav"),
-          explode2: new Audio("../static/sound/td/td_explode02.wav"),
-          explode3: new Audio("../static/sound/td/td_explode03.wav"),
-          laser: new Audio("../static/sound/td/td_laser01.wav"),
-          powerUp1: new Audio("../static/sound/td/td_powerup01.wav"),
-          powerUp2: new Audio("../static/sound/td/td_powerup02.wav"),
-          shoot: new Audio("../static/sound/td/td_shoot02.wav"),
-          success: new Audio("../static/sound/td/td_success01.wav"),
-          basicHit: new Audio("../static/sound/td/td_hit01.wav"),
-          slowingHit: new Audio("../static/sound/td/td_slow_hit.wav"),
-          poisonHit: new Audio("../static/sound/td/td_poison_hit.wav"),
-          moneyHit: new Audio("../static/sound/td/td_money_hit.wav"),
-          airHit: new Audio("../static/sound/td/td_plane_hit.wav"),
-          ultimateHit: new Audio("../static/sound/td/td_ultimate_hit.wav"),
-          longRangeHit: new Audio("../static/sound/td/td_longrange_hit.wav")
+          abilityReady: new Audio("../../static/sound/td/td_ability_ready.wav"),
+          blip: new Audio("../../static/sound/td/td_blip01.wav"),
+          coin1: new Audio("../../static/sound/td/td_coin01.wav"),
+          coin2: new Audio("../../static/sound/td/td_coin02.wav"),
+          explode1: new Audio("../../static/sound/td/td_explode01.wav"),
+          explode2: new Audio("../../static/sound/td/td_explode02.wav"),
+          explode3: new Audio("../../static/sound/td/td_explode03.wav"),
+          laser: new Audio("../../static/sound/td/td_laser01.wav"),
+          powerUp1: new Audio("../../static/sound/td/td_powerup01.wav"),
+          powerUp2: new Audio("../../static/sound/td/td_powerup02.wav"),
+          shoot: new Audio("../../static/sound/td/td_shoot02.wav"),
+          success: new Audio("../../static/sound/td/td_success01.wav"),
+          basicHit: new Audio("../../static/sound/td/td_hit01.wav"),
+          slowingHit: new Audio("../../static/sound/td/td_slow_hit.wav"),
+          poisonHit: new Audio("../../static/sound/td/td_poison_hit.wav"),
+          moneyHit: new Audio("../../static/sound/td/td_money_hit.wav"),
+          airHit: new Audio("../../static/sound/td/td_plane_hit.wav"),
+          ultimateHit: new Audio("../../static/sound/td/td_ultimate_hit.wav"),
+          longRangeHit: new Audio("../../static/sound/td/td_longrange_hit.wav")
         },
         playSFX: function(name, towerName='default') {
           if (this.enabled) {
@@ -2236,7 +2236,7 @@
         //Show the towers
         document.getElementById("towers").classList.remove("hidden");
         for (let tower in towerTypes) {
-          document.getElementById("towers").innerHTML += `<img src="../static/img/towerdefense/${tower}.png" id="${tower}">`;
+          document.getElementById("towers").innerHTML += `<img src="../../static/img/towerdefense/${tower}.png" id="${tower}">`;
           document.getElementById("abilities").innerHTML += `<button id="${tower}Ability" class="invisible">Use ability</button>`;
         }
         for (let tower in towerTypes) {

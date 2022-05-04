@@ -284,13 +284,13 @@
     }
 
     //Get user's permissions from server
-    request.open("GET", '/getme', false);
+    request.open("GET", '/api/me', false);
     request.send(null);
     let meRes = JSON.parse(request.responseText);
     let myPerms = meRes.perms;
 
     //Get chat permissions from the server
-    request.open("GET", '/getpermissions', false);
+    request.open("GET", '/api/permissions', false);
     request.send(null);
     let permsRes = JSON.parse(request.responseText);
     let sayPerms = permsRes.say;

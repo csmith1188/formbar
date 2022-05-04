@@ -112,7 +112,7 @@
     }
 
     setInterval(function() {
-        checkUpdates('/getstudents');
+        checkUpdates('/api/students');
         let studentBox = document.getElementById('students');
         if (studentData == undefined) {
           studentBox.innerHTML = 'Cannot get students. Are you logged in and connected?';

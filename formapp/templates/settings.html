@@ -103,7 +103,7 @@
     function changePollType() {
       if (document.getElementById("thumbs").checked) document.getElementById("pollDescription").innerText = "Students can choose between thumbs up, thumbs down, and wiggle.";
       else if (document.getElementById("letters").checked) document.getElementById("pollDescription").innerText = "Students can choose between A, B, C, and D.";
-      else if (document.getElementById("textResponse").checked) document.getElementById("pollDescription").innerHTML = "Students will type out short answers. View responses <a href='/users'>here</a>.";
+      else if (document.getElementById("essay").checked) document.getElementById("pollDescription").innerHTML = "Students will type out short answers. View essays <a href='/users'>here</a>.";
       downloadButton();
     }
 
@@ -114,7 +114,7 @@
       } else if (document.getElementById("letters").checked) {
         request.open('GET', '/startpoll?type=abcd');
         request.send();
-      } else if (document.getElementById("textResponse").checked) {
+      } else if (document.getElementById("essay").checked) {
         request.open('GET', '/startpoll?type=text');
         request.send();
       }
@@ -152,7 +152,7 @@
         case "text":
           document.getElementById("poll").checked = true;
           document.getElementById("pollType").classList.remove("hidden");
-          document.getElementById("textResponse").checked = true;
+          document.getElementById("essay").checked = true;
           changePollType();
           break;
         case "progress":
@@ -169,7 +169,7 @@
     async function downloadButton() {
       let modeRes = await getResponse("/api/mode");
       let mode = modeRes.mode;
-      if (mode == "text" && document.getElementById("textResponse").checked) document.getElementById("drButton").classList.remove("hidden");
+      if (mode == "text" && document.getElementById("essay").checked) document.getElementById("drButton").classList.remove("hidden");
       else document.getElementById("drButton").classList.add("hidden");
     }
 
@@ -178,9 +178,9 @@
 
     async function downloadResponses() {
       let students = await getResponse("/api/students");
-      let responses = Object.values(students).map(student => [student.name, student.textRes]);
+      let essays = Object.values(students).map(student => [student.name, student.textRes]);
       let csv = "data:text/csv;charset=utf-8,";
-      csv += responses.map(e => e.join(",")).join("\n");
+      csv += essays.map(e => e.join(",")).join("\n");
       let link = document.createElement("a");
       link.href = encodeURI(csv);
 
@@ -192,7 +192,7 @@
       let mi = date.getMinutes();
       let s = date.getSeconds();
 
-      link.download = `responses_${y}_${mo}_${d}_${h}_${mi}_${s}.csv`;
+      link.download = `essays_${y}_${mo}_${d}_${h}_${mi}_${s}.csv`;
       link.click();
     }
 
@@ -232,10 +232,10 @@
       Type:
       <input type="radio" id="thumbs" name="type" checked style="margin-left: 8px;"><label for="thumbs">Thumbs</label>
       <input type="radio" id="letters" name="type" style="margin-left: 8px;"><label for="letters">Letters</label>
-      <input type="radio" id="textResponse" name="type" style="margin-left: 8px;"><label for="textResponse">Text response</label><br>
+      <input type="radio" id="essay" name="type" style="margin-left: 8px;"><label for="essay">Essay</label><br>
       <span id="pollDescription">Students can choose between thumbs up, thumbs down, and wiggle</span><br>
       <input type="button" class="button inline popOut" value="Start new poll" style="margin-top: 8px;" onclick="startPoll();">
-      <input type="button" id="drButton" class="button inline popOut hidden" value="Download responses" style="margin-top: 8px;" onclick="downloadResponses();">
+      <input type="button" id="drButton" class="button inline popOut hidden" value="Download essays" style="margin-top: 8px;" onclick="downloadResponses();">
     </form>
     <br>
 

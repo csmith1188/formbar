@@ -637,7 +637,7 @@ def tutdBar():
     if ONRPi:
         pixels.show()
 
-#Show how many students have submitted text responses
+#Show how many students have submitted Essays
 def textBar():
     if not ONRPi:
         global pixels
@@ -2347,24 +2347,24 @@ def endpoint_td():
 
 
 '''
-/textresponse
+/essay
 '''
-@app.route('/textresponse', methods = ['POST', 'GET'])
-def endpoint_textresponse():
+@app.route('/essay', methods = ['POST', 'GET'])
+def endpoint_essay():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     else:
         if request.method == 'POST':
-            response = request.form['response']
+            essay = request.form['essay']
             if sD.settings['barmode'] == 'text':
-                if not response and sD.studentDict[request.remote_addr]['textRes']:
+                if not essay and sD.studentDict[request.remote_addr]['textRes']:
                     #Response unsubmitted
                     playSFX("sfx_hit01")
-                sD.studentDict[request.remote_addr]['textRes'] = response
+                sD.studentDict[request.remote_addr]['textRes'] = essay
                 textBar()
                 return render_template("message.html", message = "Response submitted.")
             else:
-                return render_template("message.html", message = "Not in text response mode.")
+                return render_template("message.html", message = "Not in Essay mode.")
         else:
             return render_template('thumbsrental.html')
 
@@ -2502,14 +2502,14 @@ def endpoint_users():
                 refresh = request.args.get('refresh')
                 if refresh == 'all':
                     if refreshUsers(user):
-                        return render_template("message.html", message = "Removed all student responses.")
+                        return render_template("message.html", message = "Removed all student essays.")
                     else:
-                        return render_template("message.html", message = "Error removing responses from all students.")
+                        return render_template("message.html", message = "Error removing essays from all students.")
                 else:
                     if refreshUsers(user, refresh):
-                        return render_template("message.html", message = "Removed " + refresh + " responses from " + user + ".")
+                        return render_template("message.html", message = "Removed " + refresh + " essays from " + user + ".")
                     else:
-                        return render_template("message.html", message = "Error removgin " + refresh + " responses from " + user + ".")
+                        return render_template("message.html", message = "Error removgin " + refresh + " essays from " + user + ".")
             else:
                 return render_template("message.html", message = "No action given.")
         else:

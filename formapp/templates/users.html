@@ -139,7 +139,7 @@
                 if (letter == "c") icons += `<img src="{{ url_for('static', filename='img/users/c.png') }}" class="icon" title="C">`;
                 if (letter == "d") icons += `<img src="{{ url_for('static', filename='img/users/d.png') }}" class="icon" title="D">`;
 
-                //Show icon if student has submitted text response
+                //Show icon if student has submitted Essay
                 if (studentList[student].textRes) icons += `<img src="{{ url_for('static', filename='img/users/text.png') }}" class="icon" title="Response submitted">`;
 
                 if (studentList[student]['help'] == true) icons += `<img src="{{ url_for('static', filename='img/users/help.png') }}" class="icon" title="Help ticket">`;

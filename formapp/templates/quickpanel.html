@@ -84,7 +84,7 @@
     margin: auto;
   }
 
-  #response {
+  #essay {
     width: 360px;
     height: 108px;
     margin-bottom: 8px;
@@ -175,7 +175,7 @@
       <img src="{{ url_for('static', filename='img/basic/letterButton3.png') }}" id="letterButton3" class="letterButton button inline popOut moreDepth greenColor" title="Vote D" onclick="letterVote(3);" tabindex="0">
     </div>
     <div id="textBox" class="hidden">
-      <textarea id="response" placeholder="Type your response here" oninput="checkResponse();"></textarea><br>
+      <textarea id="essay" placeholder="Type your essay here" oninput="checkResponse();"></textarea><br>
       <button id="submitResponse" class="inline popOut unselectable">Submit</button>
     </div>
     <h2 id="noPoll">There is no poll right now.</h2>
@@ -198,8 +198,8 @@
       <div id="newPoll" class="hidden">New poll:
         <button class="inline popOut" onclick="startPoll('tutd')">Thumbs</button>
         <button class="inline popOut" onclick="startPoll('abcd')">Letters</button>
-        <button class="inline popOut" onclick="startPoll('text')">Text response</button><br>
-        <span id="textLink" class="hidden">Click <a href="/advanced?page=users">here</a> to see responses</span>
+        <button class="inline popOut" onclick="startPoll('text')">Essay</button><br>
+        <span id="textLink" class="hidden">Click <a href="/advanced?page=users">here</a> to see essays</span>
       </div>
       <button class="inline popOut" onclick="window.open('/advanced?page=settings');">All settings 🡆</button>
     </div>
@@ -329,7 +329,7 @@
           }
           if (mode == "text") {
             textBox.classList.remove("hidden");
-            pollName.innerText = "Poll: text response";
+            pollName.innerText = "Poll: Essay";
           } else {
             textBox.classList.add("hidden");
           }

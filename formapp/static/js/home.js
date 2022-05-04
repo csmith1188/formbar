@@ -113,14 +113,14 @@ function updateVotes() {
     else if (letter !== chosenLetter) letterVote(letter);
   }
 
-  let textResEl = document.getElementById("response");
-  let response = meRes.textRes;
-  if (response && !textResEl.value) {
-    textResEl.value = response;
+  let textResEl = document.getElementById("essay");
+  let essay = meRes.textRes;
+  if (essay && !textResEl.value) {
+    textResEl.value = essay;
     checkResponse();
-    responseSubmitted();
+    essaySubmitted();
   }
-  if (!response && textResEl.value) responseUnsubmitted();
+  if (!essay && textResEl.value) essayUnsubmitted();
 }
 
 function highlight(image) {
@@ -160,7 +160,7 @@ function removeHighlight(image) {
 }
 
 function checkResponse() {
-  let box = document.getElementById("response");
+  let box = document.getElementById("essay");
   let button = document.getElementById("submitResponse");
   if (box.value) {
     button.classList.remove("unselectable");
@@ -172,14 +172,14 @@ function checkResponse() {
 }
 
 function submitResponse() {
-  let box = document.getElementById("response");
-  request.open("POST", "/textresponse?response=" + box.value);
+  let box = document.getElementById("essay");
+  request.open("POST", "/essay?essay=" + box.value);
   request.send();
-  responseSubmitted();
+  essaySubmitted();
 }
 
-function responseSubmitted() {
-  let box = document.getElementById("response");
+function essaySubmitted() {
+  let box = document.getElementById("essay");
   let button = document.getElementById("submitResponse");
   box.disabled = true;
   box.classList.add("unselectable");
@@ -188,14 +188,14 @@ function responseSubmitted() {
 }
 
 function unsubmitResponse() {
-  let box = document.getElementById("response");
-  request.open("GET", "/textresponse?response=");
+  let box = document.getElementById("essay");
+  request.open("GET", "/essay?essay=");
   request.send();
-  responseUnsubmitted();
+  essayUnsubmitted();
 }
 
-function responseUnsubmitted() {
-  let box = document.getElementById("response");
+function essayUnsubmitted() {
+  let box = document.getElementById("essay");
   let button = document.getElementById("submitResponse");
   box.disabled = false;
   box.classList.remove("unselectable");

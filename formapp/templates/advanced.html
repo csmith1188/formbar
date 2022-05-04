@@ -531,7 +531,7 @@
     document.title = `${innerPageTitle} - Formbar`;
     window.history.pushState({}, '', "?page=" + path.slice(1)); //Update the URL to include the title
     let tabs = document.querySelectorAll(".tab");
-    let tabEl = document.getElementById(path.substring(1) + "Tab");
+    let tabEl = document.getElementById(path.substring(1) + "Tab") || document.getElementById(path.substring(7) + "Tab");
     if (!content) openPage("chat?alert='Page does not exist.'");
     Array.from(tabs).forEach(tab => tab.classList.remove("open"));
     if (["/help", "/break", "/wawd", "/flashcards"].includes(path)) document.getElementById("studentsTab").classList.add("open");

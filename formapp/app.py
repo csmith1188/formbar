@@ -2355,7 +2355,7 @@ def endpoint_textresponse():
         return redirect('/login?forward=' + request.path)
     else:
         if request.method == 'POST':
-            response = request.args.get('response')
+            response = request.form['response']
             if sD.settings['barmode'] == 'text':
                 if not response and sD.studentDict[request.remote_addr]['textRes']:
                     #Response unsubmitted

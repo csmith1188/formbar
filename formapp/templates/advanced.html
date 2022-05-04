@@ -308,7 +308,7 @@
 
   <div id="otherSidebar" class="hidden">
     Name: <a id="name"></a><span id="excluded"></span><br>
-    <button class="inline popOut" onclick="window.location = '/login';">Log out</button><br>
+    <button class="inline popOut" onclick="logOut();">Log out</button><br>
     <button class="inline popOut" onclick="window.location = '/changepassword';">Change your password</button>
     <button class="inline popOut" onclick="window.open('https://github.com/csmith1188/formbar/issues/new');">Send feedback</button><br>
     <button class="inline popOut" onclick="window.location = '/quickpanel';">Go to the quick panel</button><br>
@@ -455,6 +455,17 @@
     } else {
       textDiv.classList.add("hidden");
       colorDiv.classList.add("hidden");
+    }
+  }
+
+  function logOut() {
+    //If the user is the only teacher logged in, confirm before logging out
+    if (
+      meRes.perms != permsRes.teacher ||
+      Object.values(studentsRes).filter(user => user.perms == permsRes.teacher).length > 1 ||
+      confirm("If you log out, the next person to log in will become the teacher. Log out anyway?")
+    ) {
+      window.location = "/login";
     }
   }
 

@@ -205,205 +205,210 @@
 <!-- Extra JavaScript here -->
 {% block script %}
 <script>
-  let divKeys = document.getElementById('keys');
-  let letterList = 'abcdefghijklmnopqrstuvwxyz';
-  for (let i = 0; i < letterList.length; i++) {
-    divKeys.innerHTML += `<div id="${letterList[i]}" class="key" onclick="guess('${letterList[i]}')">${letterList[i]}</div>`
-  }
-  var score = 0;
-  var highscore = {{ highScore }};
-  var lives = 10;
-  var guessed = [];
-  var word;
-  var letters;
-  var displayWord = "";
-  var savedWord;
-  var newWord;
-  var newDefinition;
+  {
+    let divKeys = document.getElementById('keys');
+    let letterList = 'abcdefghijklmnopqrstuvwxyz';
+    for (let i = 0; i < letterList.length; i++) {
+      divKeys.innerHTML += `<div id="${letterList[i]}" class="key">${letterList[i]}</div>`;
+    }
+    for (let i = 0; i < letterList.length; i++) {
+      document.getElementById(letterList[i]).onclick = () => guess(letterList[i]);
+    }
+    let score = 0;
+    let highscore = {{ highScore }};
+    let lives = 10;
+    let guessed = [];
+    let word;
+    let letters;
+    let displayWord = "";
+    let savedWord;
+    let newWord;
+    let newDefinition;
 
-  var wordObj = {{wordObj | tojson}}
-  var wordList = [];
+    let wordObj = {{wordObj | tojson}}
+    let wordList = [];
 
-  window.onload = () => {
-    keyColor();
-    randomize();
-    document.getElementById("highscore").innerHTML = highscore;
-  };
+    window.onload = () => {
+      keyColor();
+      randomize();
+      document.getElementById("highscore").innerHTML = highscore;
+    };
 
-  function createList() {
-    wordList = Object.keys(wordObj)
-    document.getElementById('wordBank').innerHTML = wordList[0]
-    for (let i = 1; i < wordList.length; i++) {
-      document.getElementById('wordBank').innerHTML += ', ' + wordList[i]
+    function createList() {
+      wordList = Object.keys(wordObj)
+      document.getElementById('wordBank').innerHTML = wordList[0]
+      for (let i = 1; i < wordList.length; i++) {
+        document.getElementById('wordBank').innerHTML += ', ' + wordList[i]
+        if (wordObj[word] && !(wordObj.place == "your" && wordObj.words == "here")) {
+          document.getElementById("category").innerHTML = wordList[i];
+
+          letters = wordList[i].split('');
+          displayWord = "";
+          for (let j = 0; j < wordList[i].length; j++) {
+            //Add an underscore for each character
+            displayWord = displayWord + "_ ";
+            savedWord = displayWord.split('');
+          }
+
+          document.getElementById("word").innerHTML = displayWord;
+        }
+      }
+    }
+    if (!(wordObj.place == "your" && wordObj.words == "here")) createList();
+
+    function getNewWord() {
+      guessed = [];
+      let wordRequest = new XMLHttpRequest();
+      wordRequest.open('GET', "/getword");
+      wordRequest.onload = function() {
+        newWord = wordRequest.response;
+        let definitionRequest = new XMLHttpRequest();
+        definitionRequest.open('GET', "https://api.dictionaryapi.dev/api/v2/entries/en_US/" + newWord);
+        definitionRequest.onload = function() {
+          newDefinition = JSON.parse(definitionRequest.response);
+          if (newDefinition.title == "No Definitions Found") {
+            getNewWord();
+          } else {
+            newDefinition = newDefinition[0].meanings[0].definitions[0].definition;
+            wordObj = {};
+            wordObj[newWord] = newDefinition;
+            word = newWord;
+            letters = newWord.split('');
+            displayWord = "";
+            document.getElementById("category").innerHTML = wordObj[newWord];
+            displayWord = "";
+            for (let i = 0; i < newWord.length; i++) {
+              //Add an underscore for each character
+              displayWord = displayWord + "_ ";
+              savedWord = displayWord.split('');
+            }
+            document.getElementById("word").innerHTML = displayWord;
+          }
+        };
+        definitionRequest.send();
+      };
+      wordRequest.send();
+    }
+    if (wordObj.place == "your" && wordObj.words == "here") getNewWord();
+
+    function keyColor() {
+      elements = document.getElementsByClassName("keys");
+      //Fix: i is undefined
+      //elements[i].style.backgroundColor = "dcf0ef";
+    }
+
+    function randomize() {
+      document.getElementById("lives").style.color = "inherit";
+      document.getElementById("category").innerText = "Getting new word…";
+      document.getElementById("word").innerText = null;
+      lives = 10;
+
+      document.getElementById("lives").innerHTML = lives;
+
+      word = wordList[Math.floor(Math.random() * wordList.length)];
+
       if (wordObj[word] && !(wordObj.place == "your" && wordObj.words == "here")) {
-        document.getElementById("category").innerHTML = wordList[i];
+        document.getElementById("category").innerHTML = wordObj[word];
 
-        letters = wordList[i].split('');
+        letters = word.split('');
         displayWord = "";
-        for (var j = 0; j < wordList[i].length; j++) {
-          //Add an underscore for each character
+        for (let i = 0; i < word.length; i++) {
           displayWord = displayWord + "_ ";
           savedWord = displayWord.split('');
         }
 
         document.getElementById("word").innerHTML = displayWord;
       }
-    }
-  }
-  if (!(wordObj.place == "your" && wordObj.words == "here")) createList();
 
-  function getNewWord() {
-    guessed = [];
-    var wordRequest = new XMLHttpRequest();
-    wordRequest.open('GET', "/getword");
-    wordRequest.onload = function() {
-      newWord = wordRequest.response;
-      var definitionRequest = new XMLHttpRequest();
-      definitionRequest.open('GET', "https://api.dictionaryapi.dev/api/v2/entries/en_US/" + newWord);
-      definitionRequest.onload = function() {
-        newDefinition = JSON.parse(definitionRequest.response);
-        if (newDefinition.title == "No Definitions Found") {
-          getNewWord();
-        } else {
-          newDefinition = newDefinition[0].meanings[0].definitions[0].definition;
-          wordObj = {};
-          wordObj[newWord] = newDefinition;
-          word = newWord;
-          letters = newWord.split('');
-          displayWord = "";
-          document.getElementById("category").innerHTML = wordObj[newWord];
-          displayWord = "";
-          for (let i = 0; i < newWord.length; i++) {
-            //Add an underscore for each character
+    }
+
+    function guess(l) {
+      let check = false;
+      for (let i = 0; i < letters.length; i++) {
+
+        if (l == letters[i]) {
+          check = true;
+        }
+      }
+
+      closeLetter(l, check);
+
+      if (check == true) {
+        displayWord = "";
+        for (let i = 0; i < word.length; i++) {
+          if (letters[i] == l) {
+            displayWord = displayWord + l + " ";
+            savedWord[i] = l;
+          } else if (letters[i] == savedWord[i]) {
+            displayWord = displayWord + savedWord[i] + " ";
+          } else {
             displayWord = displayWord + "_ ";
-            savedWord = displayWord.split('');
           }
-          document.getElementById("word").innerHTML = displayWord;
+
         }
-      };
-      definitionRequest.send();
-    };
-    wordRequest.send();
-  }
-  if (wordObj.place == "your" && wordObj.words == "here") getNewWord();
+        document.getElementById("word").innerHTML = displayWord;
 
-  function keyColor() {
-    elements = document.getElementsByClassName("keys");
-    //Fix: i is undefined
-    //elements[i].style.backgroundColor = "dcf0ef";
-  }
-
-  function randomize() {
-    document.getElementById("lives").style.color = "inherit";
-    document.getElementById("category").innerText = "Getting new word…";
-    document.getElementById("word").innerText = null;
-    lives = 10;
-
-    document.getElementById("lives").innerHTML = lives;
-
-    word = wordList[Math.floor(Math.random() * wordList.length)];
-
-    if (wordObj[word] && !(wordObj.place == "your" && wordObj.words == "here")) {
-      document.getElementById("category").innerHTML = wordObj[word];
-
-      letters = word.split('');
-      displayWord = "";
-      for (var i = 0; i < word.length; i++) {
-        displayWord = displayWord + "_ ";
-        savedWord = displayWord.split('');
-      }
-
-      document.getElementById("word").innerHTML = displayWord;
-    }
-
-  }
-
-  function guess(l) {
-    var check = false;
-    for (var i = 0; i < letters.length; i++) {
-
-      if (l == letters[i]) {
-        check = true;
-      }
-    }
-
-    closeLetter(l, check);
-
-    if (check == true) {
-      displayWord = "";
-      for (var i = 0; i < word.length; i++) {
-        if (letters[i] == l) {
-          displayWord = displayWord + l + " ";
-          savedWord[i] = l;
-        } else if (letters[i] == savedWord[i]) {
-          displayWord = displayWord + savedWord[i] + " ";
-        } else {
-          displayWord = displayWord + "_ ";
-        }
-
-      }
-      document.getElementById("word").innerHTML = displayWord;
-
-      if (displayWord.slice(0, -1) == word.split('').join(' ')) {
-        //they solved the word
-        let lastword = word;
-        document.getElementById("last").innerHTML = lastword;
-        score += lives;
-        if (score > highscore) {
-          highscore = score;
-          document.getElementById("highscore").style.color = "var(--light-purple)";
-        }
-        randomize();
-        resetLetters();
-        getNewWord();
-      }
-
-      document.getElementById("score").innerHTML = score;
-      document.getElementById("highscore").innerHTML = highscore;
-      document.getElementById("lives").innerHTML = lives;
-
-    } else if (!guessed.includes(l)) {
-      //they guessed a wrong letter
-
-      lives--;
-      if (lives < 1) {
-        //they lost
-        if (lives == 0) {
-          request.open("POST", "/savescore?game=hangman&score=" + score);
-          request.send();
-          score = 0;
+        if (displayWord.slice(0, -1) == word.split('').join(' ')) {
+          //they solved the word
           let lastword = word;
           document.getElementById("last").innerHTML = lastword;
+          score += lives;
+          if (score > highscore) {
+            highscore = score;
+            document.getElementById("highscore").style.color = "var(--light-purple)";
+          }
           randomize();
           resetLetters();
           getNewWord();
         }
+
+        document.getElementById("score").innerHTML = score;
+        document.getElementById("highscore").innerHTML = highscore;
+        document.getElementById("lives").innerHTML = lives;
+
+      } else if (!guessed.includes(l)) {
+        //they guessed a wrong letter
+
+        lives--;
+        if (lives < 1) {
+          //they lost
+          if (lives == 0) {
+            request.open("POST", "/savescore?game=hangman&score=" + score);
+            request.send();
+            score = 0;
+            let lastword = word;
+            document.getElementById("last").innerHTML = lastword;
+            randomize();
+            resetLetters();
+            getNewWord();
+          }
+        }
+        document.getElementById("score").innerHTML = score;
+        document.getElementById("lives").innerHTML = lives;
+        if (lives == 1) document.getElementById("lives").style.color = "var(--light-red)";
       }
-      document.getElementById("score").innerHTML = score;
-      document.getElementById("lives").innerHTML = lives;
-      if (lives == 1) document.getElementById("lives").style.color = "var(--light-red)";
+
+      guessed.push(l);
     }
 
-    guessed.push(l);
-  }
-
-  function closeLetter(letter, correct) {
-    let el = document.getElementById(letter);
-    el.classList.add("unselectable");
-    if (correct) el.style.background = "var(--light-green)";
-    else el.style.background = "var(--light-red)";
-  }
-
-  function resetLetters() {
-    elements = document.getElementsByClassName("key");
-    for (var i = 0; i < elements.length; i++) {
-      elements[i].classList.remove("unselectable");
-      elements[i].style.backgroundColor = "#FFFFFF";
+    function closeLetter(letter, correct) {
+      let el = document.getElementById(letter);
+      el.classList.add("unselectable");
+      if (correct) el.style.background = "var(--light-green)";
+      else el.style.background = "var(--light-red)";
     }
-  }
 
-  document.addEventListener("keydown", event => {
-    if (/^[a-z]{1}$/.test(event.key)) guess(event.key); //If a letter key is pressed, guess that letter
-  });
+    function resetLetters() {
+      elements = document.getElementsByClassName("key");
+      for (let i = 0; i < elements.length; i++) {
+        elements[i].classList.remove("unselectable");
+        elements[i].style.backgroundColor = "#FFFFFF";
+      }
+    }
+
+    document.addEventListener("keydown", event => {
+      if (/^[a-z]{1}$/.test(event.key)) guess(event.key); //If a letter key is pressed, guess that letter
+    });
+  }
 </script>
 {% endblock %}

@@ -22,12 +22,12 @@ let removeFocus;
 
 async function getApiData(first) {
   let apiData = await Promise.all([
-    getResponse("/getme"),
-    getResponse("/getbgm"),
-    getResponse("/getmode"),
-    getResponse("/getpermissions"),
-    getResponse("/getpix"),
-    getResponse("/getstudents")
+    getResponse("/api/me"),
+    getResponse("/api/bgm"),
+    getResponse("/api/mode"),
+    getResponse("/api/permissions"),
+    getResponse("/api/pix"),
+    getResponse("/api/students")
   ]);
   //Save every response to a variable
   meRes = apiData[0];
@@ -338,7 +338,7 @@ if (document.getElementById("music")) document.getElementById("music").addEventL
 });
 
 function nowPlaying() {
-  //Get current song from server
+  //api/ current song from server
   let songName = bgmRes.bgm;
   let paused = bgmRes.paused;
 

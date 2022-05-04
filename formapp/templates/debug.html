@@ -70,20 +70,21 @@
 {% block script %}
 <script>
   let urls = [
-    "/getbgm",
-    "/getfightermatches",
-    "/getme",
-    "/getmode",
-    "/getpermissions",
-    "/getphrase",
-    "/getpix",
-    "/getquizname",
-    "/getstudents",
+    "/bgm",
+    "/fightermatches",
+    "/ip",
+    "/me",
+    "/mode",
+    "/permissions",
+    "/phrase",
+    "/pix",
+    "/quizname",
+    "/students",
   ];
   let timeLeft = 3;
-  let dataURL = "/getpix";
+  let dataURL = "/pix";
 
-  urls.forEach(url => document.getElementById("buttonContainer").innerHTML += `<button id="${url}" onclick="update('${url}')">${url}</button>`);
+  urls.forEach(url => document.getElementById("buttonContainer").innerHTML += `<button id="${url}" onclick="update('${url}')">/api${url}</button>`);
 
   function countdown() {
     document.getElementById("timeLeft").innerHTML = timeLeft--;
@@ -99,7 +100,7 @@
 
     //Update the data
     let newRequest = new XMLHttpRequest();
-    newRequest.open("GET", newURL);
+    newRequest.open("GET", "/api" + newURL);
     newRequest.onload = () => document.getElementById("data").innerText = newRequest.responseText;
     newRequest.send(null);
 

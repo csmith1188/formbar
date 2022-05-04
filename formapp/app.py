@@ -802,21 +802,7 @@ def endpoint_root():
 
 @app.route('/2048')
 def endpoint_2048():
-    if not request.remote_addr in sD.studentDict:
-        return redirect('/login?forward=' + request.path)
-    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
-        return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
-    else:
-        username = sD.studentDict[request.remote_addr]['name']
-        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
-        dbcmd = db.cursor()
-        highScore = dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='2048' ORDER BY score DESC", {"uname": username}).fetchone()
-        db.close()
-        if highScore:
-            highScore = highScore[3]
-        else:
-            highScore = 0
-        return render_template('2048.html', highScore = highScore)
+    return redirect('games/2048')
 
 #  █████
 # ██   ██
@@ -908,7 +894,107 @@ def endpoint_advanced():
 
 @app.route('/api')
 def endpoint_api():
-    return render_template("message.html", message = "New API endpoint")
+    return redirect('/debug')
+
+@app.route('/api/bgm')
+def endpoint_api_bgm():
+    if not request.remote_addr in sD.studentDict:
+        return '{"error": "You are not logged in."}'
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
+        return '{"error": "Insufficient permissions."}'
+    else:
+        return '{"bgm": "' + str(sD.bgm['nowplaying']) + '", "paused": "' + str(sD.bgm['paused']) + '", "volume": "' + str(sD.bgm['volume']) + '"}'
+
+@app.route('/api/fightermatches')
+def endpoint_api_fightermatches():
+    if not request.remote_addr in sD.studentDict:
+        return '{"error": "You are not logged in."}'
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
+        return '{"error": "Insufficient permissions."}'
+    else:
+        return json.dumps(sD.fighter)
+
+@app.route('/api/ip')
+def endpoint_api_ip():
+    if not request.remote_addr in sD.studentDict:
+        return '{"error": "You are not logged in."}'
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
+        return '{"error": "Insufficient permissions."}'
+    else:
+        return '{"ip": "'+ ip +'"}'
+
+#Sends back your student information
+@app.route('/api/me')
+def endpoint_api_me():
+    if not request.remote_addr in sD.studentDict:
+        return '{"error": "You are not logged in."}'
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
+        return '{"error": "Insufficient permissions."}'
+    else:
+        return json.dumps(sD.studentDict[request.remote_addr])
+
+@app.route('/api/mode')
+def endpoint_api_mode():
+    if not request.remote_addr in sD.studentDict:
+        return '{"error": "You are not logged in."}'
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
+        return '{"error": "Insufficient permissions."}'
+    else:
+        return '{"mode": "'+ str(sD.settings['barmode']) +'"}'
+
+@app.route('/api/permissions')
+def endpoint_api_permissions():
+    if not request.remote_addr in sD.studentDict:
+        return '{"error": "You are not logged in."}'
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
+        return '{"error": "Insufficient permissions."}'
+    else:
+        return json.dumps(sD.settings['perms'])
+
+@app.route('/api/phrase')
+def endpoint_api_phrase():
+    if not request.remote_addr in sD.studentDict:
+        return '{"error": "You are not logged in."}'
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
+        return '{"error": "Insufficient permissions."}'
+    else:
+        return '{"phrase": "'+ str(sD.activePhrase) +'"}'
+
+#Shows the different colors the pixels take in the virtualbar.
+@app.route('/api/pix')
+def endpoint_api_pix():
+    if not request.remote_addr in sD.studentDict:
+        return '{"error": "You are not logged in."}'
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
+        return '{"error": "Insufficient permissions."}'
+    else:
+        if not ONRPi:
+            global pixels
+        return '{"pixels": "'+ str(pixels[:BARPIX]) +'"}'
+
+@app.route('/api/quizname')
+def endpoint_api_quizname():
+    if not request.remote_addr in sD.studentDict:
+        return '{"error": "You are not logged in."}'
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
+        return '{"error": "Insufficient permissions."}'
+    else:
+        if sD.activeQuiz:
+            return '{"quizname": "'+ str(sD.activeQuiz['name']) +'"}'
+        else:
+            return '{"error": "No quiz is currently loaded."}'
+
+#This endpoints shows the actions the students did EX:TUTD up
+@app.route('/api/students')
+def endpoint_api_students():
+    if not request.remote_addr in sD.studentDict:
+        return '{"error": "You are not logged in."}'
+    if sD.studentDict[request.remote_addr]['perms'] <= sD.settings['perms']['admin']:
+        return json.dumps(sD.studentDict)
+    elif sD.studentDict[request.remote_addr]['perms'] <= sD.settings['perms']['api']:
+        return json.dumps(stripUserData())
+    else:
+        return '{"error": "Insufficient permissions."}'
 
 # ██████
 # ██   ██
@@ -1006,21 +1092,7 @@ def endpoint_bgmstop():
 
 @app.route('/bitshifter')
 def endpoint_bitshifter():
-    if not request.remote_addr in sD.studentDict:
-        return redirect('/login?forward=' + request.path)
-    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
-        return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
-    else:
-        username = sD.studentDict[request.remote_addr]['name']
-        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
-        dbcmd = db.cursor()
-        highScore = dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='bitshifter' ORDER BY score DESC", {"uname": username}).fetchone()
-        db.close()
-        if highScore:
-            highScore = highScore[3]
-        else:
-            highScore = 0
-        return render_template('bitshifter.html', highScore = highScore)
+    return redirect('games/bitshifter')
 
 '''
     /break
@@ -1271,17 +1343,9 @@ def endpoint_expert():
 # ██
 
 
-'''
-    /fighter
-'''
 @app.route('/fighter')
 def endpoint_fighter():
-    if not request.remote_addr in sD.studentDict:
-        return redirect('/login?forward=' + request.path)
-    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
-        return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
-    else:
-        return render_template('fighter.html', username = sD.studentDict[request.remote_addr]['name'])
+    return redirect('games/fighter')
 
 
 '''
@@ -1315,105 +1379,179 @@ def endpoint_flush():
 #  ██████
 
 
-@app.route('/getbgm')
-def endpoint_getbgm():
+@app.route('/games/2048')
+def endpoint_games_2048():
     if not request.remote_addr in sD.studentDict:
-        return '{"error": "You are not logged in."}'
-    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
-        return '{"error": "Insufficient permissions."}'
+        return redirect('/login?forward=' + request.path)
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
     else:
-        return '{"bgm": "' + str(sD.bgm['nowplaying']) + '", "paused": "' + str(sD.bgm['paused']) + '", "volume": "' + str(sD.bgm['volume']) + '"}'
-
-@app.route('/getfightermatches')
-def endpoint_getfightermatches():
-    if not request.remote_addr in sD.studentDict:
-        return '{"error": "You are not logged in."}'
-    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
-        return '{"error": "Insufficient permissions."}'
-    else:
-        return json.dumps(sD.fighter)
-
-@app.route('/getip')
-def endpoint_getip():
-    if not request.remote_addr in sD.studentDict:
-        return '{"error": "You are not logged in."}'
-    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
-        return '{"error": "Insufficient permissions."}'
-    else:
-        return '{"ip": "'+ ip +'"}'
-
-#Sends back your student information
-@app.route('/getme')
-def endpoint_getme():
-    if not request.remote_addr in sD.studentDict:
-        return '{"error": "You are not logged in."}'
-    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
-        return '{"error": "Insufficient permissions."}'
-    else:
-        return json.dumps(sD.studentDict[request.remote_addr])
-
-@app.route('/getmode')
-def endpoint_getmode():
-    if not request.remote_addr in sD.studentDict:
-        return '{"error": "You are not logged in."}'
-    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
-        return '{"error": "Insufficient permissions."}'
-    else:
-        return '{"mode": "'+ str(sD.settings['barmode']) +'"}'
-
-@app.route('/getpermissions')
-def endpoint_getpermissions():
-    if not request.remote_addr in sD.studentDict:
-        return '{"error": "You are not logged in."}'
-    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
-        return '{"error": "Insufficient permissions."}'
-    else:
-        return json.dumps(sD.settings['perms'])
-
-@app.route('/getphrase')
-def endpoint_getphrase():
-    if not request.remote_addr in sD.studentDict:
-        return '{"error": "You are not logged in."}'
-    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
-        return '{"error": "Insufficient permissions."}'
-    else:
-        return '{"phrase": "'+ str(sD.activePhrase) +'"}'
-
-#Shows the different colors the pixels take in the virtualbar.
-@app.route('/getpix')
-def endpoint_getpix():
-    if not request.remote_addr in sD.studentDict:
-        return '{"error": "You are not logged in."}'
-    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
-        return '{"error": "Insufficient permissions."}'
-    else:
-        if not ONRPi:
-            global pixels
-        return '{"pixels": "'+ str(pixels[:BARPIX]) +'"}'
-
-@app.route('/getquizname')
-def endpoint_getquizname():
-    if not request.remote_addr in sD.studentDict:
-        return '{"error": "You are not logged in."}'
-    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
-        return '{"error": "Insufficient permissions."}'
-    else:
-        if sD.activeQuiz:
-            return '{"quizname": "'+ str(sD.activeQuiz['name']) +'"}'
+        username = sD.studentDict[request.remote_addr]['name']
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        highScore = dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='2048' ORDER BY score DESC", {"uname": username}).fetchone()
+        db.close()
+        if highScore:
+            highScore = highScore[3]
         else:
-            return '{"error": "No quiz is currently loaded."}'
+            highScore = 0
+        return render_template('games/2048.html', highScore = highScore)
 
-#This endpoints shows the actions the students did EX:TUTD up
-@app.route('/getstudents')
-def endpoint_getstudents():
+@app.route('/games/bitshifter')
+def endpoint_games_bitshifter():
     if not request.remote_addr in sD.studentDict:
-        return '{"error": "You are not logged in."}'
-    if sD.studentDict[request.remote_addr]['perms'] <= sD.settings['perms']['admin']:
-        return json.dumps(sD.studentDict)
-    elif sD.studentDict[request.remote_addr]['perms'] <= sD.settings['perms']['api']:
-        return json.dumps(stripUserData())
+        return redirect('/login?forward=' + request.path)
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
     else:
-        return '{"error": "Insufficient permissions."}'
+        username = sD.studentDict[request.remote_addr]['name']
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        highScore = dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='bitshifter' ORDER BY score DESC", {"uname": username}).fetchone()
+        db.close()
+        if highScore:
+            highScore = highScore[3]
+        else:
+            highScore = 0
+        return render_template('games/bitshifter.html', highScore = highScore)
+
+@app.route('/games/fighter')
+def endpoint_games_fighter():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
+    else:
+        return render_template('games/fighter.html', username = sD.studentDict[request.remote_addr]['name'])
+
+#This endpoint takes you to the hangman game
+@app.route('/games/hangman')
+def endpoint_games_hangman():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
+    else:
+        if sD.lesson:
+            if sD.lesson.vocab:
+                wordObj = sD.lesson.vocab
+        else:
+            #Need more generic words here
+            wordObj = {
+                'place': 'your',
+                'words': 'here'
+            }
+        username = sD.studentDict[request.remote_addr]['name']
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        highScore = dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='hangman' ORDER BY score DESC", {"uname": username}).fetchone()
+        db.close()
+        if highScore:
+            highScore = highScore[3]
+        else:
+            highScore = 0
+        return render_template("games/hangman.html", wordObj=wordObj, highScore = highScore)
+
+@app.route('/games/minesweeper')
+def endpoint_games_minesweeper():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
+    else:
+        cols = 20
+        rows = 20
+        dense = 10
+        if request.args.get('cols'):
+            cols = request.args.get('cols')
+        if request.args.get('rows'):
+            rows = request.args.get('rows')
+        if request.args.get('dense'):
+            dense = request.args.get('dense')
+        username = sD.studentDict[request.remote_addr]['name']
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        bestTime = dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='minesweeper' ORDER BY score ASC", {"uname": username}).fetchone()
+        db.close()
+        if bestTime:
+            bestTime = bestTime[3]
+        else:
+            bestTime = 0
+        return render_template("games/mnsw.html", cols=cols, rows=rows, dense=dense, bestTime=bestTime)
+
+@app.route('/games/speedtype')
+def endpoint_games_speedtype():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
+    else:
+        username = sD.studentDict[request.remote_addr]['name']
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        highScore = dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='speedtype' ORDER BY score DESC", {"uname": username}).fetchone()
+        db.close()
+        if highScore:
+            highScore = highScore[3]
+        else:
+            highScore = 0
+        return render_template("games/speedtype.html", highScore = highScore)
+
+    @app.route('/games/towerdefense')
+    def endpoint_games_towerdefense():
+        if not request.remote_addr in sD.studentDict:
+            return redirect('/login?forward=' + request.path)
+        if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
+            return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
+        else:
+            return render_template('games/towerdefense.html')
+
+#Tic Tac Toe
+@app.route('/games/ttt')
+def endpoint_games_ttt():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['student']:
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
+    else:
+        opponent = request.args.get('opponent')
+
+        #Loop through all existing games
+        for game in sD.ttt:
+            #If the user and the opponent is in an existing player list
+            if sD.studentDict[request.remote_addr]['name'] in game.players and opponent in game.players:
+                #Then you have found the right game and can edit it here
+                return render_template("games/ttt.html", game = str(game))
+                #return the response here
+
+
+        #Creating a new game
+        for student in sD.studentDict:
+            if sD.studentDict[student]['name'] == opponent:
+                sD.ttt.append(sessions.TTTGame([sD.studentDict[request.remote_addr]['name'], opponent]))
+                return render_template("ttt.html", game = json.dumps(sD.ttt[-1].__dict__))
+
+
+        #If there is no game with these players
+        return render_template("message.html", message = "No game found")
+
+@app.route('/games/wordle')
+def endpoint_games_wordle():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
+    else:
+        username = sD.studentDict[request.remote_addr]['name']
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        highScore = dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='wordle' ORDER BY score DESC", {"uname": username}).fetchone()
+        db.close()
+        if highScore:
+            highScore = highScore[3]
+        else:
+            highScore = 0
+        return render_template('games/wordle.html', wordList = str(words.keys()), highScore = highScore)
 
 @app.route('/getword')
 def endpoint_getword():
@@ -1438,33 +1576,9 @@ def endpoint_getword():
 # ██   ██
 
 
-#This endpoint takes you to the hangman game
 @app.route('/hangman')
 def endpoint_hangman():
-    if not request.remote_addr in sD.studentDict:
-        return redirect('/login?forward=' + request.path)
-    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
-        return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
-    else:
-        if sD.lesson:
-            if sD.lesson.vocab:
-                wordObj = sD.lesson.vocab
-        else:
-            #Need more generic words here
-            wordObj = {
-                'place': 'your',
-                'words': 'here'
-            }
-        username = sD.studentDict[request.remote_addr]['name']
-        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
-        dbcmd = db.cursor()
-        highScore = dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='hangman' ORDER BY score DESC", {"uname": username}).fetchone()
-        db.close()
-        if highScore:
-            highScore = highScore[3]
-        else:
-            highScore = 0
-        return render_template("hangman.html", wordObj=wordObj, highScore = highScore)
+    return redirect('games/hangman')
 
 @app.route('/help', methods = ['POST', 'GET'])
 def endpoint_help():
@@ -1737,41 +1851,14 @@ def endpoint_logout():
 # ██  ██  ██
 # ██      ██
 
-
-'''
-    /minesweeper
-'''
 @app.route('/minesweeper')
 def endpoint_minesweeper():
-    if not request.remote_addr in sD.studentDict:
-        return redirect('/login?forward=' + request.path)
-    elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
-        return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
-    else:
-        cols = 20
-        rows = 20
-        dense = 10
-        if request.args.get('cols'):
-            cols = request.args.get('cols')
-        if request.args.get('rows'):
-            rows = request.args.get('rows')
-        if request.args.get('dense'):
-            dense = request.args.get('dense')
-        username = sD.studentDict[request.remote_addr]['name']
-        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
-        dbcmd = db.cursor()
-        bestTime = dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='minesweeper' ORDER BY score ASC", {"uname": username}).fetchone()
-        db.close()
-        if bestTime:
-            bestTime = bestTime[3]
-        else:
-            bestTime = 0
-        return render_template("mnsw.html", cols=cols, rows=rows, dense=dense, bestTime=bestTime)
+    return redirect('games/minesweeper')
 
 
 @app.route('/mnsw')
 def endpoint_mnsw():
-    return redirect('/minesweeper')
+    return redirect('games/minesweeper')
 
 '''
     /mobile
@@ -2217,26 +2304,9 @@ def endpoint_sfx():
 def endpoint_socket():
     return render_template('socket.html', async_mode=socket_.async_mode)
 
-'''
-    /speedtype
-'''
 @app.route('/speedtype')
 def endpoint_speedtype():
-    if not request.remote_addr in sD.studentDict:
-        return redirect('/login?forward=' + request.path)
-    elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
-        return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
-    else:
-        username = sD.studentDict[request.remote_addr]['name']
-        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
-        dbcmd = db.cursor()
-        highScore = dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='speedtype' ORDER BY score DESC", {"uname": username}).fetchone()
-        db.close()
-        if highScore:
-            highScore = highScore[3]
-        else:
-            highScore = 0
-        return render_template("speedtype.html", highScore = highScore)
+    return redirect('games/speedtype')
 
 
 @app.route('/standard')
@@ -2269,7 +2339,7 @@ def endpoint_startpoll():
 
 @app.route('/td')
 def endpoint_td():
-    return redirect('/towerdefense')
+    return redirect('games/towerdefense')
 
 
 '''
@@ -2296,42 +2366,11 @@ def endpoint_textresponse():
 
 @app.route('/towerdefense')
 def endpoint_towerdefense():
-    if not request.remote_addr in sD.studentDict:
-        return redirect('/login?forward=' + request.path)
-    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
-        return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
-    else:
-        return render_template('towerdefense.html')
+    return redirect('games/towerdefense')
 
-
-#Tic Tac Toe
 @app.route('/ttt')
 def endpoint_ttt():
-    if not request.remote_addr in sD.studentDict:
-        return redirect('/login?forward=' + request.path)
-    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['student']:
-        return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
-    else:
-        opponent = request.args.get('opponent')
-
-        #Loop through all existing games
-        for game in sD.ttt:
-            #If the user and the opponent is in an existing player list
-            if sD.studentDict[request.remote_addr]['name'] in game.players and opponent in game.players:
-                #Then you have found the right game and can edit it here
-                return render_template("ttt.html", game = str(game))
-                #return the response here
-
-
-        #Creating a new game
-        for student in sD.studentDict:
-            if sD.studentDict[student]['name'] == opponent:
-                sD.ttt.append(sessions.TTTGame([sD.studentDict[request.remote_addr]['name'], opponent]))
-                return render_template("ttt.html", game = json.dumps(sD.ttt[-1].__dict__))
-
-
-        #If there is no game with these players
-        return render_template("message.html", message = "No game found")
+    return redirect('games/ttt')
 
 '''
     /tutd
@@ -2511,21 +2550,7 @@ def endpoint_wawd():
 
 @app.route('/wordle')
 def endpoint_wordle():
-    if not request.remote_addr in sD.studentDict:
-        return redirect('/login?forward=' + request.path)
-    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
-        return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
-    else:
-        username = sD.studentDict[request.remote_addr]['name']
-        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
-        dbcmd = db.cursor()
-        highScore = dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='wordle' ORDER BY score DESC", {"uname": username}).fetchone()
-        db.close()
-        if highScore:
-            highScore = highScore[3]
-        else:
-            highScore = 0
-        return render_template('wordle.html', wordList = str(words.keys()), highScore = highScore)
+    return redirect('games/wordle')
 
 
 # ███████  ██████   ██████ ██   ██ ███████ ████████ ████████  ██████

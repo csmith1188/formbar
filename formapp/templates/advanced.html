@@ -329,15 +329,15 @@
     </div>
     <div id="gamesTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/advanced/games.png') }}" class="icon"> <span class="tabText">Games</span></div>
     <div id="gamesMenu" class="menu hidden" tabindex="-1">
-      <div id="2048Tab" class="tab" onclick="openPage('2048');">2048</div>
-      <div id="bitshifterTab" class="tab" onclick="openPage('bitshifter');">Bitshifter</div>
-      <div id="hangmanTab" class="tab" onclick="openPage('hangman');">Hangman</div>
-      <div id="minesweeperTab" class="tab" onclick="openPage('minesweeper');">Minesweeper</div>
-      <div id="speedtypeTab" class="tab" onclick="openPage('speedtype');">Speed Typer</div>
-      <div id="tttTab" class="tab hidden" onclick="openPage('ttt');">Tic-tac-toe</div>
-      <div id="towerdefenseTab" class="tab" onclick="openPage('towerdefense');">Tower Defense</div>
-      <div id="fighterTab" class="tab hidden" onclick="openPage('fighter');">Turn-Based Fighter</div>
-      <div id="wordleTab" class="tab" onclick="openPage('wordle');">Wordle</div>
+      <div id="2048Tab" class="tab" onclick="openPage('games/2048');">2048</div>
+      <div id="bitshifterTab" class="tab" onclick="openPage('games/bitshifter');">Bitshifter</div>
+      <div id="hangmanTab" class="tab" onclick="openPage('games/hangman');">Hangman</div>
+      <div id="minesweeperTab" class="tab" onclick="openPage('games/minesweeper');">Minesweeper</div>
+      <div id="speedtypeTab" class="tab" onclick="openPage('games/speedtype');">Speed Typer</div>
+      <div id="tttTab" class="tab hidden" onclick="openPage('games/ttt');">Tic-tac-toe</div>
+      <div id="towerdefenseTab" class="tab" onclick="openPage('games/towerdefense');">Tower Defense</div>
+      <div id="fighterTab" class="tab hidden" onclick="openPage('games/fighter');">Turn-Based Fighter</div>
+      <div id="wordleTab" class="tab" onclick="openPage('games/wordle');">Wordle</div>
       <div id="leaderboardsTab" class="tab" onclick="openPage('leaderboards');">Leaderboards</div>
     </div>
     <div id="teacherTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/advanced/teacher.png') }}" class="icon"> <span class="tabText">Teacher</span></div>
@@ -535,7 +535,7 @@
     if (!content) openPage("chat?alert='Page does not exist.'");
     Array.from(tabs).forEach(tab => tab.classList.remove("open"));
     if (["/help", "/break", "/wawd", "/flashcards"].includes(path)) document.getElementById("studentsTab").classList.add("open");
-    if (["/2048", "/bitshifter", "/hangman", "/minesweeper", "/speedtype", "/ttt", "/towerdefense", "/fighter", "/wordle", "/leaderboards"].includes(path)) document.getElementById("gamesTab").classList.add("open");
+    if (path.startsWith("/games") || path == "/leaderboards") document.getElementById("gamesTab").classList.add("open");
     if (["/needshelp", "/settings", "/users", "/lesson", "/virtualbar"].includes(path)) document.getElementById("teacherTab").classList.add("open");
     if (tabEl) tabEl.classList.add("open");
     if (["/abcd", "/advanced", "/home", "/mobile", "/quickpanel", "/textresponse", "/tutd"].includes(path)) openPage("chat");

@@ -57,7 +57,7 @@
     function update() {
       //Update the virtual bar
       let pixRequest = new XMLHttpRequest();
-      pixRequest.open("GET", '/getpix');
+      pixRequest.open("GET", '/api/pix');
       pixRequest.onload = () => {
         let pixRes = JSON.parse(pixRequest.responseText);
         let pix = eval(pixRes.pixels);
@@ -76,7 +76,7 @@
 
       //Update the virtual bar's text
       let textRequest = new XMLHttpRequest();
-      textRequest.open("GET", '/getphrase');
+      textRequest.open("GET", '/api/phrase');
       textRequest.onload = () => {
         let phraseRes = JSON.parse(textRequest.responseText);
         let phrase = phraseRes.phrase;

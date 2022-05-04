@@ -67,7 +67,7 @@
 
     async function updateStudents() {
         if (document.getElementById("autoStudents").checked) {
-          let res = await getResponse("/getstudents");
+          let res = await getResponse("/api/students");
           document.getElementById("studentNum").value = Object.keys(res).length;
         }
     }
@@ -132,7 +132,7 @@
 
 
     (async () => {
-      let modeRes = await getResponse("/getmode");
+      let modeRes = await getResponse("/api/mode");
       let mode = modeRes.mode;
       if (mode == "tutd" || mode == "poll") {
         document.getElementById("poll").checked = true;

@@ -27,7 +27,7 @@
     el.innerHTML = message;
     message =  el.value;
 
-    let lastPage = new URL(document.referrer);
+    let lastPage = document.referrer && new URL(document.referrer);
 
     alert(message);
     if (forward) location.href = forward;

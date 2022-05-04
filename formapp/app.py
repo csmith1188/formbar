@@ -1103,8 +1103,6 @@ def endpoint_bitshifter():
 def endpoint_break():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
-    if sD.studentDict[request.remote_addr]['perms'] == sD.settings['perms']['teacher']:
-        return render_template("message.html", message = "Teachers can't request bathroom breaks.")
     else:
         name = request.args.get('name') or sD.studentDict[request.remote_addr]['name'].strip()
         if name in helpList:
@@ -1112,6 +1110,8 @@ def endpoint_break():
         else:
             ticket = ''
         if request.args.get('action') == 'request':
+            if sD.studentDict[request.remote_addr]['perms'] == sD.settings['perms']['teacher']:
+                return render_template("message.html", message = "Teachers can't request bathroom breaks.")
             if name in helpList:
                 return render_template("message.html", message = "You already have a help ticket or break request in.", forward = request.path)
             else:
@@ -1121,6 +1121,8 @@ def endpoint_break():
                 playSFX("sfx_pickup02")
                 return render_template("message.html", message = "Your request was sent. The teacher still needs to approve it.", forward = request.path)
         elif request.args.get('action') == 'end':
+            if name != sD.studentDict[request.remote_addr]['name'] and sD.studentDict[request.remote_addr]['perms'] != sD.settings['perms']['teacher']:
+                return render_template("message.html", message = "Only teachers can end other people's breaks.")
             #Find the student whose username matches the "name" argument
             for student in sD.studentDict:
                 if sD.studentDict[student]['name'].strip() == name:
@@ -1131,9 +1133,11 @@ def endpoint_break():
                         #server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', student, 'server', 'Your break was ended.')))
                         return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'], ticket = ticket)
                     else:
-                        return render_template("message.html", message = "This student is not currently taking a bathroom break.", forward = request.path)
+                        return render_template("message.html", message = "This student is not currently taking a bathroom break.")
             return render_template("message.html", message = 'Student not found.', forward = request.path)
         else:
+            if sD.studentDict[request.remote_addr]['perms'] == sD.settings['perms']['teacher']:
+                return render_template("message.html", message = "Teachers can't request bathroom breaks.")
             return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'], ticket = ticket)
 
 

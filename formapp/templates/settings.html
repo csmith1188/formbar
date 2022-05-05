@@ -178,9 +178,9 @@
 
     async function downloadResponses() {
       let students = await getResponse("/api/students");
-      let responses = Object.values(students).map(student => [student.name, student.textRes]);
+      let responses = Object.values(students).map(student => [`"${student.name}"`, `"${student.textRes}"`]); //Add quotes around each value
       let csv = "data:text/csv;charset=utf-8,";
-      csv += responses.map(e => e.join(",")).join("\n");
+      csv += responses.map(response => response.join(",")).join("\n");
       let link = document.createElement("a");
       link.href = encodeURI(csv);
 

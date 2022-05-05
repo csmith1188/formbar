@@ -179,18 +179,19 @@
     async function downloadResponses() {
       let students = await getResponse("/api/students");
       let essays = Object.values(students).map(student => [student.name, student.textRes]);
+      essays = essays.map(essay => essay.map(value => `"${value.replaceAll("\"", "\"\"")}"`)); //Escape quotes in values, then add quotes around each value
       let csv = "data:text/csv;charset=utf-8,";
-      csv += essays.map(e => e.join(",")).join("\n");
+      csv += essays.map(essay => essay.join(",")).join("\n");
       let link = document.createElement("a");
       link.href = encodeURI(csv);
 
       let date = new Date();
       let y = date.getFullYear();
-      let mo = date.getMonth() + 1;
-      let d = date.getDate();
-      let h = date.getHours();
-      let mi = date.getMinutes();
-      let s = date.getSeconds();
+      let mo = (date.getMonth() + 1).toString().padStart(2, "0");
+      let d = date.getDate().toString().padStart(2, "0");
+      let h = date.getHours().toString().padStart(2, "0");
+      let mi = date.getMinutes().toString().padStart(2, "0");
+      let s = date.getSeconds().toString().padStart(2, "0");
 
       link.download = `essays_${y}_${mo}_${d}_${h}_${mi}_${s}.csv`;
       link.click();

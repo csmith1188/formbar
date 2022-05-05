@@ -8,7 +8,7 @@
       <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
       {% block style %}{% endblock %}
       <style>
-        #home {
+        #homeLink {
           position: absolute;
           left: 8px;
           top: 8px;
@@ -18,11 +18,11 @@
           text-decoration: none;
         }
 
-        .light #home {
+        .light #homeLink {
           color: var(--color-red);
         }
 
-        #home:hover {
+        #homeLink:hover {
           color: var(--main-color);
         }
       </style>

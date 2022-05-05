@@ -659,9 +659,9 @@ def textBar():
         if fill > 0:
             for i, pix in enumerate(pixRange):
                 if i == 0:
-                    pixels[pix] = colors['blind']
+                    pixels[pix] = colors['student']
                 else:
-                    pixels[pix] = fadein(pixRange, i, colors['white'])
+                    pixels[pix] = fadein(pixRange, i, colors['blind'])
             fill -= 1
     if sD.settings['captions']:
         clearString()

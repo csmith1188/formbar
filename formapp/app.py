@@ -659,7 +659,7 @@ def textBar():
         if fill > 0:
             for i, pix in enumerate(pixRange):
                 if i == 0:
-                    pixels[pix] = colors['student']
+                    pixels[pix] = colors['blind']
                 else:
                     pixels[pix] = fadein(pixRange, i, colors['white'])
             fill -= 1

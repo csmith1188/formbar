@@ -244,9 +244,9 @@
       <img src="{{ url_for('static', filename='img/advanced/letterButton3.png') }}" id="letterButton3" class="letterButton button inline popOut moreDepth greenColor" title="Vote D" onclick="letterVote(3);" tabindex="0">
     </div>
 
-    <div id="responseDiv" class="hidden">
-      <h2>Text response</h2>
-      <textarea id="response" rows="6" cols="25" placeholder="Type your response here" oninput="checkResponse();"></textarea><br>
+    <div id="essayDiv" class="hidden">
+      <h2>Essay</h2>
+      <textarea id="essay" rows="6" cols="25" placeholder="Type your essay here" oninput="checkResponse();"></textarea><br>
       <button id="submitResponse" class="inline popOut unselectable">Submit</button>
     </div>
 
@@ -438,8 +438,8 @@
     if (mode == "abcd" && myPerms == permsRes.student) abcdDiv.classList.remove("hidden");
     else abcdDiv.classList.add("hidden");
 
-    if (mode == "text" && myPerms == permsRes.student) responseDiv.classList.remove("hidden");
-    else responseDiv.classList.add("hidden");
+    if (mode == "text" && myPerms == permsRes.student) essayDiv.classList.remove("hidden");
+    else essayDiv.classList.add("hidden");
 
     let sfxPerm = permsRes.sfx;
     let bgmPerm = permsRes.bgm;
@@ -549,7 +549,7 @@
     if (path.startsWith("/games") || path == "/leaderboards") document.getElementById("gamesTab").classList.add("open");
     if (["/needshelp", "/settings", "/users", "/lesson", "/virtualbar"].includes(path)) document.getElementById("teacherTab").classList.add("open");
     if (tabEl) tabEl.classList.add("open");
-    if (["/abcd", "/advanced", "/home", "/mobile", "/quickpanel", "/textresponse", "/tutd"].includes(path)) openPage("chat");
+    if (["/abcd", "/advanced", "/home", "/mobile", "/quickpanel", "/essay", "/tutd"].includes(path)) openPage("chat");
     if (path == "/chat") {
       newMessages = 0;
       document.getElementById("newMessages").innerText = null;

@@ -81,7 +81,7 @@
           let mines, remaining, revealed;
           let status = document.getElementById('status');
           let button = document.getElementById('button');
-          let minebox = document.getElementById('minebox')
+          let minebox = document.getElementById('minebox');
           minebox.setAttribute("oncontextmenu", "return false;")
           button.addEventListener('click', init)
           let bestSeconds = {{ bestTime }};
@@ -227,9 +227,11 @@
                   clearInterval(timer);
                   status.innerHTML = 'YOU WIN!';
                   document.body.style.background = "var(--bg-dark-blue)";
-                  if (seconds < bestSeconds || !bestSeconds) document.getElementById("best").innerText = "Best: " + time;
-                  request.open("POST", "/savescore?game=minesweeper&score=" + seconds);
-                  request.send();
+                  if (cols == 20 && rows == 20 && dense == 10) {
+                    if (seconds < bestSeconds || !bestSeconds) document.getElementById("best").innerText = "Best: " + time;
+                    request.open("POST", "/savescore?game=minesweeper&score=" + seconds);
+                    request.send();
+                  }
               }
           }
 

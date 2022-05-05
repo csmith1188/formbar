@@ -187,11 +187,11 @@
 
       let date = new Date();
       let y = date.getFullYear();
-      let mo = date.getMonth() + 1;
-      let d = date.getDate();
-      let h = date.getHours();
-      let mi = date.getMinutes();
-      let s = date.getSeconds();
+      let mo = (date.getMonth() + 1).toString().padStart(2, "0");
+      let d = date.getDate().toString().padStart(2, "0");
+      let h = date.getHours().toString().padStart(2, "0");
+      let mi = date.getMinutes().toString().padStart(2, "0");
+      let s = date.getSeconds().toString().padStart(2, "0");
 
       link.download = `responses_${y}_${mo}_${d}_${h}_${mi}_${s}.csv`;
       link.click();

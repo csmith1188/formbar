@@ -94,7 +94,7 @@
     async function switchGame(newGame) {
       document.getElementById("game").innerText = newGame[1];
 
-      let gameData = data.filter(item => item[1] == newGame[0]);
+      let gameData = data.filter(item => item[1] == newGame[0] && item[3]); //Get all scores for the game that are above 0
 
       if (gameData.length) {
         let metric;
@@ -125,7 +125,7 @@
 
         let alreadyInList = [];
         gameData.forEach(score => {
-          if (!(newGame[0] == "towerdefense" && alreadyInList.includes(score[2]))) { //One Tower Defense score per username
+          if (!alreadyInList.includes(score[2])) { //One score per username
             document.getElementById("table").innerHTML += `
               <tr>
                 <td>${score[2]}</td>

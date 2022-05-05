@@ -178,7 +178,8 @@
 
     async function downloadResponses() {
       let students = await getResponse("/api/students");
-      let responses = Object.values(students).map(student => [`"${student.name}"`, `"${student.textRes}"`]); //Add quotes around each value
+      let responses = Object.values(students).map(student => [student.name, student.textRes]);
+      responses = responses.map(response => response.map(value => `"${value.replaceAll("\"", "\"\"")}"`)); //Escape quotes in values, then add quotes around each value
       let csv = "data:text/csv;charset=utf-8,";
       csv += responses.map(response => response.join(",")).join("\n");
       let link = document.createElement("a");

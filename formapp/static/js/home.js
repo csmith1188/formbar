@@ -214,8 +214,8 @@ function shorten(container, maxHeight, text, maxWidth) {
 
 function ticketsText() {
   let users = Object.values(studentsRes);
-  let helpTickets = users.filter(user => user.help);
-  let breakRequests = users.filter(user => user.breakReq);
+  let helpTickets = users.filter(user => user.help.type == "help");
+  let breakRequests = users.filter(user => user.help.type == "break");
   let el = document.getElementById("ticketsText");
   let helpText = helpTickets.length == 1 ? "There is currently 1 help ticket in." : `There are currently ${helpTickets.length} tickets in.`
   let breakText = breakRequests.length == 1 ? "1 student has requested a bathroom break." : `${breakRequests.length} students have requested bathroom breaks.`;
@@ -230,9 +230,9 @@ function usersText() {
 }
 
 function checkForHelpTicket() {
-  if (meRes.breakReq) {
+  if (meRes.help.type == "break") {
     ticketSent("break");
-  } else if (meRes.help) {
+  } else if (meRes.help.type) {
     ticketSent("help");
   } else {
     document.getElementById("help").onclick = requestHelp;

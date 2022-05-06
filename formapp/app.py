@@ -181,8 +181,11 @@ def newStudent(remote, username, bot=False):
             'quizRes': [],
             'essayRes': '',
             'bot': bot,
-            'help': False,
-            'breakReq': False,
+            'help': {
+                'type': '',
+                'time': None,
+                'message': ''
+            },
             'excluded': False,
             'preferredHomepage': None,
             'wsID': ''
@@ -222,12 +225,6 @@ def newStudent(remote, username, bot=False):
                     sD.studentDict[remote]['perms'] = sD.settings['perms']['admin']
                 else:
                     sD.studentDict[remote]['perms'] = int(user[3])
-
-        #Check if the user has a help ticket or break request in
-        if username in helpList:
-            sD.studentDict[request.remote_addr]['help'] = True
-            if helpList[username] == "<i>Requested a bathroom break</i>":
-                sD.studentDict[request.remote_addr]['breakReq'] = True
 
         playSFX("sfx_up02")
 
@@ -1116,8 +1113,8 @@ def endpoint_break():
                 return render_template("message.html", message = "You already have a help ticket or break request in.", forward = request.path)
             else:
                 helpList[name] = '<i>Requested a bathroom break</i>'
-                sD.studentDict[request.remote_addr]['help'] = True
-                sD.studentDict[request.remote_addr]['breakReq'] = True
+                sD.studentDict[request.remote_addr]['help']['type'] = 'break'
+                sD.studentDict[request.remote_addr]['help']['time'] = time.time()
                 playSFX("sfx_pickup02")
                 return render_template("message.html", message = "Your request was sent. The teacher still needs to approve it.", forward = request.path)
         elif request.args.get('action') == 'end':
@@ -1597,7 +1594,9 @@ def endpoint_help():
             return render_template("message.html", message = "You already have a help ticket or break request in. If your problem is time-sensitive, or your last ticket was not cleared, please get the teacher's attention manually.")
         elif request.method == 'POST':
             helpList[name] = request.args.get('message') or '<i>Sent a help ticket</i>'
-            sD.studentDict[request.remote_addr]['help'] = True
+            sD.studentDict[request.remote_addr]['help']['type'] = 'help';
+            sD.studentDict[request.remote_addr]['help']['time'] = time.time()
+            sD.studentDict[request.remote_addr]['help']['message'] = request.args.get('message');
             playSFX("sfx_up04")
             return render_template("message.html", message = "Your ticket was sent. Keep working on the problem the best you can while you wait.", forward = sD.mainPage)
         else:
@@ -1918,7 +1917,11 @@ def endpoint_needshelp():
                 name = sD.studentDict[student]['name'].strip()
                 if name == remove:
                     #Remove the help flag from their user and break loop
-                    sD.studentDict[student]['help'] = False
+                    sD.studentDict[student]['help'] = {
+                        'type': '',
+                        'time': None,
+                        'message': ''
+                    }
                     if request.args.get('acceptBreak'):
                         sD.studentDict[student]['excluded'] = True
                         sD.studentDict[student]['oldPerms'] = sD.studentDict[student]['perms'] #Get the student's current permissions so they can be restored later

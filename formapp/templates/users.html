@@ -261,7 +261,7 @@
 
             if (JSON.stringify(studentList) != JSON.stringify(oldStudentList)) {
               oldStudentList = studentList;
-              if (studentList.length == 0) {
+              if (!studentList.length) {
                 document.getElementById("collapseButton").classList.add("hidden");
                 studentBox.innerHTML = 'No students match these filters.';
               } else {

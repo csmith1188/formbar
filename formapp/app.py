@@ -1332,6 +1332,28 @@ def endpoint_emptyblocks():
     return render_template("message.html", message = "Emptied blocks")
 '''
 
+'''
+/essay
+'''
+@app.route('/essay', methods = ['POST', 'GET'])
+def endpoint_essay():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    else:
+        if request.method == 'POST':
+            essay = request.form['essay']
+            if sD.settings['barmode'] == 'text':
+                if not essay and sD.studentDict[request.remote_addr]['textRes']:
+                    #Response unsubmitted
+                    playSFX("sfx_hit01")
+                sD.studentDict[request.remote_addr]['textRes'] = essay
+                textBar()
+                return render_template("message.html", message = "Response submitted.")
+            else:
+                return render_template("message.html", message = "Not in Essay mode.")
+        else:
+            return render_template('thumbsrental.html')
+
 
 @app.route('/expert')
 def endpoint_expert():
@@ -2347,29 +2369,6 @@ def endpoint_startpoll():
 @app.route('/td')
 def endpoint_td():
     return redirect('games/towerdefense')
-
-
-'''
-/essay
-'''
-@app.route('/essay', methods = ['POST', 'GET'])
-def endpoint_essay():
-    if not request.remote_addr in sD.studentDict:
-        return redirect('/login?forward=' + request.path)
-    else:
-        if request.method == 'POST':
-            essay = request.form['essay']
-            if sD.settings['barmode'] == 'text':
-                if not essay and sD.studentDict[request.remote_addr]['textRes']:
-                    #Response unsubmitted
-                    playSFX("sfx_hit01")
-                sD.studentDict[request.remote_addr]['textRes'] = essay
-                textBar()
-                return render_template("message.html", message = "Response submitted.")
-            else:
-                return render_template("message.html", message = "Not in Essay mode.")
-        else:
-            return render_template('thumbsrental.html')
 
 @app.route('/towerdefense')
 def endpoint_towerdefense():

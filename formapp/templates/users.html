@@ -268,39 +268,39 @@
                 document.getElementById("collapseButton").classList.remove("hidden");
                 studentBox.innerHTML = '';
                 //Loop through each student in the list
-                for (student in studentList) {
+                for (student of studentList) {
                     let newStudent = document.createElement('h3');
                     let icons = "";
 
                     //Change student color according to thumb response
-                    let thumb = studentList[student]['thumb'];
+                    let thumb = student['thumb'];
                     if (thumb) var thumbIcon = document.createElement("img");
                     if (thumb == "up") icons += `<img src="{{ url_for('static', filename='img/users/up.png') }}" class="icon" title="Up">`;
                     if (thumb == "wiggle") icons += `<img src="{{ url_for('static', filename='img/users/wiggle.png') }}" class="icon" title="Wiggle">`;
                     if (thumb == "down") icons += `<img src="{{ url_for('static', filename='img/users/down.png') }}" class="icon" title="Down">`;
 
                     //Change student letter according to letter response
-                    let letter = studentList[student]['letter']
+                    let letter = student['letter']
                     if (letter == "a") icons += `<img src="{{ url_for('static', filename='img/users/a.png') }}" class="icon" title="A">`;
                     if (letter == "b") icons += `<img src="{{ url_for('static', filename='img/users/b.png') }}" class="icon" title="B">`;
                     if (letter == "c") icons += `<img src="{{ url_for('static', filename='img/users/c.png') }}" class="icon" title="C">`;
                     if (letter == "d") icons += `<img src="{{ url_for('static', filename='img/users/d.png') }}" class="icon" title="D">`;
 
                     //Show icon if student has submitted Essay
-                    if (studentList[student].essay) icons += `<img src="{{ url_for('static', filename='img/users/text.png') }}" class="icon" title="Essay submitted">`;
+                    if (student.essay) icons += `<img src="{{ url_for('static', filename='img/users/text.png') }}" class="icon" title="Essay submitted">`;
 
-                    if (studentList[student]['help'].type) icons += `<img src="{{ url_for('static', filename='img/users/help.png') }}" class="icon" title="Help ticket">`;
+                    if (student['help'].type) icons += `<img src="{{ url_for('static', filename='img/users/help.png') }}" class="icon" title="Help ticket">`;
 
-                    if (studentList[student]['complete']) icons += `<img src="{{ url_for('static', filename='img/users/complete.png') }}" class="icon" title="Complete">`;
+                    if (student['complete']) icons += `<img src="{{ url_for('static', filename='img/users/complete.png') }}" class="icon" title="Complete">`;
 
-                    newStudent.innerHTML = icons + studentList[student].name;
+                    newStudent.innerHTML = icons + student.name;
                     let newDetails = document.createElement('span');
                     newDetails.classList.add('user');
                     if (collapsed) newDetails.classList.add("hidden");
-                    if (studentList[student].essay) newDetails.innerHTML += "<div style='margin-bottom: 8px;'><b>Essay: </b>" + studentList[student].essay + "</div>";
-                    if (studentList[student].help.type) {
+                    if (student.essay) newDetails.innerHTML += "<div style='margin-bottom: 8px;'><b>Essay: </b>" + student.essay + "</div>";
+                    if (student.help.type) {
                       let helpTicket = document.createElement("div");
-                      let ticketTime = new Date(studentList[student].help.time * 1000);
+                      let ticketTime = new Date(student.help.time * 1000);
                       let timestamp = document.createElement("span");
                       timestamp.style.color = ("var(--light-gray)");
                       let hour = ticketTime.getHours();
@@ -314,7 +314,7 @@
                       }
                       timestamp.innerText = `${hour}:${minute} ${ampm} `;
                       helpTicket.appendChild(timestamp);
-                      if (studentList[student].help.type == "break") {
+                      if (student.help.type == "break") {
                         helpTicket.innerHTML += "<i>Requested a bathroom break</i>";
                         let acceptButton = document.createElement("button");
                         let rejectButton = document.createElement("button");
@@ -322,8 +322,8 @@
                         rejectButton.classList.add("inline", "popOut");
                         acceptButton.style.marginLeft = "8px";
                         rejectButton.style.marginLeft = "8px";
-                        acceptButton.setAttribute("onclick", "request.open('GET', `/needshelp?remove=${studentList[student].name}&acceptBreak=true`); request.send();");
-                        rejectButton.setAttribute("onclick", "request.open('GET', `/needshelp?remove=${studentList[student].name}`); request.send();");
+                        acceptButton.setAttribute("onclick", "request.open('GET', `/needshelp?remove=${student.name}&acceptBreak=true`); request.send();");
+                        rejectButton.setAttribute("onclick", "request.open('GET', `/needshelp?remove=${student.name}`); request.send();");
                         acceptButton.innerText = "Accept";
                         rejectButton.innerText = "Reject";
                         helpTicket.appendChild(acceptButton);
@@ -334,14 +334,14 @@
                         removeButton.id = "e"
                         removeButton.classList.add("inline", "popOut");
                         removeButton.style.marginLeft = "8px";
-                        removeButton.setAttribute("onclick", "request.open('GET', `/needshelp?remove=${studentList[student].name}`); request.send();");
+                        removeButton.setAttribute("onclick", "request.open('GET', `/needshelp?remove=${student.name}`); request.send();");
                         removeButton.innerText = "Remove";
                         helpTicket.appendChild(removeButton);
                         console.log(helpTicket);
                       }
                       newDetails.appendChild(helpTicket);
                     }
-                    if (studentList[student].excluded) {
+                    if (student.excluded) {
                         let excluded = document.createElement("div");
                         newStudent.style.color = "#aaa";
                         excluded.innerHTML += "Taking a bathroom break";
@@ -349,7 +349,7 @@
                         endButton.classList.add("inline", "popOut");
                         endButton.style.marginLeft = "8px";
                         endButton.onclick = () => {
-                          request.open("GET", "/break?action=end&name=" + studentList[student].name);
+                          request.open("GET", "/break?action=end&name=" + student.name);
                           request.send();
                         }
                         endButton.innerText = "End break";
@@ -357,29 +357,29 @@
                         excluded.innerHTML += "</div><br>";
                         newDetails.appendChild(excluded);
                     }
-                    let studentPerms = studentList[student]['perms'];
+                    let studentPerms = student['perms'];
                     newDetails.innerHTML +=
                         `
                         <select onchange="updatePerm(this, '${student}')" id="userpermsDrop" name="userpermsDrop">
-                        <option value="/users?name=${studentList[student]['name']}&action=perm&perm=0" ${studentPerms === 0 ? "selected" : ""}>${permNames[0]}</option>
-                        <option value="/users?name=${studentList[student]['name']}&action=perm&perm=1" ${studentPerms === 1 ? "selected" : ""}>${permNames[1]}</option>
-                        <option value="/users?name=${studentList[student]['name']}&action=perm&perm=2" ${studentPerms === 2 ? "selected" : ""}>${permNames[2]}</option>
-                        <option value="/users?name=${studentList[student]['name']}&action=perm&perm=3" ${studentPerms === 3 ? "selected" : ""}>${permNames[3]}</option>
+                        <option value="/users?name=${student['name']}&action=perm&perm=0" ${studentPerms === 0 ? "selected" : ""}>${permNames[0]}</option>
+                        <option value="/users?name=${student['name']}&action=perm&perm=1" ${studentPerms === 1 ? "selected" : ""}>${permNames[1]}</option>
+                        <option value="/users?name=${student['name']}&action=perm&perm=2" ${studentPerms === 2 ? "selected" : ""}>${permNames[2]}</option>
+                        <option value="/users?name=${student['name']}&action=perm&perm=3" ${studentPerms === 3 ? "selected" : ""}>${permNames[3]}</option>
                         </select>
                         `
                     //Check the results of the student's current progress bar
-                    if (studentList[student]['progress'] && studentList[student]['progress'].length) {
+                    if (student['progress'] && student['progress'].length) {
                         let dotbox = document.createElement('div');
                         dotbox.style.styleFloat = 'right';
                         dotbox.style.cssFloat = 'right';
                         let newProg = 0;
                         let newProgMax = 0;
-                        for (let i = 0; i < studentList[student]['progress'].length; i++) {
+                        for (let i = 0; i < student['progress'].length; i++) {
                             newProgMax++;
                             var img = document.createElement("img");
                             img.width = 16;
                             img.height = 16;
-                            if (studentList[student]['progress'][i]) {
+                            if (student['progress'][i]) {
                               newProg++;
                               img.src = "{{ url_for('static', filename='img/dot_green.png') }}";
                             } else {
@@ -391,19 +391,19 @@
                         newDetails.innerHTML += ` [Prog: ${newProg}/${newProgMax}]`
                     }
                     //Get the results of the student's current quiz
-                    if (studentList[student]['quizRes'] && studentList[student]['quizRes'].length) {
+                    if (student['quizRes'] && student['quizRes'].length) {
                       let dotbox = document.createElement('div');
                       dotbox.style.styleFloat = 'right';
                       dotbox.style.cssFloat = 'right';
                         let newQuiz = 0;
                         let newQuizMax = 0;
-                        for (let i = 0; i < studentList[student]['quizRes'].length; i++) {
+                        for (let i = 0; i < student['quizRes'].length; i++) {
                             newQuizMax++;
-                            if (studentList[student]['quizRes'][i]) {
+                            if (student['quizRes'][i]) {
                               var img = document.createElement("img");
                               img.width = 16;
                               img.height = 16;
-                              if (studentList[student]['quizRes'][i]) {
+                              if (student['quizRes'][i]) {
                                 newQuiz++;
                                 img.src = "{{ url_for('static', filename='img/dot_green.png') }}"; ////These need to be updated
                               } else {
@@ -416,7 +416,7 @@
                     }
                     studentBox.appendChild(newStudent)
                     studentBox.appendChild(newDetails)
-                    let name = studentList[student]['name'];
+                    let name = student['name'];
                     newDetails.innerHTML += "	&nbsp; ";
                     newDetails.innerHTML += `<a onclick="remove('${name}')">Remove</a>`;
                     newDetails.innerHTML += "	&nbsp; ";
@@ -436,7 +436,7 @@
         let meRes = await getResponse("/api/me");
         let permsRes = await getResponse("/api/permissions");
         if (
-          studentList[student].name != meRes.name ||
+          student.name != meRes.name ||
           meRes.perms > el.value[el.value.length - 1] ||
           confirm("If you lower your own permissions, you may not be able to change them back. If no users have teacher permissions, the next person to log in will become the teacher.")
         ) {

@@ -1102,10 +1102,6 @@ def endpoint_break():
         return redirect('/login?forward=' + request.path)
     else:
         name = request.args.get('name') or sD.studentDict[request.remote_addr]['name'].strip()
-        if name in helpList:
-            ticket = helpList[name]
-        else:
-            ticket = ''
         if request.args.get('action') == 'request':
             if sD.studentDict[request.remote_addr]['perms'] == sD.settings['perms']['teacher']:
                 return render_template("message.html", message = "Teachers can't request bathroom breaks.")
@@ -1128,14 +1124,14 @@ def endpoint_break():
                         sD.studentDict[student]['perms'] = sD.studentDict[student]['oldPerms']
                         #Disabled until chat works
                         #server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', student, 'server', 'Your break was ended.')))
-                        return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'], ticket = ticket)
+                        return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'], ticket = json.dumps(sD.studentDict[request.remote_addr]['help']))
                     else:
                         return render_template("message.html", message = "This student is not currently taking a bathroom break.")
             return render_template("message.html", message = 'Student not found.', forward = request.path)
         else:
             if sD.studentDict[request.remote_addr]['perms'] == sD.settings['perms']['teacher']:
                 return render_template("message.html", message = "Teachers can't request bathroom breaks.")
-            return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'], ticket = ticket)
+            return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'], ticket = json.dumps(sD.studentDict[request.remote_addr]['help']))
 
 
 #  ██████

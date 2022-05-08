@@ -691,8 +691,8 @@
     }
   }
 
-  ws.onmessage = message => {
-    let data = JSON.parse(message.data);
+  chatSocket.on("message", () => {
+    let data = JSON.parse(message);
     if (data.type == "message") {
       if (document.hidden || (innerPage.contentWindow.location.pathname != "/chat" && sidebar != "chat")) {
         newMessages++;
@@ -703,7 +703,7 @@
         }
       }
     }
-  };
+  });
 
   //When user goes to this page, if chat is open, remove number of new messages from title
   document.addEventListener("visibilitychange", () => {

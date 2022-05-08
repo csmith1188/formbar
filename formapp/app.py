@@ -64,9 +64,6 @@ from key import key
 if ONRPi:
     from modules import ir
 
-#Set the websocket port for chat and live actions
-WSPORT=9001
-
 # Change the built-in logging for flask
 flasklog = logging.getLogger('werkzeug')
 flasklog.setLevel(logging.ERROR)
@@ -2711,16 +2708,10 @@ def message():
     except Exception as e:
         print("[error] " + 'Error: ' + str(e))
 
-@socket_.on('fighter', namespace = chatnamespace)
-def fighter():
+@socket_.on('fighter', namespace=chatnamespace)
+def fighter(message):
     try:
-        message = json.loads(message)
-        for student in sD.studentDict:
-            if sD.studentDict[student]['name'] == message['to'] or sD.studentDict[student]['name'] == message['from']:
-                for toClient in server.clients:
-                    if toClient['id'] == sD.studentDict[student]['wsID']:
-                        emit('message', toClient, json.dumps(message))
-                        break
+        emit('fighter', message)
     except Exception as e:
         print("[error] " + 'Error: ' + str(e))
 

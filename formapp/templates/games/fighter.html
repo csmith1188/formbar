@@ -1118,7 +1118,7 @@
       }
 
       chatSocket.on("fighter", message => {
-        let data = JSON.parse(message.data);
+        let data = JSON.parse(message);
         console.log(data);
         if (data.content.type == "join" && data.from != me.name) document.getElementById("opponentStatus").innerText = "Opponent is getting ready…";
         if (data.content.type == "player" && data.from != me.name) receivePlayerReady(data.content.player);

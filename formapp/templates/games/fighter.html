@@ -1560,6 +1560,8 @@
         document.getElementById("gameContainer").classList.remove("hidden");
         document.getElementById("gameChat").classList.remove("hidden");
 
+        window.onbeforeunload = () => true; //Show warning before leaving page
+
         if (me.team == 1) {
           player1 = me;
           player2 = opponent;
@@ -2350,6 +2352,8 @@
 
         document.getElementById("game").classList.add("hidden");
         document.getElementById("matchOver").classList.remove("hidden");
+
+        window.onbeforeunload = () => false;
 
         if (winner == me) {
           resultEl.innerText = "You win!";

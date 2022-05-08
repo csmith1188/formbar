@@ -27,7 +27,8 @@ async function getApiData(first) {
     getResponse("/api/mode"),
     getResponse("/api/permissions"),
     getResponse("/api/pix"),
-    getResponse("/api/students")
+    getResponse("/api/students"),
+    getResponse("/api/phrase")
   ]);
   //Save every response to a variable
   meRes = apiData[0];
@@ -36,6 +37,7 @@ async function getApiData(first) {
   permsRes = apiData[3];
   pixRes = apiData[4];
   studentsRes = apiData[5];
+  phraseRes = apiData[6];
   //Each homepage has its own init and update functions
   if (first) init();
   else update();

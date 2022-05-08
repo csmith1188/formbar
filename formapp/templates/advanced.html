@@ -88,14 +88,6 @@
     color: var(--color-red);
   }
 
-  #otherSidebar {
-    text-align: center;
-  }
-
-  #otherSidebar button {
-    width: 75%;
-  }
-
   #chatSidebar {
     position: absolute;
     left: 0;
@@ -209,11 +201,49 @@
     height: calc(100% - 32px);
     border: none;
   }
+
+  #virtualBar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px;
+    background: var(--bg-dark-blue);
+  }
+
+  #vbText {
+    width: 10ch;
+    padding: 0 4px;
+    box-sizing:
+    border-box; border: 1px white;
+    border-style: solid solid none;
+    font: 20px monospace;
+    text-transform: uppercase;
+    background: black;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  #pixBox {
+    width: 100%;
+    height: 16px;
+    box-sizing: border-box;
+    border: 1px solid white;
+    display: flex;
+    justify-content: space-around;
+    user-select: none;
+  }
 </style>
 {% endblock %}
 
 <!-- Main content here -->
 {% block main %}
+<div id="virtualBar" class="hidden">
+  <div id="vbText"></div>
+  <span id="pixBox"></span>
+</div>
+
 <div id="sidebar" class="light">
   <div id="sidebarButtons">
     <button id="formbarButton" class="pressed" onclick="changeSidebar('formbar')">Formbar</button>
@@ -308,12 +338,18 @@
 
   <div id="otherSidebar" class="hidden">
     Name: <a id="name"></a><span id="excluded"></span><br>
-    <button class="inline popOut" onclick="logOut();">Log out</button><br>
-    <button class="inline popOut" onclick="window.location = '/changepassword';">Change your password</button>
-    <button class="inline popOut" onclick="window.open('https://github.com/csmith1188/formbar/issues/new');">Send feedback</button><br>
-    <button class="inline popOut" onclick="window.location = '/quickpanel';">Go to the quick panel</button><br>
-    <button class="inline popOut" onclick="window.location = '/home';">Go to the standard homepage</button><br>
-    <button class="inline popOut" onclick="window.location = '/setdefault';">Set default homepage</button>
+
+    <h2>Settings</h2>
+    <b>Default page:</b> /<input type="text" id="defaultPage" class="line" style="width: 100px;" placeholder="URL path"><br>
+    <input type="checkbox" id="pinVB"><label for="pinVB">Pin virtual bar to top</label><br>
+
+    <h2>More</h2>
+    <a href="javascript:logOut();">Log out</a><br>
+    <a href="/changepassword">Change your password</a><br>
+    <a href="/quickpanel">Go to the quick panel</a><br>
+    <a href="/home">Go to the standard homepage</a><br>
+    <a href="/setdefault">Set default homepage</a><br>
+    <a href="https://github.com/csmith1188/formbar/issues/new" target="_blank">Send feedback 🡆</a>
   </div>
 </div>
 
@@ -364,6 +400,7 @@
 <script>
   let other = document.getElementById("otherSidebar");
   let sbSections = ["formbar", "chat", "other"];
+  let tabs = Array.from(document.querySelectorAll(".tab"));
   let tabLabels = Array.from(document.querySelectorAll(".tabText"));
   let menus = ["students", "games", "teacher"];
   let innerPage = document.getElementById("innerPage");
@@ -371,6 +408,8 @@
   let innerPageTitle;
   let urlOpen;
   let username = "{{ username }}";
+  let defaultPage = localStorage.getItem("defaultPage") || "chat";
+  let oldPix;
 
   function init() {
     menuPositions();
@@ -384,6 +423,7 @@
     listSounds("{{ sfx }}");
     listMusic("{{ bgm }}");
     segmentNumbers();
+    updateVirtualBar();
   }
   getApiData(true);
 
@@ -395,12 +435,18 @@
     nowPlaying();
     updateVolume();
     checkIfExcluded();
+    updateVirtualBar();
   };
   setInterval(getApiData, 1000);
 
   window.addEventListener("resize", minimizeTabs);
 
-  openPage("{{ page }}" || "chat"); //If there is no "page" param, go to the main page
+  try {
+    openPage("{{ page }}" || defaultPage); //If there is no "page" param, go to the main page
+  } catch {
+    alert("Page does not exist");
+    openPage("chat");
+  }
 
   function changeSidebar(id) {
     sidebar = id;
@@ -489,7 +535,7 @@
     tabLabels.forEach(label => label.classList.remove("hidden"));
     //If container has overflow, show only icons
     if (container.scrollHeight > container.clientHeight) tabLabels.forEach(label => label.classList.add("hidden"));
-
+    menuPositions();
   }
 
   function menuPositions() {
@@ -528,6 +574,16 @@
     }
   }
 
+  document.getElementById("defaultPage").value = defaultPage;
+
+  document.getElementById("defaultPage").onchange = function() {
+    localStorage.setItem("defaultPage", this.value);
+  }
+
+  document.getElementById("pinVB").onchange = function() {
+    localStorage.setItem("advancedVB", this.checked ? "on" : "");
+  }
+
   function openPage(page) {
     innerPage.contentWindow.location = `/${page}?advanced=true`;
     menus.forEach(menu => {
@@ -541,15 +597,17 @@
     innerPageTitle = innerPage.contentWindow.document.title;
     document.title = `${innerPageTitle} - Formbar`;
     window.history.pushState({}, '', "?page=" + path.slice(1)); //Update the URL to include the title
-    let tabs = document.querySelectorAll(".tab");
     let tabEl = document.getElementById(path.substring(1) + "Tab") || document.getElementById(path.substring(7) + "Tab");
-    if (!content) openPage("chat?alert='Page does not exist.'");
-    Array.from(tabs).forEach(tab => tab.classList.remove("open"));
+    if (content.startsWith("<h1>Not Found</h1>")) {
+      alert("Page does not exist.");
+      openPage((decodeURI(path) == "/" + defaultPage) ? "chat" : defaultPage); //If the default page doesn't exist, go to /chat
+    }
+    tabs.forEach(tab => tab.classList.remove("open"));
     if (["/help", "/break", "/wawd", "/flashcards"].includes(path)) document.getElementById("studentsTab").classList.add("open");
     if (path.startsWith("/games") || path == "/leaderboards") document.getElementById("gamesTab").classList.add("open");
     if (["/needshelp", "/settings", "/users", "/lesson", "/virtualbar"].includes(path)) document.getElementById("teacherTab").classList.add("open");
     if (tabEl) tabEl.classList.add("open");
-    if (["/abcd", "/advanced", "/home", "/mobile", "/quickpanel", "/essay", "/tutd"].includes(path)) openPage("chat");
+    if (["/abcd", "/advanced", "/home", "/mobile", "/quickpanel", "/essay", "/tutd"].includes(path)) openPage(defaultPage);
     if (path == "/chat") {
       newMessages = 0;
       document.getElementById("newMessages").innerText = null;
@@ -594,6 +652,44 @@
       if (event.code == "Escape") this.blur(); //Hide menu when Esc key pressed
     });
   });
+
+  function updateVirtualBar() {
+    if (localStorage.getItem("advancedVB")) {
+      //Update the bar
+      let pix = eval(pixRes.pixels.replaceAll("(", "[").replaceAll(")", "]"));
+      if (JSON.stringify(pix) != oldPix) {
+        oldPix = JSON.stringify(pix);
+        let pixBox = document.getElementById("pixBox");
+        pixBox.innerHTML = '';
+        for (let i = pix.length - 1; i >= 0; i--) {
+            for (let color = 0; color < pix[i].length; color++) {
+                pix[i][color] = pix[i][color].toString(16);
+                if (pix[i][color].length < 2)
+                    pix[i][color] = "0" + pix[i][color];
+            }
+            pixBox.innerHTML += "<div style='display: inline; flex-grow: 1; overflow: hidden; background-color: #" + pix[i][0] + "" + pix[i][1] + "" + pix[i][2] + ";'>&nbsp;</div>";
+        }
+      }
+
+      //Update the text
+      let phrase = phraseRes.phrase;
+      let text = document.getElementById("vbText");
+      text.innerText = phrase;
+      ////To do: update color
+
+      document.getElementById("sidebar").style.height = "calc(100% - 56px)";
+      document.getElementById("rightSide").style.height = "calc(100% - 56px)";
+      menus.forEach(menu => document.getElementById(menu + "Menu").style.top = "88px");
+      document.getElementById("virtualBar").classList.remove("hidden");
+      document.getElementById("pinVB").checked = true;
+    } else {
+      document.getElementById("sidebar").style.height = "100%";
+      document.getElementById("rightSide").style.height = "100%";
+      menus.forEach(menu => document.getElementById(menu + "Menu").style.top = null);
+      document.getElementById("virtualBar").classList.add("hidden");
+      document.getElementById("pinVB").checked = false;
+    }
+  }
 
   ws.onmessage = message => {
     let data = JSON.parse(message.data);

@@ -35,7 +35,7 @@
       border: 1px solid white;
       display: flex;
       justify-content: space-around;
-      background: black;
+      user-select: none;
     }
   </style>
 {% endblock %}
@@ -60,7 +60,7 @@
       pixRequest.open("GET", '/api/pix');
       pixRequest.onload = () => {
         let pixRes = JSON.parse(pixRequest.responseText);
-        let pix = eval(pixRes.pixels);
+        let pix = eval(pixRes.pixels.replaceAll("(", "[").replaceAll(")", "]"));
         let pixBox = document.getElementById("pixBox");
         pixBox.innerHTML = '';
         for (let i = pix.length - 1; i >= 0; i--) {

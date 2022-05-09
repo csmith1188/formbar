@@ -322,8 +322,8 @@
                         rejectButton.classList.add("inline", "popOut");
                         acceptButton.style.marginLeft = "8px";
                         rejectButton.style.marginLeft = "8px";
-                        acceptButton.setAttribute("onclick", "request.open('GET', `/needshelp?remove=${student.name}&acceptBreak=true`); request.send();");
-                        rejectButton.setAttribute("onclick", "request.open('GET', `/needshelp?remove=${student.name}`); request.send();");
+                        acceptButton.setAttribute("onclick", `acceptBreak("${student.name}");`);
+                        rejectButton.setAttribute("onclick", `removeTicket("${student.name}");`);
                         acceptButton.innerText = "Accept";
                         rejectButton.innerText = "Reject";
                         helpTicket.appendChild(acceptButton);
@@ -334,10 +334,9 @@
                         removeButton.id = "e"
                         removeButton.classList.add("inline", "popOut");
                         removeButton.style.marginLeft = "8px";
-                        removeButton.setAttribute("onclick", "request.open('GET', `/needshelp?remove=${student.name}`); request.send();");
+                        removeButton.setAttribute("onclick", `removeTicket("${student.name}");`);
                         removeButton.innerText = "Remove";
                         helpTicket.appendChild(removeButton);
-                        console.log(helpTicket);
                       }
                       newDetails.appendChild(helpTicket);
                     }
@@ -431,6 +430,16 @@
             }
         }
     }, 1000);
+
+    function removeTicket(name) {
+      request.open("GET", `/needshelp?remove=${name}`);
+      request.send();
+    }
+
+    function acceptBreak(name) {
+      request.open("GET", `/needshelp?remove=${name}&acceptBreak=true`);
+      request.send();
+    }
 
     async function updatePerm(el, student) {
         let meRes = await getResponse("/api/me");

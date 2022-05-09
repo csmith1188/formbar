@@ -119,7 +119,7 @@ function updateVotes() {
   let essay = meRes.essay;
   if (essay && !essayEl.value) {
     essayEl.value = essay;
-    checkResponse();
+    checkEssay();
     essaySubmitted();
   }
   if (!essay && essayEl.value) essayUnsubmitted();
@@ -161,19 +161,19 @@ function removeHighlight(image) {
   }
 }
 
-function checkResponse() {
+function checkEssay() {
   let box = document.getElementById("essay");
-  let button = document.getElementById("submitResponse");
+  let button = document.getElementById("submitEssay");
   if (box.value) {
     button.classList.remove("unselectable");
-    button.onclick = submitResponse;
+    button.onclick = submitEssay;
   } else {
     button.classList.add("unselectable");
     button.onclick = null;
   }
 }
 
-function submitResponse() {
+function submitEssay() {
   let box = document.getElementById("essay");
   request.open("POST", "/essay?essay=" + box.value);
   request.send();
@@ -182,14 +182,14 @@ function submitResponse() {
 
 function essaySubmitted() {
   let box = document.getElementById("essay");
-  let button = document.getElementById("submitResponse");
+  let button = document.getElementById("submitEssay");
   box.disabled = true;
   box.classList.add("unselectable");
   button.innerText = "Unsubmit";
-  button.onclick = unsubmitResponse;
+  button.onclick = unsubmitEssay;
 }
 
-function unsubmitResponse() {
+function unsubmitEssay() {
   let box = document.getElementById("essay");
   request.open("GET", "/essay?essay=");
   request.send();
@@ -198,11 +198,11 @@ function unsubmitResponse() {
 
 function essayUnsubmitted() {
   let box = document.getElementById("essay");
-  let button = document.getElementById("submitResponse");
+  let button = document.getElementById("submitEssay");
   box.disabled = false;
   box.classList.remove("unselectable");
   button.innerText = "Submit";
-  button.onclick = submitResponse;
+  button.onclick = submitEssay;
 }
 
 function shorten(container, maxHeight, text, maxWidth) {

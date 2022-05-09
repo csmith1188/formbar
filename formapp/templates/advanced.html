@@ -593,15 +593,10 @@
   }
 
   function pageOpened(path) {
-    let content = innerPage.contentWindow.document.body.innerHTML;
-    innerPageTitle = innerPage.contentWindow.document.title;
+    let innerPageTitle = innerPage.contentWindow.document.title;
     document.title = `${innerPageTitle} - Formbar`;
     window.history.pushState({}, '', "?page=" + path.slice(1)); //Update the URL to include the title
     let tabEl = document.getElementById(path.substring(1) + "Tab") || document.getElementById(path.substring(7) + "Tab");
-    if (content.startsWith("<h1>Not Found</h1>")) {
-      alert("Page does not exist.");
-      openPage((decodeURI(path) == "/" + defaultPage) ? "chat" : defaultPage); //If the default page doesn't exist, go to /chat
-    }
     tabs.forEach(tab => tab.classList.remove("open"));
     if (["/help", "/break", "/wawd", "/flashcards"].includes(path)) document.getElementById("studentsTab").classList.add("open");
     if (path.startsWith("/games") || path == "/leaderboards") document.getElementById("gamesTab").classList.add("open");

@@ -766,6 +766,9 @@ def updateStep():
 # ██      ██  ██ ██ ██   ██ ██      ██    ██ ██ ██  ██ ██    ██         ██
 # ███████ ██   ████ ██████  ██       ██████  ██ ██   ████    ██    ███████
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template("message.html", message = e), 404
 
 '''
     /

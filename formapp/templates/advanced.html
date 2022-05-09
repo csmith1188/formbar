@@ -378,7 +378,6 @@
     </div>
     <div id="teacherTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/advanced/teacher.png') }}" class="icon"> <span class="tabText">Teacher</span></div>
     <div id="teacherMenu" class="menu hidden" tabindex="-1">
-      <div id="needshelpTab" class="tab" onclick="openPage('needshelp');">Help tickets</div>
       <div id="settingsTab" class="tab" onclick="openPage('settings');">Settings</div>
       <div id="usersTab" class="tab" onclick="openPage('users');">User list</div>
       <div id="lessonTab" class="tab" onclick="openPage('lesson');">Lesson</div>
@@ -524,7 +523,7 @@
       let cl = document.getElementById(tab + "Tab").classList;
       meRes.perms > permsRes.games ? cl.add("unselectable") : cl.remove("unselectable");
     });
-    ["needshelp", "settings", "users", "lesson"].forEach(tab => {
+    ["settings", "users", "lesson"].forEach(tab => {
       let cl = document.getElementById(tab + "Tab").classList;
       meRes.perms > permsRes.teacher ? cl.add("unselectable") : cl.remove("unselectable");
     });
@@ -605,7 +604,7 @@
     tabs.forEach(tab => tab.classList.remove("open"));
     if (["/help", "/break", "/wawd", "/flashcards"].includes(path)) document.getElementById("studentsTab").classList.add("open");
     if (path.startsWith("/games") || path == "/leaderboards") document.getElementById("gamesTab").classList.add("open");
-    if (["/needshelp", "/settings", "/users", "/lesson", "/virtualbar"].includes(path)) document.getElementById("teacherTab").classList.add("open");
+    if (["/settings", "/users", "/lesson", "/virtualbar"].includes(path)) document.getElementById("teacherTab").classList.add("open");
     if (tabEl) tabEl.classList.add("open");
     if (["/abcd", "/advanced", "/home", "/mobile", "/quickpanel", "/essay", "/tutd"].includes(path)) openPage(defaultPage);
     if (path == "/chat") {

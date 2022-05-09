@@ -65,6 +65,7 @@
 <!-- Main content here -->
 {% block main %}
 <h1>Users</h1>
+<div id="npRequests"></div>
 <div class="controls yellow">
   Filters:
   <button id="help" class="filter">Help ticket in</button>
@@ -150,11 +151,6 @@
         request.open("GET", "/users?name=" + name + "&action=delete");
         request.send();
       }
-    }
-
-    function removeHelp(name) {
-      request.open("GET", "/needshelp?remove=" + name);
-      request.send();
     }
 
     function toggleFilter(el) {
@@ -431,13 +427,46 @@
         }
     }, 1000);
 
+    setInterval(async () => {
+      let npRequests = await getResponse("/api/newpasswords");
+      let el = document.getElementById("npRequests");
+      el.innerHTML = "";
+      for (let student in npRequests) {
+        let ticket = document.createElement("div");
+        ticket.innerHTML += `<i><b>${student}</b> requested a password change from the login page. Before you accept, confirm that this request is legitimate.</i>`;
+        let acceptButton = document.createElement("button");
+        let rejectButton = document.createElement("button");
+        acceptButton.classList.add("inline", "popOut");
+        rejectButton.classList.add("inline", "popOut");
+        acceptButton.style.marginLeft = "8px";
+        rejectButton.style.marginLeft = "8px";
+        acceptButton.setAttribute("onclick", `acceptNP("${student}", "${npRequests[student]}");`);
+        rejectButton.setAttribute("onclick", `removeNP("${student}");`);
+        acceptButton.innerText = "Accept";
+        rejectButton.innerText = "Reject";
+        ticket.appendChild(acceptButton);
+        ticket.appendChild(rejectButton);
+        el.appendChild(ticket);
+      }
+    }, 1000);
+
     function removeTicket(name) {
-      request.open("GET", `/needshelp?remove=${name}`);
+      request.open("GET", `/users?action=removeTicket&name=${name}`);
       request.send();
     }
 
     function acceptBreak(name) {
-      request.open("GET", `/needshelp?remove=${name}&acceptBreak=true`);
+      request.open("GET", `/users?action=removeTicket&name=${name}&acceptBreak=true`);
+      request.send();
+    }
+
+    function removeNP(name) {
+      request.open("GET", `/users?action=removeNP&name=${name}`);
+      request.send();
+    }
+
+    function acceptNP(name, pw) {
+      request.open("GET", `/users?action=removeNP&name=${name}&password=${pw}&acceptNP=true`);
       request.send();
     }
 

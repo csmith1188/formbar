@@ -2590,7 +2590,6 @@ def packMSG(rx, tx, content):
 
 @socket_.on('connect', namespace=chatnamespace)
 def connect():
-    print('User connected')
     '''
     #print("SOCKET: " + socket)
     try:
@@ -2605,7 +2604,6 @@ def connect():
 
 @socket_.on('disconnect', namespace=chatnamespace)
 def disconnect():
-    print('User disconnected')
     '''
     try:
         if client['address'][0] in sD.studentDict and 'wsID' in sD.studentDict[client['address'][0]]: #Do nothing is user has already disconnected or logged out

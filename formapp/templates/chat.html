@@ -479,10 +479,14 @@
         textarea.innerHTML = message.content;
         message.content = textarea.value;
 
+        let note = "";
+        if (message.from == "server" || !message.from) note = "· From server";
+        else if (message.to != "all") note = "· Private message";
+
         //Use this if you want to allow HTML
         newMSG.innerHTML = `
           <b class="username" onclick="${usernameOnclick}" title="${usernameTitle}">${message.from}</b>
-          <span style="color: var(--gray-color);">${dateString(message.time)} ${message.to != "all" ? (message.from ? "· Private message" : "· From server") : ""}</span>
+          <span style="color: var(--gray-color);">${dateString(message.time)} ${note}</span>
           <div class="content">${message.content}</div>
         `;
         //Use this if you want to convert HTML into text

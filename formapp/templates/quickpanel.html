@@ -395,16 +395,15 @@
       request.send();
     }
 
-    ws.onmessage = message => {
-      let data = JSON.parse(message.data);
-      if (data.type == "message") {
-        if (document.hidden || visibleSection != "chat") {
-          newMessages++;
-          document.title = `(${newMessages}) Formbar Quick Panel`;
-          if (visibleSection != "chat") document.getElementById("newMessages").innerText = "(" + newMessages + ")";
+    chatSocket.on("message", message => {
+      if (document.hidden || visibleSection != "chat") {
+        let data = JSON.parse(message);
+        newMessages++;
+        document.title = `(${newMessages}) Formbar Quick Panel`;
+        if (visibleSection != "chat") document.getElementById("newMessages").innerText = "(" + newMessages + ")";
         }
       }
-    };
+    });
 
     //When user goes to this page, if chat is open, remove number of new messages from title
     document.addEventListener("visibilitychange", () => {

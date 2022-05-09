@@ -2676,7 +2676,8 @@ def message(message):
             #Save the message to the database
             db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
             dbcmd = db.cursor()
-            contentCrypt = cipher.encrypt(message['content'].encode())
+            content = message['content'].replace('"', '\\"')
+            contentCrypt = cipher.encrypt(content.encode())
             dbcmd.execute("INSERT INTO messages ('from', 'to', 'time', 'content') VALUES (?, ?, ?, ?)", (message['from'], message['to'], message['time'], contentCrypt))
             db.commit()
             db.close()

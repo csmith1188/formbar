@@ -474,6 +474,11 @@
           var usernameTitle = "Send a private message";
         }
 
+        //Decode HTML entities
+        let textarea = document.createElement("textarea");
+        textarea.innerHTML = message.content;
+        message.content = textarea.value;
+
         //Use this if you want to allow HTML
         newMSG.innerHTML = `
           <b class="username" onclick="${usernameOnclick}" title="${usernameTitle}">${message.from}</b>

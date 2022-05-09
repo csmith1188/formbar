@@ -1071,7 +1071,6 @@
 
       function sendPlayerReady() {
         let sendObj = {
-          type: "fighter",
           to: opponent.name,
           from: me.name,
           content: {
@@ -1100,7 +1099,6 @@
 
       function sendMove(moveObj) {
         let sendObj = {
-          type: "fighter",
           to: opponent.name,
           from: me.name,
           content: {
@@ -1197,7 +1195,6 @@
           me.fighters = [fighter2a, fighter2b];
           opponent.name = match.creator;
           chatSocket.emit("fighter", JSON.stringify({
-            type: "fighter",
             to: opponent.name,
             from: me.name,
             content: {type: "join"}
@@ -2124,7 +2121,6 @@
         removeItemtargets();
         sendMessage(me.name + " used the \"" + itemObj.name + "\" item.");
         chatSocket.emit("fighter", JSON.stringify({
-          type: "fighter",
           to: opponent.name,
           from: me.name,
           content: {
@@ -2379,7 +2375,6 @@
         el.onclick = null;
         me.rematch = true;
         chatSocket.emit("fighter", JSON.stringify({
-          type: "fighter",
           to: opponent.name,
           from: me.name,
           content: {

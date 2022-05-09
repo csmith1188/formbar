@@ -319,35 +319,42 @@
     chatSocket.on("connect", function() {});
 
     chatSocket.on("message", message => {
-        let data = JSON.parse(message.data);
-        if (data.type == 'message' || data.type == 'alert') {
-            console.log(data);
-            output(data);
-        } else if (data.type == 'userlist') {
-            boxes.userlist.innerHTML = '<h2 id="ulHeading">Online</h2>'
-            for (user in data.content) {
-                let newUser = document.createElement('div');
-                boxes.userlist.appendChild(newUser);
-                newUser.classList.add('msg', 'ulName');
-                let name = data.content[user].name;
-                newUser.appendChild(document.createTextNode(name));
-                if (data.content[user].name == username) newUser.classList.add('me');
-                else {
-                  newUser.classList.add('them')
-                  newUser.setAttribute("onclick", "changeRec('" + name + "', this)");
-                  newUser.title = "Send a private message";
-                  let profileButton = document.createElement("button");
-                  newUser.appendChild(profileButton);
-                  profileButton.innerText = "View profile";
-                  profileButton.classList.add("profileButton");
-                  profileButton.onmouseover = event => event.stopPropagation();
-                  profileButton.onclick = event => {
-                    window.location = "/profile?user=" + name;
-                    event.stopPropagation();
-                  };
-                  newUser.onmouseover = function() {this.classList.add("ulHover");};
-                  newUser.onmouseout = function() {this.classList.remove("ulHover");};
-                }
+        message = JSON.parse(message);
+        console.log(message);
+        output(message);
+      });
+
+    chatSocket.on("alert", message => {
+        message = JSON.parse(message);
+        console.log(message);
+        output(message);
+      });
+
+    chatSocket.on("userlist", message => {
+        message = JSON.parse(message);
+        boxes.userlist.innerHTML = '<h2 id="ulHeading">Online</h2>'
+        for (user in message.content) {
+            let newUser = document.createElement('div');
+            boxes.userlist.appendChild(newUser);
+            newUser.classList.add('msg', 'ulName');
+            let name = message.content[user].name;
+            newUser.appendChild(document.createTextNode(name));
+            if (message.content[user].name == username) newUser.classList.add('me');
+            else {
+              newUser.classList.add('them')
+              newUser.setAttribute("onclick", "changeRec('" + name + "', this)");
+              newUser.title = "Send a private message";
+              let profileButton = document.createElement("button");
+              newUser.appendChild(profileButton);
+              profileButton.innerText = "View profile";
+              profileButton.classList.add("profileButton");
+              profileButton.onmouseover = event => event.stopPropagation();
+              profileButton.onclick = event => {
+                window.location = "/profile?user=" + name;
+                event.stopPropagation();
+              };
+              newUser.onmouseover = function() {this.classList.add("ulHover");};
+              newUser.onmouseout = function() {this.classList.remove("ulHover");};
             }
         }
     });
@@ -369,15 +376,14 @@
         console.log(e)
     });
 
-    function packMSG(type, rx, tx, content) {
+    function packMSG(rx, tx, content) {
         let msgOUT = {
-            type: type,
             to: rx,
             from: tx,
             time: Date.now(),
             content: content
         }
-        return msgOUT
+        return JSON.stringify(msgOUT);
     }
 
     function changeRec(name, el) {
@@ -421,9 +427,9 @@
                 // text.splice(0, 2);
                 // args = text.split(" ");
                 // args.shift();
-                chatSocket.emit("help", JSON.stringify(packMSG('help', receiver, username, text)));
+                chatSocket.emit("help", packMSG(receiver, username, text));
             } else {
-                chatSocket.emit("message", JSON.stringify(packMSG('message', receiver, username, text)));
+                chatSocket.emit("message", packMSG(receiver, username, text));
             }
             boxes.inputBox.value = "";
             boxes.inputBox.focus();
@@ -458,7 +464,7 @@
         newMSG.classList.add('msg')
         if (message.to == username) newMSG.classList.add('whisper')
         if (message.from == username) newMSG.classList.add('me')
-        else if (message.from == 'server' || message.type == 'alert') {
+        else if (message.from == 'server') {
           newMSG.classList.add('alert')
           message.from = "";
         }

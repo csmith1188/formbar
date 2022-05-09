@@ -691,16 +691,14 @@
     }
   }
 
-  chatSocket.on("message", () => {
-    let data = JSON.parse(message);
-    if (data.type == "message") {
-      if (document.hidden || (innerPage.contentWindow.location.pathname != "/chat" && sidebar != "chat")) {
-        newMessages++;
-        document.title = `(${newMessages}) ${innerPageTitle} - Formbar`;
-        if (innerPage.contentWindow.location.pathname != "chat") {
-          document.getElementById("newMessages").innerText = "(" + newMessages + ")";
-          menuPositions();
-        }
+  chatSocket.on("message", message => {
+    if (document.hidden || (innerPage.contentWindow.location.pathname != "/chat" && sidebar != "chat")) {
+      let data = JSON.parse(message);
+      newMessages++;
+      document.title = `(${newMessages}) ${innerPageTitle} - Formbar`;
+      if (innerPage.contentWindow.location.pathname != "chat") {
+        document.getElementById("newMessages").innerText = "(" + newMessages + ")";
+        menuPositions();
       }
     }
   });

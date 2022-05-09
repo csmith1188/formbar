@@ -2623,29 +2623,34 @@ def disconnect_request():
 
 '''
 
-def packMSG(type, rx, tx, content):
+def packMSG(rx, tx, content):
     msgOUT = {
-        "type": type,
         "to": rx,
         "from": tx,
         "content": content
-        }
+    }
     return msgOUT
 
-'''
-@socket_.on('connection', namespace = chatnamespace)
-def connection():
-    print("SOCKET: " + socket)
+
+@socket_.on('connect', namespace=chatnamespace)
+def connect():
+    print('User connected')
+    '''
+    #print("SOCKET: " + socket)
     try:
         sD.studentDict[client['address'][0]]['wsID'] = client['id']
+        #sD.studentDict[request.remote_addr]['wsId'] = request.sid
         print("[info] " + sD.studentDict[client['address'][0]]['name'] + " connected and was given id %d" % client['id'])
         emit('message', json.dumps(packMSG('alert', 'all', 'server', sD.studentDict[client['address'][0]]['name'] + " has joined the server...")))
         emit('message', json.dumps(packMSG('userlist', 'all', 'server', chatUsers())))
     except Exception as e:
         print("[error] " + "Error finding user in list: " + str(e))
+    '''
 
-@socket_.on('disconnect', namespace = chatnamespace)
+@socket_.on('disconnect', namespace=chatnamespace)
 def disconnect():
+    print('User disconnected')
+    '''
     try:
         if client['address'][0] in sD.studentDict and 'wsID' in sD.studentDict[client['address'][0]]: #Do nothing is user has already disconnected or logged out
             print("[info] " + sD.studentDict[client['address'][0]]['name'] + " disconnected")
@@ -2657,54 +2662,67 @@ def disconnect():
                     emit('message', server.clients[i], json.dumps(packMSG('userlist', 'all', 'server', chatUsers())))
     except Exception as e:
         print("[error] " + "Error finding user in list: " + str(e))
-'''
+    '''
 
-@socket_.on('message', namespace = chatnamespace)
-def message():
+@socket_.on('message', namespace=chatnamespace)
+def message(message):
     try:
-        message = json.loads(message)
-        if message['type'] == 'ttt':
-            #For now, this will only forward the gamestate. We'll do validation later.
-            #server.send_message(message.to, json.dumps(message))
-            pass
-        elif message['type'] == 'userlist':
-            server.send_message(client, json.dumps(packMSG('userlist', sD.studentDict[client['address'][0]]['name'], 'server', chatUsers())))
-        elif message['type'] == 'alert':
-            server.send_message(client, json.dumps(packMSG('alert', sD.studentDict[client['address'][0]]['name'], 'server', 'Only the server can send alerts!')))
-        elif message['type'] == 'help':
-            name = sD.studentDict[client['address'][0]]['name']
-            name = name.replace(" ", "")
-            helpList[name] = message['content']
-            playSFX("sfx_up04")
-            server.send_message(client, json.dumps(packMSG('alert', sD.studentDict[client['address'][0]]['name'], 'server', 'Your help ticket was sent. Keep working on the problem while you wait!')))
+        #Check for permissions
+        if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['say']:
+            messageOut = packMSG('alert', sD.studentDict[client['address'][0]]['name'], 'server', "You do not have permission to send text messages.")
+            server.send_message(client, json.dumps(messageOut))
         else:
+            message = json.loads(message)
+            #Save the message to the database
             db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
             dbcmd = db.cursor()
             contentCrypt = cipher.encrypt(message['content'].encode())
             dbcmd.execute("INSERT INTO messages ('from', 'to', 'time', 'content') VALUES (?, ?, ?, ?)", (message['from'], message['to'], message['time'], contentCrypt))
             db.commit()
             db.close()
-            #Check for permissions
-            if sD.studentDict[client['address'][0]]['perms'] > sD.settings['perms']['say']:
-                messageOut = packMSG('alert', sD.studentDict[client['address'][0]]['name'], 'server', "You do not have permission to send text messages.")
-                server.send_message(client, json.dumps(messageOut))
+            #Checking max message length here
+            if len(message['content']) > 252:
+                message['content'] = message['content'][:252]+'...'
+            #Check recipients here
+            if message['to'] == 'all':
+                messageOut = packMSG('all', sD.studentDict[request.remote_addr]['name'], message['content'])
+                #messageOut = packMSG('all', sD.studentDict[client['address'][0]]['name'], message['content'])
+                emit('message', json.dumps(messageOut), broadcast=True)
             else:
-                #Checking max message length here
-                if len(message['content']) > 252:
-                    message['content'] = message['content'][:252]+'...'
-                #Check recipients here
-                if message['to'] == 'all':
-                    messageOut =  packMSG('message', 'all', sD.studentDict[client['address'][0]]['name'], message['content'])
-                    emit('message', json.dumps(messageOut))
-                else:
-                    for student in sD.studentDict:
-                        if sD.studentDict[student]['name'] == message['to'] or sD.studentDict[student]['name'] == message['from']:
-                            for toClient in server.clients:
-                                if toClient['id'] == sD.studentDict[student]['wsID']:
-                                    messageOut =  packMSG('message', message['to'], sD.studentDict[client['address'][0]]['name'], message['content'])
-                                    server.send_message(toClient, json.dumps(messageOut))
-                                    break
-                print("[info] " + message['from'] + " said to " + message['to'] + ": " + message['content'])
+                for student in sD.studentDict:
+                    if sD.studentDict[student]['name'] == message['to'] or sD.studentDict[student]['name'] == message['from']:
+                        for toClient in server.clients:
+                            if toClient['id'] == sD.studentDict[student]['wsID']:
+                                messageOut = packMSG('message', message['to'], sD.studentDict[client['address'][0]]['name'], message['content'])
+                                server.send_message(toClient, json.dumps(messageOut))
+                                break
+            print("[info] " + message['from'] + " said to " + message['to'] + ": " + message['content'])
+    except Exception as e:
+        print("[error] " + 'Error: ' + str(e))
+
+@socket_.on('userlist', namespace=chatnamespace)
+def message(message):
+    try:
+        emit('userlist', json.dumps(packMSG('userlist', sD.studentDict[request.remote_addr]['name'], 'server', chatUsers())), broadcast=True)
+    except Exception as e:
+        print("[error] " + 'Error: ' + str(e))
+
+@socket_.on('alert', namespace=chatnamespace)
+def message(message):
+    try:
+        emit('alert', client, json.dumps(packMSG('alert', sD.studentDict[request.remote_addr]['name'], 'server', 'Only the server can send alerts!')))
+    except Exception as e:
+        print("[error] " + 'Error: ' + str(e))
+
+@socket_.on('help', namespace=chatnamespace)
+def message(message):
+    try:
+        message = json.loads(message)
+        name = sD.studentDict[request.remote_addr]['name']
+        name = name.replace(" ", "")
+        helpList[name] = message['content']
+        playSFX("sfx_up04")
+        emit('help', json.dumps(packMSG('alert', sD.studentDict[request.remote_addr]['name'], 'server', 'Your help ticket was sent. Keep working on the problem while you wait!')))
     except Exception as e:
         print("[error] " + 'Error: ' + str(e))
 

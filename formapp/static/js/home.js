@@ -191,7 +191,7 @@ function essaySubmitted() {
 
 function unsubmitEssay() {
   let box = document.getElementById("essay");
-  request.open("GET", "/essay?essay=");
+  request.open("POST", "/essay?essay=");
   request.send();
   essayUnsubmitted();
 }

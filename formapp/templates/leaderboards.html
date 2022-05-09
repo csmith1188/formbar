@@ -96,6 +96,7 @@
 
       let gameData = data.filter(item => item[1] == newGame[0] && item[3]); //Get all scores for the game that are above 0
 
+
       if (gameData.length) {
         let metric;
         switch (newGame[0]) {
@@ -122,20 +123,21 @@
           </table>
         `;
 
-        let namesInList = [];
-        //while (namesInList.length < gameData.length && namesInList.length < 10) {
-          gameData.forEach(score => {
-            if (!namesInList.includes(score[2])) { //One score per username
-              document.getElementById("table").innerHTML += `
-                <tr>
-                  <td>${score[2]}</td>
-                  <td>${(metric == "Time") ? `${Math.floor(score[3] / 60)}:${score[3] % 60 < 10 ? "0" + score[3] % 60 : score[3] % 60}` : score[3]}</td>
-                </tr>
-              `;
-              namesInList.push(score[2]);
-            }
-          });
-        //}
+        //Keep one score per username
+        let scoreList = [];
+        gameData.forEach((score, i) => {
+          if (!scoreList.find(item => item[2] == score[2])) scoreList.push(score);
+        });
+        scoreList = scoreList.slice(0, 10); //Get the first 10 items
+
+        scoreList.forEach(score => {
+          document.getElementById("table").innerHTML += `
+            <tr>
+              <td>${score[2]}</td>
+              <td>${(metric == "Time") ? `${Math.floor(score[3] / 60)}:${score[3] % 60 < 10 ? "0" + score[3] % 60 : score[3] % 60}` : score[3]}</td>
+            </tr>
+          `;
+        });
       } else {
         document.getElementById("scores").innerHTML = "<h2>No scores for this game yet</h2>";
       }

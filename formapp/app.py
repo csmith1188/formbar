@@ -1334,7 +1334,10 @@ def endpoint_essay():
         return redirect('/login?forward=' + request.path)
     else:
         if request.method == 'POST':
-            essay = request.form['essay']
+            if request.form:
+                essay = request.form['essay']
+            else:
+                essay = request.args.get('essay')
             if sD.settings['barmode'] == 'text':
                 if not essay and sD.studentDict[request.remote_addr]['essay']:
                     #Response unsubmitted

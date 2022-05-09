@@ -169,7 +169,7 @@ def newStudent(remote, username, bot=False):
             'name': username,
             'thumb': '',
             'letter': '',
-            'textRes': '',
+            'essay': '',
             'perms': 3,
             'oldPerms': 3,
             'progress': [],
@@ -430,7 +430,7 @@ def repeatMode():
     elif sD.settings['barmode'] == 'text':
         # Clear bar
         for student in sD.studentDict:
-            sD.studentDict[student]['textRes'] = ''
+            sD.studentDict[student]['essay'] = ''
         textBar()
     elif sD.settings['barmode'] == 'essay' or sD.settings['barmode'] == 'quiz' :
         # Clear thumbs
@@ -639,7 +639,7 @@ def textBar():
         autoStudentCount()
     complete = fill = 0
     for x in sD.studentDict:
-        if sD.studentDict[x]['perms'] == sD.settings['perms']['student'] and sD.studentDict[x]['textRes']:
+        if sD.studentDict[x]['perms'] == sD.settings['perms']['student'] and sD.studentDict[x]['essay']:
             complete += 1
             fill += 1
     for pix in range(0, BARPIX):
@@ -1336,10 +1336,10 @@ def endpoint_essay():
         if request.method == 'POST':
             essay = request.form['essay']
             if sD.settings['barmode'] == 'text':
-                if not essay and sD.studentDict[request.remote_addr]['textRes']:
+                if not essay and sD.studentDict[request.remote_addr]['essay']:
                     #Response unsubmitted
                     playSFX("sfx_hit01")
-                sD.studentDict[request.remote_addr]['textRes'] = essay
+                sD.studentDict[request.remote_addr]['essay'] = essay
                 textBar()
                 return render_template("message.html", message = "Response submitted.")
             else:

@@ -115,14 +115,14 @@ function updateVotes() {
     else if (letter !== chosenLetter) letterVote(letter);
   }
 
-  let textResEl = document.getElementById("essay");
-  let essay = meRes.textRes;
-  if (essay && !textResEl.value) {
-    textResEl.value = essay;
+  let essayEl = document.getElementById("essay");
+  let essay = meRes.essay;
+  if (essay && !essayEl.value) {
+    essayEl.value = essay;
     checkResponse();
     essaySubmitted();
   }
-  if (!essay && textResEl.value) essayUnsubmitted();
+  if (!essay && essayEl.value) essayUnsubmitted();
 }
 
 function highlight(image) {

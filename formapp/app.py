@@ -64,9 +64,6 @@ from key import key
 if ONRPi:
     from modules import ir
 
-#Set the websocket port for chat and live actions
-WSPORT=9001
-
 # Change the built-in logging for flask
 flasklog = logging.getLogger('werkzeug')
 flasklog.setLevel(logging.ERROR)
@@ -116,7 +113,6 @@ cipher = Fernet(key)
 words = json.loads(open(os.path.dirname(os.path.abspath(__file__)) + "/data/words.json").read())
 
 banList = []
-helpList = {}
 newPasswords = {}
 blockList = []
 colorDict = {
@@ -172,7 +168,7 @@ def newStudent(remote, username, bot=False):
             'name': username,
             'thumb': '',
             'letter': '',
-            'textRes': '',
+            'essay': '',
             'perms': 3,
             'oldPerms': 3,
             'progress': [],
@@ -181,8 +177,11 @@ def newStudent(remote, username, bot=False):
             'quizRes': [],
             'essayRes': '',
             'bot': bot,
-            'help': False,
-            'breakReq': False,
+            'help': {
+                'type': '',
+                'time': None,
+                'message': ''
+            },
             'excluded': False,
             'preferredHomepage': None,
             'wsID': ''
@@ -222,12 +221,6 @@ def newStudent(remote, username, bot=False):
                     sD.studentDict[remote]['perms'] = sD.settings['perms']['admin']
                 else:
                     sD.studentDict[remote]['perms'] = int(user[3])
-
-        #Check if the user has a help ticket or break request in
-        if username in helpList:
-            sD.studentDict[request.remote_addr]['help'] = True
-            if helpList[username] == "<i>Requested a bathroom break</i>":
-                sD.studentDict[request.remote_addr]['breakReq'] = True
 
         playSFX("sfx_up02")
 
@@ -436,7 +429,7 @@ def repeatMode():
     elif sD.settings['barmode'] == 'text':
         # Clear bar
         for student in sD.studentDict:
-            sD.studentDict[student]['textRes'] = ''
+            sD.studentDict[student]['essay'] = ''
         textBar()
     elif sD.settings['barmode'] == 'essay' or sD.settings['barmode'] == 'quiz' :
         # Clear thumbs
@@ -645,7 +638,7 @@ def textBar():
         autoStudentCount()
     complete = fill = 0
     for x in sD.studentDict:
-        if sD.studentDict[x]['perms'] == sD.settings['perms']['student'] and sD.studentDict[x]['textRes']:
+        if sD.studentDict[x]['perms'] == sD.settings['perms']['student'] and sD.studentDict[x]['essay']:
             complete += 1
             fill += 1
     for pix in range(0, BARPIX):
@@ -773,6 +766,9 @@ def updateStep():
 # ██      ██  ██ ██ ██   ██ ██      ██    ██ ██ ██  ██ ██    ██         ██
 # ███████ ██   ████ ██████  ██       ██████  ██ ██   ████    ██    ███████
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template("message.html", message = e), 404
 
 '''
     /
@@ -942,6 +938,15 @@ def endpoint_api_mode():
     else:
         return '{"mode": "'+ str(sD.settings['barmode']) +'"}'
 
+@app.route('/api/newpasswords')
+def endpoint_api_newpasswords():
+    if not request.remote_addr in sD.studentDict:
+        return '{"error": "You are not logged in."}'
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
+        return '{"error": "Insufficient permissions."}'
+    else:
+        return json.dumps(newPasswords)
+
 @app.route('/api/permissions')
 def endpoint_api_permissions():
     if not request.remote_addr in sD.studentDict:
@@ -1105,19 +1110,14 @@ def endpoint_break():
         return redirect('/login?forward=' + request.path)
     else:
         name = request.args.get('name') or sD.studentDict[request.remote_addr]['name'].strip()
-        if name in helpList:
-            ticket = helpList[name]
-        else:
-            ticket = ''
         if request.args.get('action') == 'request':
             if sD.studentDict[request.remote_addr]['perms'] == sD.settings['perms']['teacher']:
                 return render_template("message.html", message = "Teachers can't request bathroom breaks.")
-            if name in helpList:
+            if sD.studentDict[request.remote_addr]['help']['type']:
                 return render_template("message.html", message = "You already have a help ticket or break request in.", forward = request.path)
             else:
-                helpList[name] = '<i>Requested a bathroom break</i>'
-                sD.studentDict[request.remote_addr]['help'] = True
-                sD.studentDict[request.remote_addr]['breakReq'] = True
+                sD.studentDict[request.remote_addr]['help']['type'] = 'break'
+                sD.studentDict[request.remote_addr]['help']['time'] = time.time()
                 playSFX("sfx_pickup02")
                 return render_template("message.html", message = "Your request was sent. The teacher still needs to approve it.", forward = request.path)
         elif request.args.get('action') == 'end':
@@ -1131,14 +1131,14 @@ def endpoint_break():
                         sD.studentDict[student]['perms'] = sD.studentDict[student]['oldPerms']
                         #Disabled until chat works
                         #server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', student, 'server', 'Your break was ended.')))
-                        return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'], ticket = ticket)
+                        return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'], ticket = json.dumps(sD.studentDict[request.remote_addr]['help']))
                     else:
                         return render_template("message.html", message = "This student is not currently taking a bathroom break.")
             return render_template("message.html", message = 'Student not found.', forward = request.path)
         else:
             if sD.studentDict[request.remote_addr]['perms'] == sD.settings['perms']['teacher']:
-                return render_template("message.html", message = "Teachers can't request bathroom breaks.")
-            return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'], ticket = ticket)
+                return render_template("message.html", message = "Teachers can't request bathroom breaks. To see students' tickets, go to /users.")
+            return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'], ticket = json.dumps(sD.studentDict[request.remote_addr]['help']))
 
 
 #  ██████
@@ -1184,9 +1184,12 @@ def endpoint_changepassword():
                         else:
                             return render_template("message.html", message = "Your password is incorrect.")
             else:
-                if username in helpList:
-                    return render_template("message.html", message = "There is already a help ticket in under this username.")
-                helpList[username] = '<i>Requested a password change from the login page. Before you accept, confirm that this request is legitimate.</i>'
+                loggedIn = False
+                for user in sD.studentDict:
+                    if sD.studentDict[user]['name'].strip() == username:
+                        loggedIn = True
+                if loggedIn:
+                    return render_template("message.html", message = "Someone is logged in with this username.")
                 newPasswords[username] = newPassword
                 playSFX("sfx_powerup01")
                 return render_template("message.html", message = "Your password change needs to be approved by the teacher. You can use the Formbar as a guest while you wait.", forward = '/login')
@@ -1334,6 +1337,31 @@ def endpoint_emptyblocks():
         pixels.show()
     return render_template("message.html", message = "Emptied blocks")
 '''
+
+'''
+/essay
+'''
+@app.route('/essay', methods = ['POST', 'GET'])
+def endpoint_essay():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    else:
+        if request.method == 'POST':
+            if request.form:
+                essay = request.form['essay']
+            else:
+                essay = request.args.get('essay')
+            if sD.settings['barmode'] == 'text':
+                if not essay and sD.studentDict[request.remote_addr]['essay']:
+                    #Response unsubmitted
+                    playSFX("sfx_hit01")
+                sD.studentDict[request.remote_addr]['essay'] = essay
+                textBar()
+                return render_template("message.html", message = "Response submitted.")
+            else:
+                return render_template("message.html", message = "Not in Essay mode.")
+        else:
+            return render_template('thumbsrental.html')
 
 
 @app.route('/expert')
@@ -1589,15 +1617,16 @@ def endpoint_help():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     if sD.studentDict[request.remote_addr]['perms'] == sD.settings['perms']['teacher']:
-        return render_template("message.html", message = "Teachers can't send help tickets.")
+        return render_template("message.html", message = "Teachers can't send help tickets. To see students' tickets, go to /users.")
     else:
         name = sD.studentDict[request.remote_addr]['name']
         name = name.strip()
-        if name in helpList:
+        if sD.studentDict[request.remote_addr]['help']['type']:
             return render_template("message.html", message = "You already have a help ticket or break request in. If your problem is time-sensitive, or your last ticket was not cleared, please get the teacher's attention manually.")
         elif request.method == 'POST':
-            helpList[name] = request.args.get('message') or '<i>Sent a help ticket</i>'
-            sD.studentDict[request.remote_addr]['help'] = True
+            sD.studentDict[request.remote_addr]['help']['type'] = 'help';
+            sD.studentDict[request.remote_addr]['help']['time'] = time.time()
+            sD.studentDict[request.remote_addr]['help']['message'] = request.args.get('message');
             playSFX("sfx_up04")
             return render_template("message.html", message = "Your ticket was sent. Keep working on the problem the best you can while you wait.", forward = sD.mainPage)
         else:
@@ -1879,80 +1908,6 @@ def endpoint_mobile():
     for key, value in bgm.bgm.items():
         music.append(key)
     return render_template("mobile.html", sfx = sounds, bgm = music)
-
-# ███    ██
-# ████   ██
-# ██ ██  ██
-# ██  ██ ██
-# ██   ████
-
-
-#This endpoint allows the teacher to check tickets that students send for help.
-@app.route('/needshelp')
-def endpoint_needshelp():
-    if not request.remote_addr in sD.studentDict:
-        return redirect('/login?forward=' + request.path)
-    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['admin']:
-        return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
-    else:
-        remove = request.args.get('remove')
-        '''
-        if bool(helpList):
-            if ONRPi:
-                pixels.fill(colors['red'])
-            else:
-                pixels = [colors['red']] * MAXPIX
-        else:
-            if ONRPi:
-                pixels.fill((0, 0, 0))
-            else:
-                pixels = [(0,0,0)] * MAXPIX
-        if ONRPi:
-            pixels.show()
-        '''
-    if remove:
-        if remove in helpList:
-            #Seacrch through each student
-            for student in sD.studentDict:
-                #If the name with no whitespaces equals the name we want to remove
-                name = sD.studentDict[student]['name'].strip()
-                if name == remove:
-                    #Remove the help flag from their user and break loop
-                    sD.studentDict[student]['help'] = False
-                    if request.args.get('acceptBreak'):
-                        sD.studentDict[student]['excluded'] = True
-                        sD.studentDict[student]['oldPerms'] = sD.studentDict[student]['perms'] #Get the student's current permissions so they can be restored later
-                        sD.studentDict[student]['perms'] = sD.settings['perms']['anyone']
-                    #Disabled until chat works
-                        #server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', name, 'server', 'The teacher accepted your break request.')))
-                    #elif helpList[name] == "<i>Requested a bathroom break</i>":
-                        #server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', name, 'server', 'The teacher rejected your break request.')))
-            if request.args.get('newPassword'):
-                passwordCrypt = cipher.encrypt(request.args.get('newPassword').encode())
-                db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
-                dbcmd = db.cursor()
-                dbcmd.execute("UPDATE users SET password=:pw WHERE username=:uname", {"uname": remove, "pw": passwordCrypt})
-                db.commit()
-                db.close()
-            del helpList[remove]
-            return redirect("/needshelp")
-        else:
-            return render_template("message.html", message = "Couldn't find ticket for: " + remove + ".", forward = '/needshelp')
-    else:
-        resString = '<meta http-equiv="refresh" content="5">'
-        if not helpList:
-            resString += "No tickets yet. <button class='inline popOut' onclick='location.reload();'>Try Again</button>"
-        else:
-            for ticket in helpList:
-                resString += "<span class='ticket'><b>" + ticket + ":</b> " + helpList[ticket]
-                if helpList[ticket] == '<i>Requested a bathroom break</i>':
-                    resString += " <button class='inline popOut' onclick='window.location = \"/needshelp?remove=" + ticket + "&acceptBreak=true\"'>Accept</button> <button class='inline popOut' onclick='window.location = \"/needshelp?remove=" + ticket + "\"'>Reject</button>"
-                elif helpList[ticket] == '<i>Requested a password change from the login page. Before you accept, confirm that this request is legitimate.</i>':
-                    resString += " <button class='inline popOut' onclick='window.location = \"/needshelp?remove=" + ticket + "&newPassword=" + newPasswords[ticket] + "\"'>Accept</button> <button class='inline popOut' onclick='window.location = \"/needshelp?remove=" + ticket + "\"'>Reject</button>"
-                else:
-                    resString += " <button class='inline popOut' onclick='window.location = \"/needshelp?remove=" + ticket + "\"'>Remove</button>"
-                resString += "</span>"
-        return render_template("needshelp.html", list = resString)
 
 # ██████
 # ██   ██
@@ -2345,29 +2300,6 @@ def endpoint_startpoll():
 def endpoint_td():
     return redirect('games/towerdefense')
 
-
-'''
-/essay
-'''
-@app.route('/essay', methods = ['POST', 'GET'])
-def endpoint_essay():
-    if not request.remote_addr in sD.studentDict:
-        return redirect('/login?forward=' + request.path)
-    else:
-        if request.method == 'POST':
-            essay = request.form['essay']
-            if sD.settings['barmode'] == 'text':
-                if not essay and sD.studentDict[request.remote_addr]['textRes']:
-                    #Response unsubmitted
-                    playSFX("sfx_hit01")
-                sD.studentDict[request.remote_addr]['textRes'] = essay
-                textBar()
-                return render_template("message.html", message = "Response submitted.")
-            else:
-                return render_template("message.html", message = "Not in Essay mode.")
-        else:
-            return render_template('thumbsrental.html')
-
 @app.route('/towerdefense')
 def endpoint_towerdefense():
     return redirect('games/towerdefense')
@@ -2440,64 +2372,86 @@ def endpoint_users():
                 user = request.args.get('ip')
             else:
                 return render_template("message.html", message = "That user was not found by their IP address.")
+        action = request.args.get('action')
+        if action == 'removeNP':
+            if request.args.get('name') in newPasswords:
+                del newPasswords[request.args.get('name')]
+            else:
+                return render_template("message.html", message = "That user was has not requested a new password.")
+            if request.args.get('acceptNP'):
+                return redirect('/users?action=changePw&name=' + request.args.get('name') + '&password=' + request.args.get('password'))
+            else:
+                return render_template("message.html", message = "Request rejected.")
+        if action == 'changePw':
+            password = request.args.get('password')
+            if password:
+                passwordCrypt = cipher.encrypt(password.encode())
+                db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+                dbcmd = db.cursor()
+                dbcmd.execute("UPDATE users SET password=:pw WHERE username=:uname", {"uname": request.args.get('name'), "pw": passwordCrypt})
+                db.commit()
+                db.close()
+                return render_template("message.html", message = "Password reset.")
+            else:
+                return render_template("message.html", message = "New password reqired.")
         if user:
-            if request.args.get('action'):
-                action = request.args.get('action')
-                if action == 'kick':
-                    if user in sD.studentDict:
-                        del sD.studentDict[user]
-                        return render_template("message.html", message = "User removed")
-                    else:
-                        return render_template("message.html", message = "User not in list.")
-                if action == 'ban':
-                    if user in sD.studentDict:
-                        banList.append(user)
-                        del sD.studentDict[user]
-                        return render_template("message.html", message = "User removed and added to ban list.")
-                    else:
-                        return render_template("message.html", message = "User not in list.")
-                if action == 'perm':
-                    if request.args.get('perm'):
-                        try:
-                            perm = int(request.args.get('perm'))
-                            if user in sD.studentDict:
-                                if perm > 4 or perm < 0 :
-                                    return render_template("message.html", message = "Permissions out of range.")
-                                else:
-                                    sD.studentDict[user]['perms'] = perm
-                                    #Open and connect to database
-                                    db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
-                                    dbcmd = db.cursor()
-                                    dbcmd.execute("UPDATE users SET permissions=:perms WHERE username=:uname", {"uname": sD.studentDict[user]['name'], "perms": sD.studentDict[user]['perms']})
-                                    db.commit()
-                                    db.close()
-                                    print("[info] " + "")
-                                    return render_template("message.html", message = "Changed user permission.")
+            if action == 'removeTicket':
+                sD.studentDict[user]['help'] = {
+                    'type': '',
+                    'time': None,
+                    'message': ''
+                }
+                if request.args.get('acceptBreak'):
+                    sD.studentDict[student]['excluded'] = True
+                    sD.studentDict[student]['oldPerms'] = sD.studentDict[student]['perms'] #Get the student's current permissions so they can be restored later
+                    sD.studentDict[student]['perms'] = sD.settings['perms']['anyone']
+                #Disabled until chat works
+                    #server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', name, 'server', 'The teacher accepted your break request.')))
+                #elif sD.studentDict[student]['help']['type'] == 'break':
+                    #server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', name, 'server', 'The teacher rejected your break request.')))
+            if action == 'kick':
+                if user in sD.studentDict:
+                    del sD.studentDict[user]
+                    return render_template("message.html", message = "User removed")
+                else:
+                    return render_template("message.html", message = "User not in list.")
+            if action == 'ban':
+                if user in sD.studentDict:
+                    banList.append(user)
+                    del sD.studentDict[user]
+                    return render_template("message.html", message = "User removed and added to ban list.")
+                else:
+                    return render_template("message.html", message = "User not in list.")
+            if action == 'perm':
+                if request.args.get('perm'):
+                    try:
+                        perm = int(request.args.get('perm'))
+                        if user in sD.studentDict:
+                            if perm > 4 or perm < 0 :
+                                return render_template("message.html", message = "Permissions out of range.")
                             else:
-                                return render_template("message.html", message = "User not in list.")
-                        except:
-                            return render_template("message.html", message = "Perm was not an integer.")
-                if action == 'changePw':
-                    password = request.args.get('password')
-                    if password:
-                        passwordCrypt = cipher.encrypt(password.encode())
-                        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
-                        dbcmd = db.cursor()
-                        dbcmd.execute("UPDATE users SET password=:pw WHERE username=:uname", {"uname": sD.studentDict[user]['name'], "pw": passwordCrypt})
-                        db.commit()
-                        db.close()
-                        return render_template("message.html", message = "Password reset.")
-                    else:
-                        return render_template("message.html", message = "New password reqired.")
-                if action == 'delete':
-                    db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
-                    dbcmd = db.cursor()
-                    dbcmd.execute("DELETE FROM users WHERE username=:uname", {"uname": sD.studentDict[user]['name']})
-                    db.commit()
-                    db.close()
-                    if user in sD.studentDict:
-                        del sD.studentDict[user]
-                    return render_template("message.html", message = "User deleted.")
+                                sD.studentDict[user]['perms'] = perm
+                                #Open and connect to database
+                                db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+                                dbcmd = db.cursor()
+                                dbcmd.execute("UPDATE users SET permissions=:perms WHERE username=:uname", {"uname": sD.studentDict[user]['name'], "perms": sD.studentDict[user]['perms']})
+                                db.commit()
+                                db.close()
+                                print("[info] " + "")
+                                return render_template("message.html", message = "Changed user permission.")
+                        else:
+                            return render_template("message.html", message = "User not in list.")
+                    except:
+                        return render_template("message.html", message = "Perm was not an integer.")
+            if action == 'delete':
+                db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+                dbcmd = db.cursor()
+                dbcmd.execute("DELETE FROM users WHERE username=:uname", {"uname": sD.studentDict[user]['name']})
+                db.commit()
+                db.close()
+                if user in sD.studentDict:
+                    del sD.studentDict[user]
+                return render_template("message.html", message = "User deleted.")
             if request.args.get('refresh'):
                 refresh = request.args.get('refresh')
                 if refresh == 'all':
@@ -2628,29 +2582,32 @@ def disconnect_request():
 
 '''
 
-def packMSG(type, rx, tx, content):
+def packMSG(rx, tx, content):
     msgOUT = {
-        "type": type,
         "to": rx,
         "from": tx,
         "content": content
-        }
+    }
     return msgOUT
 
-'''
-@socket_.on('connection', namespace = chatnamespace)
-def connection():
-    print("SOCKET: " + socket)
+
+@socket_.on('connect', namespace=chatnamespace)
+def connect():
+    '''
+    #print("SOCKET: " + socket)
     try:
         sD.studentDict[client['address'][0]]['wsID'] = client['id']
+        #sD.studentDict[request.remote_addr]['wsId'] = request.sid
         print("[info] " + sD.studentDict[client['address'][0]]['name'] + " connected and was given id %d" % client['id'])
         emit('message', json.dumps(packMSG('alert', 'all', 'server', sD.studentDict[client['address'][0]]['name'] + " has joined the server...")))
         emit('message', json.dumps(packMSG('userlist', 'all', 'server', chatUsers())))
     except Exception as e:
         print("[error] " + "Error finding user in list: " + str(e))
+    '''
 
-@socket_.on('disconnect', namespace = chatnamespace)
+@socket_.on('disconnect', namespace=chatnamespace)
 def disconnect():
+    '''
     try:
         if client['address'][0] in sD.studentDict and 'wsID' in sD.studentDict[client['address'][0]]: #Do nothing is user has already disconnected or logged out
             print("[info] " + sD.studentDict[client['address'][0]]['name'] + " disconnected")
@@ -2662,67 +2619,77 @@ def disconnect():
                     emit('message', server.clients[i], json.dumps(packMSG('userlist', 'all', 'server', chatUsers())))
     except Exception as e:
         print("[error] " + "Error finding user in list: " + str(e))
-'''
+    '''
 
-@socket_.on('message', namespace = chatnamespace)
-def message():
+@socket_.on('message', namespace=chatnamespace)
+def message(message):
     try:
-        message = json.loads(message)
-        if message['type'] == 'ttt':
-            #For now, this will only forward the gamestate. We'll do validation later.
-            #server.send_message(message.to, json.dumps(message))
-            pass
-        elif message['type'] == 'userlist':
-            server.send_message(client, json.dumps(packMSG('userlist', sD.studentDict[client['address'][0]]['name'], 'server', chatUsers())))
-        elif message['type'] == 'alert':
-            server.send_message(client, json.dumps(packMSG('alert', sD.studentDict[client['address'][0]]['name'], 'server', 'Only the server can send alerts!')))
-        elif message['type'] == 'help':
-            name = sD.studentDict[client['address'][0]]['name']
-            name = name.replace(" ", "")
-            helpList[name] = message['content']
-            playSFX("sfx_up04")
-            server.send_message(client, json.dumps(packMSG('alert', sD.studentDict[client['address'][0]]['name'], 'server', 'Your help ticket was sent. Keep working on the problem while you wait!')))
+        #Check for permissions
+        if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['say']:
+            messageOut = packMSG('alert', sD.studentDict[client['address'][0]]['name'], 'server', "You do not have permission to send text messages.")
+            server.send_message(client, json.dumps(messageOut))
         else:
+            message = json.loads(message)
+            #Save the message to the database
             db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
             dbcmd = db.cursor()
-            contentCrypt = cipher.encrypt(message['content'].encode())
+            content = message['content'].replace('"', '\\"')
+            contentCrypt = cipher.encrypt(content.encode())
             dbcmd.execute("INSERT INTO messages ('from', 'to', 'time', 'content') VALUES (?, ?, ?, ?)", (message['from'], message['to'], message['time'], contentCrypt))
             db.commit()
             db.close()
-            #Check for permissions
-            if sD.studentDict[client['address'][0]]['perms'] > sD.settings['perms']['say']:
-                messageOut = packMSG('alert', sD.studentDict[client['address'][0]]['name'], 'server', "You do not have permission to send text messages.")
-                server.send_message(client, json.dumps(messageOut))
+            #Checking max message length here
+            if len(message['content']) > 252:
+                message['content'] = message['content'][:252]+'...'
+            #Check recipients here
+            if message['to'] == 'all':
+                messageOut = packMSG('all', sD.studentDict[request.remote_addr]['name'], message['content'])
+                #messageOut = packMSG('all', sD.studentDict[client['address'][0]]['name'], message['content'])
+                emit('message', json.dumps(messageOut), broadcast=True)
             else:
-                #Checking max message length here
-                if len(message['content']) > 252:
-                    message['content'] = message['content'][:252]+'...'
-                #Check recipients here
-                if message['to'] == 'all':
-                    messageOut =  packMSG('message', 'all', sD.studentDict[client['address'][0]]['name'], message['content'])
-                    emit('message', json.dumps(messageOut))
-                else:
-                    for student in sD.studentDict:
-                        if sD.studentDict[student]['name'] == message['to'] or sD.studentDict[student]['name'] == message['from']:
-                            for toClient in server.clients:
-                                if toClient['id'] == sD.studentDict[student]['wsID']:
-                                    messageOut =  packMSG('message', message['to'], sD.studentDict[client['address'][0]]['name'], message['content'])
-                                    server.send_message(toClient, json.dumps(messageOut))
-                                    break
-                print("[info] " + message['from'] + " said to " + message['to'] + ": " + message['content'])
+                for student in sD.studentDict:
+                    if sD.studentDict[student]['name'] == message['to'] or sD.studentDict[student]['name'] == message['from']:
+                        for toClient in server.clients:
+                            if toClient['id'] == sD.studentDict[student]['wsID']:
+                                messageOut = packMSG('message', message['to'], sD.studentDict[client['address'][0]]['name'], message['content'])
+                                server.send_message(toClient, json.dumps(messageOut))
+                                break
+            print("[info] " + message['from'] + " said to " + message['to'] + ": " + message['content'])
     except Exception as e:
         print("[error] " + 'Error: ' + str(e))
 
-@socket_.on('fighter', namespace = chatnamespace)
-def fighter():
+@socket_.on('userlist', namespace=chatnamespace)
+def message(message):
     try:
-        message = json.loads(message)
-        for student in sD.studentDict:
-            if sD.studentDict[student]['name'] == message['to'] or sD.studentDict[student]['name'] == message['from']:
-                for toClient in server.clients:
-                    if toClient['id'] == sD.studentDict[student]['wsID']:
-                        emit('message', toClient, json.dumps(message))
-                        break
+        emit('userlist', json.dumps(packMSG('userlist', sD.studentDict[request.remote_addr]['name'], 'server', chatUsers())), broadcast=True)
+    except Exception as e:
+        print("[error] " + 'Error: ' + str(e))
+
+@socket_.on('alert', namespace=chatnamespace)
+def message(message):
+    try:
+        emit('alert', client, json.dumps(packMSG('alert', sD.studentDict[request.remote_addr]['name'], 'server', 'Only the server can send alerts!')))
+    except Exception as e:
+        print("[error] " + 'Error: ' + str(e))
+
+@socket_.on('help', namespace=chatnamespace)
+def message(message):
+    try:
+        #Update or remove
+        pass
+        #message = json.loads(message)
+        #name = sD.studentDict[request.remote_addr]['name']
+        #name = name.replace(" ", "")
+        #helpList[name] = message['content']
+        #playSFX("sfx_up04")
+        #emit('help', json.dumps(packMSG('alert', sD.studentDict[request.remote_addr]['name'], 'server', 'Your help ticket was sent. Keep working on the problem while you wait!')))
+    except Exception as e:
+        print("[error] " + 'Error: ' + str(e))
+
+@socket_.on('fighter', namespace=chatnamespace)
+def fighter(message):
+    try:
+        emit('fighter', message)
     except Exception as e:
         print("[error] " + 'Error: ' + str(e))
 

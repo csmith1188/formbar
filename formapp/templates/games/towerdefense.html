@@ -894,7 +894,7 @@
                 </h2>
                 ${type.ability.description}
               `;
-              document.getElementById("container").appendChild(menu);
+              document.getElementById("container").append(menu);
 
               let sellButton = document.getElementById("sell");
               let rangeButton = document.getElementById("range");
@@ -1162,7 +1162,7 @@
         [[10, "y"], [4, "o", pause], "o"],
         [[6, "g", "y", "o", pause], "g", "y", "o"],
         [[9, "y"], [7, "o"]],
-        [[50, "g"], ["alert", "All enemy types gain health every 10 rounds."]],
+        [[50, "g"]],
         [["alert", "<h1>New enemy ability: <b>Healing</b></h1>Enemies with this ability gradually regain health, so you need to destroy them quickly. They're also immune to poison."], [9, "oh", pause], "oh"],
         [[7, [6, "y", pause]], [6, "y"]],
         [[20, "oh"]],
@@ -2056,7 +2056,7 @@
         back.id = "back";
         back.innerText = "🡄";
         back.onclick = () => window.location.reload();
-        container.appendChild(back);
+        container.append(back);
 
         let left = document.createElement("div");
         let right = document.createElement("div");
@@ -2072,8 +2072,8 @@
           (mapIndex == maps.length - 1) ? mapIndex = 0 : mapIndex++;
           switchMap();
         }
-        container.appendChild(left);
-        container.appendChild(right);
+        container.append(left);
+        container.append(right);
 
         let difficultyButtons = document.createElement("div");
         difficultyButtons.id = "difficulty";
@@ -2092,15 +2092,15 @@
           difficulty = "hard";
           switchDifficulty();
         };
-        container.appendChild(difficultyButtons);
-        document.getElementById("difficulty").appendChild(normal);
-        document.getElementById("difficulty").appendChild(hard);
+        container.append(difficultyButtons);
+        document.getElementById("difficulty").append(normal);
+        document.getElementById("difficulty").append(hard);
 
         let startButton = document.createElement("button");
         startButton.id = "startButton";
         startButton.classList.add("hCentered");
         startButton.innerText = "Start game";
-        container.appendChild(startButton);
+        container.append(startButton);
 
         switchMap();
 
@@ -2270,13 +2270,13 @@
         let alertText = document.createElement("div");
         alertText.id = "alertText";
         alertText.innerHTML = message;
-        alertBox.appendChild(alertText);
+        alertBox.append(alertText);
         let okButton = document.createElement("button");
         okButton.id = "ok";
         okButton.innerText = "OK";
         okButton.onclick = hideAlert;
-        alertBox.appendChild(okButton);
-        document.getElementById("container").appendChild(alertBox);
+        alertBox.append(okButton);
+        document.getElementById("container").append(alertBox);
         document.addEventListener("keydown", hideAlert);
       }
 

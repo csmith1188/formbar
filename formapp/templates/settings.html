@@ -1,6 +1,3 @@
-<!-- Original Site -->
-<!-- https://www.geeksforgeeks.org/design-a-typing-speed-test-game-using-javascript/ -->
-
 {% extends 'header.html' %}
 <!-- ^^ This means add this file to the end of the contents of header.html -->
 <!-- This is where the title, top buttons, and stylesheet is located -->
@@ -178,7 +175,7 @@
 
     async function downloadResponses() {
       let students = await getResponse("/api/students");
-      let essays = Object.values(students).map(student => [student.name, student.textRes]);
+      let essays = Object.values(students).map(student => [student.name, student.essay]);
       essays = essays.map(essay => essay.map(value => `"${value.replaceAll("\"", "\"\"")}"`)); //Escape quotes in values, then add quotes around each value
       let csv = "data:text/csv;charset=utf-8,";
       csv += essays.map(essay => essay.join(",")).join("\n");
@@ -219,7 +216,7 @@
 
 <h2>Number of students</h2>
 <input type="number" id="studentNum" class="line" onchange="sendStudents();" name="studentNum" min="1" max="30">&nbsp;&nbsp;
-<input type="checkBox" id="autoStudents" checked onchange="sendStudents();"><label for="autoStudents">Auto</label><br>
+<input type="checkbox" id="autoStudents" checked onchange="sendStudents();"><label for="autoStudents">Auto</label><br>
 
 <div onchange="changeMode();">
     <h2>Bar mode</h2>
@@ -332,15 +329,15 @@
 
 <h2>Lock Formbar</h2>
 Only whitelisted users will be able to make changes.<br>
-<input type="checkBox" id="lock" onchange="request.open('GET', `/settings?locked=${this.value}`); request.send();"><label for="lock">Lock</label><br>
+<input type="checkbox" id="lock" onchange="request.open('GET', `/settings?locked=${this.value}`); request.send();"><label for="lock">Lock</label><br>
 
 <h2>Blind results</h2>
 Results won't be shown until the poll is complete.<br>
-<input type="checkBox" id="blind" onchange="request.open('GET', `/settings?blind=${this.value}`); request.send();"><label for="blind">Hide results</label><br>
+<input type="checkbox" id="blind" onchange="request.open('GET', `/settings?blind=${this.value}`); request.send();"><label for="blind">Hide results</label><br>
 
 <h2>Show missing votes</h2>
 When votes are missing, there will be empty spaces on the bar.<br>
-<input type="checkBox" id="showMissing" checked onchange="request.open('GET', `/settings?showinc=${this.value}`); request.send();"><label for="showMissing">Show</label><br>
+<input type="checkbox" id="showMissing" checked onchange="request.open('GET', `/settings?showinc=${this.value}`); request.send();"><label for="showMissing">Show</label><br>
 
 <h2>Restart session</h2>
 <button class="inline popOut" onclick="restart();">Remove all students and restart</button><br>

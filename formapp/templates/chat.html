@@ -483,14 +483,16 @@
         if (message.from == "server" || !message.from) note = "· From server";
         else if (message.to != "all") note = "· Private message";
 
-        //Use this if you want to allow HTML
         newMSG.innerHTML = `
           <b class="username" onclick="${usernameOnclick}" title="${usernameTitle}">${message.from}</b>
           <span style="color: var(--gray-color);">${dateString(message.time)} ${note}</span>
-          <div class="content">${message.content}</div>
         `;
-        //Use this if you want to convert HTML into text
-        // newMSG.appendChild(document.createTextNode(message.from + ": " + message.content))
+        let content = document.createElement("div");
+        //The server can send HTML; students can't
+        if (message.from == "server" || !message.from) content.innerHTML = message.content;
+        else content.innerText = message.content;
+        newMSG.append(content);
+
         boxes.outputBox.appendChild(newMSG);
         if (lockBottom) boxes.outputBox.scrollTo(0, boxes.outputBox.scrollHeight);
 

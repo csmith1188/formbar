@@ -570,7 +570,7 @@
         poison: {
           name: "Poison Tower",
           color: "#df80ff",
-          description: "Enemies are poisoned when hit, taking 0.4 damage a second for 5 seconds.",
+          description: "Enemies are poisoned when hit, taking 0.6 damage a second for 5 seconds.",
           range: 3.19,
           speed: 1.2,
           strength: 0.7,
@@ -1521,7 +1521,7 @@
               enemy.distance += enemy.speed * (enemy.slowed ? 2 : 4);
             }
             if (enemy.slowed) enemy.slowed--;
-            if (enemy.poisoned && --enemy.poisoned % (enemy.doublePoisoned ? 12.5 : 25) < 1) enemy.hit(0.4, null, "poison");
+            if (enemy.poisoned && --enemy.poisoned % (enemy.doublePoisoned ? 12.5 : 25) < 1) enemy.hit(0.6, null, "poison");
             if (!enemy.poisoned) delete enemy.doublePoisoned;
 
             enemy.x = map.start[0] * 60;

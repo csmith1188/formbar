@@ -1491,7 +1491,7 @@
         document.getElementById("matchCode").innerText = matchCode;
 
         if (document.getElementById("chatCheckbox").checked) {
-          let message = `${me.name} is looking for a Fighter opponent. <button class="inline popOut" onclick="window.location = '/games/fighter?match=${matchCode}';">Join match</button>`;
+          let message = `${me.name} is looking for a Fighter opponent. <button class="inline popOut" onclick="window.open('/games/fighter?match=${matchCode}');">Join match</button>`;
           sendMessage(message, "all");
         }
 

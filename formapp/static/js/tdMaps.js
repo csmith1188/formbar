@@ -17,7 +17,7 @@
 }*/
 let pause = [10, null];
 
-let waves = [
+let wavesDefault = [
   [[4, "g", pause], "g"],
   [[7, "g", "g", pause], ["alert", "All enemy types have different health and speed stats."], "y", pause, "y"],
   [[5, "g"], [3, "y"]],
@@ -96,7 +96,7 @@ let waves = [
   [[90, "b", "p"], pause, [100, "x"]],
   [[2, "zd", "ud", pause], "zd", "ud", [300, "ba"], [30, "xh"], pause, [20, "u", "uh", "ua"]]
 ];
-waves.forEach(wave => wave.unshift([8, pause])); //Add a break at the start of each wave
+wavesDefault.forEach(wave => wave.unshift([8, pause])); //Add a break at the start of each wave
 
 let maps = [
   {

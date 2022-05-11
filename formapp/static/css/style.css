@@ -39,7 +39,6 @@
 .light {
   --bg-color: white;
   --theme-color: var(--color-blue);
-  accent-color: var(--color-blue);
   --main-color: black;
   --gray-color: var(--dark-gray);
   --emphasis-color: white;
@@ -57,37 +56,30 @@
 
 .red {
   --theme-color: var(--light-red);
-  accent-color: var(--light-red);
 }
 
 .brown {
   --theme-color: var(--light-brown);
-  accent-color: var(--light-brown);
 }
 
 .orange {
   --theme-color: var(--light-orange);
-  accent-color: var(--light-orange);
 }
 
 .yellow {
   --theme-color: var(--light-yellow);
-  accent-color: var(--light-yellow);
 }
 
 .green {
   --theme-color: var(--light-green);
-  accent-color: var(--light-green);
 }
 
 .blue {
   --theme-color: var(--light-blue);
-  accent-color: var(--light-blue);
 }
 
 .purple {
   --theme-color: var(--light-purple);
-  accent-color: var(--light-purple);
 }
 
 body {
@@ -180,6 +172,7 @@ body, .light, .dark {
 * {
   font-family: inherit;
   color: inherit;
+  accent-color: var(--theme-color);
 }
 
 input, button, textarea, select {

@@ -431,7 +431,7 @@
           price: 35,
           extra1: {
             description: "Projectiles can bounce to up to three nearby enemies.",
-            price: 40,
+            price: 60,
             add: function() {
               this.bounce = 3;
             }
@@ -489,10 +489,10 @@
           color: "#df80ff",
           description: "Enemies are poisoned when hit, taking 0.4 damage a second for 5 seconds.",
           range: 3.19,
-          speed: 0.8,
-          strength: 0.6,
+          speed: 1.2,
+          strength: 0.7,
           poison: true,
-          price: 60,
+          price: 55,
           extra1: {
             description: "Poison can splash to a nearby enemy.",
             price: 30,
@@ -592,19 +592,19 @@
           description: "Gets 3× as much money from defeating enemies.",
           range: 3.32,
           speed: 0.88,
-          strength: 0.7,
+          strength: 1.25,
           extraMoney: true,
           price: 150,
           extra1: {
-            description: "Adds an extra $5 every 10 seconds.",
-            price: 250,
+            description: "Adds an extra $10 every 10 seconds.",
+            price: 300,
             add: function() {
               player.bonusMoney += 5;
             }
           },
           extra2: {
             description: "Adds an extra life every 15 seconds.",
-            price: 300,
+            price: 250,
             add: function() {
               player.bonusLives += 1;
             }
@@ -1498,6 +1498,7 @@
             }
             if (currentWave < waves.length) currentWave++;
             currentEnemy = 0;
+            //if (currentWave = 50) for (let type in enemyTypes) enemyTypes[type].health *= 2; //All enemy types get double health for the last 25 rounds of hard mode
           }
         }
 
@@ -2266,6 +2267,7 @@
         let alertBox = document.createElement("div");
         alertBox.id = "alert";
         alertBox.classList.add("centered");
+        alertBox.classList.add("light");
         if (large) alertBox.classList.add("large");
         let alertText = document.createElement("div");
         alertText.id = "alertText";

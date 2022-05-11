@@ -3,6 +3,7 @@
 //Avoid the tower icons at the bottom, the buttons in the top-left, and the info in the top-right
 //Maps should always start in the middle of a square
 //New maps must be added to the end of the list
+//If you do not include an array of waves, the default waves will be used
 
 //Map object template:
 /*{
@@ -13,8 +14,36 @@
     [direction, length],
     [direction, length],
     …
-  ]
+  ],
+  waves: See below
 }*/
+
+//Waves array example:
+/*[
+  //Each array is a wave. There must be 75 waves.
+  ["g", pause, "y", pause, "o"], //A green, a yellow, and an orange, with pauses in between
+  [[10, "r"], ["alert", "This is a message that will be shown onscreen."]], //10 reds followed by a message for the player
+  [[5, "pa", "bh"]], //A purple with acceleration and a brown with healing, repeated 5 times
+  …
+]*/
+
+//ENEMY CODES:
+//Types (first charcter):
+//"g" — green
+//"y" — yellow
+//"o" — orange
+//"r" — red
+//"p" — purple
+//"b" — brown
+//"x" — boss
+//"z" — brown-boss
+//"u" — purple-boss
+//Abilities (second character):
+//"h" — healing
+//"a" — acceleration
+//"s" — split
+//"k" — blink
+//"d" — shield
 
 let maps = [
   {

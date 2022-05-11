@@ -670,7 +670,7 @@
   <div id="matchOver" class="vCentered hidden" style="left: 0; width: calc(100% - 452px); text-align: center;">
     <h1 id="result"></h1><br>
     <button id="rematchButton">Rematch?</button>
-    <button style="margin-left: 16px; color: white;" onclick="window.location = '/fighter';">Home</button>
+    <button style="margin-left: 16px; color: white;" onclick="window.location = '/games/fighter';">Home</button>
   </div>
 {% endblock %}
 {% block script %}
@@ -1071,7 +1071,6 @@
 
       function sendPlayerReady() {
         let sendObj = {
-          type: "fighter",
           to: opponent.name,
           from: me.name,
           content: {
@@ -1089,18 +1088,18 @@
           type: "message",
           to: recipient,
           from: "server",
+          time: Date.now(),
           content: content
         };
-        ////chatSocket.emit("message", JSON.stringify(messageObj));
-        if (!recipient != "all") { //If message is private, send to sender in addition to recipient
+        chatSocket.emit("message", JSON.stringify(messageObj));
+        if (!recipient != "all") { //If message is private, send to sender in addition to recipient ////still necessary?
           messageObj.to = me.name;
-          ////chatSocket.emit("message", JSON.stringify(messageObj));
+          chatSocket.emit("message", JSON.stringify(messageObj));
         }
       }
 
       function sendMove(moveObj) {
         let sendObj = {
-          type: "fighter",
           to: opponent.name,
           from: me.name,
           content: {
@@ -1118,7 +1117,7 @@
       }
 
       chatSocket.on("fighter", message => {
-        let data = JSON.parse(message.data);
+        let data = JSON.parse(message);
         console.log(data);
         if (data.content.type == "join" && data.from != me.name) document.getElementById("opponentStatus").innerText = "Opponent is getting ready…";
         if (data.content.type == "player" && data.from != me.name) receivePlayerReady(data.content.player);
@@ -1126,7 +1125,7 @@
           console.log(data.content.type);
           if (data.content.type == "move") receiveMove(data.content.move);
           else if (data.content.type == "item") receiveItem(data.content);
-          else if (data.content.type == "rematch" && players.every(player => player.rematch) && me.team == 1) window.location = "/fighter?rematch=" + matchCode;
+          else if (data.content.type == "rematch" && players.every(player => player.rematch) && me.team == 1) window.location = "/games/fighter?rematch=" + matchCode;
         }
       });
 
@@ -1180,7 +1179,7 @@
       }
 
       function joinMatch(code) {
-        request.open("GET", '/getfightermatches', false);
+        request.open("GET", '/api/fightermatches', false);
         request.send(null);
         let res = JSON.parse(request.responseText);
         match = res["match" + code];
@@ -1197,7 +1196,6 @@
           me.fighters = [fighter2a, fighter2b];
           opponent.name = match.creator;
           chatSocket.emit("fighter", JSON.stringify({
-            type: "fighter",
             to: opponent.name,
             from: me.name,
             content: {type: "join"}
@@ -1482,7 +1480,7 @@
         if (me.team == 1) wait();
         else if (match.opponent) {
           alert("Match is already full.");
-          window.location = "/fighter";
+          window.location = "/games/fighter";
         }
         else sendPlayerReady();
       }
@@ -1493,8 +1491,7 @@
         document.getElementById("matchCode").innerText = matchCode;
 
         if (document.getElementById("chatCheckbox").checked) {
-          let message = `${me.name} is looking for a Fighter opponent.<br>
-          <button onclick="window.location = '/fighter?match=${matchCode}';">Join match</button>`;
+          let message = `${me.name} is looking for a Fighter opponent. <button class="inline popOut" onclick="window.location = '/games/fighter?match=${matchCode}';">Join match</button>`;
           sendMessage(message, "all");
         }
 
@@ -1550,7 +1547,7 @@
         fighters.forEach(fighter => fighter.el = document.getElementById("fighter" + fighter.name));
 
         ////!get ready at same time
-        if (me.rematch) window.location = "/fighter?match=" + matchCode; //Join match if you are player 2 and waiting for rematch
+        if (me.rematch) window.location = "/games/fighter?match=" + matchCode; //Join match if you are player 2 and waiting for rematch
         startMatch();
       }
 
@@ -1559,6 +1556,8 @@
         document.getElementById("border").classList.add("hidden");
         document.getElementById("gameContainer").classList.remove("hidden");
         document.getElementById("gameChat").classList.remove("hidden");
+
+        window.onbeforeunload = () => true; //Show warning before leaving page
 
         if (me.team == 1) {
           player1 = me;
@@ -2122,7 +2121,6 @@
         removeItemtargets();
         sendMessage(me.name + " used the \"" + itemObj.name + "\" item.");
         chatSocket.emit("fighter", JSON.stringify({
-          type: "fighter",
           to: opponent.name,
           from: me.name,
           content: {
@@ -2351,6 +2349,8 @@
         document.getElementById("game").classList.add("hidden");
         document.getElementById("matchOver").classList.remove("hidden");
 
+        window.onbeforeunload = () => false;
+
         if (winner == me) {
           resultEl.innerText = "You win!";
           me.wins++;
@@ -2375,7 +2375,6 @@
         el.onclick = null;
         me.rematch = true;
         chatSocket.emit("fighter", JSON.stringify({
-          type: "fighter",
           to: opponent.name,
           from: me.name,
           content: {
@@ -2398,7 +2397,7 @@
           document.getElementById("opponentStatus").innerText = "Waiting for opponent…"
         } else { //If joining player
           alert(opponent.name + " disconnected.");
-          window.location = "/fighter";
+          window.location = "/games/fighter";
         }
       }
 

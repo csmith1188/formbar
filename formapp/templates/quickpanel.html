@@ -175,8 +175,8 @@
       <img src="{{ url_for('static', filename='img/basic/letterButton3.png') }}" id="letterButton3" class="letterButton button inline popOut moreDepth greenColor" title="Vote D" onclick="letterVote(3);" tabindex="0">
     </div>
     <div id="textBox" class="hidden">
-      <textarea id="essay" placeholder="Type your essay here" oninput="checkResponse();"></textarea><br>
-      <button id="submitResponse" class="inline popOut unselectable">Submit</button>
+      <textarea id="essay" placeholder="Type your essay here" oninput="checkEssay();"></textarea><br>
+      <button id="submitEssay" class="inline popOut unselectable">Submit</button>
     </div>
     <h2 id="noPoll">There is no poll right now.</h2>
     <br><br>
@@ -207,7 +207,7 @@
     <div>
       <h1>Help tickets</h1>
       <span id="ticketsText"></span><br>
-      <button class="inline popOut" onclick="window.open('/advanced?page=needshelp');">All tickets 🡆</button>
+      <button class="inline popOut" onclick="window.open('/advanced?page=users');">All tickets 🡆</button>
     </div>
     <br><br>
     <div>
@@ -395,16 +395,15 @@
       request.send();
     }
 
-    ws.onmessage = message => {
-      let data = JSON.parse(message.data);
-      if (data.type == "message") {
-        if (document.hidden || visibleSection != "chat") {
-          newMessages++;
-          document.title = `(${newMessages}) Formbar Quick Panel`;
-          if (visibleSection != "chat") document.getElementById("newMessages").innerText = "(" + newMessages + ")";
+    chatSocket.on("message", message => {
+      if (document.hidden || visibleSection != "chat") {
+        let data = JSON.parse(message);
+        newMessages++;
+        document.title = `(${newMessages}) Formbar Quick Panel`;
+        if (visibleSection != "chat") document.getElementById("newMessages").innerText = "(" + newMessages + ")";
         }
       }
-    };
+    });
 
     //When user goes to this page, if chat is open, remove number of new messages from title
     document.addEventListener("visibilitychange", () => {

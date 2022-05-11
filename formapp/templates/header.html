@@ -39,10 +39,13 @@
     request.open("GET", '/api/ip', false);
     request.send(null);
     const serverIp = JSON.parse(request.responseText).ip;
-    const ws = new WebSocket(`ws://${serverIp}:9001`);
-
     const apiSocket = io("/apinamespace");
     const chatSocket = io("/chat");
+
+    chatSocket.on("disconnect", () => {
+      alert("Session ended.");
+      window.location.reload();
+    });
 
     function getResponse(endpoint, parse = true) {
       return new Promise((resolve, reject) => {

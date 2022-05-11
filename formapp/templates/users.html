@@ -8,6 +8,25 @@
 <!-- Extra style declarations here -->
 {% block style %}
 <style>
+  body {
+    overflow-x: hidden;
+  }
+
+  .controls {
+    padding: 8px;
+    background: var(--bg-dark-highlight);
+    margin-bottom: 16px;
+  }
+
+  .controls button {
+    margin: 0 4px;
+    font-size: 14px;
+  }
+
+  .controls button.pressed {
+    cursor: pointer;
+  }
+
   .user {
     position: relative;
     left: 21px;
@@ -23,8 +42,7 @@
     padding: 4px;
   }
 
-  button {
-    margin-left: 4px;
+  button.inline {
     margin-bottom: 8px;
   }
 
@@ -47,7 +65,22 @@
 <!-- Main content here -->
 {% block main %}
 <h1>Users</h1>
-<button id="collapseButton" class="inline popOut">Collapse all</button>
+<div id="npRequests"></div>
+<div class="controls yellow">
+  Filters:
+  <button id="help" class="filter">Help ticket in</button>
+  <button id="break" class="filter">Taking a break</button>
+  <button id="poll" class="filter">Responded to poll</button>
+</div>
+<div class="controls yellow">
+  Sort:
+  <button id="logIn" class="sort">Time joined</button>
+  <button id="name" class="sort">Name</button>
+  <button id="helpTime" class="sort">Help ticket time</button>
+  <button id="pollRes" class="sort">Poll response</button>
+  <button id="perms" class="sort">Permissions</button>
+</div>
+<button id="collapseButton" class="inline popOut hidden">Collapse all</button>
 <div id="students">
 </div>
 <button id="addUser" class="inline popOut">Add user</button>
@@ -57,10 +90,19 @@
 {% block script %}
 <script type="text/javascript">
     let studentData = null;
+    let oldStudentList;
     let studentList;
-    let oldStudentData;
     let permNames = ['Teacher', 'Mod', 'Student', 'Guest']
     let collapsed = false;
+    let filters = [];
+    let sort;
+
+    let filterButtons = Array.from(document.querySelectorAll(".filter"));
+    filterButtons.forEach(button => button.onclick = () => toggleFilter(button));
+
+    let sortButtons = Array.from(document.querySelectorAll(".sort"));
+    sortButtons.forEach(button => button.onclick = () => changeSort(button));
+    changeSort(document.getElementById("logIn"));
 
     collapseButton.onclick = function() {
       collapsed = !collapsed;
@@ -84,8 +126,10 @@
     }
 
     function remove(name) {
-      request.open("GET", "users?name=" + name + "&action=kick");
-      request.send();
+      if (confirm(`Remove ${name}? They will still be able to log in.`)) {
+        request.open("GET", "users?name=" + name + "&action=kick");
+        request.send();
+      }
     }
 
     function banip(name) {
@@ -103,141 +147,334 @@
     }
 
     function deleteAcc(name) {
-      request.open("GET", "/users?name=" + name + "&action=delete");
-      request.send();
+      if (confirm(`Permanently delete ${name}'s account?`)) {
+        request.open("GET", "/users?name=" + name + "&action=delete");
+        request.send();
+      }
     }
 
-    function removeHelp(name) {
-      request.open("GET", "/needshelp?remove=" + name);
-      request.send();
+    function toggleFilter(el) {
+      let pairs = {
+        help: ["Help ticket in", "No help ticket in"],
+        break: ["Taking a break", "Not taking a break"],
+        poll: ["Responded to poll", "Did not respond to poll"]
+      };
+      if (filters.includes(el.id)) {
+        filters.splice(filters.indexOf(el.id), 1, "!" + el.id);
+        el.classList.add("pressed");
+        el.innerText = pairs[el.id][1];
+      } else if (filters.includes("!" + el.id)) {
+        filters.splice(filters.indexOf("!" + el.id), 1);
+        el.classList.remove("pressed");
+        el.innerText = pairs[el.id][0];
+      } else {
+        filters.push(el.id);
+        el.classList.add("pressed");
+        el.innerText = pairs[el.id][0];
+      }
+    }
+
+    function changeSort(el) {
+      let newSort = el.id;
+      sortButtons.forEach(button => {
+        if (button.innerText.endsWith("🡇") || button.innerText.endsWith("🡅")) button.innerText = button.innerText.slice(0, -2);
+        if (button == el) {
+          button.classList.add("pressed");
+        } else {
+          button.classList.remove("pressed");
+        }
+      });
+      el.classList.add("pressed");
+      if (newSort == sort) {
+        sort = newSort + "Rev";
+        el.innerText += " 🡅";
+      } else {
+        sort = newSort;
+        el.innerText += " 🡇";
+      }
     }
 
     setInterval(function() {
         checkUpdates('/api/students');
         let studentBox = document.getElementById('students');
-        if (studentData == undefined) {
+        if (studentData === undefined) {
           studentBox.innerHTML = 'Cannot get students. Are you logged in and connected?';
-        } else if (studentData != oldStudentData) {
-            studentBox.innerHTML = '';
-            oldStudentData = studentData;
-            studentList = JSON.parse(studentData);
-            //Loop through each student in the list
-            for (student in studentList) {
-                let newStudent = document.createElement('h3');
-                let icons = "";
+        } else if (studentData === null) {
+          studentBox.innerHTML = 'Getting students…';
+        } else {
+            parsed = JSON.parse(studentData);
+            studentList = Object.values(parsed);
 
-                //Change student color according to thumb response
-                let thumb = studentList[student]['thumb'];
-                if (thumb) var thumbIcon = document.createElement("img");
-                if (thumb == "up") icons += `<img src="{{ url_for('static', filename='img/users/up.png') }}" class="icon" title="Up">`;
-                if (thumb == "wiggle") icons += `<img src="{{ url_for('static', filename='img/users/wiggle.png') }}" class="icon" title="Wiggle">`;
-                if (thumb == "down") icons += `<img src="{{ url_for('static', filename='img/users/down.png') }}" class="icon" title="Down">`;
+            if (filters.includes("help")) studentList = studentList.filter(student => student.help.type);
+            if (filters.includes("!help")) studentList = studentList.filter(student => !student.help.type);
+            if (filters.includes("break")) studentList = studentList.filter(student => student.excluded);
+            if (filters.includes("!break")) studentList = studentList.filter(student => !student.excluded);
+            if (filters.includes("poll")) studentList = studentList.filter(student => student.thumb || student.letter || student.essay);
+            if (filters.includes("!poll")) studentList = studentList.filter(student => !(student.thumb || student.letter || student.essay));
 
-                //Change student letter according to letter response
-                let letter = studentList[student]['letter']
-                if (letter == "a") icons += `<img src="{{ url_for('static', filename='img/users/a.png') }}" class="icon" title="A">`;
-                if (letter == "b") icons += `<img src="{{ url_for('static', filename='img/users/b.png') }}" class="icon" title="B">`;
-                if (letter == "c") icons += `<img src="{{ url_for('static', filename='img/users/c.png') }}" class="icon" title="C">`;
-                if (letter == "d") icons += `<img src="{{ url_for('static', filename='img/users/d.png') }}" class="icon" title="D">`;
+            let thumbs, letters, helpTimes;
+            switch (sort) {
+              case "logIn":
+                studentList.reverse();
+                break;
+              case "logInRev":
+                //Do nothing to the array
+                break;
+              case "name":
+                studentList = studentList.sort((a, b) => a.name.localeCompare(b.name));
+                break;
+              case "nameRev":
+                studentList = studentList.sort((a, b) => b.name.localeCompare(a.name));
+                break;
+              case "helpTime":
+                studentList.forEach(student => student.help.time = student.help.time || 0);
+                studentList = studentList.sort((a, b) => b.help.time - a.help.time);
+                break;
+              case "helpTimeRev":
+                studentList.forEach(student => student.help.time = student.help.time || Infinity);
+                studentList = studentList.sort((a, b) => a.help.time - b.help.time);
+                break;
+              case "pollRes":
+                thumbs = ["up", "wiggle", "down", ""];
+                letters = ["a", "b", "c", "d", ""];
+                studentList = studentList.sort((a, b) => thumbs.indexOf(a.thumb) - thumbs.indexOf(b.thumb)); //Thumbs poll
+                studentList = studentList.sort((a, b) => letters.indexOf(a.letter) - letters.indexOf(b.letter)); //Letters poll
+                studentList = studentList.sort((a, b) => !!b.essay - !!a.essay); //Essay poll
+                break;
+              case "pollResRev":
+                thumbs = ["down", "wiggle", "up", ""];
+                letters = ["d", "c", "b", "a", ""];
+                studentList = studentList.sort((a, b) => thumbs.indexOf(a.thumb) - thumbs.indexOf(b.thumb)); //Thumbs poll
+                studentList = studentList.sort((a, b) => letters.indexOf(a.letter) - letters.indexOf(b.letter)); //Letters poll
+                studentList = studentList.reverse().sort((a, b) => !!b.essay - !!a.essay); //Essay poll
+                break;
+              case "perms":
+                studentList = studentList.sort((a, b) => a.perms - b.perms);
+                break;
+              case "permsRev":
+                studentList = studentList.sort((a, b) => b.perms - a.perms);
+            }
 
-                //Show icon if student has submitted Essay
-                if (studentList[student].textRes) icons += `<img src="{{ url_for('static', filename='img/users/text.png') }}" class="icon" title="Response submitted">`;
+            if (JSON.stringify(studentList) != JSON.stringify(oldStudentList)) {
+              oldStudentList = studentList;
+              if (!studentList.length) {
+                document.getElementById("collapseButton").classList.add("hidden");
+                studentBox.innerHTML = 'No students match these filters.';
+              } else {
+                document.getElementById("collapseButton").classList.remove("hidden");
+                studentBox.innerHTML = '';
+                //Loop through each student in the list
+                for (student of studentList) {
+                    let newStudent = document.createElement('h3');
+                    let icons = "";
 
-                if (studentList[student]['help'] == true) icons += `<img src="{{ url_for('static', filename='img/users/help.png') }}" class="icon" title="Help ticket">`;
+                    //Change student color according to thumb response
+                    let thumb = student['thumb'];
+                    if (thumb) var thumbIcon = document.createElement("img");
+                    if (thumb == "up") icons += `<img src="{{ url_for('static', filename='img/users/up.png') }}" class="icon" title="Up">`;
+                    if (thumb == "wiggle") icons += `<img src="{{ url_for('static', filename='img/users/wiggle.png') }}" class="icon" title="Wiggle">`;
+                    if (thumb == "down") icons += `<img src="{{ url_for('static', filename='img/users/down.png') }}" class="icon" title="Down">`;
 
-                if (studentList[student]['complete']) icons += `<img src="{{ url_for('static', filename='img/users/complete.png') }}" class="icon" title="Complete">`;
+                    //Change student letter according to letter response
+                    let letter = student['letter']
+                    if (letter == "a") icons += `<img src="{{ url_for('static', filename='img/users/a.png') }}" class="icon" title="A">`;
+                    if (letter == "b") icons += `<img src="{{ url_for('static', filename='img/users/b.png') }}" class="icon" title="B">`;
+                    if (letter == "c") icons += `<img src="{{ url_for('static', filename='img/users/c.png') }}" class="icon" title="C">`;
+                    if (letter == "d") icons += `<img src="{{ url_for('static', filename='img/users/d.png') }}" class="icon" title="D">`;
 
-                newStudent.innerHTML = icons + studentList[student].name;
-                let newDetails = document.createElement('span');
-                newDetails.classList.add('user');
-                if (collapsed) newDetails.classList.add("hidden");
-                if (studentList[student].textRes) newDetails.innerHTML += "<div style='margin-bottom: 8px;'><b>Response: </b>" + studentList[student].textRes + "</div>";
-                if (studentList[student].excluded) {
-                    newStudent.style.background = "var(--highlight-color)";
-                    newDetails.innerHTML += "Taking a bathroom break <button class='inline popOut' onclick='request.open(\"GET\", \"/break?action=end&name=" + studentList[student].name + "\");  request.send();'>End break</button><br>";
-                }
-                let studentPerms = studentList[student]['perms'];
-                newDetails.innerHTML +=
-                    `
-                    <select onchange="updatePerm(this, '${student}')" id="userpermsDrop" name="userpermsDrop">
-                    <option value="/users?name=${studentList[student]['name']}&action=perm&perm=0" ${studentPerms === 0 ? "selected" : ""}>${permNames[0]}</option>
-                    <option value="/users?name=${studentList[student]['name']}&action=perm&perm=1" ${studentPerms === 1 ? "selected" : ""}>${permNames[1]}</option>
-                    <option value="/users?name=${studentList[student]['name']}&action=perm&perm=2" ${studentPerms === 2 ? "selected" : ""}>${permNames[2]}</option>
-                    <option value="/users?name=${studentList[student]['name']}&action=perm&perm=3" ${studentPerms === 3 ? "selected" : ""}>${permNames[3]}</option>
-                    </select>
-                    `
-                //Check the results of the student's current progress bar
-                if (studentList[student]['progress'] && studentList[student]['progress'].length) {
-                    let dotbox = document.createElement('div');
-                    dotbox.style.styleFloat = 'right';
-                    dotbox.style.cssFloat = 'right';
-                    let newProg = 0;
-                    let newProgMax = 0;
-                    for (let i = 0; i < studentList[student]['progress'].length; i++) {
-                        newProgMax++;
-                        var img = document.createElement("img");
-                        img.width = 16;
-                        img.height = 16;
-                        if (studentList[student]['progress'][i]) {
-                          newProg++;
-                          img.src = "{{ url_for('static', filename='img/dot_green.png') }}";
-                        } else {
-                          img.src = "{{ url_for('static', filename='img/dot_red.png') }}";
+                    //Show icon if student has submitted Essay
+                    if (student.essay) icons += `<img src="{{ url_for('static', filename='img/users/text.png') }}" class="icon" title="Essay submitted">`;
+
+                    if (student['help'].type) icons += `<img src="{{ url_for('static', filename='img/users/help.png') }}" class="icon" title="Help ticket">`;
+
+                    if (student['complete']) icons += `<img src="{{ url_for('static', filename='img/users/complete.png') }}" class="icon" title="Complete">`;
+
+                    newStudent.innerHTML = icons + student.name;
+                    let newDetails = document.createElement('span');
+                    newDetails.classList.add('user');
+                    if (collapsed) newDetails.classList.add("hidden");
+                    if (student.essay) newDetails.innerHTML += "<div style='margin-bottom: 8px;'><b>Essay: </b>" + student.essay + "</div>";
+                    if (student.help.type) {
+                      let helpTicket = document.createElement("div");
+                      let ticketTime = new Date(student.help.time * 1000);
+                      let timestamp = document.createElement("span");
+                      timestamp.style.color = ("var(--light-gray)");
+                      let hour = ticketTime.getHours();
+                      let minute = ticketTime.getMinutes().toString().padStart(2, "0");
+                      if (hour > 12) {
+                        hour -= 12;
+                        ampm = "PM";
+                      } else {
+                        if (hour == 0) hour = 12;
+                        ampm = "AM";
+                      }
+                      timestamp.innerText = `${hour}:${minute} ${ampm} `;
+                      helpTicket.appendChild(timestamp);
+                      if (student.help.type == "break") {
+                        helpTicket.innerHTML += "<i>Requested a bathroom break</i>";
+                        let acceptButton = document.createElement("button");
+                        let rejectButton = document.createElement("button");
+                        acceptButton.classList.add("inline", "popOut");
+                        rejectButton.classList.add("inline", "popOut");
+                        acceptButton.style.marginLeft = "8px";
+                        rejectButton.style.marginLeft = "8px";
+                        acceptButton.setAttribute("onclick", `acceptBreak("${student.name}");`);
+                        rejectButton.setAttribute("onclick", `removeTicket("${student.name}");`);
+                        acceptButton.innerText = "Accept";
+                        rejectButton.innerText = "Reject";
+                        helpTicket.appendChild(acceptButton);
+                        helpTicket.appendChild(rejectButton);
+                      } else {
+                        helpTicket.innerHTML += help.message || "<i>Sent a help ticket</i>";
+                        let removeButton = document.createElement("button");
+                        removeButton.id = "e"
+                        removeButton.classList.add("inline", "popOut");
+                        removeButton.style.marginLeft = "8px";
+                        removeButton.setAttribute("onclick", `removeTicket("${student.name}");`);
+                        removeButton.innerText = "Remove";
+                        helpTicket.appendChild(removeButton);
+                      }
+                      newDetails.appendChild(helpTicket);
+                    }
+                    if (student.excluded) {
+                        let excluded = document.createElement("div");
+                        newStudent.style.color = "#aaa";
+                        excluded.innerHTML += "Taking a bathroom break";
+                        let endButton = document.createElement("button");
+                        endButton.classList.add("inline", "popOut");
+                        endButton.style.marginLeft = "8px";
+                        endButton.onclick = () => {
+                          request.open("GET", "/break?action=end&name=" + student.name);
+                          request.send();
                         }
-                        dotbox.appendChild(img)
+                        endButton.innerText = "End break";
+                        excluded.appendChild(endButton);
+                        excluded.innerHTML += "</div><br>";
+                        newDetails.appendChild(excluded);
                     }
-                    newStudent.appendChild(dotbox)
-                    newDetails.innerHTML += ` [Prog: ${newProg}/${newProgMax}]`
-                }
-                //Get the results of the student's current quiz
-                if (studentList[student]['quizRes'] && studentList[student]['quizRes'].length) {
-                  let dotbox = document.createElement('div');
-                  dotbox.style.styleFloat = 'right';
-                  dotbox.style.cssFloat = 'right';
-                    let newQuiz = 0;
-                    let newQuizMax = 0;
-                    for (let i = 0; i < studentList[student]['quizRes'].length; i++) {
-                        newQuizMax++;
-                        if (studentList[student]['quizRes'][i]) {
-                          var img = document.createElement("img");
-                          img.width = 16;
-                          img.height = 16;
-                          if (studentList[student]['quizRes'][i]) {
-                            newQuiz++;
-                            img.src = "{{ url_for('static', filename='img/dot_green.png') }}"; ////These need to be updated
-                          } else {
-                            img.src = "{{ url_for('static', filename='img/dot_red.png') }}"; ////
-                          }
-                          dotbox.appendChild(img)
+                    let studentPerms = student['perms'];
+                    newDetails.innerHTML +=
+                        `
+                        <select onchange="updatePerm(this, '${student}')" id="userpermsDrop" name="userpermsDrop">
+                        <option value="/users?name=${student['name']}&action=perm&perm=0" ${studentPerms === 0 ? "selected" : ""}>${permNames[0]}</option>
+                        <option value="/users?name=${student['name']}&action=perm&perm=1" ${studentPerms === 1 ? "selected" : ""}>${permNames[1]}</option>
+                        <option value="/users?name=${student['name']}&action=perm&perm=2" ${studentPerms === 2 ? "selected" : ""}>${permNames[2]}</option>
+                        <option value="/users?name=${student['name']}&action=perm&perm=3" ${studentPerms === 3 ? "selected" : ""}>${permNames[3]}</option>
+                        </select>
+                        `
+                    //Check the results of the student's current progress bar
+                    if (student['progress'] && student['progress'].length) {
+                        let dotbox = document.createElement('div');
+                        dotbox.style.styleFloat = 'right';
+                        dotbox.style.cssFloat = 'right';
+                        let newProg = 0;
+                        let newProgMax = 0;
+                        for (let i = 0; i < student['progress'].length; i++) {
+                            newProgMax++;
+                            var img = document.createElement("img");
+                            img.width = 16;
+                            img.height = 16;
+                            if (student['progress'][i]) {
+                              newProg++;
+                              img.src = "{{ url_for('static', filename='img/dot_green.png') }}";
+                            } else {
+                              img.src = "{{ url_for('static', filename='img/dot_red.png') }}";
+                            }
+                            dotbox.appendChild(img)
+                        }
+                        newStudent.appendChild(dotbox)
+                        newDetails.innerHTML += ` [Prog: ${newProg}/${newProgMax}]`
                     }
-                  }
-                    newDetails.innerHTML += ` [Quiz: ${newQuiz}/${newQuizMax}]`
+                    //Get the results of the student's current quiz
+                    if (student['quizRes'] && student['quizRes'].length) {
+                      let dotbox = document.createElement('div');
+                      dotbox.style.styleFloat = 'right';
+                      dotbox.style.cssFloat = 'right';
+                        let newQuiz = 0;
+                        let newQuizMax = 0;
+                        for (let i = 0; i < student['quizRes'].length; i++) {
+                            newQuizMax++;
+                            if (student['quizRes'][i]) {
+                              var img = document.createElement("img");
+                              img.width = 16;
+                              img.height = 16;
+                              if (student['quizRes'][i]) {
+                                newQuiz++;
+                                img.src = "{{ url_for('static', filename='img/dot_green.png') }}"; ////These need to be updated
+                              } else {
+                                img.src = "{{ url_for('static', filename='img/dot_red.png') }}"; ////
+                              }
+                              dotbox.appendChild(img)
+                        }
+                      }
+                        newDetails.innerHTML += ` [Quiz: ${newQuiz}/${newQuizMax}]`
+                    }
+                    studentBox.appendChild(newStudent)
+                    studentBox.appendChild(newDetails)
+                    let name = student['name'];
+                    newDetails.innerHTML += "	&nbsp; ";
+                    newDetails.innerHTML += `<a onclick="remove('${name}')">Remove</a>`;
+                    newDetails.innerHTML += "	&nbsp; ";
+                    newDetails.innerHTML += `<a onclick="banip('${name}')">Ban Device</a>`;
+                    newDetails.innerHTML += "	&nbsp; ";
+                    newDetails.innerHTML += `<a onclick="changePw('${name}')">Change password</a>`;
+                    newDetails.innerHTML += "	&nbsp; ";
+                    newDetails.innerHTML += `<a onclick="deleteAcc('${name}')">Delete account</a>`;
+                    newDetails.innerHTML += "<br><br>";
                 }
-                studentBox.appendChild(newStudent)
-                studentBox.appendChild(newDetails)
-                let name = studentList[student]['name'];
-                newDetails.innerHTML += "	&nbsp; ";
-                newDetails.innerHTML += `<a onclick="remove('${name}')">Remove</a>`;
-                newDetails.innerHTML += "	&nbsp; ";
-                newDetails.innerHTML += `<a onclick="banip('${name}')">Ban Device</a>`;
-                newDetails.innerHTML += "	&nbsp; ";
-                newDetails.innerHTML += `<a onclick="changePw('${name}')">Change password</a>`;
-                newDetails.innerHTML += "	&nbsp; ";
-                newDetails.innerHTML += `<a onclick="deleteAcc('${name}')">Delete account</a>`;
-                if (studentList[student]['help'] == true) {
-                  newDetails.innerHTML += "	&nbsp; ";
-                  newDetails.innerHTML += `<a onclick="removeHelp('${name}')">Remove help ticket</a>`;
-                }
-                newDetails.innerHTML += "<br><br>";
+              }
             }
         }
     }, 1000);
+
+    setInterval(async () => {
+      let npRequests = await getResponse("/api/newpasswords");
+      let el = document.getElementById("npRequests");
+      el.innerHTML = "";
+      for (let student in npRequests) {
+        let ticket = document.createElement("div");
+        ticket.innerHTML += `<i><b>${student}</b> requested a password change from the login page. Before you accept, confirm that this request is legitimate.</i>`;
+        let acceptButton = document.createElement("button");
+        let rejectButton = document.createElement("button");
+        acceptButton.classList.add("inline", "popOut");
+        rejectButton.classList.add("inline", "popOut");
+        acceptButton.style.marginLeft = "8px";
+        rejectButton.style.marginLeft = "8px";
+        acceptButton.setAttribute("onclick", `acceptNP("${student}", "${npRequests[student]}");`);
+        rejectButton.setAttribute("onclick", `removeNP("${student}");`);
+        acceptButton.innerText = "Accept";
+        rejectButton.innerText = "Reject";
+        ticket.appendChild(acceptButton);
+        ticket.appendChild(rejectButton);
+        el.appendChild(ticket);
+      }
+    }, 1000);
+
+    function removeTicket(name) {
+      request.open("GET", `/users?action=removeTicket&name=${name}`);
+      request.send();
+    }
+
+    function acceptBreak(name) {
+      request.open("GET", `/users?action=removeTicket&name=${name}&acceptBreak=true`);
+      request.send();
+    }
+
+    function removeNP(name) {
+      request.open("GET", `/users?action=removeNP&name=${name}`);
+      request.send();
+    }
+
+    function acceptNP(name, pw) {
+      request.open("GET", `/users?action=removeNP&name=${name}&password=${pw}&acceptNP=true`);
+      request.send();
+    }
 
     async function updatePerm(el, student) {
         let meRes = await getResponse("/api/me");
         let permsRes = await getResponse("/api/permissions");
         if (
-          studentList[student].name != meRes.name ||
+          student.name != meRes.name ||
           meRes.perms > el.value[el.value.length - 1] ||
           confirm("If you lower your own permissions, you may not be able to change them back. If no users have teacher permissions, the next person to log in will become the teacher.")
         ) {
@@ -247,7 +484,7 @@
           };
           request.send();
         } else {
-          el.value = el.options[meRes.perms].value; //If perms are not updated, give el the correct value 
+          el.value = el.options[meRes.perms].value; //If perms are not updated, give el the correct value
         }
     }
 

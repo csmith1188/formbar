@@ -27,7 +27,8 @@ async function getApiData(first) {
     getResponse("/api/mode"),
     getResponse("/api/permissions"),
     getResponse("/api/pix"),
-    getResponse("/api/students")
+    getResponse("/api/students"),
+    getResponse("/api/phrase")
   ]);
   //Save every response to a variable
   meRes = apiData[0];
@@ -36,6 +37,7 @@ async function getApiData(first) {
   permsRes = apiData[3];
   pixRes = apiData[4];
   studentsRes = apiData[5];
+  phraseRes = apiData[6];
   //Each homepage has its own init and update functions
   if (first) init();
   else update();
@@ -113,14 +115,14 @@ function updateVotes() {
     else if (letter !== chosenLetter) letterVote(letter);
   }
 
-  let textResEl = document.getElementById("essay");
-  let essay = meRes.textRes;
-  if (essay && !textResEl.value) {
-    textResEl.value = essay;
-    checkResponse();
+  let essayEl = document.getElementById("essay");
+  let essay = meRes.essay;
+  if (essay && !essayEl.value) {
+    essayEl.value = essay;
+    checkEssay();
     essaySubmitted();
   }
-  if (!essay && textResEl.value) essayUnsubmitted();
+  if (!essay && essayEl.value) essayUnsubmitted();
 }
 
 function highlight(image) {
@@ -159,19 +161,19 @@ function removeHighlight(image) {
   }
 }
 
-function checkResponse() {
+function checkEssay() {
   let box = document.getElementById("essay");
-  let button = document.getElementById("submitResponse");
+  let button = document.getElementById("submitEssay");
   if (box.value) {
     button.classList.remove("unselectable");
-    button.onclick = submitResponse;
+    button.onclick = submitEssay;
   } else {
     button.classList.add("unselectable");
     button.onclick = null;
   }
 }
 
-function submitResponse() {
+function submitEssay() {
   let box = document.getElementById("essay");
   request.open("POST", "/essay?essay=" + box.value);
   request.send();
@@ -180,27 +182,27 @@ function submitResponse() {
 
 function essaySubmitted() {
   let box = document.getElementById("essay");
-  let button = document.getElementById("submitResponse");
+  let button = document.getElementById("submitEssay");
   box.disabled = true;
   box.classList.add("unselectable");
   button.innerText = "Unsubmit";
-  button.onclick = unsubmitResponse;
+  button.onclick = unsubmitEssay;
 }
 
-function unsubmitResponse() {
+function unsubmitEssay() {
   let box = document.getElementById("essay");
-  request.open("GET", "/essay?essay=");
+  request.open("POST", "/essay?essay=");
   request.send();
   essayUnsubmitted();
 }
 
 function essayUnsubmitted() {
   let box = document.getElementById("essay");
-  let button = document.getElementById("submitResponse");
+  let button = document.getElementById("submitEssay");
   box.disabled = false;
   box.classList.remove("unselectable");
   button.innerText = "Submit";
-  button.onclick = submitResponse;
+  button.onclick = submitEssay;
 }
 
 function shorten(container, maxHeight, text, maxWidth) {
@@ -214,8 +216,8 @@ function shorten(container, maxHeight, text, maxWidth) {
 
 function ticketsText() {
   let users = Object.values(studentsRes);
-  let helpTickets = users.filter(user => user.help);
-  let breakRequests = users.filter(user => user.breakReq);
+  let helpTickets = users.filter(user => user.help.type == "help");
+  let breakRequests = users.filter(user => user.help.type == "break");
   let el = document.getElementById("ticketsText");
   let helpText = helpTickets.length == 1 ? "There is currently 1 help ticket in." : `There are currently ${helpTickets.length} tickets in.`
   let breakText = breakRequests.length == 1 ? "1 student has requested a bathroom break." : `${breakRequests.length} students have requested bathroom breaks.`;
@@ -230,9 +232,9 @@ function usersText() {
 }
 
 function checkForHelpTicket() {
-  if (meRes.breakReq) {
+  if (meRes.help.type == "break") {
     ticketSent("break");
-  } else if (meRes.help) {
+  } else if (meRes.help.type) {
     ticketSent("help");
   } else {
     document.getElementById("help").onclick = requestHelp;

@@ -21,8 +21,8 @@
   }
 
   td {
-    width: 75px;
-    height: 75px;
+    width: 70px;
+    height: 70px;
     font-size: 40px;
     font-weight: 600;
     user-select: none;
@@ -30,7 +30,7 @@
 
   #keys {
     bottom: 15px;
-    width: 800px;
+    width: 750px;
   }
 
   .key {
@@ -39,11 +39,11 @@
     border-radius: 5px;
     color: var(--bg-dark);
     margin: 5px;
-    font-size: 40px;
+    font-size: 35px;
     font-weight: 600;
-    line-height: 70px;
-    width: 50px;
-    height: 70px;
+    line-height: 65px;
+    width: 45px;
+    height: 65px;
     text-align: center;
     user-select: none;
     background-color: white;
@@ -113,7 +113,7 @@
     let enterKey = document.createElement("div");
     enterKey.id = "Enter";
     enterKey.classList.add("key");
-    enterKey.style.width = "250px";
+    enterKey.style.width = "235px";
     enterKey.onclick = () => guessWord();
     enterKey.innerText = "Guess";
     document.getElementById("keys").append(enterKey);
@@ -163,60 +163,58 @@
 
     function guessWord() {
       if (guess.length == 5) {
-        if (!word) {
+        if (!wordList.includes(guess)) {
+          alert("Not in word list");
+        } else if (!word) {
           alert("Still getting a word. Try again in a few seconds.");
         } else {
-          if (!wordList.includes(guess)) {
-            alert("Not in word list");
-          } else {
-            let greenList = guess.split("").filter((letter, i) => letter == word[i]);
+          let greenList = guess.split("").filter((letter, i) => letter == word[i]);
 
-            for (let i = 0; i < guess.length; i++) {
-              let box = document.getElementById(`r${guessed}c${i}`);
-              let key = document.getElementById(guess[i]);
-              box.innerText = guess[i];
+          for (let i = 0; i < guess.length; i++) {
+            let box = document.getElementById(`r${guessed}c${i}`);
+            let key = document.getElementById(guess[i]);
+            box.innerText = guess[i];
 
-              let instancesOfLetter = word.split("").filter(letter => letter == guess[i]);
-              let instancesGreen = greenList.filter(letter => letter == guess[i]);
-              let allGreen = instancesGreen.length == instancesOfLetter.length;
-              let instancesFound = guess.slice(0, i).split("").filter(letter => letter == guess[i]);
-              let tooMany = instancesFound.length >= instancesOfLetter.length;
+            let instancesOfLetter = word.split("").filter(letter => letter == guess[i]);
+            let instancesGreen = greenList.filter(letter => letter == guess[i]);
+            let allGreen = instancesGreen.length == instancesOfLetter.length;
+            let instancesFound = guess.slice(0, i).split("").filter(letter => letter == guess[i]);
+            let tooMany = instancesFound.length >= instancesOfLetter.length;
 
-              if (guess[i] == word[i]) {
-                box.style.background = "var(--color-green)";
-                key.style.background = "var(--light-green)";
-                greenList.push(i);
-              } else if (word.includes(guess[i]) && !allGreen && !tooMany) {
-                box.style.background = "var(--color-yellow)";
-                if (!key.style.background) key.style.background = "var(--light-yellow)";
-              } else {
-                box.style.background = "gray";
-                if (!key.style.background) key.style.background = "gray";
-              }
+            if (guess[i] == word[i]) {
+              box.style.background = "var(--color-green)";
+              key.style.background = "var(--light-green)";
+              greenList.push(i);
+            } else if (word.includes(guess[i]) && !allGreen && !tooMany) {
+              box.style.background = "var(--color-yellow)";
+              if (!key.style.background) key.style.background = "var(--light-yellow)";
+            } else {
+              box.style.background = "gray";
+              if (!key.style.background) key.style.background = "gray";
             }
-
-            guessed++;
-            setTimeout(() => {
-              if (guess == word) {
-                alert("Correct!");
-                score += 7 - guessed;
-                if (score > highScore) {
-                  highScore = score;
-                  document.getElementById("highScore").style.color = "var(--light-purple)";
-                }
-                newWord();
-              } else if (guessed == 6) {
-                alert("Game over\nCorrect word: " + word);
-                request.open("POST", "/savescore?game=wordle&score=" + score);
-                request.send();
-                score = 0;
-                newWord();
-              }
-              document.getElementById("score").innerText = score;
-              document.getElementById("highScore").innerText = highScore;
-              guess = "";
-            }, 0);
           }
+
+          guessed++;
+          setTimeout(() => {
+            if (guess == word) {
+              alert("Correct!");
+              score += 7 - guessed;
+              if (score > highScore) {
+                highScore = score;
+                document.getElementById("highScore").style.color = "var(--light-purple)";
+              }
+              newWord();
+            } else if (guessed == 6) {
+              alert("Game over\nCorrect word: " + word);
+              request.open("POST", "/savescore?game=wordle&score=" + score);
+              request.send();
+              score = 0;
+              newWord();
+            }
+            document.getElementById("score").innerText = score;
+            document.getElementById("highScore").innerText = highScore;
+            guess = "";
+          }, 0);
         }
       } else {
         alert("Not enough letters");

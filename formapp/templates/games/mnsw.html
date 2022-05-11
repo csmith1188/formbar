@@ -227,7 +227,7 @@
                   clearInterval(timer);
                   status.innerHTML = 'YOU WIN!';
                   document.body.style.background = "var(--bg-dark-blue)";
-                  if (cols == 20 && rows == 20 && dense == 10) {
+                  if (columns == 20 && rows == 20 && dense == 10) {
                     if (seconds < bestSeconds || !bestSeconds) document.getElementById("best").innerText = "Best: " + time;
                     request.open("POST", "/savescore?game=minesweeper&score=" + seconds);
                     request.send();

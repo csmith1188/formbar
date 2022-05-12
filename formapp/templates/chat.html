@@ -422,7 +422,7 @@
 
     function onSubmit() {
         let text = boxes.inputBox.value;
-        if (text != "") {
+        if (text.replaceAll(" ", "") != "") {
             if (text.startsWith("!#help")) {
                 // text.splice(0, 2);
                 // args = text.split(" ");

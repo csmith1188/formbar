@@ -429,7 +429,7 @@
       [[10, "y"], [4, "o", pause], "o"],
       [[6, "g", "y", "o", pause], "g", "y", "o"],
       [[9, "y"], [7, "o"]],
-      [[50, "g"], ["alert", "All enemy types gain health every 10 rounds."]],
+      [[50, "g"]],
       [["alert", "<h1>New enemy ability: <b>Healing</b></h1>Enemies with this ability gradually regain health, so you need to destroy them quickly. They're also immune to poison."], [9, "oh", pause], "oh"],
       [[7, [6, "y", pause]], [6, "y"]],
       [[20, "oh"]],
@@ -514,7 +514,7 @@
           price: 35,
           extra1: {
             description: "Projectiles can bounce to up to three nearby enemies.",
-            price: 40,
+            price: 60,
             add: function() {
               this.bounce = 3;
             }
@@ -540,8 +540,8 @@
           color: "#80ffff",
           description: "Weaker attacks, but hits slow down enemies for 10 seconds.",
           range: 1.64,
-          speed: 2.12,
-          strength: 0.4,
+          speed: 1.92,
+          strength: 0.5,
           slowing: true,
           price: 30,
           extra1: {
@@ -570,12 +570,12 @@
         poison: {
           name: "Poison Tower",
           color: "#df80ff",
-          description: "Enemies are poisoned when hit, taking 0.4 damage a second for 5 seconds.",
+          description: "Enemies are poisoned when hit, taking 0.6 damage a second for 5 seconds.",
           range: 3.19,
-          speed: 0.8,
-          strength: 0.6,
+          speed: 1.2,
+          strength: 0.75,
           poison: true,
-          price: 60,
+          price: 55,
           extra1: {
             description: "Poison can splash to a nearby enemy.",
             price: 30,
@@ -675,19 +675,19 @@
           description: "Gets 3× as much money from defeating enemies.",
           range: 3.32,
           speed: 0.88,
-          strength: 0.7,
+          strength: 1.25,
           extraMoney: true,
           price: 150,
           extra1: {
-            description: "Adds an extra $5 every 10 seconds.",
-            price: 250,
+            description: "Adds an extra $10 every 10 seconds.",
+            price: 300,
             add: function() {
               player.bonusMoney += 5;
             }
           },
           extra2: {
             description: "Adds an extra life every 15 seconds.",
-            price: 300,
+            price: 250,
             add: function() {
               player.bonusLives += 1;
             }
@@ -1499,6 +1499,7 @@
             }
             if (currentWave < map.waves.length) currentWave++;
             currentEnemy = 0;
+            //if (currentWave = 50) for (let type in enemyTypes) enemyTypes[type].health *= 2; //All enemy types get double health for the last 25 rounds of hard mode
           }
         }
 
@@ -1520,7 +1521,7 @@
               enemy.distance += enemy.speed * (enemy.slowed ? 2 : 4);
             }
             if (enemy.slowed) enemy.slowed--;
-            if (enemy.poisoned && --enemy.poisoned % (enemy.doublePoisoned ? 12.5 : 25) < 1) enemy.hit(0.4, null, "poison");
+            if (enemy.poisoned && --enemy.poisoned % (enemy.doublePoisoned ? 12.5 : 25) < 1) enemy.hit(0.6, null, "poison");
             if (!enemy.poisoned) delete enemy.doublePoisoned;
 
             enemy.x = map.start[0] * 60;
@@ -1636,9 +1637,9 @@
               if (!tower.seeInvisible) inRange = inRange.filter(enemy => enemy.visible);
               if (inRange.length) {
                 let furthest = inRange.sort((a, b) => b.distance - a.distance)[0]; //Sort inRange from highest to lowest distance and get the first item
-                let strong = inRange.sort((a, b) => b.type.health - a.type.health); //Sort inRange from highest to lowest health
+                let strong = inRange.sort((a, b) => b.health - a.health); //Sort inRange from highest to lowest health
                 let strongest = strong.find(enemy => enemy.abilities.includes("shield")) || strong[0]; //Target shielded enemies
-                let target = (tower.name == "Long-Range tower") ? strongest : furthest;
+                let target = (tower.name == "Long-Range Tower") ? strongest : furthest;
                 let damage = tower.strength;
                 if (tower.crowdBonus) damage *= 1 + enemies.length / 100; //Increase the damage by 1% for each enemy onscreen
                 if (tower.bossBonus && target.boss) damage *= 5;
@@ -2269,6 +2270,7 @@
         let alertBox = document.createElement("div");
         alertBox.id = "alert";
         alertBox.classList.add("centered");
+        alertBox.classList.add("light");
         if (large) alertBox.classList.add("large");
         let alertText = document.createElement("div");
         alertText.id = "alertText";

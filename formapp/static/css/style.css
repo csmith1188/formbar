@@ -172,6 +172,7 @@ body, .light, .dark {
 * {
   font-family: inherit;
   color: inherit;
+  accent-color: var(--theme-color);
 }
 
 input, button, textarea, select {
@@ -284,65 +285,6 @@ input[type="color"] {
 input[type="range"] {
   width: 96px;
   vertical-align: middle;
-}
-
-input[type="radio"] {
-  -webkit-appearance: none;
-  width: 14px;
-  height: 14px;
-  margin: 3px 6px 3px 0;
-  background: var(--emphasis-color);
-  color: var(--main-color);
-  border: 1px solid;
-  border-radius: 50%;
-  vertical-align: middle;
-}
-
-input[type="radio"]:checked {
-  background: var(--theme-color);
-  box-shadow: 0 0 0 2px var(--emphasis-color) inset;
-  color: var(--theme-color);
-}
-
-input[type="checkbox"] {
-  -webkit-appearance: none;
-  width: 14px;
-  height: 14px;
-  margin: 3px 6px 3px 0;
-  background: var(--emphasis-color);
-  color: var(--main-color);
-  border: 1px solid;
-  border-radius: 0%;
-  vertical-align: text-bottom;
-}
-
-input[type="checkbox"]:checked {
-  background: var(--theme-color) url("../img/checkMark.png") no-repeat;
-  background-size: 100%;
-  color: var(--theme-color);
-}
-
-.light input[type="checkbox"]:checked {
-  background: var(--theme-color) url("../img/checkMarkLight.png") no-repeat;
-  background-size: 100%;
-  color: var(--theme-color);
-}
-
-input[type="radio"]:hover:not([disabled]), input[type="checkbox"]:hover:not([disabled]) {
-  box-shadow: 0 0 4px;
-}
-
-input[type="radio"]:checked:hover:not([disabled]) {
-  box-shadow: 0 0 0 2px var(--emphasis-color) inset, 0 0 4px;
-}
-
-input[type="radio"][disabled], input[type="checkbox"]:not([checked])[disabled] {
-  background-color: var(--highlight-color);
-  opacity: 50%;
-}
-
-input[type="checkbox"][checked][disabled] {
-  opacity: 50%;
 }
 
 textarea {

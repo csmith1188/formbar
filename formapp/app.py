@@ -1383,14 +1383,11 @@ def endpoint_fighter():
 
 
 '''
-    /flashcards
+    /gams/flashcards
 '''
-@app.route('/flashcards')
+@app.route('/games/flashcards')
 def endpoint_flashcards():
-    if not request.remote_addr in sD.studentDict:
-        return redirect('/login?forward=' + request.path)
-    else:
-        return render_template('flashcards.html')
+    return redirect('games/flashcards')
 
 '''
     /flush
@@ -1457,6 +1454,16 @@ def endpoint_games_fighter():
         return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
     else:
         return render_template('games/fighter.html', username = sD.studentDict[request.remote_addr]['name'])
+
+'''
+    /games/flashcards
+'''
+@app.route('/games/flashcards')
+def endpoint_games_flashcards():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    else:
+        return render_template('games/flashcards.html')
 
 #This endpoint takes you to the hangman game
 @app.route('/games/hangman')

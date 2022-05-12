@@ -2689,7 +2689,7 @@ def message(message):
 @socket_.on('fighter', namespace=chatnamespace)
 def fighter(message):
     try:
-        emit('fighter', message)
+        emit('fighter', message, broadcast=True)
     except Exception as e:
         print("[error] " + 'Error: ' + str(e))
 

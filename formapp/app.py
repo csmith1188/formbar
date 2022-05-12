@@ -1964,6 +1964,7 @@ def endpoint_profile():
                     "minesweeper": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='minesweeper' ORDER BY score ASC", {"uname": user['name']}).fetchone(),
                     "speedtype": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='speedtype' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
                     "towerdefense": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='towerdefense' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
+                    "fighter": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='towerdefense' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
                     "wordle": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='wordle' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
                 }
                 db.close()

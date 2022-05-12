@@ -2359,6 +2359,9 @@
           me.winStreak++;
           opponent.losses++;
           opponent.winStreak = 0;
+
+          request.open("POST", "/savescore?game=fighter&score=" + me.wins);
+          request.send();
         } else {
           resultEl.innerText = "You lose";
           opponent.wins++;

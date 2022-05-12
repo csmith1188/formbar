@@ -1091,10 +1091,10 @@
           time: Date.now(),
           content: content
         };
-        chatSocket.emit("message", JSON.stringify(messageObj));
+        ////chatSocket.emit("message", JSON.stringify(messageObj));
         if (!recipient != "all") { //If message is private, send to sender in addition to recipient ////still necessary?
           messageObj.to = me.name;
-          chatSocket.emit("message", JSON.stringify(messageObj));
+          ////chatSocket.emit("message", JSON.stringify(messageObj));
         }
       }
 

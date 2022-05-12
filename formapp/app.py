@@ -847,11 +847,13 @@ def endpoint_abcd():
 '''
     /addfighteropponent
 '''
-@app.route('/addfighteropponent', methods = ['POST', 'GET'])
+@app.route('/addfighteropponent', methods = ['POST'])
 def endpoint_addfighteropponent():
     code = request.args.get('code')
     name = request.args.get('name')
     sD.fighter['match' + code]['opponent'] = name #Set "opponent" of object to arg "name"
+    return render_template("message.html", message = "Opponent added.")
+
 
 '''
 /addfile

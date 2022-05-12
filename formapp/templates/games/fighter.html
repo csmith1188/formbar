@@ -570,7 +570,7 @@
 
     <div class="large hCentered" style="top: 16px;">
       Choose two fighters to take into the match.<br>
-      <button id="randomButton"><img src="{{ url_for('static', filename='img/fighter/random.png') }}" class="randomIcon"> Random</button>
+      <button id="randomButton"><img src="{{ url_for('static', filename='img/fighter/random.png') }}" class="randomIcon" draggable="false"> Random</button>
     </div>
     <div id="fighterOptions" class="vCentered">
       <div id="redFighter"></div>
@@ -1239,7 +1239,7 @@
             else lockedMessage = color.unlockStreak + "-win streak to unlock";
             el.classList.add("fighter", "locked");
             el.innerHTML = `<div class="vCentered" style="left: 0; width: 100%; text-align: center;">
-              <img src="{{ url_for('static', filename='img/fighter/locked.png') }}" class="lockedIcon"><br><br>
+              <img src="{{ url_for('static', filename='img/fighter/locked.png') }}" class="lockedIcon" draggable="false"><br><br>
               <h2>${lockedMessage}</h2>
             </div>`;
           }

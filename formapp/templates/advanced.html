@@ -362,7 +362,6 @@
       <div id="helpTab" class="tab" onclick="openPage('help');">Help!</div>
       <div id="breakTab" class="tab" onclick="openPage('break');">Bathroom break</div>
       <div id="wawdTab" class="tab" onclick="openPage('wawd');">What are we doing?</div>
-      <div id="flashcardsTab" class="tab" onclick="openPage('flashcards');">Flashcards</div>
     </div>
     <div id="gamesTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/advanced/games.png') }}" class="icon"> <span class="tabText">Games</span></div>
     <div id="gamesMenu" class="menu hidden" tabindex="-1">
@@ -375,6 +374,7 @@
       <div id="towerdefenseTab" class="tab" onclick="openPage('games/towerdefense');">Tower Defense</div>
       <div id="fighterTab" class="tab hidden" onclick="openPage('games/fighter');">Turn-Based Fighter</div>
       <div id="wordleTab" class="tab" onclick="openPage('games/wordle');">Wordle</div>
+      <div id="flashcardsTab" class="tab" onclick="openPage('games/flashcards');">Flashcards</div>
       <div id="leaderboardsTab" class="tab" onclick="openPage('leaderboards');">Leaderboards</div>
     </div>
     <div id="teacherTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/advanced/teacher.png') }}" class="icon"> <span class="tabText">Teacher</span></div>
@@ -598,7 +598,7 @@
     window.history.pushState({}, '', "?page=" + path.slice(1)); //Update the URL to include the title
     let tabEl = document.getElementById(path.substring(1) + "Tab") || document.getElementById(path.substring(7) + "Tab");
     tabs.forEach(tab => tab.classList.remove("open"));
-    if (["/help", "/break", "/wawd", "/flashcards"].includes(path)) document.getElementById("studentsTab").classList.add("open");
+    if (["/help", "/break", "/wawd"].includes(path)) document.getElementById("studentsTab").classList.add("open");
     if (path.startsWith("/games") || path == "/leaderboards") document.getElementById("gamesTab").classList.add("open");
     if (["/settings", "/users", "/lesson", "/virtualbar"].includes(path)) document.getElementById("teacherTab").classList.add("open");
     if (tabEl) tabEl.classList.add("open");

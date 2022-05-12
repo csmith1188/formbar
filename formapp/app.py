@@ -1383,9 +1383,9 @@ def endpoint_fighter():
 
 
 '''
-    /gams/flashcards
+    /flashcards
 '''
-@app.route('/games/flashcards')
+@app.route('/flashcards')
 def endpoint_flashcards():
     return redirect('games/flashcards')
 

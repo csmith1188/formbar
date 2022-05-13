@@ -1075,6 +1075,7 @@
           from: me.name,
           content: {
             type: "player",
+            match: matchCode,
             player: me
           },
         }
@@ -1099,6 +1100,8 @@
       }
 
       function sendMove(moveObj) {
+        console.log("match");
+        console.log(matchCode);
         let sendObj = {
           to: opponent.name,
           from: me.name,
@@ -1118,10 +1121,12 @@
 
       chatSocket.on("fighter", message => {
         let data = JSON.parse(message);
-        console.log(data);
-        if (data.content.type == "join" && data.from != me.name) document.getElementById("opponentStatus").innerText = "Opponent is getting ready…";
-        if (data.content.type == "player" && data.from != me.name) receivePlayerReady(data.content.player);
-        else if (data.content.match == matchCode) { //Only receive if sent from current match
+        if (data.content.match == matchCode) { //Only receive if sent from current match
+          console.log("msg");
+          console.log(data);
+          if (data.content.type == "join" && data.from != me.name) document.getElementById("opponentStatus").innerText = "Opponent is getting ready…";
+          if (data.content.type == "player" && data.from != me.name) receivePlayerReady(data.content.player);
+          console.log("type");
           console.log(data.content.type);
           if (data.content.type == "move") receiveMove(data.content.move);
           else if (data.content.type == "item") receiveItem(data.content);
@@ -1195,10 +1200,14 @@
           me.team = 2;
           me.fighters = [fighter2a, fighter2b];
           opponent.name = match.creator;
+          matchCode = code;
           chatSocket.emit("fighter", JSON.stringify({
             to: opponent.name,
             from: me.name,
-            content: {type: "join"}
+            content: {
+              type: "join",
+              match: code
+            }
           }));
           fighterOptions();
         }
@@ -1540,7 +1549,6 @@
         } else {
           fighter1a = opponent.fighters[0];
           fighter1b = opponent.fighters[1];
-          matchCode = player.match;
           opponent.firstMove ? me.firstMove = false : me.firstMove = true;
         }
         fighters = [fighter1a, fighter1b, fighter2a, fighter2b];
@@ -1843,22 +1851,23 @@
         if (move.charged == move.charge) { //If move is fully charged
           move.charged = 0;
           sender.chargeTarget = null;
-          //Reset all chargeSquares
-          for (let i = 1; i <= move.charge; i++) {
-            let el = document.getElementById(sender.name + "-" + move.id + "-cs" + i);
-            el.classList.remove("charged");
-          }
           if (fighters.includes(target) || !target) useMove(sender, move, target);
           else { //If target is defeated
             sendMessage(me.name + " couldn't use " + capitalize(sender.color) + "'s " + move.name + " because the target was already defeated.");
-            endTurn();
           }
         } else {
           let el = document.getElementById(sender.name + "-" + move.id + "-cs" + ++move.charged);
           sender.chargeTarget = target;
           el.classList.add("charged");
           sendMessage(me.name + " charged " + capitalize(sender.color) + "'s " + move.name + ".");
-          endTurn();
+
+          let sendObj = {
+            type: "charge",
+            sender: sender,
+            move: move,
+            target: target
+          };
+          sendMove(sendObj);
         }
       }
 
@@ -1980,6 +1989,12 @@
             endMatch(data.winner);
           }
 
+          else if (data.type == "charge") {
+            let el = document.getElementById(data.sender.name + "-" + data.move.id + "-cs" + ++data.move.charged);
+            data.sender.chargeTarget = data.target;
+            el.classList.add("charged");
+          }
+
           else if (data.move.type == "revenge") addEffect("revenge", data.sender, data.move.revengeDuration);
 
           else if (data.move.type == "effectRevenge") active.fighters.forEach(fighter => addEffect("effectRevenge", fighter, data.move.effectRevengeDuration));
@@ -2043,6 +2058,12 @@
                 if (target.effects.effectRevenge) addEffect("stunned", data.sender, data.move.stunDuration);
               }
             });
+
+            //Reset all chargeSquares
+            for (let i = 1; i <= move.charge; i++) {
+              let el = document.getElementById(data.sender.name + "-" + data.move.id + "-cs" + i);
+              el.classList.remove("charged");
+            }
 
             //Attack animation
             let root = document.documentElement;

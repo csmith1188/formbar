@@ -74,6 +74,9 @@
   #tabBox li {
     display: inline;
   }
+  #tabBox a {
+    text-decoration: none;
+  }
   #permsContainer {
     display: flex;
     justify-content: space-evenly;
@@ -98,10 +101,10 @@
 {% block main %}
 <div id="tabs">
   <ul id="tabBox">
-    <li><a href="#tabs-1">Users</a></li>
-    <li><a href="#tabs-2">Interaction</a></li>
-    <li><a href="#tabs-3">Permissions</a></li>
-    <li><a href="#tabs-4">Configuration</a></li>
+    <li><a class="button" href="#tabs-1">Users</a></li>
+    <li><a class="button pressed" href="#tabs-2">Interaction</a></li>
+    <li><a class="button" href="#tabs-3">Permissions</a></li>
+    <li><a class="button" href="#tabs-4">Configuration</a></li>
   </ul>
   <div id="tabs-1">
     <h2>Users</h2>
@@ -888,7 +891,15 @@
 <script src="../static/jquery/jquery-ui.min.js" charset="utf-8"></script>
 <script>
   $(function() {
-    $("#tabs").tabs();
+    $("#tabs").tabs({
+      activate: function(event, ui) {
+        let activeTab = $("#tabs").tabs("option", "active");
+        $("#tabs .ui-tabs-nav a").each((i, el) => {
+          if (i == activeTab) el.classList.add("pressed");
+          else el.classList.remove("pressed");
+        });
+      }
+    });
   });
 </script>
 {% endblock %}

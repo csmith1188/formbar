@@ -253,6 +253,11 @@ def refreshUsers(selectedStudent='', category=''):
             return True
 
 def changeMode(newMode='', direction='next'):
+    # Clear answers
+    for student in sD.studentDict:
+        sD.studentDict[student]['thumb'] = ''
+        sD.studentDict[student]['letter'] = ''
+        sD.studentDict[student]['essay'] = ''
     index = sD.settings['modes'].index(sD.settings['barmode'])
     if newMode in sD.settings['modes']:
         sD.settings['barmode'] = newMode
@@ -416,20 +421,16 @@ def fillBar(color=colors['default'], stop=BARPIX, start=0):
         pixels[pix] = color
 
 def repeatMode():
+    # Clear answers
+    for student in sD.studentDict:
+        sD.studentDict[student]['thumb'] = ''
+        sD.studentDict[student]['letter'] = ''
+        sD.studentDict[student]['essay'] = ''
     if sD.settings['barmode'] == 'tutd':
-        # Clear thumbs
-        for student in sD.studentDict:
-            sD.studentDict[student]['thumb'] = ''
         tutdBar()
     elif sD.settings['barmode'] == 'abcd':
-        # Clear answers
-        for student in sD.studentDict:
-            sD.studentDict[student]['letter'] = ''
         abcdBar()
     elif sD.settings['barmode'] == 'text':
-        # Clear bar
-        for student in sD.studentDict:
-            sD.studentDict[student]['essay'] = ''
         textBar()
     elif sD.settings['barmode'] == 'essay' or sD.settings['barmode'] == 'quiz' :
         # Clear thumbs

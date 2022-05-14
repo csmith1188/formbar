@@ -1140,7 +1140,7 @@ def endpoint_break():
             return render_template("message.html", message = 'Student not found.', forward = request.path)
         else:
             if sD.studentDict[request.remote_addr]['perms'] == sD.settings['perms']['teacher']:
-                return render_template("message.html", message = "Teachers can't request bathroom breaks. To see students' tickets, go to /users.")
+                return render_template("message.html", message = "Teachers can't request bathroom breaks. To see students' tickets, go to /controlpanel.")
             return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'], ticket = json.dumps(sD.studentDict[request.remote_addr]['help']))
 
 
@@ -1232,7 +1232,7 @@ def endpoint_cleartable():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['teacher']:
-        return render_template("message.html", message = "You do not have high enough permissions to do this right now.", forward = '/settings')
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now.", forward = '/controlpanel')
     table = request.args.get('table')
     if table:
         db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
@@ -1241,9 +1241,9 @@ def endpoint_cleartable():
         db.commit()
         db.close()
         playSFX("sfx_explode01")
-        return render_template("message.html", message = "Data in " + table + " deleted.", forward = '/settings')
+        return render_template("message.html", message = "Data in " + table + " deleted.", forward = '/controlpanel')
     else:
-        return render_template("message.html", message = "Missing table argument.", forward = '/settings')
+        return render_template("message.html", message = "Missing table argument.", forward = '/controlpanel')
 
 '''
     /color
@@ -1278,6 +1278,63 @@ def endpoint_color():
             pixels.show()
         return render_template("message.html", message = "Color sent!", forward = '/home')
 
+#This endpoint is exclusive only to the teacher.
+@app.route('/controlpanel', methods = ['POST', 'GET'])
+def endpoint_settings():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['admin']:
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
+    else:
+        resString = ''
+        #Loop through every arg that was sent as a query parameter
+        for arg in request.args:
+            if arg != 'advanced':
+                #See if you save the
+                argVal = str2bool(request.args.get(arg))
+                #if the argVal resolved to a boolean value
+                if isinstance(argVal, bool):
+                    if arg in sD.settings:
+                        sD.settings[arg] = argVal
+                        resString += 'Set <i>' + arg + '</i> to: <i>' + str(argVal) + "</i>"
+                    else:
+                        resString += 'There is no setting that takes \'true\' or \'false\' named: <i>' + arg + "</i>"
+                else:
+                    try:
+                        argInt = int(request.args.get(arg))
+                        if arg in sD.settings['perms']:
+                            if argInt > 4 or argInt < 0:
+                                resString += "Permission value out of range! "
+                            else:
+                                sD.settings['perms'][arg] = argInt
+                    except:
+                        pass
+
+        ###
+        ### Everything past this point uses the old method of changing settings. Needs updated
+        ###
+
+        if request.args.get('students'):
+            sD.settings['numStudents'] = int(request.args.get('students'))
+            if sD.settings['numStudents'] == 0:
+                sD.settings['autocount'] = True
+                autoStudentCount()
+            else:
+                sD.settings['autocount'] = False
+                resString += 'Set <i>numStudents</i> to: ' + str(sD.settings['numStudents'])
+        if request.args.get('barmode'):
+            if request.args.get('barmode') in sD.settings['modes']:
+                sD.settings['barmode'] = request.args.get('barmode')
+                resString += 'Set <i>mode</i> to: ' + sD.settings['barmode']
+            else:
+                resString += 'No setting called ' + sD.settings['barmode']
+        if resString == '':
+            return render_template("controlpanel.html")
+        else:
+            playSFX("sfx_pickup01")
+            resString += ""
+            return resString
+
 
 @app.route('/countdown')
 def endpoint_countdown():
@@ -1297,7 +1354,7 @@ def endpoint_createaccount():
     dbcmd.execute("INSERT INTO users (username, password, permissions, bot) VALUES (?, ?, ?, ?)", (name, passwordCrypt, sD.settings['perms']['anyone'], "False"))
     db.commit()
     db.close()
-    return render_template("message.html", message = 'Account created.', forward = '/settings')
+    return render_template("message.html", message = 'Account created.', forward = '/controlpanel')
 
 @app.route('/createfightermatch', methods = ['POST'])
 def endpoint_createfightermatch():
@@ -1402,7 +1459,7 @@ def endpoint_flush():
     else:
         flushUsers()
         sD.refresh()
-        return render_template("message.html", message = "Session was restarted.", forward = '/settings')
+        return render_template("message.html", message = "Session was restarted.", forward = '/controlpanel')
 
 #  ██████
 # ██
@@ -1627,7 +1684,7 @@ def endpoint_help():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     if sD.studentDict[request.remote_addr]['perms'] == sD.settings['perms']['teacher']:
-        return render_template("message.html", message = "Teachers can't send help tickets. To see students' tickets, go to /users.")
+        return render_template("message.html", message = "Teachers can't send help tickets. To see students' tickets, go to /controlpanel.")
     else:
         name = sD.studentDict[request.remote_addr]['name']
         name = name.strip()
@@ -2191,63 +2248,6 @@ def endpoint_setdefault():
         return redirect('/')
     else:
         return render_template('setdefault.html', pm = sD.studentDict[request.remote_addr]['preferredHomepage'])
-
-#This endpoint is exclusive only to the teacher.
-@app.route('/settings', methods = ['POST', 'GET'])
-def endpoint_settings():
-    if not request.remote_addr in sD.studentDict:
-        return redirect('/login?forward=' + request.path)
-    elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['admin']:
-        return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
-    else:
-        resString = ''
-        #Loop through every arg that was sent as a query parameter
-        for arg in request.args:
-            if arg != 'advanced':
-                #See if you save the
-                argVal = str2bool(request.args.get(arg))
-                #if the argVal resolved to a boolean value
-                if isinstance(argVal, bool):
-                    if arg in sD.settings:
-                        sD.settings[arg] = argVal
-                        resString += 'Set <i>' + arg + '</i> to: <i>' + str(argVal) + "</i>"
-                    else:
-                        resString += 'There is no setting that takes \'true\' or \'false\' named: <i>' + arg + "</i>"
-                else:
-                    try:
-                        argInt = int(request.args.get(arg))
-                        if arg in sD.settings['perms']:
-                            if argInt > 4 or argInt < 0:
-                                resString += "Permission value out of range! "
-                            else:
-                                sD.settings['perms'][arg] = argInt
-                    except:
-                        pass
-
-        ###
-        ### Everything past this point uses the old method of changing settings. Needs updated
-        ###
-
-        if request.args.get('students'):
-            sD.settings['numStudents'] = int(request.args.get('students'))
-            if sD.settings['numStudents'] == 0:
-                sD.settings['autocount'] = True
-                autoStudentCount()
-            else:
-                sD.settings['autocount'] = False
-                resString += 'Set <i>numStudents</i> to: ' + str(sD.settings['numStudents'])
-        if request.args.get('barmode'):
-            if request.args.get('barmode') in sD.settings['modes']:
-                sD.settings['barmode'] = request.args.get('barmode')
-                resString += 'Set <i>mode</i> to: ' + sD.settings['barmode']
-            else:
-                resString += 'No setting called ' + sD.settings['barmode']
-        if resString == '':
-            return render_template("settings.html")
-        else:
-            playSFX("sfx_pickup01")
-            resString += ""
-            return resString
 
 #This endpoint leads to the Sound Effect page
 @app.route('/sfx')

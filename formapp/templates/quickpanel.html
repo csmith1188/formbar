@@ -1,5 +1,5 @@
-{% extends 'header.html' %}
-<!-- ^^ This means add this file to the end of the contents of header.html -->
+{% extends 'header_fullscreen.html' %}
+<!-- ^^ This means add this file into the contents of the header page -->
 <!-- This is where the title, top buttons, and stylesheet is located -->
 
 <!-- Change title here -->
@@ -378,13 +378,13 @@
       let newMode = document.getElementById("mode").value;
       switch (newMode) {
         case "Poll":
-          request.open("GET", "/settings?barmode=poll");
+          request.open("GET", "/controlpanel?barmode=poll");
           break;
         case "Progress":
-          request.open("GET", "/settings?barmode=progress");
+          request.open("GET", "/controlpanel?barmode=progress");
           break;
         case "Playtime":
-          request.open("GET", "/settings?barmode=playtime");
+          request.open("GET", "/controlpanel?barmode=playtime");
       }
       request.send();
       updateMode();

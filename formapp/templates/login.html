@@ -1,5 +1,5 @@
-{% extends 'header.html' %}
-<!-- ^^ This means add this file to the end of the contents of header.html -->
+{% extends 'header_content.html' %}
+<!-- ^^ This means add this file into the contents of the header page -->
 <!-- This is where the title, top buttons, and stylesheet is located -->
 
 <!-- Change title here -->
@@ -44,7 +44,7 @@
 <button id="logInButton" class="pressed" onclick="changeUserType(this);">Log in</button>
 <button id="newAccountButton" onclick="changeUserType(this);">New account</button>
 <button id="guestButton" onclick="changeUserType(this);">Use as guest</button>
-<form action="login" method="post">
+<form action="login" method="post" style="margin-bottom: 16px;">
     <input type="text" id="usernameBox" name="username" class="box" placeholder="Name" value="" autocomplete="off" required>
     <input type="password" id="passwordBox" name="password" class="box" placeholder="Password" value="" required>
     <a href="/changepassword" id="forgotPassword">Forgot password</a>

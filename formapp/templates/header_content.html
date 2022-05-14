@@ -25,6 +25,18 @@
     #homeLink:hover {
       color: var(--main-color);
     } */
+    body {
+      background: var(--bg-darker);
+      padding: 12px;
+    }
+    h1 {
+      text-align: center;
+      margin-top: 12px;
+    }
+
+    h2 {
+      margin-top: 32px;
+    }
     #quickmenu {
         text-align: center;
         justify-content: center;
@@ -35,12 +47,15 @@
     #homebutton {
       border-style: solid;
       border-width: 2px;
-      border-color: var(--white);
       border-radius: 10px;
       margin: auto;
       padding: 10px;
       max-width: 600px;
-      background-color: var(--light-blue);
+      background-color: var(--bg-color);
+    }
+    .classic #content,
+    .classic #homebutton {
+      border-color: var(--light-blue);
     }
   </style>
   {% block style %}{% endblock %}
@@ -48,7 +63,7 @@
 
 <body class="{% block color %}{% endblock %}">
   <div id="quickmenu">
-    <a href="/" id="homebutton" class="hidden">Home</a>
+    <a href="/home" id="homebutton" class="hidden">Home</a>
   </div>
   <div id="content">
     {% block main %}{% endblock %}
@@ -59,7 +74,7 @@
 <script src="{{url_for('static', filename='js/socket.io.min.js')}}"></script>
 <script src="{{url_for('static', filename='js/header.js')}}"></script>
 <script>
-  if (!urlParams.get("advanced")) document.getElementById("homebutton").classList.remove("hidden");
+  if (!urlParams.get("advanced") && window.location.pathname != "/login" && window.location.pathname != "/home") document.getElementById("homebutton").classList.remove("hidden");
 </script>
 {% block script %}{% endblock %}
 

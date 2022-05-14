@@ -27,7 +27,6 @@
     } */
     body {
       background: var(--bg-darker);
-      padding: 12px;
     }
     h1 {
       text-align: center;
@@ -41,10 +40,10 @@
         text-align: center;
         justify-content: center;
         margin: auto;
-        margin-bottom: 20px;
+        margin-bottom: 16px;
     }
     #content,
-    #homebutton {
+    .quickButton {
       border-style: solid;
       border-width: 2px;
       border-radius: 10px;
@@ -53,8 +52,14 @@
       max-width: 600px;
       background-color: var(--bg-color);
     }
+    .quickButton {
+      display: inline-block;
+      margin: 0 4px;
+      width: 50px;
+      padding: 5px;
+    }
     .classic #content,
-    .classic #homebutton {
+    .classic .quickButton {
       border-color: var(--light-blue);
     }
   </style>
@@ -62,8 +67,10 @@
 </head>
 
 <body class="{% block color %}{% endblock %}">
-  <div id="quickmenu">
-    <a href="/home" id="homebutton" class="hidden">Home</a>
+  <div id="quickmenu" class="hidden">
+    <a href="/home" class="quickButton">Home</a>
+    <a href="/chat" class="quickButton">Chat</a>
+    <a href="/tutd" class="quickButton">Polls</a>
   </div>
   <div id="content">
     {% block main %}{% endblock %}
@@ -74,7 +81,7 @@
 <script src="{{url_for('static', filename='js/socket.io.min.js')}}"></script>
 <script src="{{url_for('static', filename='js/header.js')}}"></script>
 <script>
-  if (!urlParams.get("advanced") && window.location.pathname != "/login" && window.location.pathname != "/home") document.getElementById("homebutton").classList.remove("hidden");
+  if (!urlParams.get("advanced") && window.location.pathname != "/login") document.getElementById("quickmenu").classList.remove("hidden");
 </script>
 {% block script %}{% endblock %}
 

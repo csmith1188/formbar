@@ -184,7 +184,7 @@ def newStudent(remote, username, bot=False):
             },
             'excluded': False,
             'preferredHomepage': None,
-            'wsID': ''
+            'sid': ''
         }
         #Track if the teacher is logged in
         teacher = False
@@ -724,11 +724,11 @@ def stripUserData(perm='', sList={}):
 def chatUsers():
     newList = {}
     for student in sD.studentDict:
-        if 'wsID' in sD.studentDict[student].keys():
+        if 'sid' in sD.studentDict[student].keys():
             newList[student] = {}
             newList[student]['name'] = sD.studentDict[student]['name']
             newList[student]['perms'] = sD.studentDict[student]['perms']
-            newList[student]['wsID'] = sD.studentDict[student]['wsID']
+            newList[student]['sid'] = sD.studentDict[student]['sid']
     return newList
 
 def updateStep():
@@ -2557,60 +2557,6 @@ def endpoint_wordle():
 # ███████  ██████   ██████ ██   ██ ███████    ██ ██ ████████  ██████
 
 '''
-
-block = {
-    'users': [{
-        'name': 'ur mum',
-        'perm': True
-    },
-    {
-        'name': 'dem mums',
-        'perm': True
-    }]
-}
-
-@socket_.on('loadUsers', namespace=apinamespace)
-def api_loadUsers():
-    #Check permissions here
-    #Check to see if block is active to select users
-    emit( 'api_userList', {'data': block['users'], 'message': ''} )
-
-@socket_.on('changeperm', namespace=apinamespace)
-def api_changeperm():
-    #Check permissions here
-    #Check to see if block is active to select users
-    block['users'][0]['perm'] = not block['users'][0]['perm']
-    print(block['users'][0]['perm'])
-    emit( 'api_userList', {'data': block['users'], 'message': ''} )
-
-
-@socket_.on('my_event', namespace=chatnamespace)
-def chat_message(message):
-    session['receive_count'] = session.get('receive_count', 0) + 1
-    emit('my_response',
-         {'data': message['data'], 'count': session['receive_count']})
-
-@socket_.on('my_broadcast_event', namespace=chatnamespace)
-def chat_broadcast_message(message):
-    session['receive_count'] = session.get('receive_count', 0) + 1
-    emit('my_response',
-         {'data': message['data'], 'count': session['receive_count']},
-         broadcast=True)
-
-@socket_.on('disconnect_request', namespace=chatnamespace)
-def disconnect_request():
-    @copy_current_request_context
-    def can_disconnect():
-        disconnect()
-
-    session['receive_count'] = session.get('receive_count', 0) + 1
-    emit('my_response',
-         {'data': 'Disconnected!', 'count': session['receive_count']},
-         callback=can_disconnect)
-
-'''
-
-'''
     A message to or from the server should be a stringified JSON object:
     {
         type: <alert|userlist|help|message|fighter>,
@@ -2632,33 +2578,24 @@ def packMSG(rx, tx, content):
 
 @socket_.on('connect', namespace=chatnamespace)
 def connect():
-    '''
-    #print("SOCKET: " + socket)
     try:
-        sD.studentDict[client['address'][0]]['wsID'] = client['id']
-        #sD.studentDict[request.remote_addr]['wsId'] = request.sid
-        print("[info] " + sD.studentDict[client['address'][0]]['name'] + " connected and was given id %d" % client['id'])
-        emit('message', json.dumps(packMSG('alert', 'all', 'server', sD.studentDict[client['address'][0]]['name'] + " has joined the server...")))
-        emit('message', json.dumps(packMSG('userlist', 'all', 'server', chatUsers())))
+        if request.remote_addr in sD.studentDict:
+            sD.studentDict[request.remote_addr]['sid'] = request.sid
+            print("[info] " + sD.studentDict[request.remote_addr]['name'] + " connected and was given id \"" + request.sid + "\"")
+            emit('alert', json.dumps(packMSG('all', 'server', sD.studentDict[request.remote_addr]['name'] + " has joined the server...")), broadcast=True)
+            emit('userlist', json.dumps(packMSG('all', 'server', chatUsers())), broadcast=True)
     except Exception as e:
         print("[error] " + "Error finding user in list: " + str(e))
-    '''
 
 @socket_.on('disconnect', namespace=chatnamespace)
 def disconnect():
-    '''
     try:
-        if client['address'][0] in sD.studentDict and 'wsID' in sD.studentDict[client['address'][0]]: #Do nothing is user has already disconnected or logged out
-            print("[info] " + sD.studentDict[client['address'][0]]['name'] + " disconnected")
-            del sD.studentDict[client['address'][0]]['wsID']
-            #Send a message to every client that isn't THIS disconnecting client, telling them the user disconnected
-            for i, user in enumerate(server.clients):
-                if not server.clients[i] == client:
-                    emit('message', server.clients[i], json.dumps(packMSG('alert', 'all', 'server', sD.studentDict[client['address'][0]]['name'] + " has left the server...")))
-                    emit('message', server.clients[i], json.dumps(packMSG('userlist', 'all', 'server', chatUsers())))
+        if request.remote_addr in sD.studentDict:
+            del sD.studentDict[request.remote_addr]['sid']
+            emit('alert', json.dumps(packMSG('all', 'server', sD.studentDict[request.remote_addr]['name'] + " has left the server...")), broadcast=True)
+            emit('userlist', json.dumps(packMSG('all', 'server', chatUsers())), broadcast=True)
     except Exception as e:
         print("[error] " + "Error finding user in list: " + str(e))
-    '''
 
 @socket_.on('message', namespace=chatnamespace)
 def message(message):
@@ -2688,11 +2625,9 @@ def message(message):
             else:
                 for student in sD.studentDict:
                     if sD.studentDict[student]['name'] == message['to'] or sD.studentDict[student]['name'] == message['from']:
-                        for toClient in server.clients:
-                            if toClient['id'] == sD.studentDict[student]['wsID']:
-                                messageOut = packMSG('message', message['to'], sD.studentDict[client['address'][0]]['name'], message['content'])
-                                server.send_message(toClient, json.dumps(messageOut))
-                                break
+                        messageOut = packMSG(message['to'], sD.studentDict[request.remote_addr]['name'], message['content'])
+                        emit('message', json.dumps(messageOut), to=sD.studentDict[student]['sid'])
+                        break
             print("[info] " + message['from'] + " said to " + message['to'] + ": " + message['content'])
     except Exception as e:
         print("[error] " + 'Error: ' + str(e))

@@ -332,6 +332,8 @@
 
     chatSocket.on("userlist", message => {
         message = JSON.parse(message);
+        console.log("userlist");
+        console.log(message);
         boxes.userlist.innerHTML = '<h2 id="ulHeading">Online</h2>'
         for (user in message.content) {
             let newUser = document.createElement('div');
@@ -344,18 +346,18 @@
               newUser.classList.add('them')
               newUser.setAttribute("onclick", "changeRec('" + name + "', this)");
               newUser.title = "Send a private message";
-              let profileButton = document.createElement("button");
-              newUser.appendChild(profileButton);
-              profileButton.innerText = "View profile";
-              profileButton.classList.add("profileButton");
-              profileButton.onmouseover = event => event.stopPropagation();
-              profileButton.onclick = event => {
-                window.location = "/profile?user=" + name;
-                event.stopPropagation();
-              };
               newUser.onmouseover = function() {this.classList.add("ulHover");};
               newUser.onmouseout = function() {this.classList.remove("ulHover");};
             }
+            let profileButton = document.createElement("button");
+            profileButton.innerText = "View profile";
+            profileButton.classList.add("profileButton");
+            profileButton.onmouseover = event => event.stopPropagation();
+            profileButton.onclick = event => {
+              window.location = "/profile?user=" + name;
+              event.stopPropagation();
+            };
+            newUser.appendChild(profileButton);
         }
     });
 
@@ -464,8 +466,8 @@
         newMSG.classList.add('msg')
         if (message.to == username) newMSG.classList.add('whisper')
         if (message.from == username) newMSG.classList.add('me')
-        else if (message.from == 'server') {
-          newMSG.classList.add('alert')
+        else if (message.from == 'server' || !message.from) {
+          newMSG.classList.add('alert');
           message.from = "";
         }
         else {
@@ -480,7 +482,7 @@
         message.content = textarea.value;
 
         let note = "";
-        if (message.from == "server" || !message.from) note = "· From server";
+        if (!message.from) note = "· From server";
         else if (message.to != "all") note = "· Private message";
 
         newMSG.innerHTML = `
@@ -488,8 +490,9 @@
           <span style="color: var(--gray-color);">${dateString(message.time)} ${note}</span>
         `;
         let content = document.createElement("div");
+        content.classList.add("content");
         //The server can send HTML; students can't
-        if (message.from == "server" || !message.from) content.innerHTML = message.content;
+        if (!message.from) content.innerHTML = message.content;
         else content.innerText = message.content;
         newMSG.append(content);
 

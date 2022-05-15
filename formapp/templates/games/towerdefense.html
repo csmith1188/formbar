@@ -1891,8 +1891,8 @@
         frame++;
       }
 
-      let progress = localStorage.getItem("tdProgress") || ""; //2 means map completed on hard, 1 means map completed on normal, 0 means map not completed
-      let achievements = localStorage.getItem("tdAchievements") || "0000000"; //1 means earned, 0 means not earned
+      let progress = "{{ progress }}"; //2 means map completed on hard, 1 means map completed on normal, 0 means map not completed
+      let achievements = "{{ achievements }}" || "0000000"; //1 means earned, 0 means not earned
       achievements = achievements.split("");
       let player = {
         money: 75,
@@ -1922,7 +1922,8 @@
 
       progress = progress.padEnd(maps.length, "0"); //Add zeroes to the end when maps are added
       if (progress.length > maps.length) progress = progress.slice(0, maps.length - progress.length); //Remove numbers from the end if maps are deleted
-      localStorage.setItem("tdProgress", progress);
+      request.open("POST", "/updateuser?field=tdProgress&value=" + progress);
+      request.send();
       progress = progress.split(""); //Turn the string into an array
 
       let achievementList = [
@@ -2296,7 +2297,10 @@
           sound.playSFX("success");
           let num = (difficulty == "hard") ? 2 : 1;
           if (progress[mapIndex] < num) progress.splice(mapIndex, 1, num); //Update progress
-          localStorage.setItem("tdProgress", progress.join("")); //Save to local storage as string
+          //Save to the database as a string
+          let request1 = new XMLHttpRequest();
+          request1.open("POST", "/updateuser?field=tdProgress&value=" + progress.join(""));
+          request1.send();
         } else {
           sound.playSFX("shoot");
           gameAchievements[4] = 0;
@@ -2304,13 +2308,16 @@
           gameAchievements[6] = 0;
         }
         let allAchievements = achievements.map((achievement, i) => +achievement || gameAchievements[i]); //New achievements + ones that were earned before
-        localStorage.setItem("tdAchievements", allAchievements.join(""));
+        let request2 = new XMLHttpRequest();
+        request2.open("POST", "/updateuser?field=tdAchievements&value=" + allAchievements.join(""));
+        request2.send();
         completeMaps = progress.reduce((a, b) => +a + +b);
         completeAchv = achievements.reduce((a, b) => +a + +b);
         let totalComplete = completeMaps + completeAchv;
         if (totalComplete) {
-          request.open("POST", "/savescore?game=towerdefense&score=" + totalComplete);
-          request.send();
+          let request3 = new XMLHttpRequest();
+          request3.open("POST", "/savescore?game=towerdefense&score=" + totalComplete);
+          request3.send();
         }
         //If a tower has a menu open, close it
         let menuTower = towers.find(tower => tower?.menuOpen);

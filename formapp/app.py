@@ -1602,7 +1602,13 @@ def endpoint_games_towerdefense():
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
     else:
-        return render_template('games/towerdefense.html')
+        username = sD.studentDict[request.remote_addr]['name']
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        progress = dbcmd.execute("SELECT tdProgress FROM users WHERE username=:uname", {"uname": username}).fetchone()[0] or ''
+        achievements = dbcmd.execute("SELECT tdAchievements FROM users WHERE username=:uname", {"uname": username}).fetchone()[0] or ''
+        db.close()
+        return render_template('games/towerdefense.html', progress = progress, achievements = achievements)
 
 #Tic Tac Toe
 @app.route('/games/ttt')
@@ -2359,6 +2365,24 @@ def endpoint_tutd():
 # ██    ██
 #  ██████
 
+@app.route('/updateuser', methods = ['POST'])
+def endpoint_updateuser():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    field = request.args.get("field")
+    value = request.args.get("value")
+    print(field)
+    print(value)
+    if field and value:
+        username = sD.studentDict[request.remote_addr]['name']
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        dbcmd.execute("UPDATE users SET " + field + "=:value WHERE username=:uname", {"uname": username, "value": value})
+        db.commit()
+        db.close()
+        return render_template("message.html", message = "Account updated.")
+    else:
+        return render_template("message.html", message = "Missing arguments.")
 
 #This endpoint allows us to see which user(Student) is logged in.
 @app.route('/users')

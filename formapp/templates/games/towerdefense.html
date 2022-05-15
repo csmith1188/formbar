@@ -1891,8 +1891,8 @@
         frame++;
       }
 
-      let progress = "{{ progress }}"; //2 means map completed on hard, 1 means map completed on normal, 0 means map not completed
-      let achievements = "{{ achievements }}" || "0000000"; //1 means earned, 0 means not earned
+      let progress = "{{ progress }}" || localStorage.getItem("tdProgress"); //2 means map completed on hard, 1 means map completed on normal, 0 means map not completed
+      let achievements = "{{ achievements }}" || localStorage.getItem("tdAchievements") || "0000000"; //1 means earned, 0 means not earned
       achievements = achievements.split("");
       let player = {
         money: 75,

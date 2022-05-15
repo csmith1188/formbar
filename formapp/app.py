@@ -2592,6 +2592,7 @@ def disconnect():
     try:
         if request.remote_addr in sD.studentDict:
             del sD.studentDict[request.remote_addr]['sid']
+            print("[info] " + sD.studentDict[request.remote_addr]['name'] + " disconnected")
             emit('alert', json.dumps(packMSG('all', 'server', sD.studentDict[request.remote_addr]['name'] + " has left the server...")), broadcast=True)
             emit('userlist', json.dumps(packMSG('all', 'server', chatUsers())), broadcast=True)
     except Exception as e:

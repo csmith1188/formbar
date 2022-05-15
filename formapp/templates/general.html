@@ -11,7 +11,7 @@
 {% block style %}{{ style|safe }}{% endblock %}
 
 <!-- Change theme color here -->
-{% block color %}purple{% endblock %}
+{% block color %}{{ color or 'purple' }}{% endblock %}
 
 <!-- Main content here -->
 {% block main %}

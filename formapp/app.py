@@ -2371,8 +2371,6 @@ def endpoint_updateuser():
         return redirect('/login?forward=' + request.path)
     field = request.args.get("field")
     value = request.args.get("value")
-    print(field)
-    print(value)
     if field and value:
         username = sD.studentDict[request.remote_addr]['name']
         db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')

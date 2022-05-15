@@ -346,18 +346,18 @@
               newUser.classList.add('them')
               newUser.setAttribute("onclick", "changeRec('" + name + "', this)");
               newUser.title = "Send a private message";
+              let profileButton = document.createElement("button");
+              profileButton.innerText = "View profile";
+              profileButton.classList.add("profileButton");
+              profileButton.onmouseover = event => event.stopPropagation();
+              profileButton.onclick = event => {
+                window.location = "/profile?user=" + name;
+                event.stopPropagation();
+              };
+              newUser.appendChild(profileButton);
               newUser.onmouseover = function() {this.classList.add("ulHover");};
               newUser.onmouseout = function() {this.classList.remove("ulHover");};
             }
-            let profileButton = document.createElement("button");
-            profileButton.innerText = "View profile";
-            profileButton.classList.add("profileButton");
-            profileButton.onmouseover = event => event.stopPropagation();
-            profileButton.onclick = event => {
-              window.location = "/profile?user=" + name;
-              event.stopPropagation();
-            };
-            newUser.appendChild(profileButton);
         }
     });
 

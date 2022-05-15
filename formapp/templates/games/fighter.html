@@ -543,7 +543,7 @@
     <div style="top: 16px; left: 16px;">
       <h2 id="myName"></h2>
       Total wins: <span id="myWins"></span><br>
-      Win percentage: <span id="myPercent"></span><br>
+      Win rate: <span id="myPercent"></span><br>
       Win streak: <span id="myStreak"></span><br>
       <u id="resetStats">Reset stats</u>
     </div>
@@ -617,7 +617,7 @@
       <div>
         <h2 id="p1-name"></h2>
         Total wins: <span id="p1-wins"></span><br>
-        Win percentage: <span id="p1-percent"></span><br>
+        Win rate: <span id="p1-percent"></span><br>
         Win streak: <span id="p1-streak"></span>
       </div>
 
@@ -629,7 +629,7 @@
       <div style="top: 8px; right: 8px; text-align: right;">
         <h2 id="p2-name"></h2>
         Total wins: <span id="p2-wins"></span><br>
-        Win percentage: <span id="p2-percent"></span><br>
+        Win rate: <span id="p2-percent"></span><br>
         Win streak: <span id="p2-streak"></span>
       </div>
 
@@ -1009,9 +1009,9 @@
         items: [],
         effects: {},
         //Convert from strings to numbers; set to 0 if undefined
-        wins: +localStorage.getItem("fighterWins") || 0,
-        losses: +localStorage.getItem("fighterLosses") || 0,
-        winStreak: +localStorage.getItem("fighterWinStreak") || 0,
+        wins: "{{ wins }}",
+        losses: "{{ losses }}",
+        winStreak: "{{ winStreak }}",
       };
 
       let colors = [red, yellow, green, blue];
@@ -1166,11 +1166,23 @@
           document.getElementById("myStreak").innerText = me.winStreak;
         }
 
-        ////save to account instead of local storage
-        localStorage.setItem("fighterWins", me.wins);
-        localStorage.setItem("fighterLosses", me.losses);
-        localStorage.setItem("fighterWinStreak", me.winStreak);
-        if (me.winStreak == gold.unlockStreak) localStorage.setItem("goldUnlocked", true);
+        let request1 = new XMLHttpRequest();
+        request1.open("POST", "/updateuser?field=fighterWins&value=" + me.wins);
+        request1.send();
+
+        let request2 = new XMLHttpRequest();
+        request2.open("POST", "/updateuser?field=fighterLosses&value=" + me.losses);
+        request2.send();
+
+        let request3 = new XMLHttpRequest();
+        request3.open("POST", "/updateuser?field=fighterWinStreak&value=" + me.winStreak);
+        request3.send();
+
+        if (me.winStreak == gold.unlockStreak) {
+          let request4 = new XMLHttpRequest();
+          request4.open("POST", "/updateuser?field=goldUnlocked&value=1");
+          request4.send();
+        }
       }
 
       function resetStats() {
@@ -1178,7 +1190,8 @@
           me.wins = 0;
           me.losses = 0;
           me.winStreak = 0;
-          localStorage.setItem("goldUnlocked", "");
+          request.open("POST", "/updateuser?field=goldUnlocked&value=0");
+          request.send();
           updateStats();
         }
       }
@@ -1236,7 +1249,7 @@
 
         lockedColors.forEach((color) => {
           /*//for testing ///et*/
-          if ((color.unlockWins && me.wins >= color.unlockWins)/* || localStorage.getItem(color.color + "Unlocked")*/) { //If player has enough wins to unlock or already unlocked
+          if ((color.unlockWins && me.wins >= color.unlockWins)/* || color.color = "gold" && {{ goldUnlocked }}*/) { //If player has enough wins to unlock or already unlocked
             colors.push(color);
             lockedColors = lockedColors.filter(locked => locked != color);
           } else {
@@ -1244,7 +1257,7 @@
             let lockedMessage;
             if (color.unlockWins) lockedMessage = color.unlockWins + " wins to unlock";
             /*//for testing ///et*/
-            else if (localStorage.getItem(color.color + "Unlocked")) lockedMessage = "Temporarily disabled<br>due to bugs";
+            else if (color.color = "gold" && {{ goldUnlocked }}) lockedMessage = "Temporarily disabled<br>due to bugs";
             else lockedMessage = color.unlockStreak + "-win streak to unlock";
             el.classList.add("fighter", "locked");
             el.innerHTML = `<div class="vCentered" style="left: 0; width: 100%; text-align: center;">
@@ -1579,8 +1592,13 @@
 
         //Add a loss and reset win streak if player leaves during match
         window.onunload = () => {
-          localStorage.setItem("fighterLosses", me.losses + 1);
-          localStorage.setItem("fighterWinStreak", 0);
+          let request1 = new XMLHttpRequest();
+          request1.open("POST", "/updateuser?field=fighterLosses&value=" + me.losses + 1);
+          request1.send();
+
+          let request2 = new XMLHttpRequest();
+          request2.open("POST", "/updateuser?field=fighterWinStreak&value=0");
+          request2.send();
         };
 
         players = [player1, player2];

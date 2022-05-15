@@ -364,7 +364,7 @@
   function changePollType() {
     if (document.getElementById("thumbs").checked) document.getElementById("pollDescription").innerText = "Students can choose between thumbs up, thumbs down, and wiggle.";
     else if (document.getElementById("letters").checked) document.getElementById("pollDescription").innerText = "Students can choose between A, B, C, and D.";
-    else if (document.getElementById("essay").checked) document.getElementById("pollDescription").innerHTML = "Students will type out short answers. View essays <a href='/users'>here</a>.";
+    else if (document.getElementById("essay").checked) document.getElementById("pollDescription").innerHTML = "Students will type out short answers. View essays in the \"Users\" section.";
     downloadButton();
   }
 
@@ -655,23 +655,23 @@
             //Change student color according to thumb response
             let thumb = student['thumb'];
             if (thumb) var thumbIcon = document.createElement("img");
-            if (thumb == "up") icons += `<img src="{{ url_for('static', filename='img/users/up.png') }}" class="icon" title="Up">`;
-            if (thumb == "wiggle") icons += `<img src="{{ url_for('static', filename='img/users/wiggle.png') }}" class="icon" title="Wiggle">`;
-            if (thumb == "down") icons += `<img src="{{ url_for('static', filename='img/users/down.png') }}" class="icon" title="Down">`;
+            if (thumb == "up") icons += `<img src="{{ url_for('static', filename='img/controlpanel/up.png') }}" class="icon" title="Up">`;
+            if (thumb == "wiggle") icons += `<img src="{{ url_for('static', filename='img/controlpanel/wiggle.png') }}" class="icon" title="Wiggle">`;
+            if (thumb == "down") icons += `<img src="{{ url_for('static', filename='img/controlpanel/down.png') }}" class="icon" title="Down">`;
 
             //Change student letter according to letter response
             let letter = student['letter']
-            if (letter == "a") icons += `<img src="{{ url_for('static', filename='img/users/a.png') }}" class="icon" title="A">`;
-            if (letter == "b") icons += `<img src="{{ url_for('static', filename='img/users/b.png') }}" class="icon" title="B">`;
-            if (letter == "c") icons += `<img src="{{ url_for('static', filename='img/users/c.png') }}" class="icon" title="C">`;
-            if (letter == "d") icons += `<img src="{{ url_for('static', filename='img/users/d.png') }}" class="icon" title="D">`;
+            if (letter == "a") icons += `<img src="{{ url_for('static', filename='img/controlpanel/a.png') }}" class="icon" title="A">`;
+            if (letter == "b") icons += `<img src="{{ url_for('static', filename='img/controlpanel/b.png') }}" class="icon" title="B">`;
+            if (letter == "c") icons += `<img src="{{ url_for('static', filename='img/controlpanel/c.png') }}" class="icon" title="C">`;
+            if (letter == "d") icons += `<img src="{{ url_for('static', filename='img/controlpanel/d.png') }}" class="icon" title="D">`;
 
             //Show icon if student has submitted Essay
-            if (student.essay) icons += `<img src="{{ url_for('static', filename='img/users/text.png') }}" class="icon" title="Essay submitted">`;
+            if (student.essay) icons += `<img src="{{ url_for('static', filename='img/controlpanel/text.png') }}" class="icon" title="Essay submitted">`;
 
-            if (student['help'].type) icons += `<img src="{{ url_for('static', filename='img/users/help.png') }}" class="icon" title="Help ticket">`;
+            if (student['help'].type) icons += `<img src="{{ url_for('static', filename='img/controlpanel/help.png') }}" class="icon" title="Help ticket">`;
 
-            if (student['complete']) icons += `<img src="{{ url_for('static', filename='img/users/complete.png') }}" class="icon" title="Complete">`;
+            if (student['complete']) icons += `<img src="{{ url_for('static', filename='img/controlpanel/complete.png') }}" class="icon" title="Complete">`;
 
             newStudent.innerHTML = icons + student.name;
             let newDetails = document.createElement('span');

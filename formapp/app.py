@@ -1510,7 +1510,15 @@ def endpoint_games_fighter():
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
     else:
-        return render_template('games/fighter.html', username = sD.studentDict[request.remote_addr]['name'])
+        username = sD.studentDict[request.remote_addr]['name']
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        wins = dbcmd.execute("SELECT fighterWins FROM users WHERE username=:uname", {"uname": username}).fetchone()[0] or 0
+        losses = dbcmd.execute("SELECT fighterLosses FROM users WHERE username=:uname", {"uname": username}).fetchone()[0] or 0
+        winStreak = dbcmd.execute("SELECT fighterWinStreak FROM users WHERE username=:uname", {"uname": username}).fetchone()[0] or 0
+        goldUnlocked = dbcmd.execute("SELECT goldUnlocked FROM users WHERE username=:uname", {"uname": username}).fetchone()[0] or 0
+        db.close()
+        return render_template('games/fighter.html', username = username, wins = wins, losses = losses, winStreak = winStreak, goldUnlocked = goldUnlocked)
 
 '''
     /games/flashcards
@@ -2371,8 +2379,8 @@ def endpoint_updateuser():
         return redirect('/login?forward=' + request.path)
     field = request.args.get("field")
     value = request.args.get("value")
+    username = request.args.get("name") or sD.studentDict[request.remote_addr]['name']
     if field and value:
-        username = sD.studentDict[request.remote_addr]['name']
         db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
         dbcmd = db.cursor()
         dbcmd.execute("UPDATE users SET " + field + "=:value WHERE username=:uname", {"uname": username, "value": value})

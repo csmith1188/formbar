@@ -1078,8 +1078,7 @@ def endpoint_bgm():
             rewindBGM()
             return render_template("message.html", message = 'Music rewound.', forward = '/bgm')
         else:
-            resString = '<a href="/home" id="homeLink">🡄 Home</a><br><br>'
-            resString += '<a href="/bgmstop">Stop Music</a>'
+            resString = '<a href="/bgmstop">Stop Music</a>'
             resString += '<h2>Now playing: ' + sD.bgm['nowplaying'] + '</h2>'
             resString += '<h2>List of available background music files:</h2><ul>'
             for key, value in bgm.bgm.items():
@@ -2263,8 +2262,7 @@ def endpoint_sfx():
             playSFX(sfx_file)
             return render_template("message.html", message = 'Playing: ' + sfx_file)
         else:
-            resString = '<a href="/home" id="homeLink">🡄 Home</a><br>'
-            resString += '<h2>List of available sound files:</h2><ul>'
+            resString = '<h2>List of available sound files:</h2><ul>'
             for key, value in sfx.sound.items():
                 resString += '<li><a href="/sfx?file=' + key + '">' + key + '</a></li>'
             resString += '</ul> You can play them by using \'/sfx?file=<b>&lt;sound file name&gt;</b>\''

@@ -1874,9 +1874,7 @@
             sendMessage(me.name + " couldn't use " + capitalize(sender.color) + "'s " + move.name + " because the target was already defeated.");
           }
         } else {
-          let el = document.getElementById(sender.name + "-" + move.id + "-cs" + ++move.charged);
           sender.chargeTarget = target;
-          el.classList.add("charged");
           sendMessage(me.name + " charged " + capitalize(sender.color) + "'s " + move.name + ".");
 
           let sendObj = {
@@ -2008,8 +2006,8 @@
           }
 
           else if (data.type == "charge") {
+            console.log(document.getElementById(data.sender.name + "-" + data.move.id + "-cs" + ++data.move.charged));
             let el = document.getElementById(data.sender.name + "-" + data.move.id + "-cs" + ++data.move.charged);
-            data.sender.chargeTarget = data.target;
             el.classList.add("charged");
           }
 
@@ -2078,7 +2076,7 @@
             });
 
             //Reset all chargeSquares
-            for (let i = 1; i <= move.charge; i++) {
+            for (let i = 1; i <= data.move.charge; i++) {
               let el = document.getElementById(data.sender.name + "-" + data.move.id + "-cs" + i);
               el.classList.remove("charged");
             }
@@ -2197,6 +2195,8 @@
       }
 
       function receiveItem(data) {
+        console.log("ri");
+        console.log(data);
         let itemObj = items[data.item];
 
         if (data.item == "heal") heal(data.target, 30);
@@ -2450,5 +2450,193 @@
 
       ////delete own matches on disconnect
     }
+
+    let testCharge = `{
+    "type": "charge",
+    "sender": {
+        "team": 1,
+        "name": "1b",
+        "color": "green",
+        "effective": "blue",
+        "weak": "yellow",
+        "moves": {
+            "main": {
+                "damage": 24,
+                "description": "Deals [damage] damage.",
+                "name": "main attack",
+                "id": "main",
+                "charged": 0,
+                "el": {}
+            },
+            "alt": {
+                "damage": 21,
+                "stunChance": 25,
+                "stunDuration": 1,
+                "description": "Deals [damage] damage. 25% chance of stunning target for 1 turn.",
+                "name": "alt attack",
+                "id": "alt",
+                "charged": 0,
+                "el": {}
+            },
+            "special": {
+                "charge": 2,
+                "damage": 78,
+                "description": "Deals [damage] damage.",
+                "name": "special attack",
+                "id": "special",
+                "charged": 0,
+                "el": {}
+            }
+        },
+        "hp": 100,
+        "attackFactor": 1,
+        "effects": {},
+        "el": {},
+        "chargeTarget": {
+            "team": 2,
+            "name": "2a",
+            "color": "red",
+            "effective": "yellow",
+            "weak": "blue",
+            "moves": {
+                "main": {
+                    "damage": 14,
+                    "doubleTarget": true,
+                    "description": "Deals [damage] damage to both opponent fighters.",
+                    "name": "main attack",
+                    "id": "main",
+                    "charged": 0,
+                    "el": {}
+                },
+                "special": {
+                    "charge": 1,
+                    "minDamage": 45,
+                    "maxDamage": 65,
+                    "description": "Deals at least [minDamage] and up to [maxDamage] damage.",
+                    "name": "special attack",
+                    "id": "special",
+                    "charged": 0,
+                    "el": {}
+                },
+                "other": {
+                    "type": "revenge",
+                    "revengeDuration": 2,
+                    "selfTarget": true,
+                    "description": "Opponents will take 50% of the damage they inflict on this fighter. Lasts for 2 turns.",
+                    "name": "other move",
+                    "id": "other",
+                    "charged": 0,
+                    "el": {}
+                }
+            },
+            "hp": 100,
+            "attackFactor": 1,
+            "effects": {},
+            "el": {}
+        }
+    },
+    "move": {
+        "charge": 2,
+        "damage": 78,
+        "description": "Deals [damage] damage.",
+        "name": "special attack",
+        "id": "special",
+        "charged": 2,
+        "el": {}
+    },
+    "target": {
+        "team": 2,
+        "name": "2a",
+        "color": "red",
+        "effective": "yellow",
+        "weak": "blue",
+        "moves": {
+            "main": {
+                "damage": 14,
+                "doubleTarget": true,
+                "description": "Deals [damage] damage to both opponent fighters.",
+                "name": "main attack",
+                "id": "main",
+                "charged": 0,
+                "el": {}
+            },
+            "special": {
+                "charge": 1,
+                "minDamage": 45,
+                "maxDamage": 65,
+                "description": "Deals at least [minDamage] and up to [maxDamage] damage.",
+                "name": "special attack",
+                "id": "special",
+                "charged": 0,
+                "el": {}
+            },
+            "other": {
+                "type": "revenge",
+                "revengeDuration": 2,
+                "selfTarget": true,
+                "description": "Opponents will take 50% of the damage they inflict on this fighter. Lasts for 2 turns.",
+                "name": "other move",
+                "id": "other",
+                "charged": 0,
+                "el": {}
+            }
+        },
+        "hp": 100,
+        "attackFactor": 1,
+        "effects": {},
+        "el": {}
+    }
+  }`;
+
+  let testItem = `{
+    "match": "621664",
+    "type": "item",
+    "item": "attackBoost",
+    "target": {
+        "team": 2,
+        "name": "2a",
+        "color": "red",
+        "effective": "yellow",
+        "weak": "blue",
+        "moves": {
+            "main": {
+                "damage": 14,
+                "doubleTarget": true,
+                "description": "Deals [damage] damage to both opponent fighters.",
+                "name": "main attack",
+                "id": "main",
+                "charged": 0,
+                "el": {}
+            },
+            "special": {
+                "charge": 1,
+                "minDamage": 45,
+                "maxDamage": 65,
+                "description": "Deals at least [minDamage] and up to [maxDamage] damage.",
+                "name": "special attack",
+                "id": "special",
+                "charged": 0,
+                "el": {}
+            },
+            "other": {
+                "type": "revenge",
+                "revengeDuration": 2,
+                "selfTarget": true,
+                "description": "Opponents will take 50% of the damage they inflict on this fighter. Lasts for 2 turns.",
+                "name": "other move",
+                "id": "other",
+                "charged": 0,
+                "el": {}
+            }
+        },
+        "hp": 100,
+        "attackFactor": 1.5,
+        "effects": {
+            "attackBoost": 3
+        },
+        "el": {}
+    },
+    "slot": 1
+  }`;
   </script>
 {% endblock %}

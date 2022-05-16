@@ -1279,7 +1279,7 @@ def endpoint_color():
 
 #This endpoint is exclusive only to the teacher.
 @app.route('/controlpanel', methods = ['POST', 'GET'])
-def endpoint_settings():
+def endpoint_controlpanel():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['admin']:
@@ -2262,6 +2262,10 @@ def endpoint_setdefault():
         return redirect('/')
     else:
         return render_template('setdefault.html', pm = sD.studentDict[request.remote_addr]['preferredHomepage'])
+
+@app.route('/settings')
+def endpoint_settings():
+    return redirect('/controlpanel')
 
 #This endpoint leads to the Sound Effect page
 @app.route('/sfx')

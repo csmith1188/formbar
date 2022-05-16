@@ -1947,6 +1947,7 @@ def endpoint_login():
         else:
             #If the user is logged in, log them out
             if remote in sD.studentDict:
+                print("[info] " + sD.studentDict[request.remote_addr]['name'] + " logged out.")
                 del sD.studentDict[request.remote_addr]
                 playSFX('sfx_laser01')
             if request.args.get('name'): ##needs update

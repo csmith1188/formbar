@@ -253,6 +253,7 @@ def refreshUsers(selectedStudent='', category=''):
             return True
 
 def changeMode(newMode='', direction='next'):
+    clearString()
     # Clear answers
     for student in sD.studentDict:
         sD.studentDict[student]['thumb'] = ''
@@ -2613,6 +2614,9 @@ def message(message):
             server.send_message(client, json.dumps(messageOut))
         else:
             message = json.loads(message)
+            #Checking max message length here
+            if len(message['content']) > 252:
+                message['content'] = message['content'][:252]+'...'
             #Save the message to the database
             db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
             dbcmd = db.cursor()
@@ -2621,9 +2625,6 @@ def message(message):
             dbcmd.execute("INSERT INTO messages ('from', 'to', 'time', 'content') VALUES (?, ?, ?, ?)", (message['from'], message['to'], message['time'], contentCrypt))
             db.commit()
             db.close()
-            #Checking max message length here
-            if len(message['content']) > 252:
-                message['content'] = message['content'][:252]+'...'
             #Check recipients here
             if message['to'] == 'all':
                 messageOut = packMSG('all', sD.studentDict[request.remote_addr]['name'], message['content'])

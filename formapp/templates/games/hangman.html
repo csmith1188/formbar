@@ -1,5 +1,5 @@
-{% extends 'header.html' %}
-<!-- ^^ This means add this file to the end of the contents of header.html -->
+{% extends 'header_fullscreen.html' %}
+<!-- ^^ This means add this file into the contents of the header page -->
 <!-- This is where the title, top buttons, and stylesheet is located -->
 
 <!-- Change title here -->
@@ -378,6 +378,7 @@
             score = 0;
             let lastword = word;
             document.getElementById("last").innerHTML = lastword;
+            document.getElementById("highscore").style.color = "white";
             randomize();
             resetLetters();
             getNewWord();

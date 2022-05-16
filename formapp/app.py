@@ -184,7 +184,7 @@ def newStudent(remote, username, bot=False):
             },
             'excluded': False,
             'preferredHomepage': None,
-            'wsID': ''
+            'sid': ''
         }
         #Track if the teacher is logged in
         teacher = False
@@ -253,6 +253,11 @@ def refreshUsers(selectedStudent='', category=''):
             return True
 
 def changeMode(newMode='', direction='next'):
+    # Clear answers
+    for student in sD.studentDict:
+        sD.studentDict[student]['thumb'] = ''
+        sD.studentDict[student]['letter'] = ''
+        sD.studentDict[student]['essay'] = ''
     index = sD.settings['modes'].index(sD.settings['barmode'])
     if newMode in sD.settings['modes']:
         sD.settings['barmode'] = newMode
@@ -416,20 +421,16 @@ def fillBar(color=colors['default'], stop=BARPIX, start=0):
         pixels[pix] = color
 
 def repeatMode():
+    # Clear answers
+    for student in sD.studentDict:
+        sD.studentDict[student]['thumb'] = ''
+        sD.studentDict[student]['letter'] = ''
+        sD.studentDict[student]['essay'] = ''
     if sD.settings['barmode'] == 'tutd':
-        # Clear thumbs
-        for student in sD.studentDict:
-            sD.studentDict[student]['thumb'] = ''
         tutdBar()
     elif sD.settings['barmode'] == 'abcd':
-        # Clear answers
-        for student in sD.studentDict:
-            sD.studentDict[student]['letter'] = ''
         abcdBar()
     elif sD.settings['barmode'] == 'text':
-        # Clear bar
-        for student in sD.studentDict:
-            sD.studentDict[student]['essay'] = ''
         textBar()
     elif sD.settings['barmode'] == 'essay' or sD.settings['barmode'] == 'quiz' :
         # Clear thumbs
@@ -723,11 +724,11 @@ def stripUserData(perm='', sList={}):
 def chatUsers():
     newList = {}
     for student in sD.studentDict:
-        if 'wsID' in sD.studentDict[student].keys():
+        if 'sid' in sD.studentDict[student].keys():
             newList[student] = {}
             newList[student]['name'] = sD.studentDict[student]['name']
             newList[student]['perms'] = sD.studentDict[student]['perms']
-            newList[student]['wsID'] = sD.studentDict[student]['wsID']
+            newList[student]['sid'] = sD.studentDict[student]['sid']
     return newList
 
 def updateStep():
@@ -847,11 +848,13 @@ def endpoint_abcd():
 '''
     /addfighteropponent
 '''
-@app.route('/addfighteropponent', methods = ['POST', 'GET'])
+@app.route('/addfighteropponent', methods = ['POST'])
 def endpoint_addfighteropponent():
     code = request.args.get('code')
     name = request.args.get('name')
     sD.fighter['match' + code]['opponent'] = name #Set "opponent" of object to arg "name"
+    return render_template("message.html", message = "Opponent added.")
+
 
 '''
 /addfile
@@ -1075,8 +1078,7 @@ def endpoint_bgm():
             rewindBGM()
             return render_template("message.html", message = 'Music rewound.', forward = '/bgm')
         else:
-            resString = '<a href="/home" id="homeLink">🡄 Home</a><br><br>'
-            resString += '<a href="/bgmstop">Stop Music</a>'
+            resString = '<a href="/bgmstop">Stop Music</a>'
             resString += '<h2>Now playing: ' + sD.bgm['nowplaying'] + '</h2>'
             resString += '<h2>List of available background music files:</h2><ul>'
             for key, value in bgm.bgm.items():
@@ -1137,7 +1139,7 @@ def endpoint_break():
             return render_template("message.html", message = 'Student not found.', forward = request.path)
         else:
             if sD.studentDict[request.remote_addr]['perms'] == sD.settings['perms']['teacher']:
-                return render_template("message.html", message = "Teachers can't request bathroom breaks. To see students' tickets, go to /users.")
+                return render_template("message.html", message = "Teachers can't request bathroom breaks. To see students' tickets, go to /controlpanel.")
             return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'], ticket = json.dumps(sD.studentDict[request.remote_addr]['help']))
 
 
@@ -1229,7 +1231,7 @@ def endpoint_cleartable():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['teacher']:
-        return render_template("message.html", message = "You do not have high enough permissions to do this right now.", forward = '/settings')
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now.", forward = '/controlpanel')
     table = request.args.get('table')
     if table:
         db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
@@ -1238,9 +1240,9 @@ def endpoint_cleartable():
         db.commit()
         db.close()
         playSFX("sfx_explode01")
-        return render_template("message.html", message = "Data in " + table + " deleted.", forward = '/settings')
+        return render_template("message.html", message = "Data in " + table + " deleted.", forward = '/controlpanel')
     else:
-        return render_template("message.html", message = "Missing table argument.", forward = '/settings')
+        return render_template("message.html", message = "Missing table argument.", forward = '/controlpanel')
 
 '''
     /color
@@ -1275,6 +1277,63 @@ def endpoint_color():
             pixels.show()
         return render_template("message.html", message = "Color sent!", forward = '/home')
 
+#This endpoint is exclusive only to the teacher.
+@app.route('/controlpanel', methods = ['POST', 'GET'])
+def endpoint_controlpanel():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['admin']:
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
+    else:
+        resString = ''
+        #Loop through every arg that was sent as a query parameter
+        for arg in request.args:
+            if arg != 'advanced':
+                #See if you save the
+                argVal = str2bool(request.args.get(arg))
+                #if the argVal resolved to a boolean value
+                if isinstance(argVal, bool):
+                    if arg in sD.settings:
+                        sD.settings[arg] = argVal
+                        resString += 'Set <i>' + arg + '</i> to: <i>' + str(argVal) + "</i>"
+                    else:
+                        resString += 'There is no setting that takes \'true\' or \'false\' named: <i>' + arg + "</i>"
+                else:
+                    try:
+                        argInt = int(request.args.get(arg))
+                        if arg in sD.settings['perms']:
+                            if argInt > 4 or argInt < 0:
+                                resString += "Permission value out of range! "
+                            else:
+                                sD.settings['perms'][arg] = argInt
+                    except:
+                        pass
+
+        ###
+        ### Everything past this point uses the old method of changing settings. Needs updated
+        ###
+
+        if request.args.get('students'):
+            sD.settings['numStudents'] = int(request.args.get('students'))
+            if sD.settings['numStudents'] == 0:
+                sD.settings['autocount'] = True
+                autoStudentCount()
+            else:
+                sD.settings['autocount'] = False
+                resString += 'Set <i>numStudents</i> to: ' + str(sD.settings['numStudents'])
+        if request.args.get('barmode'):
+            if request.args.get('barmode') in sD.settings['modes']:
+                sD.settings['barmode'] = request.args.get('barmode')
+                resString += 'Set <i>mode</i> to: ' + sD.settings['barmode']
+            else:
+                resString += 'No setting called ' + sD.settings['barmode']
+        if resString == '':
+            return render_template("controlpanel.html")
+        else:
+            playSFX("sfx_pickup01")
+            resString += ""
+            return resString
+
 
 @app.route('/countdown')
 def endpoint_countdown():
@@ -1294,7 +1353,7 @@ def endpoint_createaccount():
     dbcmd.execute("INSERT INTO users (username, password, permissions, bot) VALUES (?, ?, ?, ?)", (name, passwordCrypt, sD.settings['perms']['anyone'], "False"))
     db.commit()
     db.close()
-    return render_template("message.html", message = 'Account created.', forward = '/settings')
+    return render_template("message.html", message = 'Account created.', forward = '/controlpanel')
 
 @app.route('/createfightermatch', methods = ['POST'])
 def endpoint_createfightermatch():
@@ -1381,9 +1440,9 @@ def endpoint_fighter():
 
 
 '''
-    /gams/flashcards
+    /flashcards
 '''
-@app.route('/games/flashcards')
+@app.route('/flashcards')
 def endpoint_flashcards():
     return redirect('games/flashcards')
 
@@ -1399,7 +1458,7 @@ def endpoint_flush():
     else:
         flushUsers()
         sD.refresh()
-        return render_template("message.html", message = "Session was restarted.", forward = '/settings')
+        return render_template("message.html", message = "Session was restarted.", forward = '/controlpanel')
 
 #  ██████
 # ██
@@ -1451,7 +1510,16 @@ def endpoint_games_fighter():
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
     else:
-        return render_template('games/fighter.html', username = sD.studentDict[request.remote_addr]['name'])
+        username = sD.studentDict[request.remote_addr]['name']
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        wins = dbcmd.execute("SELECT fighterWins FROM users WHERE username=:uname", {"uname": username}).fetchone()[0] or 0
+        losses = dbcmd.execute("SELECT fighterLosses FROM users WHERE username=:uname", {"uname": username}).fetchone()[0] or 0
+        winStreak = dbcmd.execute("SELECT fighterWinStreak FROM users WHERE username=:uname", {"uname": username}).fetchone()[0] or 0
+        goldUnlocked = dbcmd.execute("SELECT goldUnlocked FROM users WHERE username=:uname", {"uname": username}).fetchone()[0] or 0
+        db.close()
+        return render_template("message.html", message = "This game is not available yet.")
+        return render_template('games/fighter.html', username = username, wins = wins, losses = losses, winStreak = winStreak, goldUnlocked = goldUnlocked)
 
 '''
     /games/flashcards
@@ -1543,7 +1611,13 @@ def endpoint_games_towerdefense():
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
     else:
-        return render_template('games/towerdefense.html')
+        username = sD.studentDict[request.remote_addr]['name']
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        progress = dbcmd.execute("SELECT tdProgress FROM users WHERE username=:uname", {"uname": username}).fetchone()[0] or ''
+        achievements = dbcmd.execute("SELECT tdAchievements FROM users WHERE username=:uname", {"uname": username}).fetchone()[0] or ''
+        db.close()
+        return render_template('games/towerdefense.html', progress = progress, achievements = achievements)
 
 #Tic Tac Toe
 @app.route('/games/ttt')
@@ -1624,7 +1698,7 @@ def endpoint_help():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     if sD.studentDict[request.remote_addr]['perms'] == sD.settings['perms']['teacher']:
-        return render_template("message.html", message = "Teachers can't send help tickets. To see students' tickets, go to /users.")
+        return render_template("message.html", message = "Teachers can't send help tickets. To see students' tickets, go to /controlpanel.")
     else:
         name = sD.studentDict[request.remote_addr]['name']
         name = name.strip()
@@ -1874,6 +1948,7 @@ def endpoint_login():
         else:
             #If the user is logged in, log them out
             if remote in sD.studentDict:
+                print("[info] " + sD.studentDict[request.remote_addr]['name'] + " logged out.")
                 del sD.studentDict[request.remote_addr]
                 playSFX('sfx_laser01')
             if request.args.get('name'): ##needs update
@@ -1962,6 +2037,7 @@ def endpoint_profile():
                     "minesweeper": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='minesweeper' ORDER BY score ASC", {"uname": user['name']}).fetchone(),
                     "speedtype": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='speedtype' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
                     "towerdefense": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='towerdefense' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
+                    "fighter": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='towerdefense' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
                     "wordle": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='wordle' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
                 }
                 db.close()
@@ -2188,62 +2264,9 @@ def endpoint_setdefault():
     else:
         return render_template('setdefault.html', pm = sD.studentDict[request.remote_addr]['preferredHomepage'])
 
-#This endpoint is exclusive only to the teacher.
-@app.route('/settings', methods = ['POST', 'GET'])
+@app.route('/settings')
 def endpoint_settings():
-    if not request.remote_addr in sD.studentDict:
-        return redirect('/login?forward=' + request.path)
-    elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['admin']:
-        return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
-    else:
-        resString = ''
-        #Loop through every arg that was sent as a query parameter
-        for arg in request.args:
-            if arg != 'advanced':
-                #See if you save the
-                argVal = str2bool(request.args.get(arg))
-                #if the argVal resolved to a boolean value
-                if isinstance(argVal, bool):
-                    if arg in sD.settings:
-                        sD.settings[arg] = argVal
-                        resString += 'Set <i>' + arg + '</i> to: <i>' + str(argVal) + "</i>"
-                    else:
-                        resString += 'There is no setting that takes \'true\' or \'false\' named: <i>' + arg + "</i>"
-                else:
-                    try:
-                        argInt = int(request.args.get(arg))
-                        if arg in sD.settings['perms']:
-                            if argInt > 4 or argInt < 0:
-                                resString += "Permission value out of range! "
-                            else:
-                                sD.settings['perms'][arg] = argInt
-                    except:
-                        pass
-
-        ###
-        ### Everything past this point uses the old method of changing settings. Needs updated
-        ###
-
-        if request.args.get('students'):
-            sD.settings['numStudents'] = int(request.args.get('students'))
-            if sD.settings['numStudents'] == 0:
-                sD.settings['autocount'] = True
-                autoStudentCount()
-            else:
-                sD.settings['autocount'] = False
-                resString += 'Set <i>numStudents</i> to: ' + str(sD.settings['numStudents'])
-        if request.args.get('barmode'):
-            if request.args.get('barmode') in sD.settings['modes']:
-                sD.settings['barmode'] = request.args.get('barmode')
-                resString += 'Set <i>mode</i> to: ' + sD.settings['barmode']
-            else:
-                resString += 'No setting called ' + sD.settings['barmode']
-        if resString == '':
-            return render_template("settings.html")
-        else:
-            playSFX("sfx_pickup01")
-            resString += ""
-            return resString
+    return redirect('/controlpanel')
 
 #This endpoint leads to the Sound Effect page
 @app.route('/sfx')
@@ -2259,8 +2282,7 @@ def endpoint_sfx():
             playSFX(sfx_file)
             return render_template("message.html", message = 'Playing: ' + sfx_file)
         else:
-            resString = '<a href="/home" id="homeLink">🡄 Home</a><br>'
-            resString += '<h2>List of available sound files:</h2><ul>'
+            resString = '<h2>List of available sound files:</h2><ul>'
             for key, value in sfx.sound.items():
                 resString += '<li><a href="/sfx?file=' + key + '">' + key + '</a></li>'
             resString += '</ul> You can play them by using \'/sfx?file=<b>&lt;sound file name&gt;</b>\''
@@ -2357,6 +2379,22 @@ def endpoint_tutd():
 # ██    ██
 #  ██████
 
+@app.route('/updateuser', methods = ['POST'])
+def endpoint_updateuser():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    field = request.args.get("field")
+    value = request.args.get("value")
+    username = request.args.get("name") or sD.studentDict[request.remote_addr]['name']
+    if field and value:
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        dbcmd.execute("UPDATE users SET " + field + "=:value WHERE username=:uname", {"uname": username, "value": value})
+        db.commit()
+        db.close()
+        return render_template("message.html", message = "Account updated.")
+    else:
+        return render_template("message.html", message = "Missing arguments.")
 
 #This endpoint allows us to see which user(Student) is logged in.
 @app.route('/users')
@@ -2474,7 +2512,11 @@ def endpoint_users():
             else:
                 return render_template("message.html", message = "No action given.")
         else:
-            return render_template("users.html")
+            db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+            dbcmd = db.cursor()
+            users = dbcmd.execute("SELECT * FROM users").fetchall()
+            db.close()
+            return render_template("users.html", users = users)
 
 # ██    ██
 # ██    ██
@@ -2525,60 +2567,6 @@ def endpoint_wordle():
 # ███████  ██████   ██████ ██   ██ ███████    ██ ██ ████████  ██████
 
 '''
-
-block = {
-    'users': [{
-        'name': 'ur mum',
-        'perm': True
-    },
-    {
-        'name': 'dem mums',
-        'perm': True
-    }]
-}
-
-@socket_.on('loadUsers', namespace=apinamespace)
-def api_loadUsers():
-    #Check permissions here
-    #Check to see if block is active to select users
-    emit( 'api_userList', {'data': block['users'], 'message': ''} )
-
-@socket_.on('changeperm', namespace=apinamespace)
-def api_changeperm():
-    #Check permissions here
-    #Check to see if block is active to select users
-    block['users'][0]['perm'] = not block['users'][0]['perm']
-    print(block['users'][0]['perm'])
-    emit( 'api_userList', {'data': block['users'], 'message': ''} )
-
-
-@socket_.on('my_event', namespace=chatnamespace)
-def chat_message(message):
-    session['receive_count'] = session.get('receive_count', 0) + 1
-    emit('my_response',
-         {'data': message['data'], 'count': session['receive_count']})
-
-@socket_.on('my_broadcast_event', namespace=chatnamespace)
-def chat_broadcast_message(message):
-    session['receive_count'] = session.get('receive_count', 0) + 1
-    emit('my_response',
-         {'data': message['data'], 'count': session['receive_count']},
-         broadcast=True)
-
-@socket_.on('disconnect_request', namespace=chatnamespace)
-def disconnect_request():
-    @copy_current_request_context
-    def can_disconnect():
-        disconnect()
-
-    session['receive_count'] = session.get('receive_count', 0) + 1
-    emit('my_response',
-         {'data': 'Disconnected!', 'count': session['receive_count']},
-         callback=can_disconnect)
-
-'''
-
-'''
     A message to or from the server should be a stringified JSON object:
     {
         type: <alert|userlist|help|message|fighter>,
@@ -2600,33 +2588,26 @@ def packMSG(rx, tx, content):
 
 @socket_.on('connect', namespace=chatnamespace)
 def connect():
-    '''
-    #print("SOCKET: " + socket)
     try:
-        sD.studentDict[client['address'][0]]['wsID'] = client['id']
-        #sD.studentDict[request.remote_addr]['wsId'] = request.sid
-        print("[info] " + sD.studentDict[client['address'][0]]['name'] + " connected and was given id %d" % client['id'])
-        emit('message', json.dumps(packMSG('alert', 'all', 'server', sD.studentDict[client['address'][0]]['name'] + " has joined the server...")))
-        emit('message', json.dumps(packMSG('userlist', 'all', 'server', chatUsers())))
+        if request.remote_addr in sD.studentDict:
+            sD.studentDict[request.remote_addr]['sid'] = request.sid
+            print("[info] " + sD.studentDict[request.remote_addr]['name'] + " connected and was given id \"" + request.sid + "\"")
+            emit('alert', json.dumps(packMSG('all', 'server', sD.studentDict[request.remote_addr]['name'] + " has joined the server...")), broadcast=True)
+            emit('userlist', json.dumps(packMSG('all', 'server', chatUsers())), broadcast=True)
     except Exception as e:
         print("[error] " + "Error finding user in list: " + str(e))
-    '''
 
 @socket_.on('disconnect', namespace=chatnamespace)
 def disconnect():
-    '''
     try:
-        if client['address'][0] in sD.studentDict and 'wsID' in sD.studentDict[client['address'][0]]: #Do nothing is user has already disconnected or logged out
-            print("[info] " + sD.studentDict[client['address'][0]]['name'] + " disconnected")
-            del sD.studentDict[client['address'][0]]['wsID']
-            #Send a message to every client that isn't THIS disconnecting client, telling them the user disconnected
-            for i, user in enumerate(server.clients):
-                if not server.clients[i] == client:
-                    emit('message', server.clients[i], json.dumps(packMSG('alert', 'all', 'server', sD.studentDict[client['address'][0]]['name'] + " has left the server...")))
-                    emit('message', server.clients[i], json.dumps(packMSG('userlist', 'all', 'server', chatUsers())))
+        if request.remote_addr in sD.studentDict:
+            if 'sid' in sD.studentDict[request.remote_addr]:
+                del sD.studentDict[request.remote_addr]['sid']
+                print("[info] " + sD.studentDict[request.remote_addr]['name'] + " disconnected")
+                emit('alert', json.dumps(packMSG('all', 'server', sD.studentDict[request.remote_addr]['name'] + " has left the server...")), broadcast=True)
+                emit('userlist', json.dumps(packMSG('all', 'server', chatUsers())), broadcast=True)
     except Exception as e:
         print("[error] " + "Error finding user in list: " + str(e))
-    '''
 
 @socket_.on('message', namespace=chatnamespace)
 def message(message):
@@ -2656,11 +2637,9 @@ def message(message):
             else:
                 for student in sD.studentDict:
                     if sD.studentDict[student]['name'] == message['to'] or sD.studentDict[student]['name'] == message['from']:
-                        for toClient in server.clients:
-                            if toClient['id'] == sD.studentDict[student]['wsID']:
-                                messageOut = packMSG('message', message['to'], sD.studentDict[client['address'][0]]['name'], message['content'])
-                                server.send_message(toClient, json.dumps(messageOut))
-                                break
+                        messageOut = packMSG(message['to'], sD.studentDict[request.remote_addr]['name'], message['content'])
+                        emit('message', json.dumps(messageOut), to=sD.studentDict[student]['sid'])
+                        break
             print("[info] " + message['from'] + " said to " + message['to'] + ": " + message['content'])
     except Exception as e:
         print("[error] " + 'Error: ' + str(e))

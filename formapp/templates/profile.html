@@ -1,12 +1,18 @@
-{% extends 'header.html' %}
-<!-- ^^ This means add this file to the end of the contents of header.html -->
+{% extends 'header_content.html' %}
+<!-- ^^ This means add this file into the contents of the header page -->
 <!-- This is where the title, top buttons, and stylesheet is located -->
 
 <!-- Change title here -->
 {% block title %}{{ username }}'s profile{% endblock %}
 
 <!-- Extra style declarations here -->
-{% block style %}{% endblock %}
+{% block style %}
+  <style>
+    h1 {
+      text-align: left;
+    }
+  </style>
+{% endblock %}
 
 <!-- Change theme color here -->
 {% block color %}purple{% endblock %}
@@ -18,6 +24,7 @@
     <li><b>Permissions:</b> {{ perms }}</li>
     <li><b>Bot:</b> {{ bot }}</li>
 </ul>
+<span id="highScores"></span>
 {% endblock %}
 
 <!-- Extra javascript here -->
@@ -27,7 +34,7 @@
     let highScores = "{{ highScores }}".replaceAll("&#34;", "\"");
     highScores = JSON.parse(highScores);
 
-    document.body.innerHTML += `
+    document.getElementById("highScores").innerHTML += `
       <h2>High scores</h2>
       <ul>
           <li><b>2048:</b> ${highScores["2048"]?.[3] || 0}</li>
@@ -36,6 +43,7 @@
           <li><b>Minesweeper:</b> ${highScores["minesweeper"]?.[3] || 0}</li>
           <li><b>Speed Typer:</b> ${highScores["speedtype"]?.[3] || 0}</li>
           <li><b>Tower Defense objectives:</b> ${highScores["towerdefense"]?.[3] || 0}</li>
+          <li><b>Fighter wins:</b> ${highScores["fighter"]?.[3] || 0}</li>
           <li><b>Wordle:</b> ${highScores["wordle"]?.[3] || 0}</li>
       </ul>
     `;

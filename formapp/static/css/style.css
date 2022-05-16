@@ -45,8 +45,18 @@
   --highlight-color: var(--light-gray);
 }
 
+.classic {
+  background: var(--bg-dark-blue);
+  --bg-color: var(--light-blue);
+  --theme-color: var(--bg-dark-blue);
+  --main-color: black;
+  --gray-color: var(--dark-gray);
+  --emphasis-color: white;
+  --highlight-color: var(--light-gray);
+}
+
 /*Dark mode is default*/
-.dark, body:not(.light) {
+.dark, body:where(:not(.light):not(.classic)) {
   --bg-color: var(--bg-dark);
   --main-color: white;
   --gray-color: var(--light-gray);

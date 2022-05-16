@@ -1,5 +1,5 @@
-{% extends 'header.html' %}
-<!-- ^^ This means add this file to the end of the contents of header.html -->
+{% extends 'header_fullscreen.html' %}
+<!-- ^^ This means add this file into the contents of the header page -->
 <!-- This is where the title, top buttons, and stylesheet is located -->
 
 <!-- Change title here -->
@@ -32,6 +32,10 @@
 
   .msg.whisper {
     background-color: var(--bg-dark-purple);
+  }
+
+  .light .msg.whisper {
+    background-color: var(--light-purple);
   }
 
   .me {
@@ -91,7 +95,8 @@
     border-top: 1px solid var(--theme-color);
     position: fixed;
     width: 100%;
-    height: 60px;
+    box-sizing: border-box;
+    height: 100px;
     bottom: 0;
     left: 0;
     padding: 20px;
@@ -162,6 +167,15 @@
     bottom: 71px;
   }
 
+  #controlChat.disabled {
+    text-align: center;
+  }
+
+  body:not(.small) #controlChat.disabled {
+    line-height: 60px;
+    font-size: 32px;
+  }
+
   a {
     color: var(--theme-color);
   }
@@ -210,6 +224,10 @@
 
   .small #controlChat {
     height: 99px;
+  }
+
+  .small #controlChat.disabled {
+    padding: 17px 0;
   }
 
   .light #controlChat {
@@ -299,9 +317,7 @@
     if (myPerms > sayPerms) {
       let cc = document.getElementById("controlChat");
       cc.innerText = "You don't have high enough permissions to send chat messages.";
-      cc.style.textAlign = "center";
-      cc.style.lineHeight = "60px";
-      cc.style.fontSize = "32px";
+      cc.classList.add("disabled");
     }
 
     messages.forEach(message => {
@@ -332,6 +348,8 @@
 
     chatSocket.on("userlist", message => {
         message = JSON.parse(message);
+        console.log("userlist");
+        console.log(message);
         boxes.userlist.innerHTML = '<h2 id="ulHeading">Online</h2>'
         for (user in message.content) {
             let newUser = document.createElement('div');
@@ -345,7 +363,6 @@
               newUser.setAttribute("onclick", "changeRec('" + name + "', this)");
               newUser.title = "Send a private message";
               let profileButton = document.createElement("button");
-              newUser.appendChild(profileButton);
               profileButton.innerText = "View profile";
               profileButton.classList.add("profileButton");
               profileButton.onmouseover = event => event.stopPropagation();
@@ -353,6 +370,7 @@
                 window.location = "/profile?user=" + name;
                 event.stopPropagation();
               };
+              newUser.appendChild(profileButton);
               newUser.onmouseover = function() {this.classList.add("ulHover");};
               newUser.onmouseout = function() {this.classList.remove("ulHover");};
             }
@@ -464,8 +482,8 @@
         newMSG.classList.add('msg')
         if (message.to == username) newMSG.classList.add('whisper')
         if (message.from == username) newMSG.classList.add('me')
-        else if (message.from == 'server') {
-          newMSG.classList.add('alert')
+        else if (message.from == 'server' || !message.from) {
+          newMSG.classList.add('alert');
           message.from = "";
         }
         else {
@@ -480,16 +498,17 @@
         message.content = textarea.value;
 
         let note = "";
-        if (message.from == "server" || !message.from) note = "· From server";
-        else if (message.to != "all") note = "· Private message";
+        if (!message.from) note = "· From server";
+        else if (message.to != "all") note = (message.from == username) ? "· To " + message.to : "· Private message";
 
         newMSG.innerHTML = `
           <b class="username" onclick="${usernameOnclick}" title="${usernameTitle}">${message.from}</b>
           <span style="color: var(--gray-color);">${dateString(message.time)} ${note}</span>
         `;
         let content = document.createElement("div");
+        content.classList.add("content");
         //The server can send HTML; students can't
-        if (message.from == "server" || !message.from) content.innerHTML = message.content;
+        if (!message.from) content.innerHTML = message.content;
         else content.innerText = message.content;
         newMSG.append(content);
 

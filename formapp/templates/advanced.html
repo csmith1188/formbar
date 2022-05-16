@@ -1,5 +1,5 @@
-{% extends 'header.html' %}
-<!-- ^^ This means add this file to the end of the contents of header.html -->
+{% extends 'header_fullscreen.html' %}
+<!-- ^^ This means add this file into the contents of the header page -->
 <!-- This is where the title, top buttons, and stylesheet is located -->
 
 <!-- Change title here -->
@@ -346,7 +346,7 @@
 
     <h2>More</h2>
     <a href="javascript:logOut();">Log out</a><br>
-    <a href="/changepassword">Change your password</a><br>
+    <a href="javascript:openPage('changepassword');">Change your password</a><br>
     <a href="/quickpanel">Go to the quick panel</a><br>
     <a href="/home">Go to the standard homepage</a><br>
     <a href="/setdefault">Set default homepage</a><br>
@@ -367,19 +367,19 @@
     <div id="gamesMenu" class="menu hidden" tabindex="-1">
       <div id="2048Tab" class="tab" onclick="openPage('games/2048');">2048</div>
       <div id="bitshifterTab" class="tab" onclick="openPage('games/bitshifter');">Bitshifter</div>
+      <div id="flashcardsTab" class="tab" onclick="openPage('games/flashcards');">Flashcards</div>
       <div id="hangmanTab" class="tab" onclick="openPage('games/hangman');">Hangman</div>
       <div id="minesweeperTab" class="tab" onclick="openPage('games/minesweeper');">Minesweeper</div>
       <div id="speedtypeTab" class="tab" onclick="openPage('games/speedtype');">Speed Typer</div>
       <div id="tttTab" class="tab hidden" onclick="openPage('games/ttt');">Tic-tac-toe</div>
       <div id="towerdefenseTab" class="tab" onclick="openPage('games/towerdefense');">Tower Defense</div>
-      <div id="fighterTab" class="tab hidden" onclick="openPage('games/fighter');">Turn-Based Fighter</div>
+      <div id="fighterTab" class="tab" onclick="openPage('games/fighter');">Turn-Based Fighter</div>
       <div id="wordleTab" class="tab" onclick="openPage('games/wordle');">Wordle</div>
-      <div id="flashcardsTab" class="tab" onclick="openPage('games/flashcards');">Flashcards</div>
       <div id="leaderboardsTab" class="tab" onclick="openPage('leaderboards');">Leaderboards</div>
     </div>
     <div id="teacherTab" class="tab dropdown"><img src="{{ url_for('static', filename='img/advanced/teacher.png') }}" class="icon"> <span class="tabText">Teacher</span></div>
     <div id="teacherMenu" class="menu hidden" tabindex="-1">
-      <div id="settingsTab" class="tab" onclick="openPage('settings');">Settings</div>
+      <div id="controlpanelTab" class="tab" onclick="openPage('controlpanel');">Teacher controls</div>
       <div id="usersTab" class="tab" onclick="openPage('users');">User list</div>
       <div id="lessonTab" class="tab" onclick="openPage('lesson');">Lesson</div>
       <div id="virtualbarTab" class="tab" onclick="openPage('virtualbar');">Virtual bar</div>
@@ -524,7 +524,7 @@
       let cl = document.getElementById(tab + "Tab").classList;
       meRes.perms > permsRes.games ? cl.add("unselectable") : cl.remove("unselectable");
     });
-    ["settings", "users", "lesson"].forEach(tab => {
+    ["controlpanel", "users", "lesson"].forEach(tab => {
       let cl = document.getElementById(tab + "Tab").classList;
       meRes.perms > permsRes.teacher ? cl.add("unselectable") : cl.remove("unselectable");
     });
@@ -600,7 +600,7 @@
     tabs.forEach(tab => tab.classList.remove("open"));
     if (["/help", "/break", "/wawd"].includes(path)) document.getElementById("studentsTab").classList.add("open");
     if (path.startsWith("/games") || path == "/leaderboards") document.getElementById("gamesTab").classList.add("open");
-    if (["/settings", "/users", "/lesson", "/virtualbar"].includes(path)) document.getElementById("teacherTab").classList.add("open");
+    if (["/controlpanel", "/users", "/lesson", "/virtualbar"].includes(path)) document.getElementById("teacherTab").classList.add("open");
     if (tabEl) tabEl.classList.add("open");
     if (["/abcd", "/advanced", "/home", "/mobile", "/quickpanel", "/essay", "/tutd"].includes(path)) openPage(defaultPage);
     if (path == "/chat") {

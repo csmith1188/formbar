@@ -1,7 +1,7 @@
 <!-- Created by Oley Birkeland -->
 
-{% extends 'header.html' %}
-<!-- ^^ This means add this file to the end of the contents of header.html -->
+{% extends 'header_fullscreen.html' %}
+<!-- ^^ This means add this file into the contents of the header page -->
 <!-- This is where the title, top buttons, and stylesheet is located -->
 
 <!-- Change title here -->
@@ -543,7 +543,7 @@
     <div style="top: 16px; left: 16px;">
       <h2 id="myName"></h2>
       Total wins: <span id="myWins"></span><br>
-      Win percentage: <span id="myPercent"></span><br>
+      Win rate: <span id="myPercent"></span><br>
       Win streak: <span id="myStreak"></span><br>
       <u id="resetStats">Reset stats</u>
     </div>
@@ -570,7 +570,7 @@
 
     <div class="large hCentered" style="top: 16px;">
       Choose two fighters to take into the match.<br>
-      <button id="randomButton"><img src="{{ url_for('static', filename='img/fighter/random.png') }}" class="randomIcon"> Random</button>
+      <button id="randomButton"><img src="{{ url_for('static', filename='img/fighter/random.png') }}" class="randomIcon" draggable="false"> Random</button>
     </div>
     <div id="fighterOptions" class="vCentered">
       <div id="redFighter"></div>
@@ -617,7 +617,7 @@
       <div>
         <h2 id="p1-name"></h2>
         Total wins: <span id="p1-wins"></span><br>
-        Win percentage: <span id="p1-percent"></span><br>
+        Win rate: <span id="p1-percent"></span><br>
         Win streak: <span id="p1-streak"></span>
       </div>
 
@@ -629,7 +629,7 @@
       <div style="top: 8px; right: 8px; text-align: right;">
         <h2 id="p2-name"></h2>
         Total wins: <span id="p2-wins"></span><br>
-        Win percentage: <span id="p2-percent"></span><br>
+        Win rate: <span id="p2-percent"></span><br>
         Win streak: <span id="p2-streak"></span>
       </div>
 
@@ -1009,9 +1009,9 @@
         items: [],
         effects: {},
         //Convert from strings to numbers; set to 0 if undefined
-        wins: +localStorage.getItem("fighterWins") || 0,
-        losses: +localStorage.getItem("fighterLosses") || 0,
-        winStreak: +localStorage.getItem("fighterWinStreak") || 0,
+        wins: "{{ wins }}",
+        losses: "{{ losses }}",
+        winStreak: "{{ winStreak }}",
       };
 
       let colors = [red, yellow, green, blue];
@@ -1075,6 +1075,7 @@
           from: me.name,
           content: {
             type: "player",
+            match: matchCode,
             player: me
           },
         }
@@ -1091,14 +1092,16 @@
           time: Date.now(),
           content: content
         };
-        ////chatSocket.emit("message", JSON.stringify(messageObj));
-        if (!recipient != "all") { //If message is private, send to sender in addition to recipient ////still necessary?
+        chatSocket.emit("message", JSON.stringify(messageObj));
+        if (!recipient != "all") { //If message is private, send to sender in addition to recipient
           messageObj.to = me.name;
-          ////chatSocket.emit("message", JSON.stringify(messageObj));
+          chatSocket.emit("message", JSON.stringify(messageObj));
         }
       }
 
       function sendMove(moveObj) {
+        console.log("match");
+        console.log(matchCode);
         let sendObj = {
           to: opponent.name,
           from: me.name,
@@ -1118,10 +1121,12 @@
 
       chatSocket.on("fighter", message => {
         let data = JSON.parse(message);
-        console.log(data);
-        if (data.content.type == "join" && data.from != me.name) document.getElementById("opponentStatus").innerText = "Opponent is getting ready…";
-        if (data.content.type == "player" && data.from != me.name) receivePlayerReady(data.content.player);
-        else if (data.content.match == matchCode) { //Only receive if sent from current match
+        if (data.content.match == matchCode) { //Only receive if sent from current match
+          console.log("msg");
+          console.log(data);
+          if (data.content.type == "join" && data.from != me.name) document.getElementById("opponentStatus").innerText = "Opponent is getting ready…";
+          if (data.content.type == "player" && data.from != me.name) receivePlayerReady(data.content.player);
+          console.log("type");
           console.log(data.content.type);
           if (data.content.type == "move") receiveMove(data.content.move);
           else if (data.content.type == "item") receiveItem(data.content);
@@ -1161,11 +1166,23 @@
           document.getElementById("myStreak").innerText = me.winStreak;
         }
 
-        ////save to account instead of local storage
-        localStorage.setItem("fighterWins", me.wins);
-        localStorage.setItem("fighterLosses", me.losses);
-        localStorage.setItem("fighterWinStreak", me.winStreak);
-        if (me.winStreak == gold.unlockStreak) localStorage.setItem("goldUnlocked", true);
+        let request1 = new XMLHttpRequest();
+        request1.open("POST", "/updateuser?field=fighterWins&value=" + me.wins);
+        request1.send();
+
+        let request2 = new XMLHttpRequest();
+        request2.open("POST", "/updateuser?field=fighterLosses&value=" + me.losses);
+        request2.send();
+
+        let request3 = new XMLHttpRequest();
+        request3.open("POST", "/updateuser?field=fighterWinStreak&value=" + me.winStreak);
+        request3.send();
+
+        if (me.winStreak == gold.unlockStreak) {
+          let request4 = new XMLHttpRequest();
+          request4.open("POST", "/updateuser?field=goldUnlocked&value=1");
+          request4.send();
+        }
       }
 
       function resetStats() {
@@ -1173,7 +1190,8 @@
           me.wins = 0;
           me.losses = 0;
           me.winStreak = 0;
-          localStorage.setItem("goldUnlocked", "");
+          request.open("POST", "/updateuser?field=goldUnlocked&value=0");
+          request.send();
           updateStats();
         }
       }
@@ -1195,10 +1213,14 @@
           me.team = 2;
           me.fighters = [fighter2a, fighter2b];
           opponent.name = match.creator;
+          matchCode = code;
           chatSocket.emit("fighter", JSON.stringify({
             to: opponent.name,
             from: me.name,
-            content: {type: "join"}
+            content: {
+              type: "join",
+              match: code
+            }
           }));
           fighterOptions();
         }
@@ -1227,7 +1249,7 @@
 
         lockedColors.forEach((color) => {
           /*//for testing ///et*/
-          if ((color.unlockWins && me.wins >= color.unlockWins)/* || localStorage.getItem(color.color + "Unlocked")*/) { //If player has enough wins to unlock or already unlocked
+          if ((color.unlockWins && me.wins >= color.unlockWins)/* || color.color = "gold" && {{ goldUnlocked }}*/) { //If player has enough wins to unlock or already unlocked
             colors.push(color);
             lockedColors = lockedColors.filter(locked => locked != color);
           } else {
@@ -1235,11 +1257,11 @@
             let lockedMessage;
             if (color.unlockWins) lockedMessage = color.unlockWins + " wins to unlock";
             /*//for testing ///et*/
-            else if (localStorage.getItem(color.color + "Unlocked")) lockedMessage = "Temporarily disabled<br>due to bugs";
+            else if (color.color = "gold" && {{ goldUnlocked }}) lockedMessage = "Temporarily disabled<br>due to bugs";
             else lockedMessage = color.unlockStreak + "-win streak to unlock";
             el.classList.add("fighter", "locked");
             el.innerHTML = `<div class="vCentered" style="left: 0; width: 100%; text-align: center;">
-              <img src="{{ url_for('static', filename='img/fighter/locked.png') }}" class="lockedIcon"><br><br>
+              <img src="{{ url_for('static', filename='img/fighter/locked.png') }}" class="lockedIcon" draggable="false"><br><br>
               <h2>${lockedMessage}</h2>
             </div>`;
           }
@@ -1540,7 +1562,6 @@
         } else {
           fighter1a = opponent.fighters[0];
           fighter1b = opponent.fighters[1];
-          matchCode = player.match;
           opponent.firstMove ? me.firstMove = false : me.firstMove = true;
         }
         fighters = [fighter1a, fighter1b, fighter2a, fighter2b];
@@ -1571,8 +1592,13 @@
 
         //Add a loss and reset win streak if player leaves during match
         window.onunload = () => {
-          localStorage.setItem("fighterLosses", me.losses + 1);
-          localStorage.setItem("fighterWinStreak", 0);
+          let request1 = new XMLHttpRequest();
+          request1.open("POST", "/updateuser?field=fighterLosses&value=" + me.losses + 1);
+          request1.send();
+
+          let request2 = new XMLHttpRequest();
+          request2.open("POST", "/updateuser?field=fighterWinStreak&value=0");
+          request2.send();
         };
 
         players = [player1, player2];
@@ -1843,22 +1869,21 @@
         if (move.charged == move.charge) { //If move is fully charged
           move.charged = 0;
           sender.chargeTarget = null;
-          //Reset all chargeSquares
-          for (let i = 1; i <= move.charge; i++) {
-            let el = document.getElementById(sender.name + "-" + move.id + "-cs" + i);
-            el.classList.remove("charged");
-          }
           if (fighters.includes(target) || !target) useMove(sender, move, target);
           else { //If target is defeated
             sendMessage(me.name + " couldn't use " + capitalize(sender.color) + "'s " + move.name + " because the target was already defeated.");
-            endTurn();
           }
         } else {
-          let el = document.getElementById(sender.name + "-" + move.id + "-cs" + ++move.charged);
           sender.chargeTarget = target;
-          el.classList.add("charged");
           sendMessage(me.name + " charged " + capitalize(sender.color) + "'s " + move.name + ".");
-          endTurn();
+
+          let sendObj = {
+            type: "charge",
+            sender: sender,
+            move: move,
+            target: target
+          };
+          sendMove(sendObj);
         }
       }
 
@@ -1980,6 +2005,12 @@
             endMatch(data.winner);
           }
 
+          else if (data.type == "charge") {
+            console.log(document.getElementById(data.sender.name + "-" + data.move.id + "-cs" + ++data.move.charged));
+            let el = document.getElementById(data.sender.name + "-" + data.move.id + "-cs" + ++data.move.charged);
+            el.classList.add("charged");
+          }
+
           else if (data.move.type == "revenge") addEffect("revenge", data.sender, data.move.revengeDuration);
 
           else if (data.move.type == "effectRevenge") active.fighters.forEach(fighter => addEffect("effectRevenge", fighter, data.move.effectRevengeDuration));
@@ -2044,6 +2075,12 @@
               }
             });
 
+            //Reset all chargeSquares
+            for (let i = 1; i <= data.move.charge; i++) {
+              let el = document.getElementById(data.sender.name + "-" + data.move.id + "-cs" + i);
+              el.classList.remove("charged");
+            }
+
             //Attack animation
             let root = document.documentElement;
             if (data.sender.team == 1) root.style.setProperty("--attack-x", "4px");
@@ -2051,6 +2088,7 @@
             if (data.targets.length == 1 && data.sender.name.includes("a") && data.targets[0].name.includes("b")) root.style.setProperty("--attack-y", "4px");
             else if (data.targets.length == 1 && data.sender.name.includes("b") && data.targets[0].name.includes("a")) root.style.setProperty("--attack-y", "-4px");
             else root.style.setProperty("--attack-y", "0");
+            data.sender.el = document.getElementById("fighter" + data.sender.name);
             data.sender.el.classList.add("attack");
             setTimeout(() => data.sender.el.classList.remove("attack"), 400);
           }
@@ -2157,6 +2195,8 @@
       }
 
       function receiveItem(data) {
+        console.log("ri");
+        console.log(data);
         let itemObj = items[data.item];
 
         if (data.item == "heal") heal(data.target, 30);
@@ -2221,6 +2261,7 @@
           opponent.fighters.splice(opponent.fighters.indexOf(target), 1);
           opponent.defeated.push(target);
         }
+        target.el = document.getElementById("fighter" + target.name);
         target.el.classList.add("defeated");
         target.el.innerText = "Defeated";
         sendMessage(target.name + "'s " + capitalize(target.color) + " defeated.");
@@ -2316,6 +2357,8 @@
       }
 
       function endTurn() {
+        console.log("end turn");
+        console.log(Date.now());
         clearInterval(countdown);
 
         //Disable moves and items
@@ -2349,7 +2392,7 @@
         document.getElementById("game").classList.add("hidden");
         document.getElementById("matchOver").classList.remove("hidden");
 
-        window.onbeforeunload = () => false;
+        window.onbeforeunload = null;
 
         if (winner == me) {
           resultEl.innerText = "You win!";
@@ -2357,6 +2400,9 @@
           me.winStreak++;
           opponent.losses++;
           opponent.winStreak = 0;
+
+          request.open("POST", "/savescore?game=fighter&score=" + me.wins);
+          request.send();
         } else {
           resultEl.innerText = "You lose";
           opponent.wins++;
@@ -2370,6 +2416,9 @@
       window.onunload = null;
 
       function rematchButton() {
+        ////
+        alert("This feature is not available yet.");
+        return;
         let el = document.getElementById("rematchButton");
         el.classList.add("pressed");
         el.onclick = null;
@@ -2403,5 +2452,559 @@
 
       ////delete own matches on disconnect
     }
+
+    let testPlayer = `{
+      "type": "player",
+      "match": "962273",
+      "player": {
+          "name": "Oley456",
+          "defeated": [],
+          "colors": [
+              {
+                  "color": "green",
+                  "effective": "blue",
+                  "weak": "yellow",
+                  "moves": {
+                      "main": {
+                          "damage": 24,
+                          "description": "Deals [damage] damage.",
+                          "name": "main attack",
+                          "id": "main",
+                          "charged": 0
+                      },
+                      "alt": {
+                          "damage": 21,
+                          "stunChance": 25,
+                          "stunDuration": 1,
+                          "description": "Deals [damage] damage. 25% chance of stunning target for 1 turn.",
+                          "name": "alt attack",
+                          "id": "alt",
+                          "charged": 0
+                      },
+                      "special": {
+                          "charge": 2,
+                          "damage": 78,
+                          "description": "Deals [damage] damage.",
+                  "hp": 100,
+                  "attackFactor": 1,
+                  "effects": {}
+              },
+              {
+                  "color": "blue",
+                  "effective": "red",
+                  "weak": "green",
+                  "moves": {
+                      "main": {
+                          "damage": 16,
+                          "poisonChance": 100,
+                          "poisonDuration": 3,
+                          "description": "Deals [damage] damage, then 5 damage per turn for the next 3 turns.",
+                          "name": "main attack",
+                          "id": "main",
+                          "charged": 0
+                      },
+                      "special": {
+                          "charge": 1,
+                          "damage": 50,
+                          "secondaryTarget": true,
+                          "secondaryDamage": 15,
+                          "combinedDamage": 60,
+                          "description": "Deals [damage] damage to target and [secondaryDamage] to other fighter. If one opponent fighter is already defeated, deals [combinedDamage] damage.",
+                          "name": "special attack",
+                          "id": "special",
+                          "charged": 0
+                      },
+                      "other": {
+                          "disorientChance": 100,
+                          "disorientDuration": 2,
+                          "description": "Target's attacks have a 40% chance of missing. Lasts for 2 turns.",
+                          "name": "other move",
+                          "id": "other",
+                          "charged": 0
+                      }
+                  },
+                  "hp": 100,
+                  "attackFactor": 1,
+                  "effects": {}
+              }
+          ],
+          "items": [
+              "heal",
+              "skipTurn",
+              "fastTimer"
+          ],
+          "effects": {},
+          "wins": "0",
+          "losses": "0",
+          "winStreak": "0",
+          "team": 2,
+          "fighters": [
+              {
+                  "team": 2,
+                  "name": "2a",
+                  "color": "green",
+                  "effective": "blue",
+                  "weak": "yellow",
+                  "moves": {
+                      "main": {
+                          "damage": 24,
+                          "description": "Deals [damage] damage.",
+                          "name": "main attack",
+                          "id": "main",
+                          "charged": 0,
+                          "el": {}
+                      },
+                      "alt": {
+                          "damage": 21,
+                          "stunChance": 25,
+                          "stunDuration": 1,
+                          "description": "Deals [damage] damage. 25% chance of stunning target for 1 turn.",
+                          "name": "alt attack",
+                          "id": "alt",
+                          "charged": 0,
+                          "el": {}
+                      },
+                      "special": {
+                          "charge": 2,
+                          "damage": 78,
+                          "description": "Deals [damage] damage.",
+                          "name": "special attack",
+                          "id": "special",
+                          "charged": 0,
+                          "el": {}
+                      }
+                  },
+                  "hp": 100,
+                  "attackFactor": 1,
+                  "effects": {},
+                  "el": {}
+              },
+              {
+                  "team": 2,
+                  "name": "2b",
+                  "color": "blue",
+                  "effective": "red",
+                  "weak": "green",
+                  "moves": {
+                      "main": {
+                          "damage": 16,
+                          "poisonChance": 100,
+                          "poisonDuration": 3,
+                          "description": "Deals [damage] damage, then 5 damage per turn for the next 3 turns.",
+                          "name": "main attack",
+                          "id": "main",
+                          "charged": 0,
+                          "el": {}
+                      },
+                      "special": {
+                          "charge": 1,
+                          "damage": 50,
+                          "secondaryTarget": true,
+                          "secondaryDamage": 15,
+                          "combinedDamage": 60,
+                          "description": "Deals [damage] damage to target and [secondaryDamage] to other fighter. If one opponent fighter is already defeated, deals [combinedDamage] damage.",
+                          "name": "special attack",
+                          "id": "special",
+                          "charged": 0,
+                          "el": {}
+                      },
+                      "other": {
+                          "disorientChance": 100,
+                          "disorientDuration": 2,
+                          "description": "Target's attacks have a 40% chance of missing. Lasts for 2 turns.",
+                          "name": "other move",
+                          "id": "other",
+                          "charged": 0,
+                          "el": {}
+                      }
+                  },
+                  "hp": 100,
+                  "attackFactor": 1,
+                  "effects": {},
+                  "el": {}
+              }
+          ]
+      }
+    }`;
+
+    let testCharge = `{
+    "type": "charge",
+    "sender": {
+        "team": 1,
+        "name": "1b",
+        "color": "green",
+        "effective": "blue",
+        "weak": "yellow",
+        "moves": {
+            "main": {
+                "damage": 24,
+                "description": "Deals [damage] damage.",
+                "name": "main attack",
+                "id": "main",
+                "charged": 0,
+                "el": {}
+            },
+            "alt": {
+                "damage": 21,
+                "stunChance": 25,
+                "stunDuration": 1,
+                "description": "Deals [damage] damage. 25% chance of stunning target for 1 turn.",
+                "name": "alt attack",
+                "id": "alt",
+                "charged": 0,
+                "el": {}
+            },
+            "special": {
+                "charge": 2,
+                "damage": 78,
+                "description": "Deals [damage] damage.",
+                "name": "special attack",
+                "id": "special",
+                "charged": 0,
+                "el": {}
+            }
+        },
+        "hp": 100,
+        "attackFactor": 1,
+        "effects": {},
+        "el": {},
+        "chargeTarget": {
+            "team": 2,
+            "name": "2a",
+            "color": "red",
+            "effective": "yellow",
+            "weak": "blue",
+            "moves": {
+                "main": {
+                    "damage": 14,
+                    "doubleTarget": true,
+                    "description": "Deals [damage] damage to both opponent fighters.",
+                    "name": "main attack",
+                    "id": "main",
+                    "charged": 0,
+                    "el": {}
+                },
+                "special": {
+                    "charge": 1,
+                    "minDamage": 45,
+                    "maxDamage": 65,
+                    "description": "Deals at least [minDamage] and up to [maxDamage] damage.",
+                    "name": "special attack",
+                    "id": "special",
+                    "charged": 0,
+                    "el": {}
+                },
+                "other": {
+                    "type": "revenge",
+                    "revengeDuration": 2,
+                    "selfTarget": true,
+                    "description": "Opponents will take 50% of the damage they inflict on this fighter. Lasts for 2 turns.",
+                    "name": "other move",
+                    "id": "other",
+                    "charged": 0,
+                    "el": {}
+                }
+            },
+            "hp": 100,
+            "attackFactor": 1,
+            "effects": {},
+            "el": {}
+        }
+    },
+    "move": {
+        "charge": 2,
+        "damage": 78,
+        "description": "Deals [damage] damage.",
+        "name": "special attack",
+        "id": "special",
+        "charged": 2,
+        "el": {}
+    },
+    "target": {
+        "team": 2,
+        "name": "2a",
+        "color": "red",
+        "effective": "yellow",
+        "weak": "blue",
+        "moves": {
+            "main": {
+                "damage": 14,
+                "doubleTarget": true,
+                "description": "Deals [damage] damage to both opponent fighters.",
+                "name": "main attack",
+                "id": "main",
+                "charged": 0,
+                "el": {}
+            },
+            "special": {
+                "charge": 1,
+                "minDamage": 45,
+                "maxDamage": 65,
+                "description": "Deals at least [minDamage] and up to [maxDamage] damage.",
+                "name": "special attack",
+                "id": "special",
+                "charged": 0,
+                "el": {}
+            },
+            "other": {
+                "type": "revenge",
+                "revengeDuration": 2,
+                "selfTarget": true,
+                "description": "Opponents will take 50% of the damage they inflict on this fighter. Lasts for 2 turns.",
+                "name": "other move",
+                "id": "other",
+                "charged": 0,
+                "el": {}
+            }
+        },
+        "hp": 100,
+        "attackFactor": 1,
+        "effects": {},
+        "el": {}
+    }
+  }`;
+
+  let testEffect = `{
+    "sender": {
+        "team": 2,
+        "name": "2a",
+        "color": "red",
+        "effective": "yellow",
+        "weak": "blue",
+        "moves": {
+            "main": {
+                "damage": 14,
+                "doubleTarget": true,
+                "description": "Deals [damage] damage to both opponent fighters.",
+                "name": "main attack",
+                "id": "main",
+                "charged": 0,
+                "el": {}
+            },
+            "special": {
+                "charge": 1,
+                "minDamage": 45,
+                "maxDamage": 65,
+                "description": "Deals at least [minDamage] and up to [maxDamage] damage.",
+                "name": "special attack",
+                "id": "special",
+                "charged": 0,
+                "el": {}
+            },
+            "other": {
+                "type": "revenge",
+                "revengeDuration": 2,
+                "selfTarget": true,
+                "description": "Opponents will take 50% of the damage they inflict on this fighter. Lasts for 2 turns.",
+                "name": "other move",
+                "id": "other",
+                "charged": 0,
+                "el": {}
+            }
+        },
+        "hp": 100,
+        "attackFactor": 1,
+        "effects": {
+            "revenge": 2
+        },
+        "el": {}
+    },
+    "targets": [
+        {
+            "team": 1,
+            "name": "1a",
+            "color": "red",
+            "effective": "yellow",
+            "weak": "blue",
+            "moves": {
+                "main": {
+                    "damage": 14,
+                    "doubleTarget": true,
+                    "description": "Deals [damage] damage to both opponent fighters.",
+                    "name": "main attack",
+                    "id": "main",
+                    "charged": 0,
+                    "el": {}
+                },
+                "special": {
+                    "charge": 1,
+                    "minDamage": 45,
+                    "maxDamage": 65,
+                    "description": "Deals at least [minDamage] and up to [maxDamage] damage.",
+                    "name": "special attack",
+                    "id": "special",
+                    "charged": 0,
+                    "el": {}
+                },
+                "other": {
+                    "type": "revenge",
+                    "revengeDuration": 2,
+                    "selfTarget": true,
+                    "description": "Opponents will take 50% of the damage they inflict on this fighter. Lasts for 2 turns.",
+                    "name": "other move",
+                    "id": "other",
+                    "charged": 0,
+                    "el": {}
+                }
+            },
+            "hp": 100,
+            "attackFactor": 1,
+            "effects": {},
+            "el": {}
+        },
+        {
+            "team": 1,
+            "name": "1b",
+            "color": "green",
+            "effective": "blue",
+            "weak": "yellow",
+            "moves": {
+                "main": {
+                    "damage": 24,
+                    "description": "Deals [damage] damage.",
+                    "name": "main attack",
+                    "id": "main",
+                    "charged": 0,
+                    "el": {}
+                },
+                "alt": {
+                    "damage": 21,
+                    "stunChance": 25,
+                    "stunDuration": 1,
+                    "description": "Deals [damage] damage. 25% chance of stunning target for 1 turn.",
+                    "name": "alt attack",
+                    "id": "alt",
+                    "charged": 0,
+                    "el": {}
+                },
+                "special": {
+                    "charge": 2,
+                    "damage": 78,
+                    "description": "Deals [damage] damage.",
+                    "name": "special attack",
+                    "id": "special",
+                    "charged": 0,
+                    "el": {}
+                }
+            },
+            "hp": 100,
+            "attackFactor": 1,
+            "effects": {},
+            "el": {}
+        }
+    ],
+    "senderTeammate": {
+        "team": 2,
+        "name": "2b",
+        "color": "yellow",
+        "effective": "green",
+        "weak": "red",
+        "moves": {
+            "main": {
+                "damage": 20,
+                "critDamage": 40,
+                "critChance": 10,
+                "description": "Deals [damage] damage. 10% chance of a critical hit, which deals [critDamage] damage.",
+                "name": "main attack",
+                "id": "main",
+                "charged": 0,
+                "el": {}
+            },
+            "alt": {
+                "damage": 7,
+                "doubleTarget": true,
+                "healing": true,
+                "description": "Deals [damage] damage to both opponent fighters. Dealt damage is added to this fighter's HP.",
+                "name": "alt attack",
+                "id": "alt",
+                "charged": 0,
+                "el": {}
+            },
+            "other": {
+                "type": "sacrifice",
+                "selfTarget": true,
+                "description": "Sacrifice this fighter. Teammate's attack power increases by 1% for each remaining HP.",
+                "name": "other move",
+                "id": "other",
+                "charged": 0,
+                "el": {}
+            }
+        },
+        "hp": 100,
+        "attackFactor": 1,
+        "effects": {},
+        "el": {}
+    },
+    "move": {
+        "type": "revenge",
+        "revengeDuration": 2,
+        "selfTarget": true,
+        "description": "Opponents will take 50% of the damage they inflict on this fighter. Lasts for 2 turns.",
+        "name": "other move",
+        "id": "other",
+        "charged": 0,
+        "el": {}
+    },
+    "damage": [
+        null,
+        null
+    ],
+    "selfDamage": 0,
+    "teammateDamage": 0,
+    "poison": [],
+    "disorient": [],
+    "stun": []
+  }`;
+
+  let testItem = `{
+    "match": "621664",
+    "type": "item",
+    "item": "attackBoost",
+    "target": {
+        "team": 2,
+        "name": "2a",
+        "color": "red",
+        "effective": "yellow",
+        "weak": "blue",
+        "moves": {
+            "main": {
+                "damage": 14,
+                "doubleTarget": true,
+                "description": "Deals [damage] damage to both opponent fighters.",
+                "name": "main attack",
+                "id": "main",
+                "charged": 0,
+                "el": {}
+            },
+            "special": {
+                "charge": 1,
+                "minDamage": 45,
+                "maxDamage": 65,
+                "description": "Deals at least [minDamage] and up to [maxDamage] damage.",
+                "name": "special attack",
+                "id": "special",
+                "charged": 0,
+                "el": {}
+            },
+            "other": {
+                "type": "revenge",
+                "revengeDuration": 2,
+                "selfTarget": true,
+                "description": "Opponents will take 50% of the damage they inflict on this fighter. Lasts for 2 turns.",
+                "name": "other move",
+                "id": "other",
+                "charged": 0,
+                "el": {}
+            }
+        },
+        "hp": 100,
+        "attackFactor": 1.5,
+        "effects": {
+            "attackBoost": 3
+        },
+        "el": {}
+    },
+    "slot": 1
+  }`;
   </script>
 {% endblock %}

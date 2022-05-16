@@ -95,7 +95,8 @@
     border-top: 1px solid var(--theme-color);
     position: fixed;
     width: 100%;
-    height: 60px;
+    box-sizing: border-box;
+    height: 100px;
     bottom: 0;
     left: 0;
     padding: 20px;
@@ -166,6 +167,15 @@
     bottom: 71px;
   }
 
+  #controlChat.disabled {
+    text-align: center;
+  }
+
+  body:not(.small) #controlChat.disabled {
+    line-height: 60px;
+    font-size: 32px;
+  }
+
   a {
     color: var(--theme-color);
   }
@@ -214,6 +224,10 @@
 
   .small #controlChat {
     height: 99px;
+  }
+
+  .small #controlChat.disabled {
+    padding: 17px 0;
   }
 
   .light #controlChat {
@@ -303,9 +317,7 @@
     if (myPerms > sayPerms) {
       let cc = document.getElementById("controlChat");
       cc.innerText = "You don't have high enough permissions to send chat messages.";
-      cc.style.textAlign = "center";
-      cc.style.lineHeight = "60px";
-      cc.style.fontSize = "32px";
+      cc.classList.add("disabled");
     }
 
     messages.forEach(message => {
@@ -487,7 +499,7 @@
 
         let note = "";
         if (!message.from) note = "· From server";
-        else if (message.to != "all") note = "· Private message";
+        else if (message.to != "all") note = (message.from == username) ? "· To " + message.to : "· Private message";
 
         newMSG.innerHTML = `
           <b class="username" onclick="${usernameOnclick}" title="${usernameTitle}">${message.from}</b>

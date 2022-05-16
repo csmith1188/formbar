@@ -2507,7 +2507,11 @@ def endpoint_users():
             else:
                 return render_template("message.html", message = "No action given.")
         else:
-            return render_template("users.html")
+            db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+            dbcmd = db.cursor()
+            users = dbcmd.execute("SELECT * FROM users").fetchall()
+            db.close()
+            return render_template("users.html", users = users)
 
 # ██    ██
 # ██    ██

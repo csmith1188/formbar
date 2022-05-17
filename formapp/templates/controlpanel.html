@@ -122,7 +122,6 @@
     <button id="collapseButton" class="inline popOut hidden">Collapse all</button>
     <div id="students">
     </div>
-    <button id="addUser" class="inline popOut">Add user</button>
   </div>
   <div id="tabs-2">
     <h2>Number of students</h2>
@@ -871,17 +870,6 @@
       el.value = el.options[meRes.perms].value; //If perms are not updated, give el the correct value
     }
   }
-
-  document.getElementById("addUser").addEventListener("click", () => {
-    let username = prompt("New user's name:");
-    if (username) {
-      let password = prompt("New user's password:");
-      if (password) {
-        request.open("POST", `/createaccount?name=${username}&password=${password}`);
-        request.send();
-      }
-    }
-  });
 </script>
 <script src="../static/jquery/external/jquery/jquery.js" charset="utf-8"></script>
 <script src="../static/jquery/jquery-ui.min.js" charset="utf-8"></script>

@@ -66,7 +66,7 @@
 {% block main %}
 <h1>Users</h1>
 <div id="users"></div>
-<button id="addUser" class="inline popOut">Add user</button>
+<button id="addUser" class="inline popOut">Create new account</button>
 {% endblock %}
 
 <!-- Extra javascript here -->
@@ -227,10 +227,7 @@
       let username = prompt("New user's name:");
       if (username) {
         let password = prompt("New user's password:");
-        if (password) {
-          request.open("POST", `/createaccount?name=${username}&password=${password}`);
-          request.send();
-        }
+        if (password) window.location = `/createaccount?name=${username}&password=${password}`;
       }
     });
 </script>

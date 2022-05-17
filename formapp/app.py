@@ -1340,21 +1340,28 @@ def endpoint_controlpanel():
 def endpoint_countdown():
     return render_template("message.html", message = 'This feature is not available yet.')
 
-@app.route('/createaccount', methods = ['POST'])
+@app.route('/createaccount')
 def endpoint_createaccount():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['teacher']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
     name = request.args.get('name')
-    password = request.args.get('password')
-    passwordCrypt = cipher.encrypt(password.encode())
     db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
     dbcmd = db.cursor()
-    dbcmd.execute("INSERT INTO users (username, password, permissions, bot) VALUES (?, ?, ?, ?)", (name, passwordCrypt, sD.settings['perms']['anyone'], "False"))
-    db.commit()
+    userFound = dbcmd.execute("SELECT * FROM users WHERE username=:uname", {"uname": name}).fetchall()
     db.close()
-    return render_template("message.html", message = 'Account created.', forward = '/controlpanel')
+    if userFound:
+        return render_template("message.html", message = 'There is already a user with that name.')
+    else:
+        password = request.args.get('password')
+        passwordCrypt = cipher.encrypt(password.encode())
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        dbcmd.execute("INSERT INTO users (username, password, permissions, bot) VALUES (?, ?, ?, ?)", (name, passwordCrypt, sD.settings['perms']['anyone'], "False"))
+        db.commit()
+        db.close()
+        return render_template("message.html", message = 'Account created.')
 
 @app.route('/createfightermatch', methods = ['POST'])
 def endpoint_createfightermatch():

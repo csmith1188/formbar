@@ -520,22 +520,6 @@
     }
   }
 
-  function changePw(name) {
-    let password;
-    do {
-      password = prompt("New password:")
-    } while (password === "");
-    request.open("GET", "/users?name=" + name + "&action=changePw&password=" + password);
-    request.send();
-  }
-
-  function deleteAcc(name) {
-    if (confirm(`Permanently delete ${name}'s account?`)) {
-      request.open("GET", "/users?name=" + name + "&action=delete");
-      request.send();
-    }
-  }
-
   function toggleFilter(el) {
     let pairs = {
       help: ["Help ticket in", "No help ticket in"],
@@ -736,15 +720,14 @@
               newDetails.appendChild(excluded);
             }
             let studentPerms = student['perms'];
-            newDetails.innerHTML +=
-              `
+            newDetails.innerHTML += `
               <select onchange="updatePerm(this, '${student}')" id="userpermsDrop" name="userpermsDrop">
                 <option value="/users?name=${student['name']}&action=perm&perm=0" ${studentPerms === 0 ? "selected" : ""}>${permNames[0]}</option>
                 <option value="/users?name=${student['name']}&action=perm&perm=1" ${studentPerms === 1 ? "selected" : ""}>${permNames[1]}</option>
                 <option value="/users?name=${student['name']}&action=perm&perm=2" ${studentPerms === 2 ? "selected" : ""}>${permNames[2]}</option>
                 <option value="/users?name=${student['name']}&action=perm&perm=3" ${studentPerms === 3 ? "selected" : ""}>${permNames[3]}</option>
               </select>
-              `
+            `;
             //Check the results of the student's current progress bar
             if (student['progress'] && student['progress'].length) {
               let dotbox = document.createElement('div');
@@ -799,10 +782,6 @@
             newDetails.innerHTML += `<a onclick="remove('${name}')">Remove</a>`;
             newDetails.innerHTML += "	&nbsp; ";
             newDetails.innerHTML += `<a onclick="banip('${name}')">Ban Device</a>`;
-            newDetails.innerHTML += "	&nbsp; ";
-            newDetails.innerHTML += `<a onclick="changePw('${name}')">Change password</a>`;
-            newDetails.innerHTML += "	&nbsp; ";
-            newDetails.innerHTML += `<a onclick="deleteAcc('${name}')">Delete account</a>`;
             newDetails.innerHTML += "<br><br>";
           }
         }

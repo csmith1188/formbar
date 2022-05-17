@@ -105,10 +105,7 @@
     }
 
     function deleteAcc(name) {
-      if (confirm(`Permanently delete ${name}'s account?`)) {
-        request.open("GET", "/users?name=" + name + "&action=delete");
-        request.send();
-      }
+      if (confirm(`Permanently delete ${name}'s account?`)) window.location = `/users?name=${name}&action=delete`;
     }
 
     function updatePerm(el) {

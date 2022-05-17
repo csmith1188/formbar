@@ -2585,11 +2585,12 @@ def endpoint_wordle():
 
 '''
 
-def packMSG(rx, tx, content):
+def packMSG(rx, tx, content, now = int(time.time() * 1000)):
     msgOUT = {
         "to": rx,
         "from": tx,
-        "content": content
+        "content": content,
+        "time": now
     }
     return msgOUT
 
@@ -2625,6 +2626,7 @@ def message(message):
             messageOut = packMSG('alert', sD.studentDict[client['address'][0]]['name'], 'server', "You do not have permission to send text messages.")
             server.send_message(client, json.dumps(messageOut))
         else:
+            now = int(time.time() * 1000)
             message = json.loads(message)
             #Checking max message length here
             if len(message['content']) > 252:
@@ -2634,21 +2636,37 @@ def message(message):
             dbcmd = db.cursor()
             content = message['content'].replace('"', '\\"')
             contentCrypt = cipher.encrypt(content.encode())
-            dbcmd.execute("INSERT INTO messages ('from', 'to', 'time', 'content') VALUES (?, ?, ?, ?)", (message['from'], message['to'], message['time'], contentCrypt))
+            dbcmd.execute("INSERT INTO messages ('from', 'to', 'time', 'content') VALUES (?, ?, ?, ?)", (message['from'], message['to'], now, contentCrypt))
             db.commit()
             db.close()
             #Check recipients here
             if message['to'] == 'all':
-                messageOut = packMSG('all', message['from'], message['content'])
+                messageOut = packMSG('all', message['from'], message['content'], now)
                 #messageOut = packMSG('all', sD.studentDict[client['address'][0]]['name'], message['content'])
                 emit('message', json.dumps(messageOut), broadcast=True)
             else:
                 for student in sD.studentDict:
                     if sD.studentDict[student]['name'] == message['to'] or sD.studentDict[student]['name'] == message['from']:
-                        messageOut = packMSG(message['to'], message['from'], message['content'])
+                        messageOut = packMSG(message['to'], message['from'], message['content'], now)
+                        print(messageOut)
                         emit('message', json.dumps(messageOut), to=sD.studentDict[student]['sid'])
                         break
             print("[info] " + message['from'] + " said to " + message['to'] + ": " + message['content'])
+    except Exception as e:
+        print("[error] " + 'Error: ' + str(e))
+
+@socket_.on('delete', namespace=chatnamespace)
+def delete(time):
+    try:
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        content = 'Message deleted'
+        contentCrypt = cipher.encrypt(content.encode())
+        dbcmd.execute("UPDATE messages SET content=:content WHERE time=" + str(time), {"content": contentCrypt})
+        dbcmd.execute("UPDATE messages SET deleted=1 WHERE time=" + str(time))
+        db.commit()
+        db.close()
+        emit('delete', time, broadcast=True)
     except Exception as e:
         print("[error] " + 'Error: ' + str(e))
 

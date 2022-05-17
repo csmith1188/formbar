@@ -47,6 +47,29 @@
     color: var(--theme-color);
   }
 
+  .deleted .content {
+    font-style: italic;
+    color: var(--light-red);
+  }
+
+  .light .deleted .content {
+    color: var(--color-red);
+  }
+
+  .msg:not(.deleted):hover .msgButton {
+    display: inline !important;
+  }
+
+  .msgButton {
+    width: 14px;
+    opacity: 50%;
+    cursor: pointer;
+  }
+
+  .msgButton:hover {
+    opacity: 100%;
+  }
+
   #userlist {
     width: 300px;
     box-sizing: border-box;
@@ -312,6 +335,7 @@
     request.send(null);
     let permsRes = JSON.parse(request.responseText);
     let sayPerms = permsRes.say;
+    let modPerms = permsRes.mod;
 
     //If user doesn't have chat permissions, remove input section
     if (myPerms > sayPerms) {
@@ -321,12 +345,14 @@
     }
 
     messages.forEach(message => {
+
       if (message[2] == "all" || message[2] == username || message[1] == username) {
         output({
           from: message[1],
           to: message[2],
           time: message[3],
-          content: message[4]
+          content: message[4],
+          deleted: message[5]
         });
       }
     });
@@ -338,13 +364,18 @@
         message = JSON.parse(message);
         console.log(message);
         output(message);
-      });
+    });
+
+    chatSocket.on("delete", time => {
+        document.getElementById("msg" + time).classList.add("deleted");
+        document.getElementById("content" + time).innerText = "Message deleted";
+    });
 
     chatSocket.on("alert", message => {
         message = JSON.parse(message);
         console.log(message);
         output(message);
-      });
+    });
 
     chatSocket.on("userlist", message => {
         message = JSON.parse(message);
@@ -381,7 +412,8 @@
     chatSocket.on("disconnect", () => {
         output({
             from: 'server',
-            content: 'Disconnected...'
+            content: 'Disconnected...',
+            time: Date.now()
         });
     });
 
@@ -389,7 +421,8 @@
     chatSocket.on("error", e => {
         output({
             from: 'server',
-            content: 'Critical Error. See console...'
+            content: 'Critical Error. See console...',
+            time: Date.now()
         });
         console.log(e)
     });
@@ -398,7 +431,6 @@
         let msgOUT = {
             to: rx,
             from: tx,
-            time: Date.now(),
             content: content
         }
         return JSON.stringify(msgOUT);
@@ -459,7 +491,7 @@
     }
 
     function dateString(time) {
-      let date = time ? new Date(time) : new Date(); //If the message does not have a time property, use the current time
+      let date = new Date(time);
       let month = date.getMonth() + 1;
       let day = date.getDate();
       let year = date.getFullYear().toString().slice(2);
@@ -479,8 +511,10 @@
         let lockBottom = false;
         if (atBottom(boxes.outputBox)) lockBottom = true;
         let newMSG = document.createElement('div')
+        newMSG.id = "msg" + message.time;
         newMSG.classList.add('msg')
         if (message.to == username) newMSG.classList.add('whisper')
+        if (message.deleted) newMSG.classList.add('deleted');
         if (message.from == username) newMSG.classList.add('me')
         else if (message.from == 'server' || !message.from) {
           newMSG.classList.add('alert');
@@ -501,15 +535,22 @@
         if (!message.from) note = "· From server";
         else if (message.to != "all") note = (message.from == username) ? "· To " + message.to : "· Private message";
 
+        let msgButtons = "";
+        if (message.from == username || myPerms <= modPerms && message.from) {
+          msgButtons += `<img src="{{ url_for('static', filename='img/chat/delete.png') }}" class="msgButton hidden" title="Delete message" onclick="del(${message.time});">`;
+        }
+
         newMSG.innerHTML = `
           <b class="username" onclick="${usernameOnclick}" title="${usernameTitle}">${message.from}</b>
-          <span style="color: var(--gray-color);">${dateString(message.time)} ${note}</span>
+          <span style="color: var(--gray-color);">${dateString(message.time)} ${note}</span> ${msgButtons}
         `;
         let content = document.createElement("div");
+        content.id = "content" + message.time;
         content.classList.add("content");
         //The server can send HTML; students can't
         if (!message.from) content.innerHTML = message.content;
         else content.innerText = message.content;
+
         newMSG.append(content);
 
         boxes.outputBox.appendChild(newMSG);
@@ -517,6 +558,10 @@
 
         let notification;
         if (localStorage.getItem("chatNotifications")) notification = new Notification(message.from, {body: message.content, icon: "{{ url_for('static', filename='img/favicon.ico') }}"});
+    }
+
+    function del(time) {
+      if (confirm("Delete this message?")) chatSocket.emit("delete", time);
     }
 
     function enterCommand(command) {

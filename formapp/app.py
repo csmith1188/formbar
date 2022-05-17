@@ -800,7 +800,7 @@ def endpoint_root():
 
 @app.route('/2048')
 def endpoint_2048():
-    return redirect('games/2048')
+    return redirect('/games/2048')
 
 #  █████
 # ██   ██
@@ -1100,7 +1100,7 @@ def endpoint_bgmstop():
 
 @app.route('/bitshifter')
 def endpoint_bitshifter():
-    return redirect('games/bitshifter')
+    return redirect('/games/bitshifter')
 
 '''
     /break
@@ -1444,7 +1444,7 @@ def endpoint_expert():
 
 @app.route('/fighter')
 def endpoint_fighter():
-    return redirect('games/fighter')
+    return redirect('/games/fighter')
 
 
 '''
@@ -1452,7 +1452,7 @@ def endpoint_fighter():
 '''
 @app.route('/flashcards')
 def endpoint_flashcards():
-    return redirect('games/flashcards')
+    return redirect('/games/flashcards')
 
 '''
     /flush
@@ -1699,7 +1699,7 @@ def endpoint_getword():
 
 @app.route('/hangman')
 def endpoint_hangman():
-    return redirect('games/hangman')
+    return redirect('/games/hangman')
 
 @app.route('/help', methods = ['POST', 'GET'])
 def endpoint_help():
@@ -1976,12 +1976,12 @@ def endpoint_logout():
 
 @app.route('/minesweeper')
 def endpoint_minesweeper():
-    return redirect('games/minesweeper')
+    return redirect('/games/minesweeper')
 
 
 @app.route('/mnsw')
 def endpoint_mnsw():
-    return redirect('games/minesweeper')
+    return redirect('/games/minesweeper')
 
 '''
     /mobile
@@ -2302,7 +2302,7 @@ def endpoint_socket():
 
 @app.route('/speedtype')
 def endpoint_speedtype():
-    return redirect('games/speedtype')
+    return redirect('/games/speedtype')
 
 
 @app.route('/standard')
@@ -2335,15 +2335,15 @@ def endpoint_startpoll():
 
 @app.route('/td')
 def endpoint_td():
-    return redirect('games/towerdefense')
+    return redirect('/games/towerdefense')
 
 @app.route('/towerdefense')
 def endpoint_towerdefense():
-    return redirect('games/towerdefense')
+    return redirect('/games/towerdefense')
 
 @app.route('/ttt')
 def endpoint_ttt():
-    return redirect('games/ttt')
+    return redirect('/games/ttt')
 
 '''
     /tutd
@@ -2565,7 +2565,7 @@ def endpoint_wawd():
 
 @app.route('/wordle')
 def endpoint_wordle():
-    return redirect('games/wordle')
+    return redirect('/games/wordle')
 
 
 # ███████  ██████   ██████ ██   ██ ███████ ████████ ████████  ██████
@@ -2639,13 +2639,13 @@ def message(message):
             db.close()
             #Check recipients here
             if message['to'] == 'all':
-                messageOut = packMSG('all', sD.studentDict[request.remote_addr]['name'], message['content'])
+                messageOut = packMSG('all', message['from'], message['content'])
                 #messageOut = packMSG('all', sD.studentDict[client['address'][0]]['name'], message['content'])
                 emit('message', json.dumps(messageOut), broadcast=True)
             else:
                 for student in sD.studentDict:
                     if sD.studentDict[student]['name'] == message['to'] or sD.studentDict[student]['name'] == message['from']:
-                        messageOut = packMSG(message['to'], sD.studentDict[request.remote_addr]['name'], message['content'])
+                        messageOut = packMSG(message['to'], message['from'], message['content'])
                         emit('message', json.dumps(messageOut), to=sD.studentDict[student]['sid'])
                         break
             print("[info] " + message['from'] + " said to " + message['to'] + ": " + message['content'])

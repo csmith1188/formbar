@@ -5,7 +5,8 @@ const serverIp = JSON.parse(request.responseText).ip;
 const apiSocket = io("/apinamespace");
 const chatSocket = io("/chat");
 
-chatSocket.on("disconnect", () => {
+chatSocket.on("disconnect", message => {
+  console.log("DISCONNECT", message);
   //This needs to be fixed—only do this when the app is closed
   //alert("Session ended.");
   //window.location.reload();

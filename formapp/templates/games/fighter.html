@@ -1093,7 +1093,7 @@
           content: content
         };
         chatSocket.emit("message", JSON.stringify(messageObj));
-        if (!recipient != "all") { //If message is private, send to sender in addition to recipient
+        if (recipient != "all") { //If message is private, send to sender in addition to recipient
           messageObj.to = me.name;
           chatSocket.emit("message", JSON.stringify(messageObj));
         }

@@ -593,7 +593,7 @@
   }
 
   function pageOpened(path) {
-    let innerPageTitle = innerPage.contentWindow.document.title;
+    innerPageTitle = innerPage.contentWindow.document.title;
     document.title = `${innerPageTitle} - Formbar`;
     window.history.pushState({}, '', "?page=" + path.slice(1)); //Update the URL to include the title
     let tabEl = document.getElementById(path.substring(1) + "Tab") || document.getElementById(path.substring(7) + "Tab");

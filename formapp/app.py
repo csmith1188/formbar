@@ -2516,7 +2516,7 @@ def endpoint_users():
                     if refreshUsers(user, refresh):
                         return render_template("message.html", message = "Removed " + refresh + " essays from " + user + ".")
                     else:
-                        return render_template("message.html", message = "Error removgin " + refresh + " essays from " + user + ".")
+                        return render_template("message.html", message = "Error removing " + refresh + " essays from " + user + ".")
             else:
                 return render_template("message.html", message = "No action given.")
         else:

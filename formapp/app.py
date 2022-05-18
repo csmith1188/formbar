@@ -253,6 +253,7 @@ def refreshUsers(selectedStudent='', category=''):
             return True
 
 def changeMode(newMode='', direction='next'):
+    clearString()
     # Clear answers
     for student in sD.studentDict:
         sD.studentDict[student]['thumb'] = ''
@@ -799,7 +800,7 @@ def endpoint_root():
 
 @app.route('/2048')
 def endpoint_2048():
-    return redirect('games/2048')
+    return redirect('/games/2048')
 
 #  █████
 # ██   ██
@@ -1099,7 +1100,7 @@ def endpoint_bgmstop():
 
 @app.route('/bitshifter')
 def endpoint_bitshifter():
-    return redirect('games/bitshifter')
+    return redirect('/games/bitshifter')
 
 '''
     /break
@@ -1339,21 +1340,28 @@ def endpoint_controlpanel():
 def endpoint_countdown():
     return render_template("message.html", message = 'This feature is not available yet.')
 
-@app.route('/createaccount', methods = ['POST'])
+@app.route('/createaccount')
 def endpoint_createaccount():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['teacher']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
     name = request.args.get('name')
-    password = request.args.get('password')
-    passwordCrypt = cipher.encrypt(password.encode())
     db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
     dbcmd = db.cursor()
-    dbcmd.execute("INSERT INTO users (username, password, permissions, bot) VALUES (?, ?, ?, ?)", (name, passwordCrypt, sD.settings['perms']['anyone'], "False"))
-    db.commit()
+    userFound = dbcmd.execute("SELECT * FROM users WHERE username=:uname", {"uname": name}).fetchall()
     db.close()
-    return render_template("message.html", message = 'Account created.', forward = '/controlpanel')
+    if userFound:
+        return render_template("message.html", message = 'There is already a user with that name.')
+    else:
+        password = request.args.get('password')
+        passwordCrypt = cipher.encrypt(password.encode())
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        dbcmd.execute("INSERT INTO users (username, password, permissions, bot) VALUES (?, ?, ?, ?)", (name, passwordCrypt, sD.settings['perms']['anyone'], "False"))
+        db.commit()
+        db.close()
+        return render_template("message.html", message = 'Account created.')
 
 @app.route('/createfightermatch', methods = ['POST'])
 def endpoint_createfightermatch():
@@ -1436,7 +1444,7 @@ def endpoint_expert():
 
 @app.route('/fighter')
 def endpoint_fighter():
-    return redirect('games/fighter')
+    return redirect('/games/fighter')
 
 
 '''
@@ -1444,7 +1452,7 @@ def endpoint_fighter():
 '''
 @app.route('/flashcards')
 def endpoint_flashcards():
-    return redirect('games/flashcards')
+    return redirect('/games/flashcards')
 
 '''
     /flush
@@ -1691,7 +1699,7 @@ def endpoint_getword():
 
 @app.route('/hangman')
 def endpoint_hangman():
-    return redirect('games/hangman')
+    return redirect('/games/hangman')
 
 @app.route('/help', methods = ['POST', 'GET'])
 def endpoint_help():
@@ -1968,12 +1976,12 @@ def endpoint_logout():
 
 @app.route('/minesweeper')
 def endpoint_minesweeper():
-    return redirect('games/minesweeper')
+    return redirect('/games/minesweeper')
 
 
 @app.route('/mnsw')
 def endpoint_mnsw():
-    return redirect('games/minesweeper')
+    return redirect('/games/minesweeper')
 
 '''
     /mobile
@@ -2294,7 +2302,7 @@ def endpoint_socket():
 
 @app.route('/speedtype')
 def endpoint_speedtype():
-    return redirect('games/speedtype')
+    return redirect('/games/speedtype')
 
 
 @app.route('/standard')
@@ -2327,15 +2335,15 @@ def endpoint_startpoll():
 
 @app.route('/td')
 def endpoint_td():
-    return redirect('games/towerdefense')
+    return redirect('/games/towerdefense')
 
 @app.route('/towerdefense')
 def endpoint_towerdefense():
-    return redirect('games/towerdefense')
+    return redirect('/games/towerdefense')
 
 @app.route('/ttt')
 def endpoint_ttt():
-    return redirect('games/ttt')
+    return redirect('/games/ttt')
 
 '''
     /tutd
@@ -2557,7 +2565,7 @@ def endpoint_wawd():
 
 @app.route('/wordle')
 def endpoint_wordle():
-    return redirect('games/wordle')
+    return redirect('/games/wordle')
 
 
 # ███████  ██████   ██████ ██   ██ ███████ ████████ ████████  ██████
@@ -2577,11 +2585,12 @@ def endpoint_wordle():
 
 '''
 
-def packMSG(rx, tx, content):
+def packMSG(rx, tx, content, now = int(time.time() * 1000)):
     msgOUT = {
         "to": rx,
         "from": tx,
-        "content": content
+        "content": content,
+        "time": now
     }
     return msgOUT
 
@@ -2617,30 +2626,65 @@ def message(message):
             messageOut = packMSG('alert', sD.studentDict[client['address'][0]]['name'], 'server', "You do not have permission to send text messages.")
             server.send_message(client, json.dumps(messageOut))
         else:
+            now = int(time.time() * 1000)
             message = json.loads(message)
+            #Checking max message length here
+            if len(message['content']) > 252:
+                message['content'] = message['content'][:252]+'...'
             #Save the message to the database
             db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
             dbcmd = db.cursor()
             content = message['content'].replace('"', '\\"')
             contentCrypt = cipher.encrypt(content.encode())
-            dbcmd.execute("INSERT INTO messages ('from', 'to', 'time', 'content') VALUES (?, ?, ?, ?)", (message['from'], message['to'], message['time'], contentCrypt))
+            dbcmd.execute("INSERT INTO messages ('from', 'to', 'time', 'content') VALUES (?, ?, ?, ?)", (message['from'], message['to'], now, contentCrypt))
             db.commit()
             db.close()
-            #Checking max message length here
-            if len(message['content']) > 252:
-                message['content'] = message['content'][:252]+'...'
             #Check recipients here
             if message['to'] == 'all':
-                messageOut = packMSG('all', sD.studentDict[request.remote_addr]['name'], message['content'])
+                messageOut = packMSG('all', message['from'], message['content'], now)
                 #messageOut = packMSG('all', sD.studentDict[client['address'][0]]['name'], message['content'])
                 emit('message', json.dumps(messageOut), broadcast=True)
             else:
                 for student in sD.studentDict:
                     if sD.studentDict[student]['name'] == message['to'] or sD.studentDict[student]['name'] == message['from']:
-                        messageOut = packMSG(message['to'], sD.studentDict[request.remote_addr]['name'], message['content'])
+                        messageOut = packMSG(message['to'], message['from'], message['content'], now)
+                        print(messageOut)
                         emit('message', json.dumps(messageOut), to=sD.studentDict[student]['sid'])
                         break
             print("[info] " + message['from'] + " said to " + message['to'] + ": " + message['content'])
+    except Exception as e:
+        print("[error] " + 'Error: ' + str(e))
+
+@socket_.on('edit', namespace=chatnamespace)
+def edit(timeSent, newContent):
+    try:
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        content = newContent
+        if len(content) > 252:
+            content = content[:252]+'...'
+        content = content.replace('"', '\\"')
+        contentCrypt = cipher.encrypt(content.encode())
+        dbcmd.execute("UPDATE messages SET content=:content WHERE time=" + str(timeSent), {"content": contentCrypt})
+        dbcmd.execute("UPDATE messages SET edited=1 WHERE time=" + str(timeSent))
+        db.commit()
+        db.close()
+        emit('edit', [timeSent, newContent], broadcast=True)
+    except Exception as e:
+        print("[error] " + 'Error: ' + str(e))
+
+@socket_.on('delete', namespace=chatnamespace)
+def delete(timeSent):
+    try:
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        content = 'Message deleted'
+        contentCrypt = cipher.encrypt(content.encode())
+        dbcmd.execute("UPDATE messages SET content=:content WHERE time=" + str(timeSent), {"content": contentCrypt})
+        dbcmd.execute("UPDATE messages SET deleted=1 WHERE time=" + str(timeSent))
+        db.commit()
+        db.close()
+        emit('delete', timeSent, broadcast=True)
     except Exception as e:
         print("[error] " + 'Error: ' + str(e))
 

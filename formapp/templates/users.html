@@ -3,7 +3,7 @@
 <!-- This is where the title, top buttons, and stylesheet is located -->
 
 <!-- Change title here -->
-{% block title %}User List{% endblock %}
+{% block title %}User Accounts{% endblock %}
 
 <!-- Extra style declarations here -->
 {% block style %}
@@ -49,13 +49,6 @@
   #users {
     margin-bottom: 8px;
   }
-
-  .icon {
-    height: 1.2em;
-    display: inline-block;
-    vertical-align: text-bottom;
-    margin-right: 8px;
-  }
 </style>
 {% endblock %}
 
@@ -64,111 +57,44 @@
 
 <!-- Main content here -->
 {% block main %}
-<h1>Users</h1>
+<h1>User accounts</h1>
 <div id="users"></div>
-<button id="addUser" class="inline popOut">Add user</button>
+<button id="addUser" class="inline popOut">Create new account</button>
 {% endblock %}
 
 <!-- Extra javascript here -->
 {% block script %}
 <script>
-    //let users = "{{ users }}".replaceAll("&#39;", "'");
-    let users = [];
+    let users = "{{ users }}".replaceAll("&#39;", "'").replaceAll("(", "[").replaceAll(")", "]").replaceAll("b'", "'").replaceAll("None", null);
+    users = eval(users);
     let permNames = ['Teacher', 'Mod', 'Student', 'Guest'];
     let usersBox = document.getElementById("users");
 
     usersBox.innerHTML = "";
     //Loop through each user in the list
     for (let user of users) {
-        console.log(user);
         let newStudent = document.createElement('h3');
 
-        newStudent.innerHTML = user.name;
+        newStudent.innerHTML = user[1];
         let newDetails = document.createElement('span');
         newDetails.classList.add('user');
-        let userPerms = user['perms'];
-        newDetails.innerHTML +=
-            `
-            <select onchange="updatePerm(this, '${user}')" id="userpermsDrop" name="userpermsDrop">
-            <option value="/users?name=${user['name']}&action=perm&perm=0" ${userPerms === 0 ? "selected" : ""}>${permNames[0]}</option>
-            <option value="/users?name=${user['name']}&action=perm&perm=1" ${userPerms === 1 ? "selected" : ""}>${permNames[1]}</option>
-            <option value="/users?name=${user['name']}&action=perm&perm=2" ${userPerms === 2 ? "selected" : ""}>${permNames[2]}</option>
-            <option value="/users?name=${user['name']}&action=perm&perm=3" ${userPerms === 3 ? "selected" : ""}>${permNames[3]}</option>
+        let userPerms = user[3];
+        newDetails.innerHTML += `
+            <select onchange="updatePerm(this)" id="userpermsDrop" name="userpermsDrop">
+            <option value="/updateuser?name=${user[1]}&field=permissions&value=0" ${userPerms === 0 ? "selected" : ""}>${permNames[0]}</option>
+            <option value="/updateuser?name=${user[1]}&field=permissions&value=1" ${userPerms === 1 ? "selected" : ""}>${permNames[1]}</option>
+            <option value="/updateuser?name=${user[1]}&field=permissions&value=2" ${userPerms === 2 ? "selected" : ""}>${permNames[2]}</option>
+            <option value="/updateuser?name=${user[1]}&field=permissions&value=3" ${userPerms === 3 ? "selected" : ""}>${permNames[3]}</option>
             </select>
-            `
-        //Check the results of the user's current progress bar
-        if (user['progress'] && user['progress'].length) {
-            let dotbox = document.createElement('div');
-            dotbox.style.styleFloat = 'right';
-            dotbox.style.cssFloat = 'right';
-            let newProg = 0;
-            let newProgMax = 0;
-            for (let i = 0; i < user['progress'].length; i++) {
-                newProgMax++;
-                var img = document.createElement("img");
-                img.width = 16;
-                img.height = 16;
-                if (user['progress'][i]) {
-                  newProg++;
-                  img.src = "{{ url_for('static', filename='img/dot_green.png') }}";
-                } else {
-                  img.src = "{{ url_for('static', filename='img/dot_red.png') }}";
-                }
-                dotbox.appendChild(img)
-            }
-            newStudent.appendChild(dotbox)
-            newDetails.innerHTML += ` [Prog: ${newProg}/${newProgMax}]`
-        }
-        //Get the results of the user's current quiz
-        if (user['quizRes'] && user['quizRes'].length) {
-          let dotbox = document.createElement('div');
-          dotbox.style.styleFloat = 'right';
-          dotbox.style.cssFloat = 'right';
-            let newQuiz = 0;
-            let newQuizMax = 0;
-            for (let i = 0; i < user['quizRes'].length; i++) {
-                newQuizMax++;
-                if (user['quizRes'][i]) {
-                  var img = document.createElement("img");
-                  img.width = 16;
-                  img.height = 16;
-                  if (user['quizRes'][i]) {
-                    newQuiz++;
-                    img.src = "{{ url_for('static', filename='img/dot_green.png') }}"; ////These need to be updated
-                  } else {
-                    img.src = "{{ url_for('static', filename='img/dot_red.png') }}"; ////
-                  }
-                  dotbox.appendChild(img)
-            }
-          }
-            newDetails.innerHTML += ` [Quiz: ${newQuiz}/${newQuizMax}]`
-        }
+        `;
         usersBox.appendChild(newStudent)
         usersBox.appendChild(newDetails)
-        let name = user['name'];
-        newDetails.innerHTML += "	&nbsp; ";
-        newDetails.innerHTML += `<a onclick="remove('${name}')">Remove</a>`;
-        newDetails.innerHTML += "	&nbsp; ";
-        newDetails.innerHTML += `<a onclick="banip('${name}')">Ban Device</a>`;
+        let name = user[1];
         newDetails.innerHTML += "	&nbsp; ";
         newDetails.innerHTML += `<a onclick="changePw('${name}')">Change password</a>`;
         newDetails.innerHTML += "	&nbsp; ";
         newDetails.innerHTML += `<a onclick="deleteAcc('${name}')">Delete account</a>`;
         newDetails.innerHTML += "<br><br>";
-    }
-
-    function remove(name) {
-      if (confirm(`Remove ${name}? They will still be able to log in.`)) {
-        request.open("GET", "users?name=" + name + "&action=kick");
-        request.send();
-      }
-    }
-
-    function banip(name) {
-      if (confirm("Are you sure you want to ban this user's DEVICE?")) {
-        request.open("GET", "/users?name=" + name + "&action=ban");
-        request.send();
-      }
     }
 
     function changePw(name) {
@@ -179,58 +105,19 @@
     }
 
     function deleteAcc(name) {
-      if (confirm(`Permanently delete ${name}'s account?`)) {
-        request.open("GET", "/users?name=" + name + "&action=delete");
-        request.send();
-      }
+      if (confirm(`Permanently delete ${name}'s account?`)) window.location = `/users?name=${name}&action=delete`;
     }
 
-    function removeTicket(name) {
-      request.open("GET", `/users?action=removeTicket&name=${name}`);
+    function updatePerm(el) {
+      request.open("POST", el.value);
       request.send();
-    }
-
-    function acceptBreak(name) {
-      request.open("GET", `/users?action=removeTicket&name=${name}&acceptBreak=true`);
-      request.send();
-    }
-
-    function removeNP(name) {
-      request.open("GET", `/users?action=removeNP&name=${name}`);
-      request.send();
-    }
-
-    function acceptNP(name, pw) {
-      request.open("GET", `/users?action=removeNP&name=${name}&password=${pw}&acceptNP=true`);
-      request.send();
-    }
-
-    async function updatePerm(el, user) {
-        let meRes = await getResponse("/api/me");
-        let permsRes = await getResponse("/api/permissions");
-        if (
-          user.name != meRes.name ||
-          meRes.perms > el.value[el.value.length - 1] ||
-          confirm("If you lower your own permissions, you may not be able to change them back. If no users have teacher permissions, the next person to log in will become the teacher.")
-        ) {
-          request.open("GET", el.value);
-          request.onload = function() {
-              console.log(request.response);
-          };
-          request.send();
-        } else {
-          el.value = el.options[meRes.perms].value; //If perms are not updated, give el the correct value
-        }
     }
 
     document.getElementById("addUser").addEventListener("click", () => {
       let username = prompt("New user's name:");
       if (username) {
         let password = prompt("New user's password:");
-        if (password) {
-          request.open("POST", `/createaccount?name=${username}&password=${password}`);
-          request.send();
-        }
+        if (password) window.location = `/createaccount?name=${username}&password=${password}`;
       }
     });
 </script>

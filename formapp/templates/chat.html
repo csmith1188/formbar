@@ -56,14 +56,16 @@
     color: var(--color-red);
   }
 
-  .msg:not(.deleted):hover .msgButton {
-    display: inline !important;
-  }
-
   .msgButton {
+    display: none;
     width: 14px;
     opacity: 50%;
     cursor: pointer;
+    user-select: none;
+  }
+
+  .msg:not(.deleted):hover .msgButton {
+    display: inline;
   }
 
   .msgButton:hover {
@@ -352,7 +354,8 @@
           to: message[2],
           time: message[3],
           content: message[4],
-          deleted: message[5]
+          edited: message[5],
+          deleted: message[6]
         });
       }
     });
@@ -366,9 +369,15 @@
         output(message);
     });
 
+    chatSocket.on("edit", data => {
+        document.getElementById("content" + data[0]).innerText = data[1];
+        document.getElementById("edited" + data[0]).innerText = "(edited)";
+    });
+
     chatSocket.on("delete", time => {
         document.getElementById("msg" + time).classList.add("deleted");
         document.getElementById("content" + time).innerText = "Message deleted";
+        document.getElementById("edited" + time).innerText = "";
     });
 
     chatSocket.on("alert", message => {
@@ -531,18 +540,21 @@
         textarea.innerHTML = message.content;
         message.content = textarea.value;
 
+        let edited = (message.edited && !message.deleted) ? "(edited)" : "";
+
         let note = "";
-        if (!message.from) note = "· From server";
-        else if (message.to != "all") note = (message.from == username) ? "· To " + message.to : "· Private message";
+        if (message.to != "all") note += (message.from == username) ? " · To " + message.to : " · Private message";
+        if (!message.from) note += " · From server";
 
         let msgButtons = "";
         if (message.from == username || myPerms <= modPerms && message.from) {
-          msgButtons += `<img src="{{ url_for('static', filename='img/chat/delete.png') }}" class="msgButton hidden" title="Delete message" onclick="del(${message.time});">`;
+          if (message.from == username) msgButtons += `<img src="{{ url_for('static', filename='img/chat/edit.png') }}" class="msgButton" title="Edit message" onclick="edit(${message.time}, '${message.content}');"> `;
+          msgButtons += `<img src="{{ url_for('static', filename='img/chat/delete.png') }}" class="msgButton" title="Delete message" onclick="del(${message.time});">`;
         }
 
         newMSG.innerHTML = `
           <b class="username" onclick="${usernameOnclick}" title="${usernameTitle}">${message.from}</b>
-          <span style="color: var(--gray-color);">${dateString(message.time)} ${note}</span> ${msgButtons}
+          <span style="color: var(--gray-color);">${dateString(message.time)} <span id="edited${message.time}">${edited}</span>${note}</span> ${msgButtons}
         `;
         let content = document.createElement("div");
         content.id = "content" + message.time;
@@ -558,6 +570,11 @@
 
         let notification;
         if (localStorage.getItem("chatNotifications")) notification = new Notification(message.from, {body: message.content, icon: "{{ url_for('static', filename='img/favicon.ico') }}"});
+    }
+
+    function edit(time, original) {
+      let newContent = prompt("Edit your message", original);
+      if (newContent && newContent != original) chatSocket.emit("edit", time, newContent);
     }
 
     function del(time) {

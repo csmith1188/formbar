@@ -2655,18 +2655,36 @@ def message(message):
     except Exception as e:
         print("[error] " + 'Error: ' + str(e))
 
+@socket_.on('edit', namespace=chatnamespace)
+def edit(timeSent, newContent):
+    try:
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        content = newContent
+        if len(content) > 252:
+            content = content[:252]+'...'
+        content = content.replace('"', '\\"')
+        contentCrypt = cipher.encrypt(content.encode())
+        dbcmd.execute("UPDATE messages SET content=:content WHERE time=" + str(timeSent), {"content": contentCrypt})
+        dbcmd.execute("UPDATE messages SET edited=1 WHERE time=" + str(timeSent))
+        db.commit()
+        db.close()
+        emit('edit', [timeSent, newContent], broadcast=True)
+    except Exception as e:
+        print("[error] " + 'Error: ' + str(e))
+
 @socket_.on('delete', namespace=chatnamespace)
-def delete(time):
+def delete(timeSent):
     try:
         db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
         dbcmd = db.cursor()
         content = 'Message deleted'
         contentCrypt = cipher.encrypt(content.encode())
-        dbcmd.execute("UPDATE messages SET content=:content WHERE time=" + str(time), {"content": contentCrypt})
-        dbcmd.execute("UPDATE messages SET deleted=1 WHERE time=" + str(time))
+        dbcmd.execute("UPDATE messages SET content=:content WHERE time=" + str(timeSent), {"content": contentCrypt})
+        dbcmd.execute("UPDATE messages SET deleted=1 WHERE time=" + str(timeSent))
         db.commit()
         db.close()
-        emit('delete', time, broadcast=True)
+        emit('delete', timeSent, broadcast=True)
     except Exception as e:
         print("[error] " + 'Error: ' + str(e))
 

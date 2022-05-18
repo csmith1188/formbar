@@ -1352,7 +1352,7 @@ def endpoint_createaccount():
     userFound = dbcmd.execute("SELECT * FROM users WHERE username=:uname", {"uname": name}).fetchall()
     db.close()
     if userFound:
-        return render_template("message.html", message = 'There is already a user with that name.')
+        return render_template("message.html", message = 'There is already a user with that name.', forward = '/users')
     else:
         password = request.args.get('password')
         passwordCrypt = cipher.encrypt(password.encode())
@@ -1361,7 +1361,7 @@ def endpoint_createaccount():
         dbcmd.execute("INSERT INTO users (username, password, permissions, bot) VALUES (?, ?, ?, ?)", (name, passwordCrypt, sD.settings['perms']['anyone'], "False"))
         db.commit()
         db.close()
-        return render_template("message.html", message = 'Account created.')
+        return render_template("message.html", message = 'Account created.', forward = '/users')
 
 @app.route('/createfightermatch', methods = ['POST'])
 def endpoint_createfightermatch():
@@ -2412,20 +2412,41 @@ def endpoint_users():
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['users']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
     else:
+        action = request.args.get('action')
         user = '';
         if request.args.get('name'):
             for key, value in sD.studentDict.items():
                 if request.args.get('name') == sD.studentDict[key]['name']:
                     user = key
                     break
+            if action == 'delete':
+                db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+                dbcmd = db.cursor()
+                dbcmd.execute("DELETE FROM users WHERE username=:uname", {"uname": request.args.get('name')})
+                db.commit()
+                db.close()
+                if user in sD.studentDict:
+                    del sD.studentDict[user]
+                return render_template("message.html", message = "User deleted.", forward = '/users')
+            if action == 'changePw':
+                password = request.args.get('password')
+                if password:
+                    passwordCrypt = cipher.encrypt(password.encode())
+                    db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+                    dbcmd = db.cursor()
+                    dbcmd.execute("UPDATE users SET password=:pw WHERE username=:uname", {"uname": request.args.get('name'), "pw": passwordCrypt})
+                    db.commit()
+                    db.close()
+                    return render_template("message.html", message = "Password reset.", forward = '/users')
+                else:
+                    return render_template("message.html", message = "New password reqired.", forward = '/users')
             if not user:
-                return render_template("message.html", message = "That user was not found by their name.")
+                return render_template("message.html", message = "That user was not found by their name.", forward = '/users')
         if request.args.get('ip'):
             if request.args.get('ip') in sD.studentDict:
                 user = request.args.get('ip')
             else:
-                return render_template("message.html", message = "That user was not found by their IP address.")
-        action = request.args.get('action')
+                return render_template("message.html", message = "That user was not found by their IP address.", forward = '/users')
         if action == 'removeNP':
             if request.args.get('name') in newPasswords:
                 del newPasswords[request.args.get('name')]
@@ -2435,18 +2456,6 @@ def endpoint_users():
                 return redirect('/users?action=changePw&name=' + request.args.get('name') + '&password=' + request.args.get('password'))
             else:
                 return render_template("message.html", message = "Request rejected.")
-        if action == 'changePw':
-            password = request.args.get('password')
-            if password:
-                passwordCrypt = cipher.encrypt(password.encode())
-                db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
-                dbcmd = db.cursor()
-                dbcmd.execute("UPDATE users SET password=:pw WHERE username=:uname", {"uname": request.args.get('name'), "pw": passwordCrypt})
-                db.commit()
-                db.close()
-                return render_template("message.html", message = "Password reset.")
-            else:
-                return render_template("message.html", message = "New password reqired.")
         if user:
             if action == 'removeTicket':
                 sD.studentDict[user]['help'] = {
@@ -2496,15 +2505,6 @@ def endpoint_users():
                             return render_template("message.html", message = "User not in list.")
                     except:
                         return render_template("message.html", message = "Perm was not an integer.")
-            if action == 'delete':
-                db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
-                dbcmd = db.cursor()
-                dbcmd.execute("DELETE FROM users WHERE username=:uname", {"uname": sD.studentDict[user]['name']})
-                db.commit()
-                db.close()
-                if user in sD.studentDict:
-                    del sD.studentDict[user]
-                return render_template("message.html", message = "User deleted.")
             if request.args.get('refresh'):
                 refresh = request.args.get('refresh')
                 if refresh == 'all':

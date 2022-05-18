@@ -100,8 +100,7 @@
     function changePw(name) {
       let password;
       do {password = prompt("New password:")} while (password === "");
-      request.open("GET", "/users?name=" + name + "&action=changePw&password=" + password);
-      request.send();
+      window.location = `/users?name=${name}&action=changePw&password=${password}`;
     }
 
     function deleteAcc(name) {

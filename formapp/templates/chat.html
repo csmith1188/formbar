@@ -371,7 +371,7 @@
 
     chatSocket.on("edit", data => {
         document.getElementById("content" + data[0]).innerText = data[1];
-        document.getElementById("edited" + data[0]).innerText = "(edited)";
+        document.getElementById("edited" + data[0]).innerText = " · Edited";
     });
 
     chatSocket.on("delete", time => {
@@ -540,7 +540,7 @@
         textarea.innerHTML = message.content;
         message.content = textarea.value;
 
-        let edited = (message.edited && !message.deleted) ? "(edited)" : "";
+        let edited = (message.edited && !message.deleted) ? " · Edited" : "";
 
         let note = "";
         if (message.to != "all") note += (message.from == username) ? " · To " + message.to : " · Private message";
@@ -554,7 +554,7 @@
 
         newMSG.innerHTML = `
           <b class="username" onclick="${usernameOnclick}" title="${usernameTitle}">${message.from}</b>
-          <span style="color: var(--gray-color);">${dateString(message.time)} <span id="edited${message.time}">${edited}</span>${note}</span> ${msgButtons}
+          <span style="color: var(--gray-color);">${dateString(message.time)}<span id="edited${message.time}">${edited}</span>${note}</span> ${msgButtons}
         `;
         let content = document.createElement("div");
         content.id = "content" + message.time;

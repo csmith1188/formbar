@@ -5,7 +5,7 @@
 <!-- This is where the title, top buttons, and stylesheet is located -->
 
 <!-- Change title here -->
-{% block title %}Turn-cringe fighter{% endblock %}
+{% block title %}Turn-Cringe Fighter{% endblock %}
 
 <!-- Extra style declarations here -->
 {% block style %}
@@ -404,7 +404,7 @@
       top: 0;
       left: 0;
       width: 100%;
-      min-width: 1200px;
+      min-width: 1300px;
       height: 100%;
       min-height: 900px;
       padding: 8px;
@@ -548,7 +548,7 @@
       <u id="resetStats">Reset stats</u>
     </div>
 
-    <h1 id="title" class="hCentered" style="top: 128px;">Turn-based fighter</h1>
+    <h1 id="title" class="hCentered" style="top: 128px;">Turn-Based Fighter</h1>
 
     <div id="joinMatch" class="vCentered" style="left: calc(50% - 482px);">
       <h2>Join match</h2>
@@ -1100,8 +1100,6 @@
       }
 
       function sendMove(moveObj) {
-        console.log("match");
-        console.log(matchCode);
         let sendObj = {
           to: opponent.name,
           from: me.name,
@@ -1111,8 +1109,6 @@
             move: moveObj
           }
         };
-        console.log("sm");
-        console.log(sendObj);
         chatSocket.emit("fighter", JSON.stringify(sendObj));
 
         /*//for testing
@@ -1122,12 +1118,8 @@
       chatSocket.on("fighter", message => {
         let data = JSON.parse(message);
         if (data.content.match == matchCode) { //Only receive if sent from current match
-          console.log("msg");
-          console.log(data);
           if (data.content.type == "join" && data.from != me.name) document.getElementById("opponentStatus").innerText = "Opponent is getting ready…";
           if (data.content.type == "player" && data.from != me.name) receivePlayerReady(data.content.player);
-          console.log("type");
-          console.log(data.content.type);
           if (data.content.type == "move") receiveMove(data.content.move);
           else if (data.content.type == "item") receiveItem(data.content);
           else if (data.content.type == "rematch" && players.every(player => player.rematch) && me.team == 1) window.location = "/games/fighter?rematch=" + matchCode;
@@ -1235,8 +1227,7 @@
 
       function createMatch() {
         //Give this match a six-digit ID
-        matchCode = pickRandom(1_000_000).toString();
-        while (matchCode.length < 6) matchCode = "0" + matchCode;
+        matchCode = pickRandom(1_000_000).toString().padStart(6, "0");
         me.team = 1;
         me.fighters = [fighter1a, fighter1b];
         pickRandom(2) ? me.firstMove = true : me.firstMove = false; //Decide which player goes first
@@ -1698,22 +1689,24 @@
           }
         });
 
-        if (active.effects.skipTurn) {
-          endTurn();
-          return;
-        }
-
-        active.fighters.forEach(fighter => {
-          for (let move in fighter.moves) {
-            if (fighter.moves[move].charged) {
-              if (fighter.effects.stunned) endTurn();
-              else charge(fighter, fighter.moves[move], fighter.chargeTarget);
-              return;
-            }
-          }
-        });
-
         if (active == me) {
+          console.log("skip turn?");
+          console.log(me.effects.skipTurn);
+          if (me.effects.skipTurn) {
+            sendMove({});
+            return;
+          }
+
+          me.fighters.forEach(fighter => {
+            for (let move in fighter.moves) {
+              if (fighter.moves[move].charged) {
+                if (fighter.effects.stunned) sendMove({});
+                else charge(fighter, fighter.moves[move], fighter.chargeTarget);
+                return;
+              }
+            }
+          });
+
           document.getElementById("turn").innerText = "Your turn";
           enableMoves(me);
           if (me.fighters.every(fighter => fighter.effects.stunned)) {
@@ -1867,7 +1860,6 @@
 
       function charge(sender, move, target) {
         if (move.charged == move.charge) { //If move is fully charged
-          move.charged = 0;
           sender.chargeTarget = null;
           if (fighters.includes(target) || !target) useMove(sender, move, target);
           else { //If target is defeated
@@ -1999,14 +1991,17 @@
       function receiveMove(data) {
         console.log("rm");
         console.log(data);
-        if (data.move) {
-          if (data.move == "give up") {
-            matchOver = true;
-            endMatch(data.winner);
-          }
 
-          else if (data.type == "charge") {
-            console.log(document.getElementById(data.sender.name + "-" + data.move.id + "-cs" + data.move.charged));
+        if (data.move == "give up") {
+          matchOver = true;
+          endMatch(data.winner);
+        }
+
+        else if (data.move) {
+          data.sender = fighters.find(fighter => fighter.name == data.sender.name);
+          data.move = Object.values(data.sender.moves).find(move => move.id == data.move.id);
+
+          if (data.type == "charge") {
             let el = document.getElementById(data.sender.name + "-" + data.move.id + "-cs" + ++data.move.charged);
             el.classList.add("charged");
           }
@@ -2056,6 +2051,7 @@
 
           else {
             data.targets.forEach((target, i) => {
+              target = fighters.find(fighter => fighter.name == target.name);
               if (data.damage[i] >= target.hp && data.selfDamage >= data.sender.hp) winnerOverride = active; //If both players lose at the same time, the sender is the winner
               if (data.damage[i]) damage(target, data.damage[i]);
               if (data.selfDamage > 0) damage(data.sender, data.selfDamage);
@@ -2075,10 +2071,13 @@
               }
             });
 
-            //Reset all chargeSquares
-            for (let i = 1; i <= data.move.charge; i++) {
-              let el = document.getElementById(data.sender.name + "-" + data.move.id + "-cs" + i);
-              el.classList.remove("charged");
+            if (data.move.charged) {
+              data.move.charged = 0;
+              //Reset all chargeSquares
+              for (let i = 1; i <= data.move.charge; i++) {
+                let el = document.getElementById(data.sender.name + "-" + data.move.id + "-cs" + i);
+                el.classList.remove("charged");
+              }
             }
 
             //Attack animation
@@ -2204,6 +2203,7 @@
         else addEffect(data.item, data.target, itemObj.duration);
         active.items[data.slot] = null;
         document.getElementById("p" + active.team + "-item" + data.slot).classList.add("hidden");
+        document.getElementById("p" + active.team + "-itemSlot" + data.slot).classList.remove("filled");
         active.fighters.forEach(fighter => {
           for (let move in fighter.moves) {
             let moveObj = fighter.moves[move];
@@ -2282,6 +2282,9 @@
 
       function addEffect(effect, target, duration) {
         let effectEl;
+        console.log("add effect to");
+        console.log(target);
+        console.log(fighters.includes(target));
         if (effect == "attackBoost" && !target.effects.attackBoost) changeAttack(target, 1.5);
         else if (effect == "stunned") for (let move in target.moves) unselectable(target.moves[move]);
         target.effects[effect] = duration;
@@ -2307,6 +2310,8 @@
 
       function removeEffect(effect, target) {
         let effectEl;
+        console.log("remove effect from");
+        console.log(target);
         delete target.effects[effect];
         if (effect == "attackBoost") changeAttack(target, 2/3);
         else if (effect == "stunned") for (let move in target.moves) removeUnselectable(target.moves[move]);
@@ -2542,8 +2547,8 @@
       team: 1,
       fighters: [
           {
-              team: 1,
-              name: "1a",
+              team: 2,
+              name: "2a",
               color: "green",
               effective: "blue",
               weak: "yellow",
@@ -2578,8 +2583,8 @@
               effects: {}
           },
           {
-              team: 1,
-              name: "1b",
+              team: 2,
+              name: "2b",
               color: "blue",
               effective: "red",
               weak: "green",
@@ -2709,7 +2714,7 @@
         description: "Deals [damage] damage.",
         name: "special attack",
         id: "special",
-        charged: 1,
+        charged: 0,
         el: {}
     },
     target: {
@@ -3076,5 +3081,193 @@
     },
     slot: 2
   };
+
+  let testHNError = {
+    sender: {
+        team: 2,
+        name: "2a",
+        color: "red",
+        effective: "yellow",
+        weak: "blue",
+        moves: {
+            main: {
+                damage: 14,
+                doubleTarget: true,
+                description: "Deals [damage] damage to both opponent fighters.",
+                name: "main attack",
+                id: "main",
+                charged: 0,
+                el: {}
+            },
+            special: {
+                charge: 1,
+                minDamage: 45,
+                maxDamage: 65,
+                description: "Deals at least [minDamage] and up to [maxDamage] damage.",
+                name: "special attack",
+                id: "special",
+                charged: 0,
+                el: {}
+            },
+            other: {
+                type: "revenge",
+                revengeDuration: 2,
+                selfTarget: true,
+                description: "Opponents will take 50% of the damage they inflict on this fighter. Lasts for 2 turns.",
+                name: "other move",
+                id: "other",
+                charged: 0,
+                el: {}
+            }
+        },
+        hp: 100,
+        attackFactor: 1,
+        effects: {},
+        el: {}
+    },
+    targets: [
+        {
+            team: 1,
+            name: "1a",
+            color: "yellow",
+            effective: "green",
+            weak: "red",
+            moves: {
+                main: {
+                    damage: 20,
+                    critDamage: 40,
+                    critChance: 10,
+                    description: "Deals [damage] damage. 10% chance of a critical hit, which deals [critDamage] damage.",
+                    name: "main attack",
+                    id: "main",
+                    charged: 0,
+                    el: {}
+                },
+                alt: {
+                    damage: 7,
+                    doubleTarget: true,
+                    healing: true,
+                    description: "Deals [damage] damage to both opponent fighters. Dealt damage is added to this fighter's HP.",
+                    name: "alt attack",
+                    id: "alt",
+                    charged: 0,
+                    el: {}
+                },
+                other: {
+                    type: "sacrifice",
+                    selfTarget: true,
+                    description: "Sacrifice this fighter. Teammate's attack power increases by 1% for each remaining HP.",
+                    name: "other move",
+                    id: "other",
+                    charged: 0,
+                    el: {}
+                }
+            },
+            hp: 100,
+            attackFactor: 1,
+            effects: {},
+            el: {}
+        }
+    ],
+    senderTeammate: {
+        team: 2,
+        name: "2b",
+        color: "green",
+        effective: "blue",
+        weak: "yellow",
+        moves: {
+            main: {
+                damage: 24,
+                description: "Deals [damage] damage.",
+                name: "main attack",
+                id: "main",
+                charged: 0,
+                el: {}
+            },
+            alt: {
+                damage: 21,
+                stunChance: 25,
+                stunDuration: 1,
+                description: "Deals [damage] damage. 25% chance of stunning target for 1 turn.",
+                name: "alt attack",
+                id: "alt",
+                charged: 0,
+                el: {}
+            },
+            special: {
+                charge: 2,
+                damage: 78,
+                description: "Deals [damage] damage.",
+                name: "special attack",
+                id: "special",
+                charged: 0,
+                el: {}
+            }
+        },
+        hp: 100,
+        attackFactor: 1.5,
+        effects: {
+            attackBoost: 1.5
+        },
+        el: {},
+        chargeTarget: {
+            team: 1,
+            name: "1b",
+            color: "green",
+            effective: "blue",
+            weak: "yellow",
+            moves: {
+                main: {
+                    damage: 24,
+                    description: "Deals [damage] damage.",
+                    name: "main attack",
+                    id: "main",
+                    charged: 0,
+                    el: {}
+                },
+                alt: {
+                    damage: 21,
+                    stunChance: 25,
+                    stunDuration: 1,
+                    description: "Deals [damage] damage. 25% chance of stunning target for 1 turn.",
+                    name: "alt attack",
+                    id: "alt",
+                    charged: 0,
+                    el: {}
+                },
+                special: {
+                    charge: 2,
+                    damage: 78,
+                    description: "Deals [damage] damage.",
+                    name: "special attack",
+                    id: "special",
+                    charged: 0,
+                    el: {}
+                }
+            },
+            hp: 100,
+            attackFactor: 1,
+            effects: {},
+            el: {}
+        }
+    },
+    move: {
+        damage: 14,
+        doubleTarget: true,
+        description: "Deals [damage] damage to both opponent fighters.",
+        name: "main attack",
+        id: "main",
+        charged: 0,
+        el: {}
+    },
+    damage: [
+        18
+    ],
+    selfDamage: 0,
+    teammateDamage: 0,
+    poison: [],
+    disorient: [],
+    stun: []
+}
   </script>
 {% endblock %}

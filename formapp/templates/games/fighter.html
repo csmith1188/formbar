@@ -2196,7 +2196,10 @@
       function receiveItem(data) {
         console.log("ri");
         console.log(data);
+
         let itemObj = items[data.item];
+
+        data.target = fighters.find(fighter => fighter.name == data.target.name);
 
         if (data.item == "heal") heal(data.target, 30);
         else if (data.item == "cleanse") cleanse(data.target);

@@ -42,6 +42,10 @@
     background-color: var(--highlight-color);
   }
 
+  .info {
+    color: var(--gray-color);
+  }
+
   .alert .content {
     font-style: italic;
     color: var(--theme-color);
@@ -239,6 +243,7 @@
 
   .game #userlist,
   .game #recContainer,
+  .game .info,
   .small #userlist {
     display: none;
   }
@@ -554,7 +559,7 @@
 
         newMSG.innerHTML = `
           <b class="username" onclick="${usernameOnclick}" title="${usernameTitle}">${message.from}</b>
-          <span style="color: var(--gray-color);">${dateString(message.time)}<span id="edited${message.time}">${edited}</span>${note}</span> ${msgButtons}
+          <span class="info">${dateString(message.time)}<span id="edited${message.time}">${edited}</span>${note} ${msgButtons}</span>
         `;
         let content = document.createElement("div");
         content.id = "content" + message.time;

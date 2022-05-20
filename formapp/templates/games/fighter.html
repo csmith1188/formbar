@@ -1230,7 +1230,7 @@
         matchCode = pickRandom(1_000_000).toString().padStart(6, "0");
         me.team = 1;
         me.fighters = [fighter1a, fighter1b];
-        pickRandom(2) ? me.firstMove = true : me.firstMove = false; //Decide which player goes first
+        me.firstMove = !pickRandom(2); //Decide which player goes first
         fighterOptions();
       }
 
@@ -2999,7 +2999,7 @@
   let testItem = {
     match: "411060",
     type: "item",
-    item: "attackBoost",
+    item: "shield",
     target: {
         team: 2,
         name: "2a",

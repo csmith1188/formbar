@@ -872,7 +872,7 @@
           alt: {
             type: "copyMove",
             doubleTarget: true,
-            description: "Use any of your opponent fighters' moves."
+            description: "Use any opponent fighter's move."
           },
           other: {
             type: "effectRevenge",
@@ -1243,7 +1243,7 @@
 
         lockedColors.forEach((color) => {
           /*//for testing ///et*/
-          if ((color.unlockWins && me.wins >= color.unlockWins)/* || color.color = "gold" && {{ goldUnlocked }}*/) { //If player has enough wins to unlock or already unlocked
+          if ((color.unlockWins && me.wins >= color.unlockWins) || (color.color == "gold" && {{ goldUnlocked }})) { //If player has enough wins to unlock or already unlocked
             colors.push(color);
             lockedColors = lockedColors.filter(locked => locked != color);
           } else {
@@ -1779,7 +1779,7 @@
       }
 
       function enableMoves(player, copySender, copyMove) {
-        console.log("enable");
+        console.log("Enable moves");
         player.fighters.forEach(fighter => {
           for (let move in fighter.moves) {
             let moveObj = fighter.moves[move];

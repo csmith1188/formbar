@@ -1080,6 +1080,9 @@
           },
         }
         chatSocket.emit("fighter", JSON.stringify(sendObj));
+
+        console.log("Move sent:");
+        console.log(sendObj);
       }
 
       function sendMessage(content, recipient = opponent.name) {
@@ -1645,6 +1648,9 @@
       }
 
       function startTurn() {
+        console.log("Turn started at:");
+        console.log(Date.now());
+
         if (matchOver) return;
 
         active == me ? inactive = opponent : inactive = me;
@@ -1690,8 +1696,6 @@
         });
 
         if (active == me) {
-          console.log("skip turn?");
-          console.log(me.effects.skipTurn);
           if (me.effects.skipTurn) {
             sendMove({});
             return;
@@ -1743,6 +1747,7 @@
       }
 
       function startTimer() {
+        console.log("Timer started");
         let timerEl = document.getElementById("timer");
         let interval;
         timerEl.innerText = time;
@@ -1996,7 +2001,7 @@
       }
 
       function receiveMove(data) {
-        console.log("rm");
+        console.log("Move received:");
         console.log(data);
 
         if (data.move == "give up") {
@@ -2007,6 +2012,8 @@
         else if (data.move) {
           data.sender = fighters.find(fighter => fighter.name == data.sender.name);
           data.move = Object.values(data.sender.moves).find(move => move.id == data.move.id);
+
+          if (inactive.fighters.includes(data.sender)) console.error("ERROR: Received move from a player when it wasn't their turn");
 
           if (data.type == "charge") {
             let el = document.getElementById(data.sender.name + "-" + data.move.id + "-cs" + ++data.move.charged);
@@ -2063,8 +2070,6 @@
             revived.el.classList.remove("defeated");
             createFighter(revived, revived.el);
             unselectable(data.move);
-            console.log("revive");
-            console.log(revived);
           }
 
           else {
@@ -2187,6 +2192,19 @@
           }
         }));
 
+        console.log("Item sent:");
+        console.log({
+          to: opponent.name,
+          from: me.name,
+          content: {
+            match: matchCode,
+            type: "item",
+            item: item,
+            target: target,
+            slot: slot
+          }
+        });
+
         /*//for testing
         receiveItem({
           item: item,
@@ -2212,7 +2230,7 @@
       }
 
       function receiveItem(data) {
-        console.log("ri");
+        console.log("Item received:");
         console.log(data);
 
         let itemObj = items[data.item];
@@ -2286,7 +2304,8 @@
         target.el = document.getElementById("fighter" + target.name);
         target.el.classList.add("defeated");
         target.el.innerText = "Defeated";
-        sendMessage(target.name + "'s " + capitalize(target.color) + " defeated.");
+        let player = (target.team == me.team) ? me : opponent;
+        sendMessage(player.name + "'s " + capitalize(target.color) + " defeated.");
         if (!me.fighters.length && winnerOverride != me) {
           matchOver = true;
           setTimeout(() => endMatch(opponent), 1000);
@@ -2304,9 +2323,8 @@
 
       function addEffect(effect, target, duration) {
         let effectEl;
-        console.log("add effect to");
+        console.log("Add effect to:");
         console.log(target);
-        console.log(fighters.includes(target));
         if (effect == "attackBoost" && !target.effects.attackBoost) changeAttack(target, 1.5);
         else if (effect == "stunned") for (let move in target.moves) unselectable(target.moves[move]);
         target.effects[effect] = duration;
@@ -2332,7 +2350,7 @@
 
       function removeEffect(effect, target) {
         let effectEl;
-        console.log("remove effect from");
+        console.log("Remove effect from:");
         console.log(target);
         delete target.effects[effect];
         if (effect == "attackBoost") changeAttack(target, 2/3);
@@ -2384,7 +2402,7 @@
       }
 
       function endTurn() {
-        console.log("end turn");
+        console.log("Turn ended at:");
         console.log(Date.now());
         clearInterval(countdown);
 

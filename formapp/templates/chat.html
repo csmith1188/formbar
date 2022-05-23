@@ -42,6 +42,10 @@
     background-color: var(--highlight-color);
   }
 
+  .info {
+    color: var(--gray-color);
+  }
+
   .alert .content {
     font-style: italic;
     color: var(--theme-color);
@@ -81,6 +85,7 @@
     top: 0;
     right: 0;
     padding: 10px;
+    overflow: auto;
   }
 
   #ulHeading {
@@ -239,6 +244,7 @@
 
   .game #userlist,
   .game #recContainer,
+  .game .info,
   .small #userlist {
     display: none;
   }
@@ -407,7 +413,8 @@
               profileButton.classList.add("profileButton");
               profileButton.onmouseover = event => event.stopPropagation();
               profileButton.onclick = event => {
-                window.location = "/profile?user=" + name;
+                let advancedParam = !!urlParams.get("advanced");
+                window.location = `/profile?user=${name}&advanced=${advancedParam}`;
                 event.stopPropagation();
               };
               newUser.appendChild(profileButton);
@@ -554,7 +561,7 @@
 
         newMSG.innerHTML = `
           <b class="username" onclick="${usernameOnclick}" title="${usernameTitle}">${message.from}</b>
-          <span style="color: var(--gray-color);">${dateString(message.time)}<span id="edited${message.time}">${edited}</span>${note}</span> ${msgButtons}
+          <span class="info">${dateString(message.time)}<span id="edited${message.time}">${edited}</span>${note} ${msgButtons}</span>
         `;
         let content = document.createElement("div");
         content.id = "content" + message.time;

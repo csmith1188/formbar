@@ -1746,7 +1746,7 @@
         let timerEl = document.getElementById("timer");
         let interval;
         timerEl.innerText = time;
-        if (me.effects.fastTimer) {
+        if (active.effects.fastTimer) {
           timerEl.style.color = "var(--light-yellow)";
           interval = 100;
         } else {
@@ -1864,6 +1864,13 @@
           if (fighters.includes(target) || !target) useMove(sender, move, target);
           else { //If target is defeated
             sendMessage(me.name + " couldn't use " + capitalize(sender.color) + "'s " + move.name + " because the target was already defeated.");
+
+            let sendObj = {
+              type: "cancel",
+              sender: sender,
+              move: move
+            };
+            sendMove(sendObj);
           }
         } else {
           sender.chargeTarget = target;
@@ -1911,6 +1918,12 @@
 
         if (sender.effects.disoriented && (pickRandom(100) < 40)) message += " and missed";
         else {
+          if (move.teamDamage) {
+            sendObj.selfDamage += move.teamDamage * sender.attackFactor;
+            sendObj.teammateDamage += move.teamDamage * sender.attackFactor;
+          }
+          sendObj.selfDamage = Math.round(sendObj.selfDamage);
+          sendObj.teammateDamage = Math.round(sendObj.teammateDamage);
           targets.forEach((target, i) => {
             if (move.secondaryTarget) {
               if (target == primaryTarget) {
@@ -1934,12 +1947,6 @@
 
             if (target.effects.revenge && !move.ignoreRevenge) sendObj.selfDamage += Math.min(sendObj.damage[i], target.hp) / 2; //Check which is lower: move's damage or target's remaining HP, then divide by 2 and set damage to sender
             if (move.healing) sendObj.selfDamage -= sendObj.damage[i];
-            if (move.teamDamage) {
-              sendObj.selfDamage += move.teamDamage * sender.attackFactor;
-              sendObj.teammateDamage += move.teamDamage * sender.attackFactor;
-            }
-            sendObj.selfDamage = Math.round(sendObj.selfDamage);
-            sendObj.teammateDamage = Math.round(sendObj.teammateDamage);
 
             let messageEffects = [];
 
@@ -2006,6 +2013,15 @@
             el.classList.add("charged");
           }
 
+          else if (data.type == "cancel") {
+            data.move.charged = 0;
+            //Reset all chargeSquares
+            for (let i = 1; i <= data.move.charge; i++) {
+              let el = document.getElementById(data.sender.name + "-" + data.move.id + "-cs" + i);
+              el.classList.remove("charged");
+            }
+          }
+
           else if (data.move.type == "revenge") addEffect("revenge", data.sender, data.move.revengeDuration);
 
           else if (data.move.type == "effectRevenge") active.fighters.forEach(fighter => addEffect("effectRevenge", fighter, data.move.effectRevengeDuration));
@@ -2022,7 +2038,7 @@
                 let itemEl = document.getElementById("p" + data.sender.team + "-item" + i);
                 let slotEl = document.getElementById("p" + data.sender.team + "-itemSlot" + i);
                 active.items[i] = data.newItem;
-                itemEl.src = "{{ url_for('static', filename='img/fighter/" + data.newItem + ".png') }}";
+                itemEl.src = "../../static/img/fighter/" + data.newItem + ".png";
                 itemEl.classList.remove("hidden");
                 slotEl.classList.add("filled");
                 return;
@@ -2047,6 +2063,8 @@
             revived.el.classList.remove("defeated");
             createFighter(revived, revived.el);
             unselectable(data.move);
+            console.log("revive");
+            console.log(revived);
           }
 
           else {
@@ -2054,9 +2072,6 @@
               target = fighters.find(fighter => fighter.name == target.name);
               if (data.damage[i] >= target.hp && data.selfDamage >= data.sender.hp) winnerOverride = active; //If both players lose at the same time, the sender is the winner
               if (data.damage[i]) damage(target, data.damage[i]);
-              if (data.selfDamage > 0) damage(data.sender, data.selfDamage);
-              else if (data.selfDamage < 0) heal(data.sender, -data.selfDamage);
-              if (data.teammateDamage) damage(data.senderTeammate, data.selfDamage);
               if (data.poison[i]) {
                 addEffect("poison", target, data.move.poisonDuration);
                 if (target.effects.effectRevenge) addEffect("poison", data.sender, data.move.poisonDuration);
@@ -2070,6 +2085,9 @@
                 if (target.effects.effectRevenge) addEffect("stunned", data.sender, data.move.stunDuration);
               }
             });
+            if (data.selfDamage > 0) damage(data.sender, data.selfDamage);
+            else if (data.selfDamage < 0) heal(data.sender, -data.selfDamage);
+            if (data.teammateDamage) damage(data.senderTeammate, data.teammateDamage);
 
             if (data.move.charged) {
               data.move.charged = 0;
@@ -2199,7 +2217,8 @@
 
         let itemObj = items[data.item];
 
-        data.target = fighters.find(fighter => fighter.name == data.target.name);
+        data.target = fighters.find(fighter => fighter.name == data.target.name) ||
+          ((me.team == data.target.team) ? me : opponent);
 
         if (data.item == "heal") heal(data.target, 30);
         else if (data.item == "cleanse") cleanse(data.target);

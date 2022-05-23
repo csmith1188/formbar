@@ -413,7 +413,8 @@
               profileButton.classList.add("profileButton");
               profileButton.onmouseover = event => event.stopPropagation();
               profileButton.onclick = event => {
-                window.location = "/profile?user=" + name;
+                let advancedParam = !!urlParams.get("advanced");
+                window.location = `/profile?user=${name}&advanced=${advancedParam}`;
                 event.stopPropagation();
               };
               newUser.appendChild(profileButton);

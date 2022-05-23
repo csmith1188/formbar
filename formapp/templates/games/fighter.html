@@ -1546,6 +1546,8 @@
       }
 
       function receivePlayerReady(player) {
+        console.log("Received player:");
+        console.log(player);
         opponent = player;
         if (me.team == 1) {
           fighter2a = opponent.fighters[0];

@@ -1763,6 +1763,8 @@
           timerEl.style.color = "white";
           interval = 1000;
         }
+        if (countdown) console.error("Tried to start the timer while it was already running.");
+        clearInterval(countdown);
         countdown = setInterval(() => {
           timerEl.innerText = --time;
           if (time < 6) timerEl.style.color = "var(--light-red)";
@@ -2406,7 +2408,7 @@
       function cleanse(player) {
         if (player.effects.fastTimer) {
           removeEffect("fastTimer", player);
-          clearInterval(countdown);
+          countdown = clearInterval(countdown);
           startTimer();
         }
         removeEffect("noItems", player);
@@ -2420,7 +2422,7 @@
       function endTurn() {
         console.log("Turn ended at:");
         console.log(Date.now());
-        clearInterval(countdown);
+        countdown = clearInterval(countdown);
 
         //Disable moves and items
         me.fighters.forEach(fighter => {

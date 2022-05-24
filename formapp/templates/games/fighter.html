@@ -1243,7 +1243,7 @@
 
         lockedColors.forEach((color) => {
           /*//for testing ///et*/
-          if ((color.unlockWins && me.wins >= color.unlockWins) || (color.color == "gold" && {{ goldUnlocked }})) { //If player has enough wins to unlock or already unlocked
+          if ((color.unlockWins && me.wins >= color.unlockWins) || (color.color == "gold" && {{ goldUnlocked }} && false)) { //If player has enough wins to unlock or already unlocked
             colors.push(color);
             lockedColors = lockedColors.filter(locked => locked != color);
           } else {
@@ -1803,13 +1803,6 @@
                   color: fighter.color,
                   move: moveObj.name
                 };
-                ////! do after target selected; can other player see?
-                if (copyMove.charge) {
-                  if (copyMove.charge == 1) chargeEl.innerHTML = "<b>Charge:</b> 1 turn ";
-                  else chargeEl.innerHTML = `<b>Charge:</b> ${copyMove.charge} turns `;
-                  for (let i = 0; i < copyMove.charge; i++) chargeEl.innerHTML += `<div id="${sender.name}-${copyMove.id}-cs${i + 1}" class="chargeSquare"></div>`;
-                  chargeEl.innerHTML += "<br>";
-                }
                 ////!
                 for (let move in opponent.moves) {
                   let moveObj = fighter.moves[move];
@@ -2018,6 +2011,12 @@
           if (inactive.fighters.includes(data.sender)) console.error("ERROR: Received move from a player when it wasn't their turn");
 
           if (data.type == "charge") {
+            if (data.copied) { ////
+              if (data.move.charge == 1) chargeEl.innerHTML = "<b>Charge:</b> 1 turn ";
+              else chargeEl.innerHTML = `<b>Charge:</b> ${data.move.charge} turns `;
+              for (let i = 0; i < data.move.charge; i++) chargeEl.innerHTML += `<div id="${data.sender.name}-${data.move.id}-cs${i + 1}" class="chargeSquare"></div>`;
+              chargeEl.innerHTML += "<br>";
+            }
             let el = document.getElementById(data.sender.name + "-" + data.move.id + "-cs" + ++data.move.charged);
             el.classList.add("charged");
           }

@@ -1081,7 +1081,7 @@
         }
         chatSocket.emit("fighter", JSON.stringify(sendObj));
 
-        console.log("Move sent:");
+        console.log("Player sent:");
         console.log(sendObj);
       }
 
@@ -1113,6 +1113,9 @@
           }
         };
         chatSocket.emit("fighter", JSON.stringify(sendObj));
+
+        console.log("Move sent:");
+        console.log(sendObj);
 
         /*//for testing
         receiveMove(moveObj); ///et*/

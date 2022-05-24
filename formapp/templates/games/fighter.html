@@ -1763,7 +1763,7 @@
           timerEl.style.color = "white";
           interval = 1000;
         }
-        if (countdown) console.error("Tried to start the timer while it was already running.");
+        if (countdown) console.error("ERROR: Tried to start the timer while it was already running.");
         clearInterval(countdown);
         countdown = setInterval(() => {
           timerEl.innerText = --time;
@@ -2017,7 +2017,7 @@
             console.error("The move's sender is undefined.");
           }
 
-          if (inactive.fighters.includes(data.sender)) console.error("ERROR: Received move from a player when it wasn't their turn");
+          if (inactive.fighters.includes(data.sender)) console.error("ERROR: Received a move from a player when it wasn't their turn");
 
           if (data.type == "charge") {
             if (data.copied) { ////

@@ -6,10 +6,11 @@ const apiSocket = io("/apinamespace");
 const chatSocket = io("/chat");
 
 chatSocket.on("disconnect", message => {
-  if (message == "transport error") {
-    alert("Session ended.");
-    window.location.reload();
-  }
+  console.log("DISCONNECTED:", message);
+  //if (message == "transport error") {
+    //alert("Session ended.");
+    //window.location.reload();
+  //}
 });
 
 function getResponse(endpoint, parse = true) {

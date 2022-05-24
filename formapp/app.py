@@ -1205,6 +1205,7 @@ def endpoint_changepassword():
             db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
             dbcmd = db.cursor()
             userFound = dbcmd.execute("SELECT * FROM users WHERE username=:uname", {"uname": username}).fetchall()
+            db.close()
             if not userFound:
                 return render_template("message.html", message = "You are logged in as a guest.")
         return render_template('changepassword.html', loggedIn = request.remote_addr in sD.studentDict)

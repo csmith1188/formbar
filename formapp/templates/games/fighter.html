@@ -872,7 +872,7 @@
           alt: {
             type: "copyMove",
             doubleTarget: true,
-            description: "Use any of your opponent fighters' moves."
+            description: "Use any opponent fighter's move."
           },
           other: {
             type: "effectRevenge",
@@ -1080,6 +1080,9 @@
           },
         }
         chatSocket.emit("fighter", JSON.stringify(sendObj));
+
+        console.log("Move sent:");
+        console.log(sendObj);
       }
 
       function sendMessage(content, recipient = opponent.name) {
@@ -1240,7 +1243,7 @@
 
         lockedColors.forEach((color) => {
           /*//for testing ///et*/
-          if ((color.unlockWins && me.wins >= color.unlockWins)/* || color.color = "gold" && {{ goldUnlocked }}*/) { //If player has enough wins to unlock or already unlocked
+          if ((color.unlockWins && me.wins >= color.unlockWins) || (color.color == "gold" && {{ goldUnlocked }} && false)) { //If player has enough wins to unlock or already unlocked
             colors.push(color);
             lockedColors = lockedColors.filter(locked => locked != color);
           } else {
@@ -1543,6 +1546,8 @@
       }
 
       function receivePlayerReady(player) {
+        console.log("Received player:");
+        console.log(player);
         opponent = player;
         if (me.team == 1) {
           fighter2a = opponent.fighters[0];
@@ -1645,6 +1650,9 @@
       }
 
       function startTurn() {
+        console.log("Turn started at:");
+        console.log(Date.now());
+
         if (matchOver) return;
 
         active == me ? inactive = opponent : inactive = me;
@@ -1690,8 +1698,6 @@
         });
 
         if (active == me) {
-          console.log("skip turn?");
-          console.log(me.effects.skipTurn);
           if (me.effects.skipTurn) {
             sendMove({});
             return;
@@ -1743,6 +1749,7 @@
       }
 
       function startTimer() {
+        console.log("Timer started");
         let timerEl = document.getElementById("timer");
         let interval;
         timerEl.innerText = time;
@@ -1774,7 +1781,7 @@
       }
 
       function enableMoves(player, copySender, copyMove) {
-        console.log("enable");
+        console.log("Enable moves");
         player.fighters.forEach(fighter => {
           for (let move in fighter.moves) {
             let moveObj = fighter.moves[move];
@@ -1796,13 +1803,6 @@
                   color: fighter.color,
                   move: moveObj.name
                 };
-                ////! do after target selected; can other player see?
-                if (copyMove.charge) {
-                  if (copyMove.charge == 1) chargeEl.innerHTML = "<b>Charge:</b> 1 turn ";
-                  else chargeEl.innerHTML = `<b>Charge:</b> ${copyMove.charge} turns `;
-                  for (let i = 0; i < copyMove.charge; i++) chargeEl.innerHTML += `<div id="${sender.name}-${copyMove.id}-cs${i + 1}" class="chargeSquare"></div>`;
-                  chargeEl.innerHTML += "<br>";
-                }
                 ////!
                 for (let move in opponent.moves) {
                   let moveObj = fighter.moves[move];
@@ -1996,7 +1996,7 @@
       }
 
       function receiveMove(data) {
-        console.log("rm");
+        console.log("Move received:");
         console.log(data);
 
         if (data.move == "give up") {
@@ -2008,7 +2008,15 @@
           data.sender = fighters.find(fighter => fighter.name == data.sender.name);
           data.move = Object.values(data.sender.moves).find(move => move.id == data.move.id);
 
+          if (inactive.fighters.includes(data.sender)) console.error("ERROR: Received move from a player when it wasn't their turn");
+
           if (data.type == "charge") {
+            if (data.copied) { ////
+              if (data.move.charge == 1) chargeEl.innerHTML = "<b>Charge:</b> 1 turn ";
+              else chargeEl.innerHTML = `<b>Charge:</b> ${data.move.charge} turns `;
+              for (let i = 0; i < data.move.charge; i++) chargeEl.innerHTML += `<div id="${data.sender.name}-${data.move.id}-cs${i + 1}" class="chargeSquare"></div>`;
+              chargeEl.innerHTML += "<br>";
+            }
             let el = document.getElementById(data.sender.name + "-" + data.move.id + "-cs" + ++data.move.charged);
             el.classList.add("charged");
           }
@@ -2063,8 +2071,6 @@
             revived.el.classList.remove("defeated");
             createFighter(revived, revived.el);
             unselectable(data.move);
-            console.log("revive");
-            console.log(revived);
           }
 
           else {
@@ -2187,6 +2193,19 @@
           }
         }));
 
+        console.log("Item sent:");
+        console.log({
+          to: opponent.name,
+          from: me.name,
+          content: {
+            match: matchCode,
+            type: "item",
+            item: item,
+            target: target,
+            slot: slot
+          }
+        });
+
         /*//for testing
         receiveItem({
           item: item,
@@ -2212,7 +2231,7 @@
       }
 
       function receiveItem(data) {
-        console.log("ri");
+        console.log("Item received:");
         console.log(data);
 
         let itemObj = items[data.item];
@@ -2286,7 +2305,8 @@
         target.el = document.getElementById("fighter" + target.name);
         target.el.classList.add("defeated");
         target.el.innerText = "Defeated";
-        sendMessage(target.name + "'s " + capitalize(target.color) + " defeated.");
+        let player = (target.team == me.team) ? me : opponent;
+        sendMessage(player.name + "'s " + capitalize(target.color) + " defeated.");
         if (!me.fighters.length && winnerOverride != me) {
           matchOver = true;
           setTimeout(() => endMatch(opponent), 1000);
@@ -2304,9 +2324,8 @@
 
       function addEffect(effect, target, duration) {
         let effectEl;
-        console.log("add effect to");
+        console.log("Add effect to:");
         console.log(target);
-        console.log(fighters.includes(target));
         if (effect == "attackBoost" && !target.effects.attackBoost) changeAttack(target, 1.5);
         else if (effect == "stunned") for (let move in target.moves) unselectable(target.moves[move]);
         target.effects[effect] = duration;
@@ -2332,7 +2351,7 @@
 
       function removeEffect(effect, target) {
         let effectEl;
-        console.log("remove effect from");
+        console.log("Remove effect from:");
         console.log(target);
         delete target.effects[effect];
         if (effect == "attackBoost") changeAttack(target, 2/3);
@@ -2384,7 +2403,7 @@
       }
 
       function endTurn() {
-        console.log("end turn");
+        console.log("Turn ended at:");
         console.log(Date.now());
         clearInterval(countdown);
 

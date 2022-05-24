@@ -2006,7 +2006,11 @@
 
         else if (data.move) {
           data.sender = fighters.find(fighter => fighter.name == data.sender.name);
-          data.move = Object.values(data.sender.moves).find(move => move.id == data.move.id);
+          try {
+            data.move = Object.values(data.sender.moves).find(move => move.id == data.move.id);
+          } catch {
+            console.error("The move's sender is undefined.");
+          }
 
           if (inactive.fighters.includes(data.sender)) console.error("ERROR: Received move from a player when it wasn't their turn");
 

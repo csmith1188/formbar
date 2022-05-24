@@ -2269,7 +2269,11 @@
         changeEl.classList.add("showHPChange");
         function decreaseHP() {
           setTimeout(() => {
-            document.getElementById(target.name + "-HPNum").innerText = --target.hp;
+            try {
+              document.getElementById(target.name + "-HPNum").innerText = --target.hp;
+            } catch {
+              console.error(`ERROR: Can't find element with id "${target.name + "-HPNum"}"`);
+            }
             fillHPBar(target, document.getElementById(target.name + "-HPBar"));
             if (!target.hp) defeat(target);
             else if (--amount) decreaseHP(); //Repeat this function until amount is 0

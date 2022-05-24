@@ -2006,7 +2006,11 @@
 
         else if (data.move) {
           data.sender = fighters.find(fighter => fighter.name == data.sender.name);
-          data.move = Object.values(data.sender.moves).find(move => move.id == data.move.id);
+          try {
+            data.move = Object.values(data.sender.moves).find(move => move.id == data.move.id);
+          } catch {
+            console.error("The move's sender is undefined.");
+          }
 
           if (inactive.fighters.includes(data.sender)) console.error("ERROR: Received move from a player when it wasn't their turn");
 
@@ -2265,7 +2269,11 @@
         changeEl.classList.add("showHPChange");
         function decreaseHP() {
           setTimeout(() => {
-            document.getElementById(target.name + "-HPNum").innerText = --target.hp;
+            try {
+              document.getElementById(target.name + "-HPNum").innerText = --target.hp;
+            } catch {
+              console.error(`ERROR: Can't find element with id "${target.name + "-HPNum"}"`);
+            }
             fillHPBar(target, document.getElementById(target.name + "-HPBar"));
             if (!target.hp) defeat(target);
             else if (--amount) decreaseHP(); //Repeat this function until amount is 0

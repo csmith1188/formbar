@@ -2018,7 +2018,11 @@
               chargeEl.innerHTML += "<br>";
             }
             let el = document.getElementById(data.sender.name + "-" + data.move.id + "-cs" + ++data.move.charged);
-            el.classList.add("charged");
+            try {
+              el.classList.add("charged");
+            } catch {
+              console.error(`ERROR: Can't find element with id "${data.sender.name + "-" + data.move.id + "-cs" + data.move.charged}"`);
+            }
           }
 
           else if (data.type == "cancel") {

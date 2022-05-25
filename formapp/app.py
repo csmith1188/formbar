@@ -1519,15 +1519,18 @@ def endpoint_games_fighter():
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
     else:
-        username = sD.studentDict[request.remote_addr]['name']
-        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
-        dbcmd = db.cursor()
-        wins = dbcmd.execute("SELECT fighterWins FROM users WHERE username=:uname", {"uname": username}).fetchone()[0] or 0
-        losses = dbcmd.execute("SELECT fighterLosses FROM users WHERE username=:uname", {"uname": username}).fetchone()[0] or 0
-        winStreak = dbcmd.execute("SELECT fighterWinStreak FROM users WHERE username=:uname", {"uname": username}).fetchone()[0] or 0
-        goldUnlocked = dbcmd.execute("SELECT goldUnlocked FROM users WHERE username=:uname", {"uname": username}).fetchone()[0] or 0
-        db.close()
-        return render_template('games/fighter.html', username = username, wins = wins, losses = losses, winStreak = winStreak, goldUnlocked = goldUnlocked)
+        try:
+            username = sD.studentDict[request.remote_addr]['name']
+            db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+            dbcmd = db.cursor()
+            wins = dbcmd.execute("SELECT fighterWins FROM users WHERE username=:uname", {"uname": username}).fetchone()[0] or 0
+            losses = dbcmd.execute("SELECT fighterLosses FROM users WHERE username=:uname", {"uname": username}).fetchone()[0] or 0
+            winStreak = dbcmd.execute("SELECT fighterWinStreak FROM users WHERE username=:uname", {"uname": username}).fetchone()[0] or 0
+            goldUnlocked = dbcmd.execute("SELECT goldUnlocked FROM users WHERE username=:uname", {"uname": username}).fetchone()[0] or 0
+            db.close()
+            return render_template('games/fighter.html', username = username, wins = wins, losses = losses, winStreak = winStreak, goldUnlocked = goldUnlocked)
+        except Exception as e:
+            print("[error] " + "Error: " + str(e))
 
 '''
     /games/flashcards
@@ -2148,18 +2151,21 @@ def endpoint_removefightermatch():
 def endpoint_savescore():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
-    game = request.args.get("game")
-    score = request.args.get("score")
-    if game and score:
-        username = sD.studentDict[request.remote_addr]['name']
-        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
-        dbcmd = db.cursor()
-        dbcmd.execute("INSERT INTO scores (game, username, score) VALUES (?, ?, ?)", (game, username, score))
-        db.commit()
-        db.close()
-        return render_template("message.html", message = "Score saved to database.")
-    else:
-        return render_template("message.html", message = "Missing arguments.")
+    try:
+        game = request.args.get("game")
+        score = request.args.get("score")
+        if game and score:
+            username = sD.studentDict[request.remote_addr]['name']
+            db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+            dbcmd = db.cursor()
+            dbcmd.execute("INSERT INTO scores (game, username, score) VALUES (?, ?, ?)", (game, username, score))
+            db.commit()
+            db.close()
+            return render_template("message.html", message = "Score saved to database.")
+        else:
+            return render_template("message.html", message = "Missing arguments.")
+    except Exception as e:
+        print("[error] " + "Error: " + str(e))
 
 
 @app.route('/say')
@@ -2397,18 +2403,21 @@ def endpoint_tutd():
 def endpoint_updateuser():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
-    field = request.args.get("field")
-    value = request.args.get("value")
-    username = request.args.get("name") or sD.studentDict[request.remote_addr]['name']
-    if field and value:
-        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
-        dbcmd = db.cursor()
-        dbcmd.execute("UPDATE users SET " + field + "=:value WHERE username=:uname", {"uname": username, "value": value})
-        db.commit()
-        db.close()
-        return render_template("message.html", message = "Account updated.")
-    else:
-        return render_template("message.html", message = "Missing arguments.")
+    try:
+        field = request.args.get("field")
+        value = request.args.get("value")
+        username = request.args.get("name") or sD.studentDict[request.remote_addr]['name']
+        if field and value:
+            db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+            dbcmd = db.cursor()
+            dbcmd.execute("UPDATE users SET " + field + "=:value WHERE username=:uname", {"uname": username, "value": value})
+            db.commit()
+            db.close()
+            return render_template("message.html", message = "Account updated.")
+        else:
+            return render_template("message.html", message = "Missing arguments.")
+    except Exception as e:
+        print("[error] " + "Error: " + str(e))
 
 #This endpoint allows us to see which user(Student) is logged in.
 @app.route('/users')

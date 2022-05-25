@@ -2020,6 +2020,7 @@
 
         else if (data.move) {
           data.sender = fighters.find(fighter => fighter.name == data.sender.name);
+          data.senderTeammate = fighters.find(fighter => fighter.name == data.senderTeammate.name);
           if (data.sender) data.move = Object.values(data.sender.moves).find(move => move.id == data.move.id);
           else console.error("The move's sender is undefined.");
 

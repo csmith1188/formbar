@@ -2132,6 +2132,12 @@ def endpoint_quiz():
         else:
             return render_template("message.html", message = "No quiz is currently loaded.")
 
+@app.route('/removefightermatch', methods = ['POST'])
+def endpoint_removefightermatch():
+    code = request.args.get('code')
+    del sD.fighter['match' + code]
+    return render_template("message.html", message = 'Match ' + code + ' removed.')
+
 # ███████
 # ██
 # ███████

@@ -1075,31 +1075,19 @@
       }
 
       function sendPlayerReady() {
-        request.open("GET", '/api/fightermatches', false);
-        request.send(null);
-        let res = JSON.parse(request.responseText);
-        match = res["match" + matchCode];
-
-
-        if (!match) {
-          alert("Match does not exist.");
-        } else if (me.team == 2 && match.opponent) {
-          alert("Match is already full.");
-        } else {
-          let sendObj = {
-            to: opponent.name,
-            from: me.name,
-            content: {
-              type: "player",
-              match: matchCode,
-              player: me
-            },
-          }
-          chatSocket.emit("fighter", JSON.stringify(sendObj));
-
-          console.log("Player sent:");
-          console.log(sendObj);
+        let sendObj = {
+          to: opponent.name,
+          from: me.name,
+          content: {
+            type: "player",
+            match: matchCode,
+            player: me
+          },
         }
+        chatSocket.emit("fighter", JSON.stringify(sendObj));
+
+        console.log("Player sent:");
+        console.log(sendObj);
       }
 
       function sendMessage(content, recipient = opponent.name) {
@@ -1237,6 +1225,8 @@
               match: code
             }
           }));
+          request.open("POST", "/addfighteropponent?code=" + code + "&name=" + me.name);
+          request.send();
           fighterOptions();
         }
       }
@@ -1572,8 +1562,6 @@
         if (me.team == 1) {
           fighter2a = opponent.fighters[0];
           fighter2b = opponent.fighters[1];
-          request.open("POST", "/addfighteropponent?code=" + matchCode + "&name=" + player.name);
-          request.send();
           sendPlayerReady();
         } else {
           fighter1a = opponent.fighters[0];

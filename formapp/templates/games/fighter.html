@@ -1673,7 +1673,7 @@
         time = 30;
         startTimer();
 
-        opponent.fighters.forEach(fighter => {if (fighter.effects.poison) damage(fighter, 5);}); //Deal poison damage
+        inactive.fighters.forEach(fighter => {if (fighter.effects.poison) damage(fighter, 5);}); //Deal poison damage
 
         //Decrease turns left for effects
         players.forEach(player => {
@@ -2011,11 +2011,8 @@
 
         else if (data.move) {
           data.sender = fighters.find(fighter => fighter.name == data.sender.name);
-          try {
-            data.move = Object.values(data.sender.moves).find(move => move.id == data.move.id);
-          } catch {
-            console.error("The move's sender is undefined.");
-          }
+          if (data.sender) data.move = Object.values(data.sender.moves).find(move => move.id == data.move.id);
+          else console.error("The move's sender is undefined.");
 
           if (inactive.fighters.includes(data.sender)) console.error("ERROR: Received a move from a player when it wasn't their turn");
 

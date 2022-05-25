@@ -1069,6 +1069,11 @@
         return teammate[0]; //Return only item of new array
       }
 
+      window.onunload = () => {
+        request.open("POST", "/removefightermatch?code=" + matchCode);
+        request.send();
+      }
+
       function sendPlayerReady() {
         let sendObj = {
           to: opponent.name,
@@ -1653,12 +1658,12 @@
       }
 
       function startTurn() {
-        console.log("Turn started at:");
-        console.log(Date.now());
 
         if (matchOver) return;
 
         active == me ? inactive = opponent : inactive = me;
+
+        console.log(`${active.name}'s turn started at: ${Date.now()}`);
 
         /*//for testing
         me = active;
@@ -1801,7 +1806,6 @@
               }
               else clickFunction = () => selectTarget(sender, copyMove || moveObj);
               if (copySender) moveObj.el.onclick = () => {
-                let chargeEl = document.getElementById(sender.name + "-" + copyMove.id + "-charge");
                 for (let property in copyMove) if (property != "name" && property != "id" && property != "el") delete copyMove[property]; //Delete all properties of copyMove except "name", "id", and "el"
                 for (let property in moveObj) if (property != "name" && property != "id" && property != "el") copyMove[property] = moveObj[property]; //Make copyMove a duplicate of target move
                 copyMove.copied = {
@@ -1852,6 +1856,11 @@
           fighter.el.classList.add("targetOption");
           if (move.charge) fighter.el.onclick = () => charge(sender, move, fighter);
           else fighter.el.onclick = () => useMove(sender, move, fighter);
+          for (let fighterMove in fighter.moves) {
+            let moveObj = fighter.moves[fighterMove];
+            moveObj.el.classList.remove("enabled");
+            moveObj.el.onclick = null;
+          }
         });
       }
 
@@ -2017,7 +2026,8 @@
           if (inactive.fighters.includes(data.sender)) console.error("ERROR: Received a move from a player when it wasn't their turn");
 
           if (data.type == "charge") {
-            if (data.copied) { ////
+            if (data.move.copied) {
+              let chargeEl = document.getElementById(data.sender.name + "-" + data.move.id + "-charge");
               if (data.move.charge == 1) chargeEl.innerHTML = "<b>Charge:</b> 1 turn ";
               else chargeEl.innerHTML = `<b>Charge:</b> ${data.move.charge} turns `;
               for (let i = 0; i < data.move.charge; i++) chargeEl.innerHTML += `<div id="${data.sender.name}-${data.move.id}-cs${i + 1}" class="chargeSquare"></div>`;
@@ -2417,12 +2427,11 @@
       }
 
       function endTurn() {
-        console.log("Turn ended at:");
-        console.log(Date.now());
+        console.log(`${active.name}'s turn ended at ${Date.now()}`);
         countdown = clearInterval(countdown);
 
         //Disable moves and items
-        me.fighters.forEach(fighter => {
+        fighters.forEach(fighter => {
           for (let move in fighter.moves) {
             let moveObj = fighter.moves[move];
             moveObj.el.classList.remove("enabled");
@@ -2453,6 +2462,7 @@
         document.getElementById("matchOver").classList.remove("hidden");
 
         window.onbeforeunload = null;
+        window.onunload = null;
 
         winner = (me.team == winner.team) ? me : opponent;
 
@@ -2473,9 +2483,10 @@
           me.winStreak = 0;
         }
         updateStats();
-      }
 
-      window.onunload = null;
+        request.open("POST", "/removefightermatch?code=" + matchCode);
+        request.send();
+      }
 
       function rematchButton() {
         ////
@@ -2514,5 +2525,180 @@
 
       ////delete own matches on disconnect
     }
+
+    let testPlayer = {
+    name: "Oley456",
+    defeated: [],
+    colors: [
+        {
+            color: "red",
+            effective: "yellow",
+            weak: "blue",
+            moves: {
+                main: {
+                    damage: 14,
+                    doubleTarget: true,
+                    description: "Deals [damage] damage to both opponent fighters.",
+                    name: "main attack",
+                    id: "main",
+                    charged: 0
+                },
+                special: {
+                    charge: 1,
+                    minDamage: 45,
+                    maxDamage: 65,
+                    description: "Deals at least [minDamage] and up to [maxDamage] damage.",
+                    name: "special attack",
+                    id: "special",
+                    charged: 0
+                },
+                other: {
+                    type: "revenge",
+                    revengeDuration: 2,
+                    selfTarget: true,
+                    description: "Opponents will take 50% of the damage they inflict on this fighter. Lasts for 2 turns.",
+                    name: "other move",
+                    id: "other",
+                    charged: 0
+                }
+            },
+            hp: 100,
+            attackFactor: 1,
+            effects: {}
+        },
+        {
+            color: "yellow",
+            effective: "green",
+            weak: "red",
+            moves: {
+                main: {
+                    damage: 20,
+                    critDamage: 40,
+                    critChance: 10,
+                    description: "Deals [damage] damage. 10% chance of a critical hit, which deals [critDamage] damage.",
+                    name: "main attack",
+                    id: "main",
+                    charged: 0
+                },
+                alt: {
+                    damage: 7,
+                    doubleTarget: true,
+                    healing: true,
+                    description: "Deals [damage] damage to both opponent fighters. Dealt damage is added to this fighter's HP.",
+                    name: "alt attack",
+                    id: "alt",
+                    charged: 0
+                },
+                other: {
+                    type: "sacrifice",
+                    selfTarget: true,
+                    description: "Sacrifice this fighter. Teammate's attack power increases by 1% for each remaining HP.",
+                    name: "other move",
+                    id: "other",
+                    charged: 0
+                }
+            },
+            hp: 100,
+            attackFactor: 1,
+            effects: {}
+        }
+    ],
+    items: [
+        "attackBoost",
+        "fastTimer",
+        "cleanse"
+    ],
+    effects: {},
+    wins: 0,
+    losses: 0,
+    winStreak: 0,
+    team: 2,
+    fighters: [
+        {
+            team: 2,
+            name: "2a",
+            color: "red",
+            effective: "yellow",
+            weak: "blue",
+            moves: {
+                main: {
+                    damage: 14,
+                    doubleTarget: true,
+                    description: "Deals [damage] damage to both opponent fighters.",
+                    name: "main attack",
+                    id: "main",
+                    charged: 0,
+                    el: {}
+                },
+                special: {
+                    charge: 1,
+                    minDamage: 45,
+                    maxDamage: 65,
+                    description: "Deals at least [minDamage] and up to [maxDamage] damage.",
+                    name: "special attack",
+                    id: "special",
+                    charged: 0,
+                    el: {}
+                },
+                other: {
+                    type: "revenge",
+                    revengeDuration: 2,
+                    selfTarget: true,
+                    description: "Opponents will take 50% of the damage they inflict on this fighter. Lasts for 2 turns.",
+                    name: "other move",
+                    id: "other",
+                    charged: 0,
+                    el: {}
+                }
+            },
+            hp: 100,
+            attackFactor: 1,
+            effects: {},
+            el: {}
+        },
+        {
+            team: 2,
+            name: "2b",
+            color: "yellow",
+            effective: "green",
+            weak: "red",
+            moves: {
+                main: {
+                    damage: 20,
+                    critDamage: 40,
+                    critChance: 10,
+                    description: "Deals [damage] damage. 10% chance of a critical hit, which deals [critDamage] damage.",
+                    name: "main attack",
+                    id: "main",
+                    charged: 0,
+                    el: {}
+                },
+                alt: {
+                    damage: 7,
+                    doubleTarget: true,
+                    healing: true,
+                    description: "Deals [damage] damage to both opponent fighters. Dealt damage is added to this fighter's HP.",
+                    name: "alt attack",
+                    id: "alt",
+                    charged: 0,
+                    el: {}
+                },
+                other: {
+                    type: "sacrifice",
+                    selfTarget: true,
+                    description: "Sacrifice this fighter. Teammate's attack power increases by 1% for each remaining HP.",
+                    name: "other move",
+                    id: "other",
+                    charged: 0,
+                    el: {}
+                }
+            },
+            hp: 100,
+            attackFactor: 1,
+            effects: {},
+            el: {}
+        }
+    ]
+}
   </script>
 {% endblock %}

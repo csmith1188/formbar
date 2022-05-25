@@ -1075,19 +1075,31 @@
       }
 
       function sendPlayerReady() {
-        let sendObj = {
-          to: opponent.name,
-          from: me.name,
-          content: {
-            type: "player",
-            match: matchCode,
-            player: me
-          },
-        }
-        chatSocket.emit("fighter", JSON.stringify(sendObj));
+        request.open("GET", '/api/fightermatches', false);
+        request.send(null);
+        let res = JSON.parse(request.responseText);
+        match = res["match" + matchCode];
 
-        console.log("Player sent:");
-        console.log(sendObj);
+
+        if (!match) {
+          alert("Match does not exist.");
+        } else if (me.team == 2 && match.opponent) {
+          alert("Match is already full.");
+        } else {
+          let sendObj = {
+            to: opponent.name,
+            from: me.name,
+            content: {
+              type: "player",
+              match: matchCode,
+              player: me
+            },
+          }
+          chatSocket.emit("fighter", JSON.stringify(sendObj));
+
+          console.log("Player sent:");
+          console.log(sendObj);
+        }
       }
 
       function sendMessage(content, recipient = opponent.name) {

@@ -1108,6 +1108,8 @@
       }
 
       function sendMove(moveObj) {
+        disableFightersAndItems();
+
         let sendObj = {
           to: opponent.name,
           from: me.name,
@@ -2275,6 +2277,24 @@
         if (active == me) enableMoves(me); //Re-enable items. If one fighter has an "add item" move, this will make it usable.
       }
 
+      function disableFightersAndItems() {
+        //Disable moves and items
+        fighters.forEach(fighter => {
+          for (let move in fighter.moves) {
+            let moveObj = fighter.moves[move];
+            moveObj.el.classList.remove("enabled");
+            moveObj.el.onclick = null;
+          }
+        });
+        me.items.forEach((item, i) => {
+          let el = document.getElementById("p" + me.team + "-item" + i);
+          el.draggable = false;
+          el.classList.remove("draggable");
+          el.ondrag = null;
+        });
+        removeTargetOptions();
+      }
+
       function damage(target, amount) {
         let changeEl = document.getElementById(target.name + "-HPNumChange");
         changeEl.style.color = "var(--color-red)";
@@ -2431,21 +2451,7 @@
         console.log(`${active.name}'s turn ended at ${Date.now()}`);
         countdown = clearInterval(countdown);
 
-        //Disable moves and items
-        fighters.forEach(fighter => {
-          for (let move in fighter.moves) {
-            let moveObj = fighter.moves[move];
-            moveObj.el.classList.remove("enabled");
-            moveObj.el.onclick = null;
-          }
-        });
-        me.items.forEach((item, i) => {
-          let el = document.getElementById("p" + me.team + "-item" + i);
-          el.draggable = false;
-          el.classList.remove("draggable");
-          el.ondrag = null;
-        });
-        removeTargetOptions();
+        disableFightersAndItems();
 
         let doNothingEl = document.getElementById("p" + me.team + "-doNothing");
         doNothingEl.classList.remove("enabled");

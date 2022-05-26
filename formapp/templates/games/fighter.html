@@ -608,9 +608,10 @@
       <h1 id="opponentStatus" style="position: static;">Waiting for opponent…</h1>
       <h2 style="font-weight: normal;">Your match code is <b id="matchCode"></b></h2>
     </div>
-    <iframe width="560" height="315" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen id="video" class="centered"></iframe>
     <div id="tip" class="large hCentered" style="bottom: 32px;"></div>
   </div>
+
+  <h1 id="starting" class="centered hidden">Starting match…</h1>
 
   <div id="gameContainer" class="hidden">
     <div id="game">
@@ -1108,6 +1109,8 @@
       }
 
       function sendMove(moveObj) {
+        disableFightersAndItems();
+
         let sendObj = {
           to: opponent.name,
           from: me.name,
@@ -1253,15 +1256,13 @@
 
         lockedColors.forEach((color) => {
           /*//for testing ///et*/
-          if ((color.unlockWins && me.wins >= color.unlockWins) || (color.color == "gold" && {{ goldUnlocked }} && false)) { //If player has enough wins to unlock or already unlocked
+          if ((color.unlockWins && me.wins >= color.unlockWins) || (color.color == "gold" && {{ goldUnlocked }})) { //If player has enough wins to unlock or already unlocked
             colors.push(color);
             lockedColors = lockedColors.filter(locked => locked != color);
           } else {
             let el = document.getElementById(color.color + "Fighter");
             let lockedMessage;
             if (color.unlockWins) lockedMessage = color.unlockWins + " wins to unlock";
-            /*//for testing ///et*/
-            else if (color.color = "gold" && {{ goldUnlocked }}) lockedMessage = "Temporarily disabled<br>due to bugs";
             else lockedMessage = color.unlockStreak + "-win streak to unlock";
             el.classList.add("fighter", "locked");
             el.innerHTML = `<div class="vCentered" style="left: 0; width: 100%; text-align: center;">
@@ -1504,11 +1505,10 @@
         }
 
         if (me.team == 1) wait();
-        else if (match.opponent) {
-          alert("Match is already full.");
-          window.location = "/games/fighter";
+        else {
+          sendPlayerReady();
+          document.getElementById("starting").classList.remove("hidden");
         }
-        else sendPlayerReady();
       }
 
       function wait() {
@@ -1578,6 +1578,7 @@
 
       function startMatch() {
         document.getElementById("waiting").classList.add("hidden");
+        document.getElementById("starting").classList.add("hidden");
         document.getElementById("border").classList.add("hidden");
         document.getElementById("gameContainer").classList.remove("hidden");
         document.getElementById("gameChat").classList.remove("hidden");
@@ -1914,7 +1915,7 @@
           else targets = opponent.fighters[1];
         }
         if (!Array.isArray(targets)) targets = [targets]; //If there is only one target, turn it into an array
-        if (targets.length == 1) targetTeammate = getTeammate(targets[0]);
+        if (targets.length == 1 || move.secondaryTarget) targetTeammate = getTeammate(targets[0]);
         let sendObj = {
           sender: sender,
           targets: targets,
@@ -1959,7 +1960,7 @@
             if (target.effects.shield && !move.ignoreShield) sendObj.damage[i] /= 2;
             sendObj.damage[i] = Math.round(sendObj.damage[i]);
 
-            if (target.effects.revenge && !move.ignoreRevenge) sendObj.selfDamage += Math.min(sendObj.damage[i], target.hp) / 2; //Check which is lower: move's damage or target's remaining HP, then divide by 2 and set damage to sender
+            if (target.effects.revenge && !move.ignoreRevenge) sendObj.selfDamage += Math.round(Math.min(sendObj.damage[i], target.hp) / 2); //Check which is lower: move's damage or target's remaining HP, then divide by 2 and set damage to sender
             if (move.healing) sendObj.selfDamage -= sendObj.damage[i];
 
             let messageEffects = [];
@@ -2020,8 +2021,10 @@
 
         else if (data.move) {
           data.sender = fighters.find(fighter => fighter.name == data.sender.name);
-          if (data.sender) data.move = Object.values(data.sender.moves).find(move => move.id == data.move.id);
-          else console.error("The move's sender is undefined.");
+          console.log(data.senderTeammate);
+          data.senderTeammate &&= fighters.find(fighter => fighter.name == data.senderTeammate.name);
+          if (!data.move.copied && data.sender) data.move = Object.values(data.sender.moves).find(move => move.id == data.move.id);
+          else if (!data.sender) console.error("The move's sender is undefined.");
 
           if (inactive.fighters.includes(data.sender)) console.error("ERROR: Received a move from a player when it wasn't their turn");
 
@@ -2274,6 +2277,24 @@
         if (active == me) enableMoves(me); //Re-enable items. If one fighter has an "add item" move, this will make it usable.
       }
 
+      function disableFightersAndItems() {
+        //Disable moves and items
+        fighters.forEach(fighter => {
+          for (let move in fighter.moves) {
+            let moveObj = fighter.moves[move];
+            moveObj.el.classList.remove("enabled");
+            moveObj.el.onclick = null;
+          }
+        });
+        me.items.forEach((item, i) => {
+          let el = document.getElementById("p" + me.team + "-item" + i);
+          el.draggable = false;
+          el.classList.remove("draggable");
+          el.ondrag = null;
+        });
+        removeTargetOptions();
+      }
+
       function damage(target, amount) {
         let changeEl = document.getElementById(target.name + "-HPNumChange");
         changeEl.style.color = "var(--color-red)";
@@ -2430,21 +2451,7 @@
         console.log(`${active.name}'s turn ended at ${Date.now()}`);
         countdown = clearInterval(countdown);
 
-        //Disable moves and items
-        fighters.forEach(fighter => {
-          for (let move in fighter.moves) {
-            let moveObj = fighter.moves[move];
-            moveObj.el.classList.remove("enabled");
-            moveObj.el.onclick = null;
-          }
-        });
-        me.items.forEach((item, i) => {
-          let el = document.getElementById("p" + me.team + "-item" + i);
-          el.draggable = false;
-          el.classList.remove("draggable");
-          el.ondrag = null;
-        });
-        removeTargetOptions();
+        disableFightersAndItems();
 
         let doNothingEl = document.getElementById("p" + me.team + "-doNothing");
         doNothingEl.classList.remove("enabled");
@@ -2473,8 +2480,9 @@
           opponent.losses++;
           opponent.winStreak = 0;
 
-          request.open("POST", "/savescore?game=fighter&score=" + me.wins);
-          request.send();
+          let request1 = new XMLHttpRequest();
+          request1.open("POST", "/savescore?game=fighter&score=" + me.wins);
+          request1.send();
         } else {
           resultEl.innerText = "You lose";
           opponent.wins++;
@@ -2484,8 +2492,9 @@
         }
         updateStats();
 
-        request.open("POST", "/removefightermatch?code=" + matchCode);
-        request.send();
+        let request2 = new XMLHttpRequest();
+        request2.open("POST", "/removefightermatch?code=" + matchCode);
+        request2.send();
       }
 
       function rematchButton() {

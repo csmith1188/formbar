@@ -2480,8 +2480,9 @@
           opponent.losses++;
           opponent.winStreak = 0;
 
-          request.open("POST", "/savescore?game=fighter&score=" + me.wins);
-          request.send();
+          let request1 = new XMLHttpRequest();
+          request1.open("POST", "/savescore?game=fighter&score=" + me.wins);
+          request1.send();
         } else {
           resultEl.innerText = "You lose";
           opponent.wins++;
@@ -2491,8 +2492,9 @@
         }
         updateStats();
 
-        request.open("POST", "/removefightermatch?code=" + matchCode);
-        request.send();
+        let request2 = new XMLHttpRequest();
+        request2.open("POST", "/removefightermatch?code=" + matchCode);
+        request2.send();
       }
 
       function rematchButton() {

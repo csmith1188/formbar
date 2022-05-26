@@ -1659,7 +1659,6 @@
       }
 
       function startTurn() {
-
         if (matchOver) return;
 
         active == me ? inactive = opponent : inactive = me;
@@ -2278,7 +2277,6 @@
       }
 
       function disableFightersAndItems() {
-        //Disable moves and items
         fighters.forEach(fighter => {
           for (let move in fighter.moves) {
             let moveObj = fighter.moves[move];

@@ -1256,15 +1256,13 @@
 
         lockedColors.forEach((color) => {
           /*//for testing ///et*/
-          if ((color.unlockWins && me.wins >= color.unlockWins) || (color.color == "gold" && {{ goldUnlocked }} && false)) { //If player has enough wins to unlock or already unlocked
+          if ((color.unlockWins && me.wins >= color.unlockWins) || (color.color == "gold" && {{ goldUnlocked }})) { //If player has enough wins to unlock or already unlocked
             colors.push(color);
             lockedColors = lockedColors.filter(locked => locked != color);
           } else {
             let el = document.getElementById(color.color + "Fighter");
             let lockedMessage;
             if (color.unlockWins) lockedMessage = color.unlockWins + " wins to unlock";
-            /*//for testing ///et*/
-            else if (color.color = "gold" && {{ goldUnlocked }}) lockedMessage = "Temporarily disabled<br>due to bugs";
             else lockedMessage = color.unlockStreak + "-win streak to unlock";
             el.classList.add("fighter", "locked");
             el.innerHTML = `<div class="vCentered" style="left: 0; width: 100%; text-align: center;">
@@ -1580,7 +1578,7 @@
 
       function startMatch() {
         document.getElementById("waiting").classList.add("hidden");
-        document.getElementById("starting").classList.remove("hidden");
+        document.getElementById("starting").classList.add("hidden");
         document.getElementById("border").classList.add("hidden");
         document.getElementById("gameContainer").classList.remove("hidden");
         document.getElementById("gameChat").classList.remove("hidden");
@@ -1917,7 +1915,7 @@
           else targets = opponent.fighters[1];
         }
         if (!Array.isArray(targets)) targets = [targets]; //If there is only one target, turn it into an array
-        if (targets.length == 1) targetTeammate = getTeammate(targets[0]);
+        if (targets.length == 1 || move.secondaryTarget) targetTeammate = getTeammate(targets[0]);
         let sendObj = {
           sender: sender,
           targets: targets,
@@ -1962,7 +1960,7 @@
             if (target.effects.shield && !move.ignoreShield) sendObj.damage[i] /= 2;
             sendObj.damage[i] = Math.round(sendObj.damage[i]);
 
-            if (target.effects.revenge && !move.ignoreRevenge) sendObj.selfDamage += Math.min(sendObj.damage[i], target.hp) / 2; //Check which is lower: move's damage or target's remaining HP, then divide by 2 and set damage to sender
+            if (target.effects.revenge && !move.ignoreRevenge) sendObj.selfDamage += Math.round(Math.min(sendObj.damage[i], target.hp) / 2); //Check which is lower: move's damage or target's remaining HP, then divide by 2 and set damage to sender
             if (move.healing) sendObj.selfDamage -= sendObj.damage[i];
 
             let messageEffects = [];
@@ -2023,9 +2021,10 @@
 
         else if (data.move) {
           data.sender = fighters.find(fighter => fighter.name == data.sender.name);
-          data.senderTeammate = fighters.find(fighter => fighter.name == data.senderTeammate.name);
-          if (data.sender) data.move = Object.values(data.sender.moves).find(move => move.id == data.move.id);
-          else console.error("The move's sender is undefined.");
+          console.log(data.senderTeammate);
+          data.senderTeammate &&= fighters.find(fighter => fighter.name == data.senderTeammate.name);
+          if (!data.move.copied && data.sender) data.move = Object.values(data.sender.moves).find(move => move.id == data.move.id);
+          else if (!data.sender) console.error("The move's sender is undefined.");
 
           if (inactive.fighters.includes(data.sender)) console.error("ERROR: Received a move from a player when it wasn't their turn");
 

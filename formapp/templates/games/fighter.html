@@ -608,9 +608,10 @@
       <h1 id="opponentStatus" style="position: static;">Waiting for opponent…</h1>
       <h2 style="font-weight: normal;">Your match code is <b id="matchCode"></b></h2>
     </div>
-    <iframe width="560" height="315" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen id="video" class="centered"></iframe>
     <div id="tip" class="large hCentered" style="bottom: 32px;"></div>
   </div>
+
+  <h1 id="starting" class="centered hidden">Starting match…</h1>
 
   <div id="gameContainer" class="hidden">
     <div id="game">
@@ -1506,11 +1507,10 @@
         }
 
         if (me.team == 1) wait();
-        else if (match.opponent) {
-          alert("Match is already full.");
-          window.location = "/games/fighter";
+        else {
+          sendPlayerReady();
+          document.getElementById("starting").classList.remove("hidden");
         }
-        else sendPlayerReady();
       }
 
       function wait() {
@@ -1580,6 +1580,7 @@
 
       function startMatch() {
         document.getElementById("waiting").classList.add("hidden");
+        document.getElementById("starting").classList.remove("hidden");
         document.getElementById("border").classList.add("hidden");
         document.getElementById("gameContainer").classList.remove("hidden");
         document.getElementById("gameChat").classList.remove("hidden");

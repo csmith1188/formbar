@@ -1194,6 +1194,7 @@
           request.open("POST", "/updateuser?field=goldUnlocked&value=0");
           request.send();
           updateStats();
+          window.location.reload();
         }
       }
 

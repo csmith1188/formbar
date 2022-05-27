@@ -95,7 +95,7 @@
     content.style.height = null;
     if (document.body.clientHeight > window.innerHeight) content.style.height = window.innerHeight - 125 + "px";
   }
-  contentHeight();
+  window.addEventListener("load", contentHeight);
   window.addEventListener("resize", contentHeight);
 </script>
 {% block script %}{% endblock %}

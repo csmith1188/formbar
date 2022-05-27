@@ -2335,7 +2335,7 @@
       function defeat(target) {
         for (let effect in target.effects) removeEffect(effect, target);
         let targetTeammate = getTeammate(target);
-        if (targetTeammate?.color == "yellow") unselectable(targetTeammate.moves.other); ////!doesn't always work
+        if (targetTeammate?.color == "yellow") unselectable(targetTeammate.moves.other);
         fighters.splice(fighters.indexOf(target), 1);
         defeated.push(target);
         if (target.team == me.team) {

@@ -2035,24 +2035,31 @@ def endpoint_profile():
         return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
     else:
         name = request.args.get('user') or sD.studentDict[request.remote_addr]['name']
+        userFound = False
         for x in sD.studentDict:
             user = sD.studentDict[x]
             if user['name'].strip() == name:
-                username = sD.studentDict[request.remote_addr]['name']
-                db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
-                dbcmd = db.cursor()
-                highScores = {
-                    "2048": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='2048' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
-                    "bitshifter": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='bitshifter' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
-                    "hangman": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='hangman' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
-                    "minesweeper": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='minesweeper' ORDER BY score ASC", {"uname": user['name']}).fetchone(),
-                    "speedtype": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='speedtype' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
-                    "towerdefense": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='towerdefense' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
-                    "fighter": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='towerdefense' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
-                    "wordle": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='wordle' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
-                }
-                db.close()
-                return render_template("profile.html", username = user['name'], perms = sD.settings['permname'][user['perms']], bot = user['bot'], highScores = json.dumps(highScores))
+                userFound = True
+        if not userFound:
+            db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+            dbcmd = db.cursor()
+            userFound = dbcmd.execute("SELECT * FROM users WHERE username=:uname", {"uname": name}).fetchall()
+            db.close()
+        if userFound:
+            db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+            dbcmd = db.cursor()
+            highScores = {
+                "2048": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='2048' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
+                "bitshifter": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='bitshifter' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
+                "hangman": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='hangman' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
+                "minesweeper": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='minesweeper' ORDER BY score ASC", {"uname": user['name']}).fetchone(),
+                "speedtype": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='speedtype' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
+                "towerdefense": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='towerdefense' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
+                "fighter": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='towerdefense' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
+                "wordle": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='wordle' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
+            }
+            db.close()
+            return render_template("profile.html", username = user['name'], perms = sD.settings['permname'][user['perms']], bot = user['bot'], highScores = json.dumps(highScores))
         #If there are no matches
         return render_template("message.html", message = "There are no users with that name.")
 

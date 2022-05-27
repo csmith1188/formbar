@@ -1070,11 +1070,6 @@
         return teammate[0]; //Return only item of new array
       }
 
-      window.onunload = () => {
-        request.open("POST", "/removefightermatch?code=" + matchCode);
-        request.send();
-      }
-
       function sendPlayerReady() {
         let sendObj = {
           to: opponent.name,
@@ -1247,6 +1242,12 @@
         me.team = 1;
         me.fighters = [fighter1a, fighter1b];
         me.firstMove = !pickRandom(2); //Decide which player goes first
+
+        window.onunload = () => {
+          request.open("POST", "/removefightermatch?code=" + matchCode);
+          request.send();
+        }
+
         fighterOptions();
       }
 

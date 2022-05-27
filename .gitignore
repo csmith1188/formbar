@@ -3,10 +3,11 @@ send.bat
 info.log
 __pycache__
 formapp/lessondata/*
-formapp/data/database.db
+database.db
 run.bat
-formapp/key.py
 __pycache__
 */__pycache__
-config.py
+**key.py
+**config.py
+**database.db
 **send.bat

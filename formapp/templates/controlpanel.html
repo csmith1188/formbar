@@ -48,7 +48,7 @@
     overflow-wrap: break-word;
   }
 
-  h3 {
+  #students h3 {
     margin: 0 0 8px 0;
     padding: 4px;
   }
@@ -67,6 +67,14 @@
     vertical-align: text-bottom;
     margin-right: 8px;
   }
+
+  #history > span, #history > b {
+    display: inline-block;
+    width: 100px;
+    margin-top: 8px;
+    margin-right: 8px;
+  }
+
   #tabBox {
     display: flex;
     justify-content: space-evenly;
@@ -100,8 +108,9 @@
   <ul id="tabBox">
     <li><a class="button pressed" href="#tabs-1">Users</a></li>
     <li><a class="button" href="#tabs-2">Interaction</a></li>
-    <li><a class="button" href="#tabs-3">Permissions</a></li>
-    <li><a class="button" href="#tabs-4">Configuration</a></li>
+    <li><a class="button" href="#tabs-3">Poll history</a></li>
+    <li><a class="button" href="#tabs-4">Permissions</a></li>
+    <li><a class="button" href="#tabs-5">Configuration</a></li>
   </ul>
   <div id="tabs-1">
     <h2>Users</h2>
@@ -135,17 +144,16 @@
         <div>
           <input type="radio" id="poll" name="mode">
           <h3 style="display: inline;">Poll</h3><br>
-          <span style="margin-left: 21px;">Students' votes are displayed on the bar.</span><br>
+          <span style="margin-left: 25px;">Students' votes are displayed on the bar.</span><br>
         </div>
       </label>
-      <form id="pollType" class="hidden" style="margin: 8px 0 0 21px;" onchange="changePollType();">
+      <form id="pollType" class="hidden" style="margin: 8px 0 0 25px;" onchange="changePollType();">
         Type:
         <input type="radio" id="thumbs" name="type" checked style="margin-left: 8px;"><label for="thumbs">Thumbs</label>
         <input type="radio" id="letters" name="type" style="margin-left: 8px;"><label for="letters">Letters</label>
         <input type="radio" id="essay" name="type" style="margin-left: 8px;"><label for="essay">Essay</label><br>
         <span id="pollDescription">Students can choose between thumbs up, thumbs down, and wiggle</span><br>
-        <input type="button" class="button inline popOut" value="Start new poll" style="margin-top: 8px;" onclick="startPoll();">
-        <input type="button" id="drButton" class="button inline popOut hidden" value="Download essays" style="margin-top: 8px;" onclick="downloadResponses();">
+        <input type="button" id="pollButton" class="button inline popOut" value="Start new poll" style="margin-top: 8px;">
       </form>
       <br>
 
@@ -153,7 +161,7 @@
         <div>
           <input type="radio" id="progress" name="mode">
           <h3 style="display: inline;">Progess</h3><br>
-          <span style="margin-left: 21px;">Description</span><br>
+          <span style="margin-left: 25px;">Description</span><br>
         </div>
       </label>
       <br>
@@ -162,7 +170,7 @@
         <div>
           <input type="radio" id="countdown" name="mode">
           <h3 style="display: inline;">Countdown</h3><br>
-          <span style="margin-left: 21px;">Set a countdown timer.</span><br>
+          <span style="margin-left: 25px;">Set a countdown timer.</span><br>
         </div>
       </label>
       <form action="/countdown" method="post" id="countdownTime" class="hidden" style="margin: 8px 0 0 21px;">
@@ -177,13 +185,17 @@
         <div>
           <input type="radio" id="playtime" name="mode">
           <h3 style="display: inline;">Playtime</h3><br>
-          <span style="margin-left: 21px;">Students can change the colors of the bar.</span><br>
+          <span style="margin-left: 25px;">Students can change the colors of the bar.</span><br>
         </div>
       </label>
     </div>
 
   </div>
   <div id="tabs-3">
+    <h2>Download poll results</h2>
+    <div id="history"></div>
+  </div>
+  <div id="tabs-4">
     <h2>Permissions</h2>
     <div id="permsContainer">
       <div class="permBox">
@@ -264,7 +276,7 @@
     </div>
     <button class="inline popOut" onclick="resetPerms();">Reset permissions</button>
   </div>
-  <div id="tabs-4">
+  <div id="tabs-5">
     <h2>Lock Formbar</h2>
     Only whitelisted users will be able to make changes.<br>
     <input type="checkbox" id="lock" onchange="request.open('GET', `/settings?locked=${this.value}`); request.send();"><label for="lock">Lock</label><br>
@@ -365,7 +377,6 @@
     if (document.getElementById("thumbs").checked) document.getElementById("pollDescription").innerText = "Students can choose between thumbs up, thumbs down, and wiggle.";
     else if (document.getElementById("letters").checked) document.getElementById("pollDescription").innerText = "Students can choose between A, B, C, and D.";
     else if (document.getElementById("essay").checked) document.getElementById("pollDescription").innerHTML = "Students will type out short answers. View essays in the \"Users\" section.";
-    downloadButton();
   }
 
   function startPoll() {
@@ -379,6 +390,19 @@
       request.open('GET', '/startpoll?type=text');
       request.send();
     }
+
+    let pollButton = document.getElementById("pollButton");
+    pollButton.value = "End poll";
+    pollButton.onclick = endPoll;
+  }
+
+  function endPoll() {
+    request.open('GET', '/endpoll');
+    request.send();
+
+    let pollButton = document.getElementById("pollButton");
+    pollButton.value = "Start new poll";
+    pollButton.onclick = startPoll;
   }
 
   function resetPerms() {
@@ -396,24 +420,36 @@
   (async () => {
     let modeRes = await getResponse("/api/mode");
     let mode = modeRes.mode;
+    document.getElementById("pollButton").onclick = startPoll;
     switch (mode) {
-      case "tutd":
       case "poll":
         document.getElementById("poll").checked = true;
         document.getElementById("pollType").classList.remove("hidden");
         document.getElementById("thumbs").checked = true;
+        document.getElementById("pollButton").onclick = startPoll;
+        break;
+      case "tutd":
+        document.getElementById("poll").checked = true;
+        document.getElementById("pollType").classList.remove("hidden");
+        document.getElementById("thumbs").checked = true;
+        document.getElementById("pollButton").value = "End poll";
+        document.getElementById("pollButton").onclick = endPoll;
         changePollType();
         break;
       case "abcd":
         document.getElementById("poll").checked = true;
         document.getElementById("pollType").classList.remove("hidden");
         document.getElementById("letters").checked = true;
+        document.getElementById("pollButton").value = "End poll";
+        document.getElementById("pollButton").onclick = endPoll;
         changePollType();
         break;
       case "text":
         document.getElementById("poll").checked = true;
         document.getElementById("pollType").classList.remove("hidden");
         document.getElementById("essay").checked = true;
+        document.getElementById("pollButton").value = "End poll";
+        document.getElementById("pollButton").onclick = endPoll;
         changePollType();
         break;
       case "progress":
@@ -426,37 +462,6 @@
         document.getElementById("playtime").checked = true;
     }
   })();
-
-  async function downloadButton() {
-    let modeRes = await getResponse("/api/mode");
-    let mode = modeRes.mode;
-    if (mode == "text" && document.getElementById("essay").checked) document.getElementById("drButton").classList.remove("hidden");
-    else document.getElementById("drButton").classList.add("hidden");
-  }
-
-  downloadButton();
-  setInterval(downloadButton, 1000);
-
-  async function downloadResponses() {
-    let students = await getResponse("/api/students");
-    let essays = Object.values(students).map(student => [student.name, student.essay]);
-    essays = essays.map(essay => essay.map(value => `"${value.replaceAll("\"", "\"\"")}"`)); //Escape quotes in values, then add quotes around each value
-    let csv = "data:text/csv;charset=utf-8,";
-    csv += essays.map(essay => essay.join(",")).join("\n");
-    let link = document.createElement("a");
-    link.href = encodeURI(csv);
-
-    let date = new Date();
-    let y = date.getFullYear();
-    let mo = (date.getMonth() + 1).toString().padStart(2, "0");
-    let d = date.getDate().toString().padStart(2, "0");
-    let h = date.getHours().toString().padStart(2, "0");
-    let mi = date.getMinutes().toString().padStart(2, "0");
-    let s = date.getSeconds().toString().padStart(2, "0");
-
-    link.download = `essays_${y}_${mo}_${d}_${h}_${mi}_${s}.csv`;
-    link.click();
-  }
 
   function restart() {
     if (confirm("Are you sure you want to restart the Formbar?")) {
@@ -850,6 +855,75 @@
       el.value = el.options[meRes.perms].value; //If perms are not updated, give el the correct value
     }
   }
+
+  let historyLength = 0;
+
+  async function updateHistory() {
+    let polls = await getResponse("/api/polls");
+    if (polls.length > historyLength) {
+      historyLength = polls.length;
+      document.getElementById("history").innerHTML = null;
+      polls.reverse(); //Sort newest to oldest
+      polls.forEach((poll) => {
+        let type;
+        switch (poll[1]) {
+          case "tutd":
+            type = "Thumbs"
+            break;
+          case "abcd":
+            type = "Letters"
+            break;
+          case "text":
+            type = "Essay"
+        }
+
+        let date = new Date(poll[2]);
+        let month = date.getMonth() + 1;
+        let day = date.getDate();
+        let year = date.getFullYear().toString().slice(2);
+        let hour = date.getHours();
+        let minute = date.getMinutes().toString().padStart(2, "0");
+        if (hour > 12) {
+          hour -= 12;
+          ampm = "PM";
+        } else {
+          if (hour == 0) hour = 12;
+          ampm = "AM";
+        }
+
+        document.getElementById("history").innerHTML += `
+         <b>${type}</b>
+         <span>${month}/${day}/${year}</span>
+         <span>${hour}:${minute} ${ampm}</span>
+         <button class="inline popOut" onclick="downloadResponses(${poll[0]})">Download</button>
+         <br>
+        `;
+      });
+    }
+  }
+  updateHistory();
+  setInterval(updateHistory, 1000);
+
+  async function downloadResponses(poll) {
+    let responses = await getResponse("/api/pollresponses");
+    responses = responses.filter(response => response[0] == poll);
+    responses = responses.map(response => [response[1], `"${response[2].replaceAll("\"", "\"\"")}"`]); //Escape quotes in values, then add quotes around each value
+    let csv = "data:text/csv;charset=utf-8,";
+    csv += responses.map(response => response.join(",")).join("\n");
+    let link = document.createElement("a");
+    link.href = encodeURI(csv);
+
+    let date = new Date();
+    let y = date.getFullYear();
+    let mo = (date.getMonth() + 1).toString().padStart(2, "0");
+    let d = date.getDate().toString().padStart(2, "0");
+    let h = date.getHours().toString().padStart(2, "0");
+    let mi = date.getMinutes().toString().padStart(2, "0");
+    let s = date.getSeconds().toString().padStart(2, "0");
+
+    link.download = `responses_${y}_${mo}_${d}_${h}_${mi}_${s}.csv`;
+    link.click();
+  }
 </script>
 <script src="../static/jquery/external/jquery/jquery.js" charset="utf-8"></script>
 <script src="../static/jquery/jquery-ui.min.js" charset="utf-8"></script>
@@ -862,6 +936,7 @@
           if (i == activeTab) el.classList.add("pressed");
           else el.classList.remove("pressed");
         });
+        contentHeight();
       }
     });
   });

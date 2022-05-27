@@ -122,6 +122,14 @@ colorDict = {
         '56': (0, 192, 192),
         }
 
+#Set pollID based on the number of polls in the database
+db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+dbcmd = db.cursor()
+pollCount = dbcmd.execute("SELECT COUNT(*) FROM polls").fetchone()
+if pollCount:
+    sD.pollID = pollCount[0] + 1
+db.close()
+
 
 
 # ███████ ██    ██ ███    ██  ██████ ████████ ██  ██████  ███    ██ ███████
@@ -254,6 +262,7 @@ def refreshUsers(selectedStudent='', category=''):
 
 def changeMode(newMode='', direction='next'):
     clearString()
+    sD.pollType = None
     # Clear answers
     for student in sD.studentDict:
         sD.studentDict[student]['thumb'] = ''
@@ -993,6 +1002,32 @@ def endpoint_api_quizname():
         else:
             return '{"error": "No quiz is currently loaded."}'
 
+@app.route('/api/polls')
+def endpoint_api_polls():
+    if not request.remote_addr in sD.studentDict:
+        return '{"error": "You are not logged in."}'
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
+        return '{"error": "Insufficient permissions."}'
+    else:
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        polls = dbcmd.execute("SELECT * FROM polls").fetchall()
+        db.close()
+        return json.dumps(polls)
+
+@app.route('/api/pollresponses')
+def endpoint_api_pollresponses():
+    if not request.remote_addr in sD.studentDict:
+        return '{"error": "You are not logged in."}'
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
+        return '{"error": "Insufficient permissions."}'
+    else:
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        responses = dbcmd.execute("SELECT * FROM responses").fetchall()
+        db.close()
+        return json.dumps(responses)
+
 #This endpoints shows the actions the students did EX:TUTD up
 @app.route('/api/students')
 def endpoint_api_students():
@@ -1405,6 +1440,30 @@ def endpoint_emptyblocks():
         pixels.show()
     return render_template("message.html", message = "Emptied blocks")
 '''
+
+#Start a poll
+@app.route('/endpoll')
+def endpoll():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['mod']:
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
+    else:
+        if not sD.pollType:
+            return render_template("message.html", message = 'There is no active poll right now.')
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        dbcmd.execute("INSERT INTO polls ('type', 'time') VALUES (?, ?)", (sD.pollType, int(time.time() * 1000)))
+        for user in sD.studentDict:
+            if sD.studentDict[user]['perms'] == sD.settings['perms']['student']:
+                response = sD.studentDict[user]['thumb'] or sD.studentDict[user]['letter'] or sD.studentDict[user]['essay']
+                response = response.replace('"', '\\"') #Escape quotes
+                dbcmd.execute("INSERT INTO responses ('poll', 'name', 'response') VALUES (?, ?, ?)", (sD.pollID, sD.studentDict[user]['name'], response))
+        db.commit()
+        db.close()
+        changeMode('poll')
+        repeatMode()
+        return render_template("message.html", message = 'Poll ended. Results saved.')
 
 '''
 /essay
@@ -2330,7 +2389,7 @@ def endpoint_speedtype():
 def endpoint_standard():
     return redirect('/home')
 
-#Start a thumbs poll
+#Start a poll
 @app.route('/startpoll')
 def endpoint_startpoll():
     if not request.remote_addr in sD.studentDict:
@@ -2345,6 +2404,7 @@ def endpoint_startpoll():
             return render_template("message.html", message = "Invalid poll type.")
         changeMode(type)
         repeatMode()
+        sD.pollType = type
         return render_template("message.html", message = 'Started a new ' + type + ' poll.')
 
 # ████████

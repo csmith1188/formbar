@@ -1716,6 +1716,11 @@
           }
         });
 
+        if (active.effects.noItems) {
+          let containerEl = document.getElementById("p" + active.team + "-items");
+          containerEl.classList.add("unselectable");
+        }
+
         if (active == me) {
           if (me.effects.skipTurn) {
             sendMove({});
@@ -1741,10 +1746,7 @@
               return;
             }
           }
-          if (me.effects.noItems) {
-            let containerEl = document.getElementById("p" + me.team + "-items");
-            containerEl.classList.add("unselectable");
-          } else {
+          if (!me.effects.noItems) {
             let containerEl = document.getElementById("p" + me.team + "-items");
             containerEl.classList.remove("unselectable");
             me.items.forEach((item, i) => { //Enable items
@@ -2341,7 +2343,7 @@
           changeEl.style.color = "var(--color-green)";
           changeEl.innerText = "+" + amount;
           changeEl.classList.add("showHPChange");
-        } try {
+        } catch {
           console.error(`ERROR: Can't find element with id "${target.name + "-HPNumChange"}"`);
         }
         function increaseHP() {

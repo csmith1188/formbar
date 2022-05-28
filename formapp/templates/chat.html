@@ -332,6 +332,22 @@
         ncb: document.getElementById("notificationsCheckbox")
     }
 
+    let gamePlayer = urlParams.get("game");
+    if (gamePlayer) {
+      document.body.classList.add("game");
+      changeRec(gamePlayer);
+      boxes.sendButton.value += " to " + gamePlayer;
+    }
+
+    let sidebar = urlParams.get("sidebar");
+    if (sidebar) {
+      document.body.classList.add("small", "light");
+      document.body.classList.remove("blue");
+    }
+
+    let mobile = urlParams.get("mobile");
+    if (mobile) document.body.classList.add("small");
+
     //Get user's permissions from server
     request.open("GET", '/api/me', false);
     request.send(null);
@@ -353,7 +369,6 @@
     }
 
     messages.forEach(message => {
-
       if (message[2] == "all" || message[2] == username || message[1] == username) {
         output({
           from: message[1],
@@ -606,21 +621,5 @@
         if (Notification.permission == "denied") alert("You need to reset this sites's permissions to allow notifications.");
       }
     };
-
-    let gamePlayer = urlParams.get("game");
-    if (gamePlayer) {
-      document.body.classList.add("game");
-      changeRec(gamePlayer);
-      boxes.sendButton.value += " to " + gamePlayer;
-    }
-
-    let sidebar = urlParams.get("sidebar");
-    if (sidebar) {
-      document.body.classList.add("small", "light");
-      document.body.classList.remove("blue");
-    }
-
-    let mobile = urlParams.get("mobile");
-    if (mobile) document.body.classList.add("small");
 </script>
 {% endblock %}

@@ -335,7 +335,7 @@
     </div>
   </div>
 
-  <iframe id="chatSidebar" class="hidden" src="/chat?sidebar=true"></iframe>
+  <iframe id="chatSidebar" class="hidden"></iframe>
 
   <div id="otherSidebar" class="hidden">
     Name: <a id="name"></a><span id="excluded"></span><br>
@@ -460,6 +460,7 @@
       }
     });
     if (id == "chat") {
+      document.getElementById("chatSidebar").src = "/chat?sidebar=true";
       document.title = `${innerPageTitle} - Formbar`;
       document.getElementById("newMessages").innerText = null;
       newMessages = 0;

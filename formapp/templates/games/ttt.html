@@ -133,12 +133,12 @@
 
         if (playerTurn == "player1") {
           if (!player1.turn) {
-            console.log(player1.name + ' tried to play ' + player1.shape + ' in square ' + square + ' when it wasn\'t their turn');
+            console.error(player1.name + ' played ' + player1.shape + ' in square ' + square + ' when it wasn\'t their turn');
             return;
           }
         } else if (playerTurn == "player2") {
           if (!player2.turn) {
-            console.log(player2.name + ' tried to play ' + player2.shape + ' in square ' + square + ' when it wasn\'t their turn');
+            console.error(player2.name + ' played ' + player2.shape + ' in square ' + square + ' when it wasn\'t their turn');
             return;
           }
         }

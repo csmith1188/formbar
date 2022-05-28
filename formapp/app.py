@@ -1699,9 +1699,8 @@ def endpoint_games_ttt():
     else:
         opponent = request.args.get('opponent')
 
-        #Disabled for testing
-        #if opponent == sD.studentDict[request.remote_addr]['name']:
-            #return render_template("message.html", message = "You can't enter your own name.")
+        if opponent == sD.studentDict[request.remote_addr]['name']:
+            return render_template("message.html", message = "You can't enter your own name.")
 
         #Loop through all existing games
         for game in sD.ttt:

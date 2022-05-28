@@ -2117,7 +2117,8 @@ def endpoint_profile():
                 "minesweeper": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='minesweeper' ORDER BY score ASC", {"uname": user['name']}).fetchone(),
                 "speedtype": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='speedtype' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
                 "towerdefense": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='towerdefense' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
-                "fighter": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='towerdefense' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
+                "ttt": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='ttt' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
+                "fighter": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='fighter' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
                 "wordle": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='wordle' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
             }
             db.close()
@@ -2204,6 +2205,12 @@ def endpoint_quiz():
         else:
             return render_template("message.html", message = "No quiz is currently loaded.")
 
+# ██████
+# ██   ██
+# ██████
+# ██   ██
+# ██   ██
+
 @app.route('/removefightermatch', methods = ['POST'])
 def endpoint_removefightermatch():
     code = request.args.get('code')
@@ -2211,6 +2218,15 @@ def endpoint_removefightermatch():
         del sD.fighter['match' + code]
         return render_template("message.html", message = 'Match ' + code + ' removed.')
     return render_template("message.html", message = 'Could not remove match.')
+
+@app.route('/removetttmatch', methods = ['POST'])
+def endpoint_removetttmatch():
+    opponent = request.args.get('opponent')
+    for game in sD.ttt:
+        if sD.studentDict[request.remote_addr]['name'] in game.players and opponent in game.players:
+            sD.ttt.remove(game)
+            return render_template("message.html", message = 'Match removed.')
+    return render_template("message.html", message = 'Match not found.')
 
 # ███████
 # ██

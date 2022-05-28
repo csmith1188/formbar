@@ -185,8 +185,17 @@
           if (checkWin()) {
             console.log(player.name + ' has won with ' + player.shape + ' on board ' + gameboard);
             setTimeout(function() {
-              alert(player.name + "(" + player.shape + ")" + " has won");
-            }, 1)
+              alert(player.name + " (" + player.shape + ")" + " has won");
+            }, 10)
+            if (eval(me) == player) {
+              request.open("POST", "/savescore?game=ttt&score=" + ({{ wins }} + 1));
+              request.send();
+            }
+            if (me == "player1") {
+              let newRequest = new XMLHttpRequest();
+              newRequest.open("POST", "/removetttmatch?opponent=" + player2.name);
+              newRequest.send();
+            }
           }
         } else {
           console.log(player.name + ' tried to play ' + player.shape + ' in square ' + square + ' when it wasn\'t empty');

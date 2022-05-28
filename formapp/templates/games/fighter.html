@@ -2314,8 +2314,8 @@
       }
 
       function damage(target, amount) {
+        let changeEl = document.getElementById(target.name + "-HPNumChange");
         try {
-          let changeEl = document.getElementById(target.name + "-HPNumChange");
           changeEl.style.color = "var(--color-red)";
           changeEl.innerText = "−" + amount;
           changeEl.classList.add("showHPChange");
@@ -2339,8 +2339,8 @@
       }
 
       function heal(target, amount) {
+        let changeEl = document.getElementById(target.name + "-HPNumChange");
         try {
-          let changeEl = document.getElementById(target.name + "-HPNumChange");
           changeEl.style.color = "var(--color-green)";
           changeEl.innerText = "+" + amount;
           changeEl.classList.add("showHPChange");

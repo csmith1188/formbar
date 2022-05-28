@@ -1699,24 +1699,28 @@ def endpoint_games_ttt():
     else:
         opponent = request.args.get('opponent')
 
+        #Disabled for testing
+        #if opponent == sD.studentDict[request.remote_addr]['name']:
+            #return render_template("message.html", message = "You can't enter your own name.")
+
         #Loop through all existing games
         for game in sD.ttt:
             #If the user and the opponent is in an existing player list
             if sD.studentDict[request.remote_addr]['name'] in game.players and opponent in game.players:
                 #Then you have found the right game and can edit it here
-                return render_template("games/ttt.html", game = str(game))
+                return render_template("games/ttt.html", game = json.dumps(game.__dict__), username = sD.studentDict[request.remote_addr]['name'])
                 #return the response here
-
 
         #Creating a new game
         for student in sD.studentDict:
             if sD.studentDict[student]['name'] == opponent:
                 sD.ttt.append(sessions.TTTGame([sD.studentDict[request.remote_addr]['name'], opponent]))
-                return render_template("games/ttt.html", game = json.dumps(sD.ttt[-1].__dict__))
+                return render_template("games/ttt.html", game = json.dumps(sD.ttt[-1].__dict__), username = sD.studentDict[request.remote_addr]['name'])
 
+        if opponent:
+            return render_template("message.html", message = "There are no users with that name.")
 
-        #If there is no game with these players
-        return render_template("message.html", message = "No game found")
+        return render_template("tttstart.html")
 
 @app.route('/games/wordle')
 def endpoint_games_wordle():
@@ -2804,6 +2808,13 @@ def message(message):
 def fighter(message):
     try:
         emit('fighter', message, broadcast=True)
+    except Exception as e:
+        print("[error] " + 'Error: ' + str(e))
+
+@socket_.on('ttt', namespace=chatnamespace)
+def fighter(message):
+    try:
+        emit('ttt', message, broadcast=True)
     except Exception as e:
         print("[error] " + 'Error: ' + str(e))
 

@@ -21,7 +21,7 @@
 
     .uname {
       font-size: 1.5em;
-      color: var(--light-cyan);
+      color: white;
     }
 
     .board {
@@ -88,6 +88,7 @@
       }
 
       document.getElementById("title").innerHTML = "PoopyCheckers: " + player1.name + " (" + player1.shape + ") vs " + player2.name + " (" + player2.shape + ")"
+      document.getElementById("title").innerHTML = `PoopyCheckers: <span style="color: var(--light-red);">${player1.name} (${player1.shape})</span> vs <span style="color: var(--light-cyan);">${player2.name} (${player2.shape})</span>`;
 
       let gameboard = gameState.gameboard;
 

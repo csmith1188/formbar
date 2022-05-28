@@ -132,6 +132,9 @@
     <button id="collapseButton" class="inline popOut hidden">Collapse all</button>
     <div id="students">
     </div>
+
+    <h2>Restart session</h2>
+    <button class="inline popOut" onclick="restart();">Remove all students and restart</button><br>
   </div>
   <div id="tabs-2">
     <h2>Number of students</h2>
@@ -288,9 +291,6 @@
     <h2>Show missing votes</h2>
     When votes are missing, there will be empty spaces on the bar.<br>
     <input type="checkbox" id="showMissing" checked onchange="request.open('GET', `/settings?showinc=${this.value}`); request.send();"><label for="showMissing">Show</label><br>
-
-    <h2>Restart session</h2>
-    <button class="inline popOut" onclick="restart();">Remove all students and restart</button><br>
 
     <h2>Clear data</h2>
     <b>Warning: These buttons will permanently delete data.</b><br>

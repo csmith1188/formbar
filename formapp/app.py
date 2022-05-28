@@ -1702,19 +1702,24 @@ def endpoint_games_ttt():
         if opponent == sD.studentDict[request.remote_addr]['name']:
             return render_template("message.html", message = "You can't enter your own name.")
 
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        wins = dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='ttt' ORDER BY score DESC", {"uname": sD.studentDict[request.remote_addr]['name']}).fetchone()[3]
+        db.close()
+
         #Loop through all existing games
         for game in sD.ttt:
             #If the user and the opponent is in an existing player list
             if sD.studentDict[request.remote_addr]['name'] in game.players and opponent in game.players:
                 #Then you have found the right game and can edit it here
-                return render_template("games/ttt.html", game = json.dumps(game.__dict__), username = sD.studentDict[request.remote_addr]['name'])
+                return render_template("games/ttt.html", game = json.dumps(game.__dict__), username = sD.studentDict[request.remote_addr]['name'], wins = wins)
                 #return the response here
 
         #Creating a new game
         for student in sD.studentDict:
             if sD.studentDict[student]['name'] == opponent:
                 sD.ttt.append(sessions.TTTGame([sD.studentDict[request.remote_addr]['name'], opponent]))
-                return render_template("games/ttt.html", game = json.dumps(sD.ttt[-1].__dict__), username = sD.studentDict[request.remote_addr]['name'])
+                return render_template("games/ttt.html", game = json.dumps(sD.ttt[-1].__dict__), username = sD.studentDict[request.remote_addr]['name'], wins = wins)
 
         if opponent:
             return render_template("message.html", message = "There are no users with that name.")

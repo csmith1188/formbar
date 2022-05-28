@@ -109,8 +109,6 @@
             packMSG(eval(opponent).name, eval(me).name, {square: id}
           )));
         }, false);
-        square.style.gridRow = Math.ceil(i / 3);
-        square.style.gridColumn = i % 3 + 1;
 
         let board = document.getElementById("board");
         board.appendChild(square);

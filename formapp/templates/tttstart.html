@@ -34,8 +34,13 @@
     <input type="text" id="opponent" class="box" name="opponent" placeholder="Enter opponent's username"><br>
     <br>
     <input type="submit" class="button" value="Go to game">
+    <input type="hidden" id="advanced" name="advanced">
   </form>
 {% endblock %}
 
 <!-- Extra JavaScript here -->
-{% block script %}{% endblock %}
+{% block script %}
+<script>
+  document.getElementById("advanced").value = urlParams.get("advanced");
+</script>
+{% endblock %}

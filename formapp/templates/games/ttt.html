@@ -1,4 +1,4 @@
-{% extends 'header_fullscreen.html' %}
+{% extends 'header_content.html' %}
 <!-- ^^ This means add this file into the contents of the header page -->
 <!-- This is where the title, top buttons, and stylesheet is located -->
 
@@ -9,63 +9,55 @@
 {% block style %}
   <style media="screen">
     .hbar {
-      background: #565c66;
-      width: 120%;
-      height: 3em;
-      position: absolute;
-      left: 0em;
-      top: 0em;
-      border: 0.2em solid #323842;
+      background: var(--dark-gray);
+      width: 560px;
+      height: fit-content;
+      border: 0.2em solid var(--light-blue);
+      padding: 8px;
+      box-sizing: border-box;
+      text-align: center;
+      margin: 20px;
     }
 
     .uname {
-      position: absolute;
-      left: 0em;
-      top: 0.1em;
-      font-size: 2em;
-      color: #8994a3;
+      font-size: 1.5em;
+      color: var(--light-cyan);
     }
 
     .board {
-      width: 25em;
-      height: 25em;
-      position: absolute;
-      left: 1em;
-      top: 3em;
+      width: 12.2em;
+      height: 12.2em;
+      display: grid;
+      grid-template-columns: repeat(3, 4em);
+      grid-template-rows: repeat(3, 4em);
+      padding: 0.1em;
+      gap: 0.1em;
       font-size: 2em;
-      color: #8994a3;
-      outline: 0.2em solid #323842;
-      display: inline-block;
+      margin: 40px auto 20px;
+      background: var(--light-blue);
     }
 
     .square {
-      width: 32.65%;
-      height: 32.65%;
       font-size: 2em;
-      color: #8994a3;
-      outline: 0.1em solid #323842;
+      box-sizing: border-box;
       display: inline-block;
+      background: var(--bg-darker);
     }
 
     img {
-      height: 261.19px;
-      width: 261.19px;
+      height: 75%;
+      width: 75%;
+      margin: 12.5%;
     }
 
     button {
       position: absolute;
       right: 35em;
     }
-
-    #quickmenu {
-      display: none;
-    }
-
-    #content {
-      background-color: transparent;
-    }
   </style>
 {% endblock %}
+
+{% block color %}green{% endblock %}
 
 <!-- Extra javascript here -->
 {% block script %}{% endblock %}
@@ -114,11 +106,11 @@
       square.addEventListener('click', () => {
         move(id, "player1");
       }, false);
+      square.style.gridRow = Math.ceil(i / 3);
+      square.style.gridColumn = i % 3 + 1;
 
       var board = document.getElementById("board");
       board.appendChild(square);
-      var space = document.createTextNode(" ")
-      board.appendChild(space);
     }
 
     function move(square, playerTurn) {

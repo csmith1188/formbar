@@ -1712,7 +1712,7 @@ def endpoint_games_ttt():
         for student in sD.studentDict:
             if sD.studentDict[student]['name'] == opponent:
                 sD.ttt.append(sessions.TTTGame([sD.studentDict[request.remote_addr]['name'], opponent]))
-                return render_template("ttt.html", game = json.dumps(sD.ttt[-1].__dict__))
+                return render_template("games/ttt.html", game = json.dumps(sD.ttt[-1].__dict__))
 
 
         #If there is no game with these players

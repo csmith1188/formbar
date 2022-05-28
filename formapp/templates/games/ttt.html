@@ -89,11 +89,8 @@
 
       document.getElementById("title").innerHTML = "PoopyCheckers: " + player1.name + " (" + player1.shape + ") vs " + player2.name + " (" + player2.shape + ")"
 
-      let gameboard = [
-        ["none", "none", "none"],
-        ["none", "none", "none"],
-        ["none", "none", "none"]
-      ];
+      let gameboard = gameState.gameboard;
+
 
       let player;
 
@@ -105,14 +102,31 @@
         square.id = id;
         // let id = document.getElementById(i + 1)
         square.addEventListener('click', () => {
-          chatSocket.emit("ttt", JSON.stringify(
-            packMSG(eval(opponent).name, eval(me).name, {square: id}
-          )));
+          if (eval(me).turn) {
+            chatSocket.emit("ttt", JSON.stringify(
+              packMSG(eval(opponent).name, eval(me).name, {square: id}
+            )));
+          }
         }, false);
 
         let board = document.getElementById("board");
         board.appendChild(square);
       }
+
+      gameboard.forEach((row, i) => {
+        row.forEach((square, j) => {
+          let squareNumber = i * 3 + j;
+          if (square == "X") {
+            let x = document.createElement("img");
+            x.setAttribute("src", "{{ url_for('static', filename='img/ttt/X.png') }}");
+            document.getElementById(squareNumber).appendChild(x);
+          } else if (square == "O") {
+            let o = document.createElement("img");
+            o.setAttribute("src", "{{ url_for('static', filename='img/ttt/O.png') }}");
+            document.getElementById(squareNumber).appendChild(o);
+          }
+        });
+      });
 
       function move(square, playerTurn) {
 
@@ -134,7 +148,7 @@
         let rBox = Math.floor(square / 3);
         let cBox = square % 3;
 
-        if (gameboard[rBox][cBox] == "none") {
+        if (gameboard[rBox][cBox] == null) {
           if (player1.turn) {
             player = player1;
             player1.turn = false;

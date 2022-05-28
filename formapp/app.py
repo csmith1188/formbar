@@ -2811,9 +2811,21 @@ def fighter(message):
         print("[error] " + 'Error: ' + str(e))
 
 @socket_.on('ttt', namespace=chatnamespace)
-def fighter(message):
+def ttt(message):
     try:
         emit('ttt', message, broadcast=True)
+        message = json.loads(message)
+        for game in sD.ttt:
+            #If the user and the opponent is in an existing player list
+            if message['from'] in game.players and message['to'] in game.players:
+                square = message['content']['square']
+                rBox = math.floor(square / 3);
+                cBox = square % 3;
+                if message['from'] == game.players[0]:
+                    shape = 'X'
+                else:
+                    shape = 'O'
+                game.gameboard[rBox][cBox] = shape
     except Exception as e:
         print("[error] " + 'Error: ' + str(e))
 

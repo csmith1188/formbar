@@ -81,3 +81,8 @@ class Student():
 class TTTGame():
     def __init__(self, players):
         self.players = players
+        self.gameboard = [
+            [None, None, None],
+            [None, None, None],
+            [None, None, None]
+        ]

@@ -130,6 +130,20 @@ if pollCount:
     sD.pollID = pollCount[0] + 1
 db.close()
 
+#Get settings from database
+db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+dbcmd = db.cursor()
+data = dbcmd.execute("SELECT * FROM settings").fetchone()
+db.close()
+sD.settings['perms']['say'] = data[0]
+sD.settings['perms']['games'] = data[1]
+sD.settings['perms']['bar'] = data[2]
+sD.settings['perms']['sfx'] = data[3]
+sD.settings['perms']['bgm'] = data[4]
+sD.settings['perms']['api'] = data[5]
+sD.settings['locked'] = data[6]
+sD.settings['blind'] = data[7]
+sD.settings['showinc'] = data[8]
 
 
 # ███████ ██    ██ ███    ██  ██████ ████████ ██  ██████  ███    ██ ███████
@@ -1333,6 +1347,11 @@ def endpoint_controlpanel():
                     if arg in sD.settings:
                         sD.settings[arg] = argVal
                         resString += 'Set <i>' + arg + '</i> to: <i>' + str(argVal) + "</i>"
+                        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+                        dbcmd = db.cursor()
+                        dbcmd.execute("UPDATE settings SET " + arg + "=:value", {"value": argVal})
+                        db.commit()
+                        db.close()
                     else:
                         resString += 'There is no setting that takes \'true\' or \'false\' named: <i>' + arg + "</i>"
                 else:
@@ -1343,6 +1362,11 @@ def endpoint_controlpanel():
                                 resString += "Permission value out of range! "
                             else:
                                 sD.settings['perms'][arg] = argInt
+                                db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+                                dbcmd = db.cursor()
+                                dbcmd.execute("UPDATE settings SET " + arg + "Perm=:value", {"value": argInt})
+                                db.commit()
+                                db.close()
                     except:
                         pass
 
@@ -1365,11 +1389,11 @@ def endpoint_controlpanel():
             else:
                 resString += 'No setting called ' + sD.settings['barmode']
         if resString == '':
-            return render_template("controlpanel.html")
+            return render_template("controlpanel.html", data = json.dumps(sD.settings))
         else:
             playSFX("sfx_pickup01")
             resString += ""
-            return resString
+            return render_template("message.html", message = resString)
 
 
 @app.route('/countdown')

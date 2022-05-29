@@ -95,6 +95,11 @@
     width: 50%;
     margin: 0px;
   }
+  #resetPerms {
+    display: block;
+    margin: 32px auto 0;
+    font-size: 18px;
+  }
 </style>
 {% endblock %}
 
@@ -204,10 +209,10 @@
       <div class="permBox">
         <h3>Chat</h3>
         <select onchange="updatePerm(this)" id="saypermsDrop" name="saypermsDrop" style="margin-top: 8px;">
-          <option value="/settings?say=0">Teacher</option>
-          <option value="/settings?say=1">Mod</option>
-          <option value="/settings?say=2" selected>Student</option>
-          <option value="/settings?say=3">Anyone</option>
+          <option value="/controlpanel?say=0">Teacher</option>
+          <option value="/controlpanel?say=1">Mod</option>
+          <option value="/controlpanel?say=2" selected>Student</option>
+          <option value="/controlpanel?say=3">Anyone</option>
         </select>
         <p>
           The ability to send chat messages. All users will still be able to read others' messages.
@@ -216,10 +221,10 @@
       <div class="permBox">
         <h3>Games</h3>
         <select onchange="updatePerm(this)" id="gamespermsDrop" name="gamespermsDrop" style="margin-top: 8px;">
-          <option value="/settings?games=0">Teacher</option>
-          <option value="/settings?games=1">Mod</option>
-          <option value="/settings?games=2" selected>Student</option>
-          <option value="/settings?games=3">Anyone</option>
+          <option value="/controlpanel?games=0">Teacher</option>
+          <option value="/controlpanel?games=1">Mod</option>
+          <option value="/controlpanel?games=2" selected>Student</option>
+          <option value="/controlpanel?games=3">Anyone</option>
         </select>
         <p>
           The ability to play any games
@@ -228,10 +233,10 @@
       <div class="permBox">
         <h3>LED bar</h3>
         <select onchange="updatePerm(this)" id="barpermsDrop" name="barpermsDrop" style="margin-top: 8px;">
-          <option value="/settings?bar=0" selected>Teacher</option>
-          <option value="/settings?bar=1">Mod</option>
-          <option value="/settings?bar=2">Student</option>
-          <option value="/settings?bar=3">Anyone</option>
+          <option value="/controlpanel?bar=0" selected>Teacher</option>
+          <option value="/controlpanel?bar=1">Mod</option>
+          <option value="/controlpanel?bar=2">Student</option>
+          <option value="/controlpanel?bar=3">Anyone</option>
         </select>
         <p>
           The ability to change the appearance of the Formbar. Does not affect polls.
@@ -240,10 +245,10 @@
       <div class="permBox">
         <h3>Sounds</h3>
         <select onchange="updatePerm(this)" id="sfxpermsDrop" name="sfxpermsDrop" style="margin-top: 8px;">
-          <option value="/settings?sfx=0" selected>Teacher</option>
-          <option value="/settings?sfx=1">Mod</option>
-          <option value="/settings?sfx=2">Student</option>
-          <option value="/settings?sfx=3">Anyone</option>
+          <option value="/controlpanel?sfx=0" selected>Teacher</option>
+          <option value="/controlpanel?sfx=1">Mod</option>
+          <option value="/controlpanel?sfx=2">Student</option>
+          <option value="/controlpanel?sfx=3">Anyone</option>
         </select>
         <p>
           The ability to play short audio clips
@@ -252,10 +257,10 @@
       <div class="permBox">
         <h3>Music</h3>
         <select onchange="updatePerm(this)" id="bgmpermsDrop" name="bgmpermsDrop" style="margin-top: 8px;">
-          <option value="/settings?bgm=0" selected>Teacher</option>
-          <option value="/settings?bgm=1">Mod</option>
-          <option value="/settings?bgm=2">Student</option>
-          <option value="/settings?bgm=3">Anyone</option>
+          <option value="/controlpanel?bgm=0" selected>Teacher</option>
+          <option value="/controlpanel?bgm=1">Mod</option>
+          <option value="/controlpanel?bgm=2">Student</option>
+          <option value="/controlpanel?bgm=3">Anyone</option>
         </select>
         <p>
           The ability to play background music
@@ -264,10 +269,10 @@
       <div class="permBox">
         <h3>API</h3>
         <select onchange="updatePerm(this)" id="apipermsDrop" name="apipermsDrop" style="margin-top: 8px;">
-          <option value="/settings?api=0">Teacher</option>
-          <option value="/settings?api=1">Mod</option>
-          <option value="/settings?api=2">Student</option>
-          <option value="/settings?api=3" selected>Anyone</option>
+          <option value="/controlpanel?api=0">Teacher</option>
+          <option value="/controlpanel?api=1">Mod</option>
+          <option value="/controlpanel?api=2">Student</option>
+          <option value="/controlpanel?api=3" selected>Anyone</option>
         </select>
         <p>
           <b>Warning: Changing API permissions may break some features.</b>
@@ -277,20 +282,20 @@
         </p>
       </div>
     </div>
-    <button class="inline popOut" onclick="resetPerms();">Reset permissions</button>
+    <button id="resetPerms" class="inline popOut" onclick="resetPerms();">Reset permissions</button>
   </div>
   <div id="tabs-5">
     <h2>Lock Formbar</h2>
     Only whitelisted users will be able to make changes.<br>
-    <input type="checkbox" id="lock" onchange="request.open('GET', `/settings?locked=${this.value}`); request.send();"><label for="lock">Lock</label><br>
+    <input type="checkbox" id="lock" onchange="request.open('GET', '/controlpanel?locked=' + this.checked); request.send();"><label for="lock">Lock</label><br>
 
     <h2>Blind results</h2>
     Results won't be shown until the poll is complete.<br>
-    <input type="checkbox" id="blind" onchange="request.open('GET', `/settings?blind=${this.value}`); request.send();"><label for="blind">Hide results</label><br>
+    <input type="checkbox" id="blind" onchange="request.open('GET', '/controlpanel?blind=' + this.checked); request.send();"><label for="blind">Hide results</label><br>
 
     <h2>Show missing votes</h2>
     When votes are missing, there will be empty spaces on the bar.<br>
-    <input type="checkbox" id="showMissing" checked onchange="request.open('GET', `/settings?showinc=${this.value}`); request.send();"><label for="showMissing">Show</label><br>
+    <input type="checkbox" id="showMissing" checked onchange="request.open('GET', '/controlpanel?showinc=' + this.checked); request.send();"><label for="showMissing">Show</label><br>
 
     <h2>Clear data</h2>
     <b>Warning: These buttons will permanently delete data.</b><br>
@@ -321,7 +326,7 @@
       input.value = studentNum;
       input.removeAttribute("readonly");
     }
-    request.open("GET", "/settings?students=" + studentNum);
+    request.open("GET", "/controlpanel?students=" + studentNum);
     // request.onload = function() {
     // console.log(request.response);
     // };
@@ -350,14 +355,14 @@
 
   function changeMode() {
     if (document.getElementById("poll").checked) {
-      request.open('GET', '/settings?barmode=poll');
+      request.open('GET', '/controlpanel?barmode=poll');
       request.send();
       document.getElementById("pollType").classList.remove("hidden");
     } else {
       document.getElementById("pollType").classList.add("hidden");
     }
     if (document.getElementById("progress").checked) {
-      request.open('GET', '/settings?barmode=progress');
+      request.open('GET', '/controlpanel?barmode=progress');
       request.send();
     }
     if (document.getElementById("countdown").checked) {
@@ -368,7 +373,7 @@
       document.getElementById("countdownTime").classList.add("hidden");
     }
     if (document.getElementById("playtime").checked) {
-      request.open('GET', '/settings?barmode=playtime');
+      request.open('GET', '/controlpanel?barmode=playtime');
       request.send();
     }
   }
@@ -406,12 +411,12 @@
   }
 
   function resetPerms() {
-    document.getElementById("saypermsDrop").value = "/settings?say=2";
-    document.getElementById("gamespermsDrop").value = "/settings?games=2";
-    document.getElementById("barpermsDrop").value = "/settings?bar=0";
-    document.getElementById("sfxpermsDrop").value = "/settings?sfx=0";
-    document.getElementById("bgmpermsDrop").value = "/settings?bgm=0";
-    document.getElementById("apipermsDrop").value = "/settings?api=3";
+    document.getElementById("saypermsDrop").value = "/controlpanel?say=2";
+    document.getElementById("gamespermsDrop").value = "/controlpanel?games=2";
+    document.getElementById("barpermsDrop").value = "/controlpanel?bar=0";
+    document.getElementById("sfxpermsDrop").value = "/controlpanel?sfx=0";
+    document.getElementById("bgmpermsDrop").value = "/controlpanel?bgm=0";
+    document.getElementById("apipermsDrop").value = "/controlpanel?api=3";
     let dropdowns = ["saypermsDrop", "barpermsDrop", "sfxpermsDrop", "bgmpermsDrop", "gamespermsDrop", "apipermsDrop"];
     dropdowns.forEach(id => updatePerm(document.getElementById(id)));
   }
@@ -530,7 +535,7 @@
     let pairs = {
       help: ["Help ticket in", "No help ticket in"],
       break: ["Taking a break", "Not taking a break"],
-      poll: ["Responded to poll", "Did not respond to poll"]
+      pollResponded: ["Responded to poll", "Did not respond to poll"]
     };
     if (filters.includes(el.id)) {
       filters.splice(filters.indexOf(el.id), 1, "!" + el.id);
@@ -582,8 +587,8 @@
       if (filters.includes("!help")) studentList = studentList.filter(student => !student.help.type);
       if (filters.includes("break")) studentList = studentList.filter(student => student.excluded);
       if (filters.includes("!break")) studentList = studentList.filter(student => !student.excluded);
-      if (filters.includes("poll")) studentList = studentList.filter(student => student.thumb || student.letter || student.essay);
-      if (filters.includes("!poll")) studentList = studentList.filter(student => !(student.thumb || student.letter || student.essay));
+      if (filters.includes("pollResponded")) studentList = studentList.filter(student => student.thumb || student.letter || student.essay);
+      if (filters.includes("!pollResponded")) studentList = studentList.filter(student => !(student.thumb || student.letter || student.essay));
 
       let thumbs, letters, helpTimes;
       switch (sort) {
@@ -727,7 +732,7 @@
             }
             let studentPerms = student['perms'];
             newDetails.innerHTML += `
-              <select onchange="updatePerm(this, '${student}')" id="userpermsDrop" name="userpermsDrop">
+              <select onchange="userPerm(this, '${student}')" id="userpermsDrop" name="userpermsDrop">
                 <option value="/users?name=${student['name']}&action=perm&perm=0" ${studentPerms === 0 ? "selected" : ""}>${permNames[0]}</option>
                 <option value="/users?name=${student['name']}&action=perm&perm=1" ${studentPerms === 1 ? "selected" : ""}>${permNames[1]}</option>
                 <option value="/users?name=${student['name']}&action=perm&perm=2" ${studentPerms === 2 ? "selected" : ""}>${permNames[2]}</option>
@@ -838,7 +843,7 @@
     request.send();
   }
 
-  async function updatePerm(el, student) {
+  async function userPerm(el, student) {
     let meRes = await getResponse("/api/me");
     let permsRes = await getResponse("/api/permissions");
     if (
@@ -924,6 +929,16 @@
     link.download = `responses_${y}_${mo}_${d}_${h}_${mi}_${s}.csv`;
     link.click();
   }
+
+  let storedSettings = JSON.parse("{{ data }}".replaceAll("&#34;", "\""));
+  for (let perm in storedSettings.perms) {
+    let el = document.getElementById(perm + "permsDrop");
+    let value = storedSettings.perms[perm];
+    if (el) el.value = `/controlpanel?${perm}=${value}`;
+  }
+  document.getElementById("lock").checked = storedSettings.locked;
+  document.getElementById("blind").checked = storedSettings.blind;
+  document.getElementById("showMissing").checked = storedSettings.showinc;
 </script>
 <script src="../static/jquery/external/jquery/jquery.js" charset="utf-8"></script>
 <script src="../static/jquery/jquery-ui.min.js" charset="utf-8"></script>

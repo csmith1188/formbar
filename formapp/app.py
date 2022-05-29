@@ -313,6 +313,7 @@ def changeMode(newMode='', direction='next'):
     elif sD.settings['barmode'] == 'playtime':
         clearString()
         showString(sD.activePhrase)
+    socket_.emit('modeChanged', {'mode': sD.settings['barmode']}, namespace=apinamespace)
     return render_template("message.html", message = 'Changed mode to ' + (newMode or direction) + '.')
 
 #This function Allows you to choose and play whatever sound effect you want
@@ -855,6 +856,7 @@ def endpoint_abcd():
                         sD.studentDict[request.remote_addr]['letter'] = vote
                         playSFX("sfx_blip01")
                         abcdBar()
+                        socket_.emit('letter', {'name': sD.studentDict[request.remote_addr]['name'], 'letter': vote}, namespace=apinamespace)
                         return render_template("message.html", message = "Thank you for your tasty bytes... (" + vote + ")")
                     else:
                         return render_template("message.html", message = "You've already submitted an answer... (" + sD.studentDict[request.remote_addr]['letter'] + ")")
@@ -863,6 +865,7 @@ def endpoint_abcd():
                         sD.studentDict[request.remote_addr]['letter'] = ''
                         playSFX("sfx_hit01")
                         abcdBar()
+                        socket_.emit('letter', {'name': sD.studentDict[request.remote_addr]['name'], 'letter': ''}, namespace=apinamespace)
                         return render_template("message.html", message = "I won\'t mention it if you don\'t")
                     else:
                         return render_template("message.html", message = "You don't have an answer to erase.")
@@ -1183,6 +1186,7 @@ def endpoint_break():
                 sD.studentDict[request.remote_addr]['help']['type'] = 'break'
                 sD.studentDict[request.remote_addr]['help']['time'] = time.time()
                 playSFX("sfx_pickup02")
+                socket_.emit('help', sD.studentDict[request.remote_addr]['help'], namespace=apinamespace)
                 return render_template("message.html", message = "Your request was sent. The teacher still needs to approve it.")
         elif request.args.get('action') == 'end':
             if name != sD.studentDict[request.remote_addr]['name'] and sD.studentDict[request.remote_addr]['perms'] != sD.settings['perms']['teacher']:
@@ -1439,8 +1443,10 @@ def endpoint_createaccount():
 def endpoint_createfightermatch():
     code = request.args.get('code')
     name = request.args.get('name')
-    sD.fighter['match' + code] = {} #Create new object for match
-    sD.fighter['match' + code]['creator'] = name #Set "creator" of object to arg "name"
+    if code in sd.Fighter:
+        return render_template("message.html", message = 'A match with this code already exists.')
+    sD.fighter[code] = {} #Create new object for match
+    sD.fighter[code]['creator'] = name #Set "creator" of object to arg "name"
     return render_template("message.html", message = 'Match ' + code + ' created by ' + name + '.')
 
 # ██████
@@ -1520,6 +1526,7 @@ def endpoint_essay():
                     playSFX("sfx_hit01")
                 sD.studentDict[request.remote_addr]['essay'] = essay
                 textBar()
+                socket_.emit('essay', {'name': sD.studentDict[request.remote_addr]['name'], 'essay': essay}, namespace=apinamespace)
                 return render_template("message.html", message = "Response submitted.")
             else:
                 return render_template("message.html", message = "Not in Essay mode.")
@@ -1835,6 +1842,7 @@ def endpoint_help():
             sD.studentDict[request.remote_addr]['help']['time'] = time.time()
             sD.studentDict[request.remote_addr]['help']['message'] = request.args.get('message');
             playSFX("sfx_up04")
+            socket_.emit('help', sD.studentDict[request.remote_addr]['help'], namespace=apinamespace)
             return render_template("message.html", message = "Your ticket was sent. Keep working on the problem the best you can while you wait.", forward = sD.mainPage)
         else:
             return render_template("help.html")
@@ -2564,6 +2572,7 @@ def endpoint_tutd():
                     if sD.studentDict[request.remote_addr]['thumb'] != thumb:
                         sD.studentDict[request.remote_addr]['thumb'] = thumb
                         tutdBar()
+                        socket_.emit('thumb', {'name': sD.studentDict[request.remote_addr]['name'], 'thumb': thumb}, namespace=apinamespace)
                         return render_template("message.html", message = "Thank you for your tasty bytes... (" + thumb + ")")
                     else:
                         return render_template("message.html", message = "You've already submitted this answer... (" + thumb + ")")
@@ -2572,6 +2581,7 @@ def endpoint_tutd():
                         sD.studentDict[request.remote_addr]['thumb'] = ''
                         playSFX("sfx_hit01")
                         tutdBar()
+                        socket_.emit('thumb', {'name': sD.studentDict[request.remote_addr]['name'], 'thumb': ''}, namespace=apinamespace)
                         return render_template("message.html", message = "I won\'t mention it if you don\'t")
                     else:
                         return render_template("message.html", message = "You don't have an answer to erase.")
@@ -2805,7 +2815,6 @@ def packMSG(rx, tx, content, now = int(time.time() * 1000)):
         "time": now
     }
     return msgOUT
-
 
 @socket_.on('connect', namespace=chatnamespace)
 def connect():

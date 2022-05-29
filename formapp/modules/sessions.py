@@ -17,6 +17,7 @@ class Session():
         self.ttt = []
         self.fighter = {}
         self.settings = {
+            #If you change the default values here, you'll need to update the database too 
             'perms': {
                 'admin' : 0,
                 'users' : 1,

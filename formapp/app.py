@@ -823,7 +823,11 @@ def endpoint_root():
 
 @app.route('/2048')
 def endpoint_2048():
-    return redirect('/games/2048')
+    if request.args.get('advanced'):
+        advanced = '?advanced=true'
+    else:
+        advanced = ''
+    return redirect('/games/2048' + advanced)
 
 #  █████
 # ██   ██
@@ -917,7 +921,11 @@ def endpoint_advanced():
 
 @app.route('/api')
 def endpoint_api():
-    return redirect('/debug')
+    if request.args.get('advanced'):
+        advanced = '?advanced=true'
+    else:
+        advanced = ''
+    return redirect('/debug' + advanced)
 
 @app.route('/api/bgm')
 def endpoint_api_bgm():
@@ -1097,36 +1105,36 @@ def endpoint_bgm():
                         startBGM(bgm_file, bgm_volume)
                     else:
                         startBGM(bgm_file)
-                    return render_template("message.html", message = 'Playing: ' + bgm_file, forward = '/bgm')
+                    return render_template("message.html", message = 'Playing: ' + bgm_file)
                 else:
                     if request.args.get('return') == 'json':
                         return '{error: "It has only been ' + str(int(time.time() - sD.bgm['lastTime'])) + ' seconds since the last song started. Please wait at least 60 seconds."}'
-                    return render_template("message.html", message = "It has only been " + str(int(time.time() - sD.bgm['lastTime'])) + " seconds since the last song started. Please wait at least 60 seconds.", forward = '/bgm')
+                    return render_template("message.html", message = "It has only been " + str(int(time.time() - sD.bgm['lastTime'])) + " seconds since the last song started. Please wait at least 60 seconds.")
             else:
-                return render_template("message.html", message = "Cannot find that filename!", forward = '/bgm')
+                return render_template("message.html", message = "Cannot find that filename!")
         elif request.args.get('voladj'):
             if request.args.get('voladj') == 'up':
                 volBGM('up')
-                return render_template("message.html", message = 'Music volume increased by one increment.', forward = '/bgm')
+                return render_template("message.html", message = 'Music volume increased by one increment.')
             elif request.args.get('voladj') == 'down':
                 volBGM('down')
-                return render_template("message.html", message = 'Music volume decreased by one increment.', forward = '/bgm')
+                return render_template("message.html", message = 'Music volume decreased by one increment.')
             else:
                 try:
                     bgm_volume = float(request.args.get('voladj'))
                     volBGM(bgm_volume)
-                    return render_template("message.html", message = 'Music volume set to ' + request.args.get('voladj') + '.', forward = '/bgm')
+                    return render_template("message.html", message = 'Music volume set to ' + request.args.get('voladj') + '.')
                 except:
-                    return render_template("message.html", message = 'Invalid voladj. Use \'up\', \'down\', or a number from 0.0 to 1.0.', forward = '/bgm')
+                    return render_template("message.html", message = 'Invalid voladj. Use \'up\', \'down\', or a number from 0.0 to 1.0.')
         elif request.args.get('playpause'):
             playpauseBGM()
             if sD.bgm['paused']:
-                return render_template("message.html", message = 'Music resumed.', forward = '/bgm')
+                return render_template("message.html", message = 'Music resumed.')
             else:
-                return render_template("message.html", message = 'Music paused.', forward = '/bgm')
+                return render_template("message.html", message = 'Music paused.')
         elif request.args.get('rewind'):
             rewindBGM()
-            return render_template("message.html", message = 'Music rewound.', forward = '/bgm')
+            return render_template("message.html", message = 'Music rewound.')
         else:
             resString = '<a href="/bgmstop">Stop Music</a>'
             resString += '<h2>Now playing: ' + sD.bgm['nowplaying'] + '</h2>'
@@ -1145,11 +1153,15 @@ def endpoint_bgm():
 def endpoint_bgmstop():
     sD.bgm['paused'] = False
     stopBGM()
-    return render_template("message.html", message = 'Stopped music...', forward = '/bgm')
+    return render_template("message.html", message = 'Stopped music...')
 
 @app.route('/bitshifter')
 def endpoint_bitshifter():
-    return redirect('/games/bitshifter')
+    if request.args.get('advanced'):
+        advanced = '?advanced=true'
+    else:
+        advanced = ''
+    return redirect('/games/bitshifter' + advanced)
 
 '''
     /break
@@ -1166,12 +1178,12 @@ def endpoint_break():
             if sD.studentDict[request.remote_addr]['perms'] == sD.settings['perms']['teacher']:
                 return render_template("message.html", message = "Teachers can't request bathroom breaks.")
             if sD.studentDict[request.remote_addr]['help']['type']:
-                return render_template("message.html", message = "You already have a help ticket or break request in.", forward = request.path)
+                return render_template("message.html", message = "You already have a help ticket or break request in.")
             else:
                 sD.studentDict[request.remote_addr]['help']['type'] = 'break'
                 sD.studentDict[request.remote_addr]['help']['time'] = time.time()
                 playSFX("sfx_pickup02")
-                return render_template("message.html", message = "Your request was sent. The teacher still needs to approve it.", forward = request.path)
+                return render_template("message.html", message = "Your request was sent. The teacher still needs to approve it.")
         elif request.args.get('action') == 'end':
             if name != sD.studentDict[request.remote_addr]['name'] and sD.studentDict[request.remote_addr]['perms'] != sD.settings['perms']['teacher']:
                 return render_template("message.html", message = "Only teachers can end other people's breaks.")
@@ -1186,7 +1198,7 @@ def endpoint_break():
                         return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'], ticket = json.dumps(sD.studentDict[request.remote_addr]['help']))
                     else:
                         return render_template("message.html", message = "This student is not currently taking a bathroom break.")
-            return render_template("message.html", message = 'Student not found.', forward = request.path)
+            return render_template("message.html", message = 'Student not found.')
         else:
             if sD.studentDict[request.remote_addr]['perms'] == sD.settings['perms']['teacher']:
                 return render_template("message.html", message = "Teachers can't request bathroom breaks. To see students' tickets, go to /controlpanel.")
@@ -1282,7 +1294,7 @@ def endpoint_cleartable():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['teacher']:
-        return render_template("message.html", message = "You do not have high enough permissions to do this right now.", forward = '/controlpanel')
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
     table = request.args.get('table')
     if table:
         db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
@@ -1291,9 +1303,9 @@ def endpoint_cleartable():
         db.commit()
         db.close()
         playSFX("sfx_explode01")
-        return render_template("message.html", message = "Data in " + table + " deleted.", forward = '/controlpanel')
+        return render_template("message.html", message = "Data in " + table + " deleted.")
     else:
-        return render_template("message.html", message = "Missing table argument.", forward = '/controlpanel')
+        return render_template("message.html", message = "Missing table argument.")
 
 '''
     /color
@@ -1412,7 +1424,7 @@ def endpoint_createaccount():
     userFound = dbcmd.execute("SELECT * FROM users WHERE username=:uname", {"uname": name}).fetchall()
     db.close()
     if userFound:
-        return render_template("message.html", message = 'There is already a user with that name.', forward = '/users')
+        return render_template("message.html", message = 'There is already a user with that name.')
     else:
         password = request.args.get('password')
         passwordCrypt = cipher.encrypt(password.encode())
@@ -1421,7 +1433,7 @@ def endpoint_createaccount():
         dbcmd.execute("INSERT INTO users (username, password, permissions, bot) VALUES (?, ?, ?, ?)", (name, passwordCrypt, sD.settings['perms']['anyone'], "False"))
         db.commit()
         db.close()
-        return render_template("message.html", message = 'Account created.', forward = '/users')
+        return render_template("message.html", message = 'Account created.')
 
 @app.route('/createfightermatch', methods = ['POST'])
 def endpoint_createfightermatch():
@@ -1528,7 +1540,11 @@ def endpoint_expert():
 
 @app.route('/fighter')
 def endpoint_fighter():
-    return redirect('/games/fighter')
+    if request.args.get('advanced'):
+        advanced = '?advanced=true'
+    else:
+        advanced = ''
+    return redirect('/games/fighter' + advanced)
 
 
 '''
@@ -1536,7 +1552,11 @@ def endpoint_fighter():
 '''
 @app.route('/flashcards')
 def endpoint_flashcards():
-    return redirect('/games/flashcards')
+    if request.args.get('advanced'):
+        advanced = '?advanced=true'
+    else:
+        advanced = ''
+    return redirect('/games/flashcards' + advanced)
 
 '''
     /flush
@@ -1550,7 +1570,7 @@ def endpoint_flush():
     else:
         flushUsers()
         sD.refresh()
-        return render_template("message.html", message = "Session was restarted.", forward = '/controlpanel')
+        return render_template("message.html", message = "Session was restarted.")
 
 #  ██████
 # ██
@@ -1793,7 +1813,11 @@ def endpoint_getword():
 
 @app.route('/hangman')
 def endpoint_hangman():
-    return redirect('/games/hangman')
+    if request.args.get('advanced'):
+        advanced = '?advanced=true'
+    else:
+        advanced = ''
+    return redirect('/games/hangman' + advanced)
 
 @app.route('/help', methods = ['POST', 'GET'])
 def endpoint_help():
@@ -1861,13 +1885,21 @@ def endpoint_lesson():
             else:
                 f = request.files['file']
                 f.save(os.path.join('lessondata', secure_filename(f.filename.strip(' '))))
-                return redirect('/lesson')
+                if request.args.get('advanced'):
+                    advanced = '?advanced=true'
+                else:
+                    advanced = ''
+                return redirect('/lesson' + advanced)
         elif request.args.get('load'):
             try:
                 sD.refresh()
                 sD.lessonList = lessons.updateFiles()
                 sD.lesson = lessons.readBook(request.args.get('load'))
-                return redirect('/lesson')
+                if request.args.get('advanced'):
+                    advanced = '?advanced=true'
+                else:
+                    advanced = ''
+                return redirect('/lesson' + advanced)
             except Exception as e:
                 print(traceback.format_exc())
                 print("[error] " + e)
@@ -1880,7 +1912,11 @@ def endpoint_lesson():
                     return render_template("message.html", message = 'End of lesson!')
                 else:
                     updateStep()
-                    return redirect('/lesson')
+                    if request.args.get('advanced'):
+                        advanced = '?advanced=true'
+                    else:
+                        advanced = ''
+                    return redirect('/lesson' + advanced)
             elif request.args.get('action') == 'prev':
                 sD.currentStep -= 1
                 if sD.currentStep <= 0:
@@ -1888,14 +1924,22 @@ def endpoint_lesson():
                     return render_template("message.html", message = 'Already at start of lesson!')
                 else:
                     updateStep()
-                    return redirect('/lesson')
+                    if request.args.get('advanced'):
+                        advanced = '?advanced=true'
+                    else:
+                        advanced = ''
+                    return redirect('/lesson' + advanced)
             elif request.args.get('action') == 'unload':
                 sD.refresh()
                 return render_template("message.html", message = 'Unloaded lesson.')
             elif request.args.get('action') == 'upload':
                 return render_template('general.html', content='<form method=post enctype=multipart/form-data><input type=file name=file accept=".xlsx"><input type=submit value=Upload></form>')
             else:
-                return redirect('/lesson')
+                if request.args.get('advanced'):
+                    advanced = '?advanced=true'
+                else:
+                    advanced = ''
+                return redirect('/lesson' + advanced)
         else:
             if not sD.lesson:
                 sD.lessonList = lessons.updateFiles()
@@ -2070,12 +2114,20 @@ def endpoint_logout():
 
 @app.route('/minesweeper')
 def endpoint_minesweeper():
-    return redirect('/games/minesweeper')
+    if request.args.get('advanced'):
+        advanced = '?advanced=true'
+    else:
+        advanced = ''
+    return redirect('/games/minesweeper' + advanced)
 
 
 @app.route('/mnsw')
 def endpoint_mnsw():
-    return redirect('/games/minesweeper')
+    if request.args.get('advanced'):
+        advanced = '?advanced=true'
+    else:
+        advanced = ''
+    return redirect('/games/minesweeper' + advanced)
 
 '''
     /mobile
@@ -2402,7 +2454,11 @@ def endpoint_setdefault():
 
 @app.route('/settings')
 def endpoint_settings():
-    return redirect('/controlpanel')
+    if request.args.get('advanced'):
+        advanced = '?advanced=true'
+    else:
+        advanced = ''
+    return redirect('/controlpanel' + advanced)
 
 #This endpoint leads to the Sound Effect page
 @app.route('/sfx')
@@ -2430,7 +2486,11 @@ def endpoint_socket():
 
 @app.route('/speedtype')
 def endpoint_speedtype():
-    return redirect('/games/speedtype')
+    if request.args.get('advanced'):
+        advanced = '?advanced=true'
+    else:
+        advanced = ''
+    return redirect('/games/speedtype' + advanced)
 
 
 @app.route('/standard')
@@ -2464,15 +2524,27 @@ def endpoint_startpoll():
 
 @app.route('/td')
 def endpoint_td():
-    return redirect('/games/towerdefense')
+    if request.args.get('advanced'):
+        advanced = '?advanced=true'
+    else:
+        advanced = ''
+    return redirect('/games/towerdefense' + advanced)
 
 @app.route('/towerdefense')
 def endpoint_towerdefense():
-    return redirect('/games/towerdefense')
+    if request.args.get('advanced'):
+        advanced = '?advanced=true'
+    else:
+        advanced = ''
+    return redirect('/games/towerdefense' + advanced)
 
 @app.route('/ttt')
 def endpoint_ttt():
-    return redirect('/games/ttt')
+    if request.args.get('advanced'):
+        advanced = '?advanced=true'
+    else:
+        advanced = ''
+    return redirect('/games/ttt' + advanced)
 
 '''
     /tutd
@@ -2559,7 +2631,7 @@ def endpoint_users():
                 db.close()
                 if user in sD.studentDict:
                     del sD.studentDict[user]
-                return render_template("message.html", message = "User deleted.", forward = '/users')
+                return render_template("message.html", message = "User deleted.")
             if action == 'changePw':
                 password = request.args.get('password')
                 if password:
@@ -2569,23 +2641,27 @@ def endpoint_users():
                     dbcmd.execute("UPDATE users SET password=:pw WHERE username=:uname", {"uname": request.args.get('name'), "pw": passwordCrypt})
                     db.commit()
                     db.close()
-                    return render_template("message.html", message = "Password reset.", forward = '/users')
+                    return render_template("message.html", message = "Password reset.")
                 else:
-                    return render_template("message.html", message = "New password reqired.", forward = '/users')
+                    return render_template("message.html", message = "New password reqired.")
             if not user:
-                return render_template("message.html", message = "That user was not found by their name.", forward = '/users')
+                return render_template("message.html", message = "That user was not found by their name.")
         if request.args.get('ip'):
             if request.args.get('ip') in sD.studentDict:
                 user = request.args.get('ip')
             else:
-                return render_template("message.html", message = "That user was not found by their IP address.", forward = '/users')
+                return render_template("message.html", message = "That user was not found by their IP address.")
         if action == 'removeNP':
             if request.args.get('name') in newPasswords:
                 del newPasswords[request.args.get('name')]
             else:
                 return render_template("message.html", message = "That user was has not requested a new password.")
             if request.args.get('acceptNP'):
-                return redirect('/users?action=changePw&name=' + request.args.get('name') + '&password=' + request.args.get('password'))
+                if request.args.get('advanced'):
+                    advanced = '&advanced=true'
+                else:
+                    advanced = ''
+                return redirect('/users?action=changePw&name=' + request.args.get('name') + '&password=' + request.args.get('password') + '&advanced=' + advanced)
             else:
                 return render_template("message.html", message = "Request rejected.")
         if user:
@@ -2697,7 +2773,11 @@ def endpoint_wawd():
 
 @app.route('/wordle')
 def endpoint_wordle():
-    return redirect('/games/wordle')
+    if request.args.get('advanced'):
+        advanced = '?advanced=true'
+    else:
+        advanced = ''
+    return redirect('/games/wordle' + advanced)
 
 
 # ███████  ██████   ██████ ██   ██ ███████ ████████ ████████  ██████

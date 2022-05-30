@@ -276,7 +276,7 @@ img.button.inline {
   cursor: not-allowed;
 }
 
-button.pressed, .button.pressed {
+.pressed.pressed {
   background: var(--theme-color);
   border-color: var(--theme-color);
   color: var(--bg-color);

@@ -111,6 +111,40 @@
       font-size: 18px;
     }
 
+    #findMatches {
+      right: 8px;
+      top: 8px;
+      width: 36px;
+      height: 36px;
+      padding: 4px;
+      font-size: 20px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #findMatches:hover {
+      background: var(--bg-dark-highlight);
+    }
+
+    #matches {
+      width: calc(100% - 64px);
+      display: grid;
+      grid-template-columns: repeat(2, calc(50% - 2px));
+      gap: 4px;
+      margin-top: 8px;
+      text-align: left;
+    }
+
+    .match {
+      position: static;
+      padding: 8px;
+      cursor: pointer;
+    }
+
+    .match:not(.pressed):hover {
+      background: var(--bg-dark-highlight);
+    }
+
     .targetOption:hover {
       cursor: pointer;
       filter: drop-shadow(0 0 6px white);
@@ -281,8 +315,8 @@
       filter: brightness(75%);
     }
 
-    #joinMatch, #createMatch {
-      width: 450px;
+    #findMatch, #enterCode, #createMatch {
+      width: 400px;
       height: 300px;
       padding: 32px;
       border: 1px solid var(--light-green);
@@ -550,15 +584,23 @@
 
     <h1 id="title" class="hCentered" style="top: 128px;">Turn-Based Fighter</h1>
 
-    <div id="joinMatch" class="vCentered" style="left: calc(50% - 482px);">
-      <h2>Join match</h2>
+    <div id="findMatch" class="vCentered" style="left: calc(50% - 632px);">
+      <div id="findMatches" title="Search again">⟳</div>
+      <h2>Find a match</h2>
+      <div id="matches"></div>
+      <button id="joinSelectedButton" class="hCentered unselectable" style="bottom: 32px;">Go</button>
+    </div>
+
+    <div id="enterCode" class="centered">
+      <h2>Enter a match code</h2>
       <input type="text" id="joinCode" class="box centered" placeholder="Six-digit code" maxlength="6" autocomplete="off"></input>
       <button id="joinButton" class="hCentered unselectable" style="bottom: 32px;">Go</button>
     </div>
 
-    <div id="createMatch" class="vCentered" style="right: calc(50% - 482px);">
-      <h2>Create match</h2>
-      <div class="centered"><input type="checkbox" id="chatCheckbox" checked><label for="chatCheckbox">Send a link in the chat</label></div>
+    <div id="createMatch" class="vCentered" style="right: calc(50% - 632px);">
+      <h2>Create a match</h2>
+      <div class="centered"><input type="checkbox" id="chatCheckbox" checked>
+        <label for="chatCheckbox">Make the match public and send a link in the chat</label></div>
       <button id="createMatchButton" class="hCentered" style="bottom: 32px;">Go</button>
     </div>
 
@@ -1135,6 +1177,33 @@
         }
       });
 
+      function findMatches() {
+        document.getElementById("matches").innerHTML = null;
+        document.getElementById("joinSelectedButton").classList.add("unselectable");
+        document.getElementById("joinSelectedButton").onclick = null;
+        request.open("GET", '/api/fightermatches', false);
+        request.send(null);
+        let res = JSON.parse(request.responseText);
+        let matches = Object.keys(res).sort(() => Math.random() - 0.5) //Randomize
+        matches = matches.filter(match => res[match].public == "true" && !res[match].opponent && res[match].creator != me.name).slice(0, 6); //Get available matches and keep first 6
+        if (!matches.length) document.getElementById("findMatch").innerHTML += `<h3 class="centered">No matches found</h3>`;
+        matches.forEach(match => {
+          let matchEl = document.createElement("div");
+          matchEl.id = "match" + match;
+          matchEl.classList.add("match");
+          matchEl.innerHTML = `<b>${res[match].creator}</b> <span style="filter: opacity(75%);">${match}</span>`;
+          matchEl.onclick = function() {
+            Array.from(document.querySelectorAll(".match")).forEach(el => el.classList.remove("pressed")); //Deselect all matches
+            this.classList.add("pressed");
+            document.getElementById("joinSelectedButton").classList.remove("unselectable");
+            document.getElementById("joinSelectedButton").onclick = () => joinMatch(match);
+          };
+          document.getElementById("matches").append(matchEl);
+        });
+      }
+      findMatches();
+      document.getElementById("findMatches").onclick = findMatches;
+
       document.getElementById("joinCode").oninput = function() {
         for (let char of this.value) if (/\D/.test(char)) this.value = this.value.replace(char, ""); //Only allow numbers
         if (this.value.length == 6) {
@@ -1145,7 +1214,6 @@
           document.getElementById("joinButton").onclick = null;
         }
       };
-
 
       function updateStats() {
         if (opponent.name) { //Do this if in a match
@@ -1202,7 +1270,7 @@
         request.open("GET", '/api/fightermatches', false);
         request.send(null);
         let res = JSON.parse(request.responseText);
-        match = res["match" + code];
+        match = res[code];
         /*//for testing
         match = {creator: me.name}; ///et*/
         if (!match) {
@@ -1518,14 +1586,16 @@
 
         document.getElementById("matchCode").innerText = matchCode;
 
-        if (document.getElementById("chatCheckbox").checked) {
+        let public = document.getElementById("chatCheckbox").checked;
+
+        if (public) {
           let message = `${me.name} is looking for a Fighter opponent. <button class="inline popOut" onclick="window.open('/games/fighter?match=${matchCode}');">Join match</button>`;
           sendMessage(message, "all");
         }
 
         if (rematchCode) sendPlayerReady();
 
-        request.open("POST", "/createfightermatch?code=" + matchCode + "&name=" + me.name);
+        request.open("POST", `/createfightermatch?code=${matchCode}&name=${me.name}&public=${public}`);
         request.send();
 
         let tips = [

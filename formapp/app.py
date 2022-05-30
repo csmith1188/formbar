@@ -1443,10 +1443,12 @@ def endpoint_createaccount():
 def endpoint_createfightermatch():
     code = request.args.get('code')
     name = request.args.get('name')
-    if code in sd.Fighter:
+    public = request.args.get('public')
+    if code in sD.fighter:
         return render_template("message.html", message = 'A match with this code already exists.')
     sD.fighter[code] = {} #Create new object for match
     sD.fighter[code]['creator'] = name #Set "creator" of object to arg "name"
+    sD.fighter[code]['public'] = public
     return render_template("message.html", message = 'Match ' + code + ' created by ' + name + '.')
 
 # ██████

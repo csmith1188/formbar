@@ -425,7 +425,7 @@
       cursor: pointer;
     }
 
-    #gameContainer {
+    #playerInfo, #gameContainer {
       top: 0;
       left: 0;
       width: 80%;
@@ -655,25 +655,27 @@
 
   <h1 id="starting" class="centered hidden">Starting match…</h1>
 
+  <div id="playerInfo" class="hidden">
+    <div>
+      <h2 id="p1-name"></h2>
+      Total wins: <span id="p1-wins"></span><br>
+      Win rate: <span id="p1-percent"></span><br>
+      Win streak: <span id="p1-streak"></span>
+    </div>
+
+    <div style="top: 8px; right: 8px; text-align: right;">
+      <h2 id="p2-name"></h2>
+      Total wins: <span id="p2-wins"></span><br>
+      Win rate: <span id="p2-percent"></span><br>
+      Win streak: <span id="p2-streak"></span>
+    </div>
+  </div>
+
   <div id="gameContainer" class="hidden">
     <div id="game">
-      <div>
-        <h2 id="p1-name"></h2>
-        Total wins: <span id="p1-wins"></span><br>
-        Win rate: <span id="p1-percent"></span><br>
-        Win streak: <span id="p1-streak"></span>
-      </div>
-
       <div class="hCentered">
         <h2 id="turn"></h2>
         <span id="timer"></span>
-      </div>
-
-      <div style="top: 8px; right: 8px; text-align: right;">
-        <h2 id="p2-name"></h2>
-        Total wins: <span id="p2-wins"></span><br>
-        Win rate: <span id="p2-percent"></span><br>
-        Win streak: <span id="p2-streak"></span>
       </div>
 
       <div id="p1-items" class="items vertical vCentered" style="left: 32px;">
@@ -1653,6 +1655,7 @@
         document.getElementById("starting").classList.add("hidden");
         document.getElementById("border").classList.add("hidden");
         document.getElementById("gameContainer").classList.remove("hidden");
+        document.getElementById("playerInfo").classList.remove("hidden");
         document.getElementById("gameChat").classList.remove("hidden");
 
         window.onbeforeunload = () => true; //Show warning before leaving page
@@ -2571,6 +2574,9 @@
         window.onbeforeunload = null;
         window.onunload = null;
 
+        document.getElementById("p1-name").style.color = "white";
+        document.getElementById("p2-name").style.color = "white";
+
         winner = (me.team == winner.team) ? me : opponent;
 
         if (winner == me) {
@@ -2634,180 +2640,5 @@
 
       ////delete own matches on disconnect
     }
-
-    let testPlayer = {
-    name: "Oley456",
-    defeated: [],
-    colors: [
-        {
-            color: "red",
-            effective: "yellow",
-            weak: "blue",
-            moves: {
-                main: {
-                    damage: 14,
-                    doubleTarget: true,
-                    description: "Deals [damage] damage to both opponent fighters.",
-                    name: "main attack",
-                    id: "main",
-                    charged: 0
-                },
-                special: {
-                    charge: 1,
-                    minDamage: 45,
-                    maxDamage: 65,
-                    description: "Deals at least [minDamage] and up to [maxDamage] damage.",
-                    name: "special attack",
-                    id: "special",
-                    charged: 0
-                },
-                other: {
-                    type: "revenge",
-                    revengeDuration: 2,
-                    selfTarget: true,
-                    description: "Opponents will take 50% of the damage they inflict on this fighter. Lasts for 2 turns.",
-                    name: "other move",
-                    id: "other",
-                    charged: 0
-                }
-            },
-            hp: 100,
-            attackFactor: 1,
-            effects: {}
-        },
-        {
-            color: "yellow",
-            effective: "green",
-            weak: "red",
-            moves: {
-                main: {
-                    damage: 20,
-                    critDamage: 40,
-                    critChance: 10,
-                    description: "Deals [damage] damage. 10% chance of a critical hit, which deals [critDamage] damage.",
-                    name: "main attack",
-                    id: "main",
-                    charged: 0
-                },
-                alt: {
-                    damage: 7,
-                    doubleTarget: true,
-                    healing: true,
-                    description: "Deals [damage] damage to both opponent fighters. Dealt damage is added to this fighter's HP.",
-                    name: "alt attack",
-                    id: "alt",
-                    charged: 0
-                },
-                other: {
-                    type: "sacrifice",
-                    selfTarget: true,
-                    description: "Sacrifice this fighter. Teammate's attack power increases by 1% for each remaining HP.",
-                    name: "other move",
-                    id: "other",
-                    charged: 0
-                }
-            },
-            hp: 100,
-            attackFactor: 1,
-            effects: {}
-        }
-    ],
-    items: [
-        "attackBoost",
-        "fastTimer",
-        "cleanse"
-    ],
-    effects: {},
-    wins: 0,
-    losses: 0,
-    winStreak: 0,
-    team: 2,
-    fighters: [
-        {
-            team: 2,
-            name: "2a",
-            color: "red",
-            effective: "yellow",
-            weak: "blue",
-            moves: {
-                main: {
-                    damage: 14,
-                    doubleTarget: true,
-                    description: "Deals [damage] damage to both opponent fighters.",
-                    name: "main attack",
-                    id: "main",
-                    charged: 0,
-                    el: {}
-                },
-                special: {
-                    charge: 1,
-                    minDamage: 45,
-                    maxDamage: 65,
-                    description: "Deals at least [minDamage] and up to [maxDamage] damage.",
-                    name: "special attack",
-                    id: "special",
-                    charged: 0,
-                    el: {}
-                },
-                other: {
-                    type: "revenge",
-                    revengeDuration: 2,
-                    selfTarget: true,
-                    description: "Opponents will take 50% of the damage they inflict on this fighter. Lasts for 2 turns.",
-                    name: "other move",
-                    id: "other",
-                    charged: 0,
-                    el: {}
-                }
-            },
-            hp: 100,
-            attackFactor: 1,
-            effects: {},
-            el: {}
-        },
-        {
-            team: 2,
-            name: "2b",
-            color: "yellow",
-            effective: "green",
-            weak: "red",
-            moves: {
-                main: {
-                    damage: 20,
-                    critDamage: 40,
-                    critChance: 10,
-                    description: "Deals [damage] damage. 10% chance of a critical hit, which deals [critDamage] damage.",
-                    name: "main attack",
-                    id: "main",
-                    charged: 0,
-                    el: {}
-                },
-                alt: {
-                    damage: 7,
-                    doubleTarget: true,
-                    healing: true,
-                    description: "Deals [damage] damage to both opponent fighters. Dealt damage is added to this fighter's HP.",
-                    name: "alt attack",
-                    id: "alt",
-                    charged: 0,
-                    el: {}
-                },
-                other: {
-                    type: "sacrifice",
-                    selfTarget: true,
-                    description: "Sacrifice this fighter. Teammate's attack power increases by 1% for each remaining HP.",
-                    name: "other move",
-                    id: "other",
-                    charged: 0,
-                    el: {}
-                }
-            },
-            hp: 100,
-            attackFactor: 1,
-            effects: {},
-            el: {}
-        }
-    ]
-}
   </script>
 {% endblock %}

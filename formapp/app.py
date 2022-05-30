@@ -1624,15 +1624,36 @@ def endpoint_games_bitshifter():
             highScore = 0
         return render_template('games/bitshifter.html', highScore = highScore)
 
-@app.route('/games/fighter')
+@app.route('/games/fighter', methods = ['GET', 'POST'])
 def endpoint_games_fighter():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
     else:
+        username = sD.studentDict[request.remote_addr]['name']
+        if request.form:
+            action = request.form['action']
+            password = request.form['password']
+        else:
+            action = request.args.get('action')
+            password = ''
+        authenticated = False
+        if action == 'resetStats':
+            if password:
+                db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+                dbcmd = db.cursor()
+                user = dbcmd.execute("SELECT * FROM users WHERE username=:uname", {"uname": username}).fetchone()
+                db.close()
+                #Check if the password is correct
+                if password == cipher.decrypt(user[2]).decode():
+                    authenticated = True
+                else:
+                    return render_template("message.html", message = "Your password is incorrect.")
+            else:
+                return render_template('authenticate.html', forward = request.path, action = action)
+
         try:
-            username = sD.studentDict[request.remote_addr]['name']
             db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
             dbcmd = db.cursor()
             wins = dbcmd.execute("SELECT fighterWins FROM users WHERE username=:uname", {"uname": username}).fetchone()[0] or 0
@@ -1640,7 +1661,7 @@ def endpoint_games_fighter():
             winStreak = dbcmd.execute("SELECT fighterWinStreak FROM users WHERE username=:uname", {"uname": username}).fetchone()[0] or 0
             goldUnlocked = dbcmd.execute("SELECT goldUnlocked FROM users WHERE username=:uname", {"uname": username}).fetchone()[0] or 0
             db.close()
-            return render_template('games/fighter.html', username = username, wins = wins, losses = losses, winStreak = winStreak, goldUnlocked = goldUnlocked)
+            return render_template('games/fighter.html', username = username, wins = wins, losses = losses, winStreak = winStreak, goldUnlocked = goldUnlocked, action = action, authenticated = authenticated)
         except Exception as e:
             print("[error] " + "Error: " + str(e))
 

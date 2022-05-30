@@ -1055,6 +1055,7 @@
         wins: {{ wins }},
         losses: {{ losses }},
         winStreak: {{ winStreak }},
+        goldUnlocked: {{ goldUnlocked }}
       };
 
       let colors = [red, yellow, green, blue];
@@ -1095,7 +1096,7 @@
         return Math.floor(Math.random() * max);
       }
 
-      document.getElementById("resetStats").onclick = resetStats;
+      document.getElementById("resetStats").onclick = () => window.location = "/games/fighter?action=resetStats";
       document.getElementById("createMatchButton").onclick = createMatch;
       document.getElementById("backToHome").onclick = backToHome;
       document.getElementById("randomButton").onclick = randomFighters;
@@ -1254,16 +1255,15 @@
         }
       }
 
-      function resetStats() {
-        if (confirm("Are you sure?")) {
-          me.wins = 0;
-          me.losses = 0;
-          me.winStreak = 0;
-          request.open("POST", "/updateuser?field=goldUnlocked&value=0");
-          request.send();
-          updateStats();
-          window.location.reload();
-        }
+      if ("{{ action }}" == "resetStats" && "{{ authenticated }}" == "True") {
+        me.wins = 0;
+        me.losses = 0;
+        me.winStreak = 0;
+        me.goldUnlocked = 0;
+        request.open("POST", "/updateuser?field=goldUnlocked&value=0");
+        request.send();
+        updateStats();
+        window.location = "/games/fighter";
       }
 
       function joinMatch(code) {
@@ -1326,7 +1326,7 @@
 
         lockedColors.forEach((color) => {
           /*//for testing ///et*/
-          if ((color.unlockWins && me.wins >= color.unlockWins) || (color.color == "gold" && {{ goldUnlocked }})) { //If player has enough wins to unlock or already unlocked
+          if ((color.unlockWins && me.wins >= color.unlockWins) || (color.color == "gold" && me.goldUnlocked)) { //If player has enough wins to unlock or already unlocked
             colors.push(color);
             lockedColors = lockedColors.filter(locked => locked != color);
           } else {

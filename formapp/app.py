@@ -2330,8 +2330,8 @@ def endpoint_quiz():
 @app.route('/removefightermatch', methods = ['POST'])
 def endpoint_removefightermatch():
     code = request.args.get('code')
-    if 'match' + code in sD.fighter:
-        del sD.fighter['match' + code]
+    if code in sD.fighter:
+        del sD.fighter[code]
         return render_template("message.html", message = 'Match ' + code + ' removed.')
     return render_template("message.html", message = 'Could not remove match.')
 

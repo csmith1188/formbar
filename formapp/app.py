@@ -244,6 +244,7 @@ def newStudent(remote, username, bot=False):
                 else:
                     sD.studentDict[remote]['perms'] = int(user[3])
 
+        socket_.emit('alert', json.dumps(packMSG('all', 'server', sD.studentDict[request.remote_addr]['name'] + " logged in...")), namespace=chatnamespace)
         playSFX("sfx_up02")
 
 def flushUsers():
@@ -2130,6 +2131,7 @@ def endpoint_login():
             #If the user is logged in, log them out
             if remote in sD.studentDict:
                 print("[info] " + sD.studentDict[request.remote_addr]['name'] + " logged out.")
+                socket_.emit('alert', json.dumps(packMSG('all', 'server', sD.studentDict[request.remote_addr]['name'] + " logged out...")), namespace=chatnamespace)
                 del sD.studentDict[request.remote_addr]
                 playSFX('sfx_laser01')
             if request.args.get('name'): ##needs update
@@ -2718,7 +2720,10 @@ def endpoint_users():
                     #server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', name, 'server', 'The teacher rejected your break request.')))
             if action == 'kick':
                 if user in sD.studentDict:
+                    print("[info] " + sD.studentDict[request.remote_addr]['name'] + " was removed by the teacher.")
+                    socket_.emit('alert', json.dumps(packMSG('all', 'server', sD.studentDict[request.remote_addr]['name'] + " was removed by the teacher...")), namespace=chatnamespace)
                     del sD.studentDict[user]
+                    playSFX('sfx_laser01')
                     return render_template("message.html", message = "User removed")
                 else:
                     return render_template("message.html", message = "User not in list.")
@@ -2849,7 +2854,6 @@ def connect():
         if request.remote_addr in sD.studentDict:
             sD.studentDict[request.remote_addr]['sid'] = request.sid
             print("[info] " + sD.studentDict[request.remote_addr]['name'] + " connected and was given id \"" + request.sid + "\"")
-            emit('alert', json.dumps(packMSG('all', 'server', sD.studentDict[request.remote_addr]['name'] + " has joined the server...")), broadcast=True)
             emit('userlist', json.dumps(packMSG('all', 'server', chatUsers())), broadcast=True)
     except Exception as e:
         print("[error] " + "Error finding user in list: " + str(e))
@@ -2861,7 +2865,6 @@ def disconnect():
             if 'sid' in sD.studentDict[request.remote_addr]:
                 del sD.studentDict[request.remote_addr]['sid']
                 print("[info] " + sD.studentDict[request.remote_addr]['name'] + " disconnected")
-                emit('alert', json.dumps(packMSG('all', 'server', sD.studentDict[request.remote_addr]['name'] + " has left the server...")), broadcast=True)
                 emit('userlist', json.dumps(packMSG('all', 'server', chatUsers())), broadcast=True)
     except Exception as e:
         print("[error] " + "Error finding user in list: " + str(e))

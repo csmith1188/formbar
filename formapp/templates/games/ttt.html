@@ -221,10 +221,10 @@
       }
 
       function checkWin() {
-        if (gameboard.find(row => row.every(square => square == player.shape))) return true; // Horizontal
-        if ([0, 1, 2].find(i => gameboard.every(row => row[i] == player.shape))) return true; // Vertical
-        if ([0, 1, 2].every(i => gameboard[i][i] == player.shape)) return true; // \ diagonal
-        if ([0, 1, 2].every(i => gameboard[i][-(i - 2)] == player.shape)) return true; // / diagonal
+        if (gameboard.find(row => row.every(square => square == player.shape))) return true; //Horizontal
+        if ([0, 1, 2].find(i => gameboard.every(row => row[i] == player.shape))) return true; //Vertical
+        if ([0, 1, 2].every(i => gameboard[i][i] == player.shape)) return true; //Diagonal (\)
+        if ([0, 1, 2].every(i => gameboard[i][-(i - 2)] == player.shape)) return true; //Diagonal (/)
         return false;
       }
       //MR Smith land

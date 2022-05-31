@@ -1778,7 +1778,11 @@ def endpoint_games_ttt():
 
         db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
         dbcmd = db.cursor()
-        wins = dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='ttt' ORDER BY score DESC", {"uname": sD.studentDict[request.remote_addr]['name']}).fetchone()[3]
+        wins = dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='ttt' ORDER BY score DESC", {"uname": sD.studentDict[request.remote_addr]['name']}).fetchone()
+        if wins:
+            wins = wins[3]
+        else:
+            wins = 0
         db.close()
 
         #Loop through all existing games
@@ -2978,6 +2982,10 @@ def ttt(message):
                 square = message['content']['square']
                 rBox = math.floor(square / 3);
                 cBox = square % 3;
+                if game.turn == 1:
+                    game.turn = 2
+                else:
+                    game.turn = 1
                 if message['from'] == game.players[0]:
                     shape = 'X'
                 else:

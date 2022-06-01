@@ -379,7 +379,7 @@
       font-size: 150%;
     }
 
-    #abilities {
+    #powers {
       position: absolute;
       bottom: 10%;
       width: 100%;
@@ -390,7 +390,7 @@
       text-align: center;
     }
 
-    #abilities button {
+    #powers button {
       width: 5.125%;
       padding: 0.1% 0.3%;
       font-size: 100%;
@@ -410,7 +410,7 @@
     <table id="grid" class="hidden"></table>
     <div id="towers" class="hidden">
       <div id="towerDesc"></div>
-      <div id="abilities"></div>
+      <div id="powers"></div>
     </div>
   </div>
 {% endblock %}
@@ -526,7 +526,7 @@
               this.bounce = 8;
             }
           },
-          ability: {
+          power: {
             description: "All Basic Towers attack 5× as fast for 10 seconds.",
             price: 75,
             use: function() {
@@ -558,7 +558,7 @@
               this.permSlow = true;
             }
           },
-          ability: {
+          power: {
             description: "Stuns every onscreen enemy for 3 seconds. Stunned enemies take twice as much damage.",
             price: 60,
             use: function() {
@@ -590,7 +590,7 @@
               this.doublePoison = true;
             }
           },
-          ability: {
+          power: {
             description: "All onscreen enemeis move backward for 3 seconds.",
             price: 55,
             use: function() {
@@ -621,7 +621,7 @@
               this.removeAbilities = true;
             }
           },
-          ability: {
+          power: {
             description: "Does 150 damage the strongest enemy on the screen.",
             price: 150,
             use: function() {
@@ -654,7 +654,7 @@
               this.powerfulExplosions = true;
             }
           },
-          ability: {
+          power: {
             description: "Creates a giant explosion at the center of the screen that does significant damage to all enemies inside of it.",
             price: 100,
             use: function() {
@@ -692,7 +692,7 @@
               player.bonusLives += 1;
             }
           },
-          ability: {
+          power: {
             description: "Adds $100 to your total.",
             price: 380,
             use: function() {
@@ -725,7 +725,7 @@
               this.rangeBoosting = true;
             }
           },
-          ability: {
+          power: {
             description: "A highly powerful plane will fly over the track, starting from the exit.",
             price: 300,
             use: function() {
@@ -780,7 +780,7 @@
               this.bossBonus = true;
             }
           },
-          ability: {
+          power: {
             description: "All towers get double range, speed, and strength for 10 seconds.",
             price: 300,
             use: function() {
@@ -970,12 +970,12 @@
                 ${this.nextExtra.description ?? this.extra2.description}
 
                 <h2>
-                  Ability
-                  <span id="ability" class="splitButton">
-                    <span class="buttonLeft">${difficulty == "hard" ? "Locked" : (this.ability.bought ? "Bought" : "Unlock")}</span><span class="buttonRight">$${this.ability.price}</span>
+                  Special power
+                  <span id="power" class="splitButton">
+                    <span class="buttonLeft">${difficulty == "hard" ? "Locked" : (this.power.bought ? "Bought" : "Unlock")}</span><span class="buttonRight">$${this.power.price}</span>
                   </span>
                 </h2>
-                ${type.ability.description}
+                ${type.power.description}
               `;
               document.getElementById("container").append(menu);
 
@@ -984,20 +984,20 @@
               let speedButton = document.getElementById("speed");
               let strengthButton = document.getElementById("strength");
               let extraButton = document.getElementById("extra");
-              let abilityButton = document.getElementById("ability");
+              let powerButton = document.getElementById("power");
 
               //Gray out upgrades that can't be bought
               if (player.money < this.upgradePrice("range") || this.range == Infinity) rangeButton.classList.add("unselectable");
               if (player.money < this.upgradePrice("speed")) speedButton.classList.add("unselectable");
               if (player.money < this.upgradePrice("strength")) strengthButton.classList.add("unselectable");
               if (player.money < this.nextExtra.price) extraButton.classList.add("unselectable");
-              if (player.money < this.ability.price || this.ability.bought || difficulty == "hard") abilityButton.classList.add("unselectable");
+              if (player.money < this.power.price || this.power.bought || difficulty == "hard") powerButton.classList.add("unselectable");
 
               if (this.upgrades.range == 2 || this.range == Infinity) rangeButton.classList.add("bought");
               if (this.upgrades.speed == 2) speedButton.classList.add("bought");
               if (this.upgrades.strength == 2) strengthButton.classList.add("bought");
               if (this.extra2.bought) extraButton.classList.add("bought");
-              if (this.ability.bought || difficulty == "hard") abilityButton.classList.add("bought");
+              if (this.power.bought || difficulty == "hard") powerButton.classList.add("bought");
 
               //Center the menu horizontally
               menu.style.left = this.x / 1920 * 100 + "%";
@@ -1078,11 +1078,11 @@
                   this.showMenu();
                 }
               };
-              abilityButton.onclick = () => {
-                  if (!this.ability.bought && player.money >= this.ability.price && difficulty == "normal") {
-                  player.money -= this.ability.price;
-                  this.value += this.ability.price;
-                  this.ability.bought = true;
+              powerButton.onclick = () => {
+                  if (!this.power.bought && player.money >= this.power.price && difficulty == "normal") {
+                  player.money -= this.power.price;
+                  this.value += this.power.price;
+                  this.power.bought = true;
                   //Update the menu
                   menu.remove();
                   this.showMenu();
@@ -1278,7 +1278,7 @@
         enabled: true,
         delay: 0.05,
         sfx: {
-          abilityReady: new Audio("../../static/sound/td/td_ability_ready.wav"),
+          powerReady: new Audio("../../static/sound/td/td_power_ready.wav"),
           blip: new Audio("../../static/sound/td/td_blip01.wav"),
           coin1: new Audio("../../static/sound/td/td_coin01.wav"),
           coin2: new Audio("../../static/sound/td/td_coin02.wav"),
@@ -1780,7 +1780,7 @@
         for (let tower in towerTypes) {
           let towerEl = document.getElementById(tower);
 
-          if (towerTypes[tower].ability.cooldown) towerTypes[tower].ability.cooldown--;
+          if (towerTypes[tower].power.cooldown) towerTypes[tower].power.cooldown--;
 
           if (player.money >= towerTypes[tower].price) {
             towerEl.classList.remove("unselectable");
@@ -1844,20 +1844,20 @@
             towerEl.draggable = false;
           }
 
-          let ability = towerTypes[tower].ability;
-          let abilityButton = document.getElementById(tower + "Ability");
-          if (ability.bought && towers.find(owned => owned?.name == towerTypes[tower].name)) {
-            abilityButton.classList.remove("invisible");
-            if (ability.cooldown) {
-              abilityButton.classList.add("unselectable");
-              let percent = ability.cooldown / 3000 * 100;
-              abilityButton.style.background = `linear-gradient(to left, var(--emphasis-color), var(--emphasis-color) ${percent}%, gray ${percent}%)`; //Show how long until the ability can be used again
+          let power = towerTypes[tower].power;
+          let powerButton = document.getElementById(tower + "Power");
+          if (power.bought && towers.find(owned => owned?.name == towerTypes[tower].name)) {
+            powerButton.classList.remove("invisible");
+            if (power.cooldown) {
+              powerButton.classList.add("unselectable");
+              let percent = power.cooldown / 3000 * 100;
+              powerButton.style.background = `linear-gradient(to left, var(--emphasis-color), var(--emphasis-color) ${percent}%, gray ${percent}%)`; //Show how long until the power can be used again
             } else {
-              abilityButton.style.background = null; //Reset the background
-              abilityButton.classList.remove("unselectable");
+              powerButton.style.background = null; //Reset the background
+              powerButton.classList.remove("unselectable");
             }
           } else {
-            abilityButton.classList.add("invisible");
+            powerButton.classList.add("invisible");
           }
         }
 
@@ -1870,7 +1870,7 @@
           if (player.money >= menuTower.upgradePrice("speed")) document.getElementById("speed").classList.remove("unselectable");
           if (player.money >= menuTower.upgradePrice("strength")) document.getElementById("strength").classList.remove("unselectable");
           if (player.money >= menuTower.nextExtra.price) document.getElementById("extra").classList.remove("unselectable");
-          if (player.money >= menuTower.ability.price && !menuTower.ability.bought && difficulty == "normal") document.getElementById("ability").classList.remove("unselectable");
+          if (player.money >= menuTower.power.price && !menuTower.power.bought && difficulty == "normal") document.getElementById("power").classList.remove("unselectable");
         }
 
         //Update text in top-right
@@ -1891,8 +1891,8 @@
         frame++;
       }
 
-      let progress = "{{ progress }}" || localStorage.getItem("tdProgress"); //2 means map completed on hard, 1 means map completed on normal, 0 means map not completed
-      let achievements = "{{ achievements }}" || localStorage.getItem("tdAchievements") || "0000000"; //1 means earned, 0 means not earned
+      let progress = "{{ progress }}"; //2 means map completed on hard, 1 means map completed on normal, 0 means map not completed
+      let achievements = "{{ achievements }}" || "0000000"; //1 means earned, 0 means not earned
       achievements = achievements.split("");
       let player = {
         money: 75,
@@ -1930,7 +1930,7 @@
         "Complete a game without losing any lives",
         "Purchase every tower type in one game",
         "Fully upgrade a tower",
-        "Use every tower ability in one game",
+        "Use every special power in one game",
         "Win a game without any Ultimate Towers",
         "Win a game without any Basic Towers",
         "Win a game without placing more than three towers"
@@ -2147,7 +2147,7 @@
           normal.classList.remove("pressed");
           ctx.fillText("• 75 waves", 960, 700);
           ctx.fillText("• 50 lives", 960, 750);
-          ctx.fillText("• No abilities", 960, 800);
+          ctx.fillText("• No special powers", 960, 800);
           ctx.fillText("• Fast forward permanently on", 960, 850);
           if (mapComplete == 2) {
             ctx.fillStyle = "#80ff80";
@@ -2242,23 +2242,23 @@
         document.getElementById("towers").classList.remove("hidden");
         for (let tower in towerTypes) {
           document.getElementById("towers").innerHTML += `<img src="../../static/img/towerdefense/${tower}.png" id="${tower}">`;
-          document.getElementById("abilities").innerHTML += `<button id="${tower}Ability" class="invisible">Use ability</button>`;
+          document.getElementById("powers").innerHTML += `<button id="${tower}Power" class="invisible">Use power</button>`;
         }
         for (let tower in towerTypes) {
           let towerEl = document.getElementById(tower);
-          let abilityButton = document.getElementById(tower + "Ability");
-          let ability = towerTypes[tower].ability;
+          let powerButton = document.getElementById(tower + "Power");
+          let power = towerTypes[tower].power;
           towerEl.onmouseover = () => document.getElementById("towerDesc").innerText = `${towerTypes[tower].name} · $${towerTypes[tower].price} · ${towerTypes[tower].description}`;
           towerEl.onmouseout = () => document.getElementById("towerDesc").innerText = null;
-          abilityButton.style.color = towerTypes[tower].color;
-          abilityButton.onmouseover = () => document.getElementById("towerDesc").innerText = ability.description;
-          abilityButton.onmouseout = () => document.getElementById("towerDesc").innerText = null;
-          abilityButton.onclick = () => {
-            if (ability.bought && !ability.cooldown && towers.find(owned => owned?.name == towerTypes[tower].name) && difficulty == "normal") {
-              ability.use();
-              ability.cooldown = 3000;
-              ability.used = true;
-              if (Object.values(towerTypes).every(tower => tower.ability.used)) gameAchievements[3] = 1;
+          powerButton.style.color = towerTypes[tower].color;
+          powerButton.onmouseover = () => document.getElementById("towerDesc").innerText = power.description;
+          powerButton.onmouseout = () => document.getElementById("towerDesc").innerText = null;
+          powerButton.onclick = () => {
+            if (power.bought && !power.cooldown && towers.find(owned => owned?.name == towerTypes[tower].name) && difficulty == "normal") {
+              power.use();
+              power.cooldown = 3000;
+              power.used = true;
+              if (Object.values(towerTypes).every(tower => tower.power.used)) gameAchievements[3] = 1;
             }
           };
         }

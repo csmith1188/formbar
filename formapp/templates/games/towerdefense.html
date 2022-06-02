@@ -137,7 +137,6 @@
     #normal, #hard {
       padding: 0.25% 1%;
       margin: 0 0.5%;
-      background: transparent;
       border: 1px solid;
       border-radius: 9999px;
       font-size: calc(inherit x 0.75);
@@ -162,10 +161,6 @@
       background: var(--light-orange);
       border-color: var(--light-orange);
       color: var(--bg-dark);
-    }
-
-    #normal:not(.pressed):hover, #hard:not(.pressed):hover {
-      background: var(--bg-dark);
     }
 
     #startButton {
@@ -1780,7 +1775,10 @@
         for (let tower in towerTypes) {
           let towerEl = document.getElementById(tower);
 
-          if (towerTypes[tower].power.cooldown) towerTypes[tower].power.cooldown--;
+          if (towerTypes[tower].power.cooldown) {
+            towerTypes[tower].power.cooldown--;
+            if (!towerTypes[tower].power.cooldown) sound.playSFX("powerReady");
+          }
 
           if (player.money >= towerTypes[tower].price) {
             towerEl.classList.remove("unselectable");

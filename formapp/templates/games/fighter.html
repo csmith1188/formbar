@@ -720,6 +720,8 @@
 {% endblock %}
 {% block script %}
   <script>
+    //Comments beginning with "TO DO" indicate parts of the code that need to be worked on.
+
     {
       let red = {
         color: "red",
@@ -1132,8 +1134,6 @@
       }
 
       function sendMessage(content, recipient = opponent.name) {
-        /*//for testing
-        console.log(content); ///et*/
         let messageObj = {
           type: "message",
           to: recipient,
@@ -1164,9 +1164,6 @@
 
         console.log("Move sent:");
         console.log(sendObj);
-
-        /*//for testing
-        receiveMove(moveObj); ///et*/
       }
 
       chatSocket.on("fighter", message => {
@@ -1273,8 +1270,6 @@
         request.send(null);
         let res = JSON.parse(request.responseText);
         match = res[code];
-        /*//for testing
-        match = {creator: me.name}; ///et*/
         if (!match) {
           alert("Match does not exist.");
         } else if (match.opponent) {
@@ -1301,10 +1296,12 @@
       }
 
       function rematch() {
-        me.team = 1;
-        ////get match
+        //The code for rematches needs to be redone
+
+        /*me.team = 1;
+        //get match
         opponent.name = match.creator;
-        fighterOptions();
+        fighterOptions();*/
       }
 
       function createMatch() {
@@ -1314,6 +1311,7 @@
         me.fighters = [fighter1a, fighter1b];
         me.firstMove = !pickRandom(2); //Decide which player goes first
 
+        //TO DO: This doesn't work. You may be able to use Flask-SocketIO to see when someone disconnects.
         window.onunload = () => {
           request.open("POST", "/removefightermatch?code=" + matchCode);
           request.send();
@@ -1327,7 +1325,6 @@
         document.getElementById("chooseFighters").classList.remove("hidden");
 
         lockedColors.forEach((color) => {
-          /*//for testing ///et*/
           if ((color.unlockWins && me.wins >= color.unlockWins) || (color.color == "gold" && me.goldUnlocked)) { //If player has enough wins to unlock or already unlocked
             colors.push(color);
             lockedColors = lockedColors.filter(locked => locked != color);
@@ -1557,20 +1554,6 @@
           }
         });
 
-        /*//for testing
-        let of1 = colors[pickRandom(7)];
-        let of2;
-        do {of2 = colors[pickRandom(7)]} while (of2 == of1);
-        for (let property in of1) {
-          if (typeof of1[property] == "object") fighter2a[property] = JSON.parse(JSON.stringify(of1[property])); //Perform a "deep copy" so object can be modified without changing original
-          else fighter2a[property] = of1[property];
-        }
-        for (let property in of2) {
-          if (typeof of2[property] == "object") fighter2b[property] = JSON.parse(JSON.stringify(of2[property])); //Perform a "deep copy" so object can be modified without changing original
-          else fighter2b[property] = of2[property];
-        }
-        ///et*/
-
         while (me.items.length < 3) {
           let random = pickRandom(itemsArr.length);
           me.items.push(itemsArr[random]);
@@ -1614,20 +1597,6 @@
 
         let randomTip = pickRandom(tips.length);
         document.getElementById("tip").innerText = tips[randomTip];
-
-        /*//for testing
-        receivePlayerReady({
-          name: "Player 2",
-          team: 2,
-          fighters: [fighter2a, fighter2b],
-          defeated: [],
-          items: ["heal", "attackBoost", "fastTimer"],
-          effects: {},
-          wins: 0,
-          losses: 0,
-          winStreak: 0,
-        });
-        ///et*/
       }
 
       function receivePlayerReady(player) {
@@ -1646,7 +1615,6 @@
         fighters = [fighter1a, fighter1b, fighter2a, fighter2b];
         fighters.forEach(fighter => fighter.el = document.getElementById("fighter" + fighter.name));
 
-        ////!get ready at same time
         if (me.rematch) window.location = "/games/fighter?match=" + matchCode; //Join match if you are player 2 and waiting for rematch
         startMatch();
       }
@@ -1672,6 +1640,7 @@
         updateStats();
 
         //Add a loss and reset win streak if player leaves during match
+        //TO DO: This doesn't work. You may be able to use Flask-SocketIO to see when someone disconnects.
         window.onunload = () => {
           let request1 = new XMLHttpRequest();
           request1.open("POST", "/updateuser?field=fighterLosses&value=" + me.losses + 1);
@@ -1681,7 +1650,6 @@
           request2.open("POST", "/updateuser?field=fighterWinStreak&value=0");
           request2.send();
 
-          /*
           if (!matchOver) {
             sendMove({
               move: "disconnect",
@@ -1689,7 +1657,6 @@
             });
           }
           sendMessage(me.name + " left the match.");
-          */
         };
 
         players = [player1, player2];
@@ -1750,11 +1717,6 @@
         active == me ? inactive = opponent : inactive = me;
 
         console.log(`${active.name}'s turn started at ${Date.now()}`);
-
-        /*//for testing
-        me = active;
-        opponent = inactive;
-        ///et*/
 
         let activeNameEl = document.getElementById("p" + active.team + "-name");
         activeNameEl.style.color = "var(--light-red)";
@@ -1900,14 +1862,12 @@
                   color: fighter.color,
                   move: moveObj.name
                 };
-                ////!
                 for (let move in opponent.moves) {
                   let moveObj = fighter.moves[move];
                   moveObj.el.classList.remove("enabled");
                   moveObj.el.onclick = null;
                 }
                 clickFunction();
-                ////! click copymove while selecting
                 event.stopPropagation();
               }
               else moveObj.el.onclick = () => clickFunction();
@@ -2321,14 +2281,6 @@
             slot: slot
           }
         });
-
-        /*//for testing
-        receiveItem({
-          item: item,
-          target: target,
-          slot: slot
-        });
-        ///et*/
       }
 
       function removeItemtargets() {
@@ -2489,7 +2441,7 @@
             document.getElementById(target.name + "-" + effectProperty).classList.add("hidden");
             allEffectsEl.classList.remove("hidden");
             //List all effects in title
-            allEffectsEl.title += effects[effectProperty].name; ////!correct order
+            allEffectsEl.title += effects[effectProperty].name;
             if (--i) allEffectsEl.title += ", ";
           }
           allEffectsEl.innerText = Object.keys(target.effects).length; //Display the total number of effects
@@ -2573,7 +2525,6 @@
         document.getElementById("matchOver").classList.remove("hidden");
 
         window.onbeforeunload = null;
-        window.onunload = null;
 
         document.getElementById("p1-name").style.color = "white";
         document.getElementById("p2-name").style.color = "white";
@@ -2599,15 +2550,17 @@
         }
         updateStats();
 
-        let request2 = new XMLHttpRequest();
-        request2.open("POST", "/removefightermatch?code=" + matchCode);
-        request2.send();
+        if (me.team == 1) {
+          let request2 = new XMLHttpRequest();
+          request2.open("POST", "/removefightermatch?code=" + matchCode);
+          request2.send();
+        }
       }
 
       function rematchButton() {
-        ////
         alert("This feature is not available yet.");
         return;
+        //TO DO: If both players press this button, start a new match
         let el = document.getElementById("rematchButton");
         el.classList.add("pressed");
         el.onclick = null;
@@ -2622,24 +2575,6 @@
         }));
         sendMessage(me.name + " wants to rematch.");
       }
-
-      function opponentDisconnected() { ////!
-        if (opponent.fighters) { //If in match
-          sendMessage(opponent.name + " disconnected.");
-          document.getElementById("rematchButton").classList.add("unselectable");
-          if (!matchOver) {
-            matchOver = true;
-            endMatch(me);
-          }
-        } else if (me.team == 1 && !rematchCode) { //If waiting for player
-          document.getElementById("opponentStatus").innerText = "Waiting for opponent…"
-        } else { //If joining player
-          alert(opponent.name + " disconnected.");
-          window.location = "/games/fighter";
-        }
-      }
-
-      ////delete own matches on disconnect
     }
   </script>
 {% endblock %}

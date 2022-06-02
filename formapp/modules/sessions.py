@@ -4,6 +4,8 @@ class Session():
         self.ip = ip
         self.studentDict = {}
         self.mainPage = '/home'
+        self.pollType = None
+        self.pollID = 1
         self.bgm = {
             'nowplaying': '',
             'lastTime': 0,
@@ -15,6 +17,7 @@ class Session():
         self.ttt = []
         self.fighter = {}
         self.settings = {
+            #If you change the default values here, you'll need to update the database too
             'perms': {
                 'admin' : 0,
                 'users' : 1,
@@ -79,3 +82,9 @@ class Student():
 class TTTGame():
     def __init__(self, players):
         self.players = players
+        self.turn = 1
+        self.gameboard = [
+            [None, None, None],
+            [None, None, None],
+            [None, None, None]
+        ]

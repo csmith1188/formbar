@@ -111,6 +111,40 @@
       font-size: 18px;
     }
 
+    #findMatches {
+      right: 8px;
+      top: 8px;
+      width: 36px;
+      height: 36px;
+      padding: 4px;
+      font-size: 20px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #findMatches:hover {
+      background: var(--bg-dark-highlight);
+    }
+
+    #matches {
+      width: calc(100% - 64px);
+      display: grid;
+      grid-template-columns: repeat(2, calc(50% - 2px));
+      gap: 4px;
+      margin-top: 8px;
+      text-align: left;
+    }
+
+    .match {
+      position: static;
+      padding: 8px;
+      cursor: pointer;
+    }
+
+    .match:not(.pressed):hover {
+      background: var(--bg-dark-highlight);
+    }
+
     .targetOption:hover {
       cursor: pointer;
       filter: drop-shadow(0 0 6px white);
@@ -281,8 +315,8 @@
       filter: brightness(75%);
     }
 
-    #joinMatch, #createMatch {
-      width: 450px;
+    #findMatch, #enterCode, #createMatch {
+      width: 400px;
       height: 300px;
       padding: 32px;
       border: 1px solid var(--light-green);
@@ -391,7 +425,7 @@
       cursor: pointer;
     }
 
-    #gameContainer {
+    #playerInfo, #gameContainer {
       top: 0;
       left: 0;
       width: 80%;
@@ -550,15 +584,23 @@
 
     <h1 id="title" class="hCentered" style="top: 128px;">Turn-Based Fighter</h1>
 
-    <div id="joinMatch" class="vCentered" style="left: calc(50% - 482px);">
-      <h2>Join match</h2>
+    <div id="findMatch" class="vCentered" style="left: calc(50% - 632px);">
+      <div id="findMatches" title="Search again">⟳</div>
+      <h2>Find a match</h2>
+      <div id="matches"></div>
+      <button id="joinSelectedButton" class="hCentered unselectable" style="bottom: 32px;">Go</button>
+    </div>
+
+    <div id="enterCode" class="centered">
+      <h2>Enter a match code</h2>
       <input type="text" id="joinCode" class="box centered" placeholder="Six-digit code" maxlength="6" autocomplete="off"></input>
       <button id="joinButton" class="hCentered unselectable" style="bottom: 32px;">Go</button>
     </div>
 
-    <div id="createMatch" class="vCentered" style="right: calc(50% - 482px);">
-      <h2>Create match</h2>
-      <div class="centered"><input type="checkbox" id="chatCheckbox" checked><label for="chatCheckbox">Send a link in the chat</label></div>
+    <div id="createMatch" class="vCentered" style="right: calc(50% - 632px);">
+      <h2>Create a match</h2>
+      <div class="centered"><input type="checkbox" id="chatCheckbox" checked>
+        <label for="chatCheckbox">Make the match public and send a link in the chat</label></div>
       <button id="createMatchButton" class="hCentered" style="bottom: 32px;">Go</button>
     </div>
 
@@ -613,25 +655,27 @@
 
   <h1 id="starting" class="centered hidden">Starting match…</h1>
 
+  <div id="playerInfo" class="hidden">
+    <div>
+      <h2 id="p1-name"></h2>
+      Total wins: <span id="p1-wins"></span><br>
+      Win rate: <span id="p1-percent"></span><br>
+      Win streak: <span id="p1-streak"></span>
+    </div>
+
+    <div style="top: 8px; right: 8px; text-align: right;">
+      <h2 id="p2-name"></h2>
+      Total wins: <span id="p2-wins"></span><br>
+      Win rate: <span id="p2-percent"></span><br>
+      Win streak: <span id="p2-streak"></span>
+    </div>
+  </div>
+
   <div id="gameContainer" class="hidden">
     <div id="game">
-      <div>
-        <h2 id="p1-name"></h2>
-        Total wins: <span id="p1-wins"></span><br>
-        Win rate: <span id="p1-percent"></span><br>
-        Win streak: <span id="p1-streak"></span>
-      </div>
-
       <div class="hCentered">
         <h2 id="turn"></h2>
         <span id="timer"></span>
-      </div>
-
-      <div style="top: 8px; right: 8px; text-align: right;">
-        <h2 id="p2-name"></h2>
-        Total wins: <span id="p2-wins"></span><br>
-        Win rate: <span id="p2-percent"></span><br>
-        Win streak: <span id="p2-streak"></span>
       </div>
 
       <div id="p1-items" class="items vertical vCentered" style="left: 32px;">
@@ -676,6 +720,8 @@
 {% endblock %}
 {% block script %}
   <script>
+    //Comments beginning with "TO DO" indicate parts of the code that need to be worked on.
+
     {
       let red = {
         color: "red",
@@ -1013,6 +1059,7 @@
         wins: {{ wins }},
         losses: {{ losses }},
         winStreak: {{ winStreak }},
+        goldUnlocked: {{ goldUnlocked }}
       };
 
       let colors = [red, yellow, green, blue];
@@ -1053,7 +1100,7 @@
         return Math.floor(Math.random() * max);
       }
 
-      document.getElementById("resetStats").onclick = resetStats;
+      document.getElementById("resetStats").onclick = () => window.location = "/games/fighter?action=resetStats";
       document.getElementById("createMatchButton").onclick = createMatch;
       document.getElementById("backToHome").onclick = backToHome;
       document.getElementById("randomButton").onclick = randomFighters;
@@ -1070,11 +1117,6 @@
         return teammate[0]; //Return only item of new array
       }
 
-      window.onunload = () => {
-        request.open("POST", "/removefightermatch?code=" + matchCode);
-        request.send();
-      }
-
       function sendPlayerReady() {
         let sendObj = {
           to: opponent.name,
@@ -1087,13 +1129,11 @@
         }
         chatSocket.emit("fighter", JSON.stringify(sendObj));
 
-        console.log("Player sent:");
+        console.log("Player info sent:");
         console.log(sendObj);
       }
 
       function sendMessage(content, recipient = opponent.name) {
-        /*//for testing
-        console.log(content); ///et*/
         let messageObj = {
           type: "message",
           to: recipient,
@@ -1124,9 +1164,6 @@
 
         console.log("Move sent:");
         console.log(sendObj);
-
-        /*//for testing
-        receiveMove(moveObj); ///et*/
       }
 
       chatSocket.on("fighter", message => {
@@ -1140,6 +1177,33 @@
         }
       });
 
+      function findMatches() {
+        document.getElementById("matches").innerHTML = null;
+        document.getElementById("joinSelectedButton").classList.add("unselectable");
+        document.getElementById("joinSelectedButton").onclick = null;
+        request.open("GET", '/api/fightermatches', false);
+        request.send(null);
+        let res = JSON.parse(request.responseText);
+        let matches = Object.keys(res).sort(() => Math.random() - 0.5) //Randomize
+        matches = matches.filter(match => res[match].public == "true" && !res[match].opponent && res[match].creator != me.name).slice(0, 6); //Get available matches and keep first 6
+        if (!matches.length) document.getElementById("findMatch").innerHTML += `<h3 class="centered">No matches found</h3>`;
+        matches.forEach(match => {
+          let matchEl = document.createElement("div");
+          matchEl.id = "match" + match;
+          matchEl.classList.add("match");
+          matchEl.innerHTML = `<b>${res[match].creator}</b> <span style="filter: opacity(75%);">${match}</span>`;
+          matchEl.onclick = function() {
+            Array.from(document.querySelectorAll(".match")).forEach(el => el.classList.remove("pressed")); //Deselect all matches
+            this.classList.add("pressed");
+            document.getElementById("joinSelectedButton").classList.remove("unselectable");
+            document.getElementById("joinSelectedButton").onclick = () => joinMatch(match);
+          };
+          document.getElementById("matches").append(matchEl);
+        });
+      }
+      findMatches();
+      document.getElementById("findMatches").onclick = findMatches;
+
       document.getElementById("joinCode").oninput = function() {
         for (let char of this.value) if (/\D/.test(char)) this.value = this.value.replace(char, ""); //Only allow numbers
         if (this.value.length == 6) {
@@ -1150,7 +1214,6 @@
           document.getElementById("joinButton").onclick = null;
         }
       };
-
 
       function updateStats() {
         if (opponent.name) { //Do this if in a match
@@ -1191,24 +1254,22 @@
         }
       }
 
-      function resetStats() {
-        if (confirm("Are you sure?")) {
-          me.wins = 0;
-          me.losses = 0;
-          me.winStreak = 0;
-          request.open("POST", "/updateuser?field=goldUnlocked&value=0");
-          request.send();
-          updateStats();
-        }
+      if ("{{ action }}" == "resetStats" && "{{ authenticated }}" == "True") {
+        me.wins = 0;
+        me.losses = 0;
+        me.winStreak = 0;
+        me.goldUnlocked = 0;
+        request.open("POST", "/updateuser?field=goldUnlocked&value=0");
+        request.send();
+        updateStats();
+        window.location = "/games/fighter";
       }
 
       function joinMatch(code) {
         request.open("GET", '/api/fightermatches', false);
         request.send(null);
         let res = JSON.parse(request.responseText);
-        match = res["match" + code];
-        /*//for testing
-        match = {creator: me.name}; ///et*/
+        match = res[code];
         if (!match) {
           alert("Match does not exist.");
         } else if (match.opponent) {
@@ -1235,10 +1296,12 @@
       }
 
       function rematch() {
-        me.team = 1;
-        ////get match
+        //The code for rematches needs to be redone
+
+        /*me.team = 1;
+        //get match
         opponent.name = match.creator;
-        fighterOptions();
+        fighterOptions();*/
       }
 
       function createMatch() {
@@ -1247,6 +1310,13 @@
         me.team = 1;
         me.fighters = [fighter1a, fighter1b];
         me.firstMove = !pickRandom(2); //Decide which player goes first
+
+        //TO DO: This doesn't work. You may be able to use Flask-SocketIO to see when someone disconnects.
+        window.onunload = () => {
+          request.open("POST", "/removefightermatch?code=" + matchCode);
+          request.send();
+        }
+
         fighterOptions();
       }
 
@@ -1255,8 +1325,7 @@
         document.getElementById("chooseFighters").classList.remove("hidden");
 
         lockedColors.forEach((color) => {
-          /*//for testing ///et*/
-          if ((color.unlockWins && me.wins >= color.unlockWins) || (color.color == "gold" && {{ goldUnlocked }})) { //If player has enough wins to unlock or already unlocked
+          if ((color.unlockWins && me.wins >= color.unlockWins) || (color.color == "gold" && me.goldUnlocked)) { //If player has enough wins to unlock or already unlocked
             colors.push(color);
             lockedColors = lockedColors.filter(locked => locked != color);
           } else {
@@ -1485,20 +1554,6 @@
           }
         });
 
-        /*//for testing
-        let of1 = colors[pickRandom(7)];
-        let of2;
-        do {of2 = colors[pickRandom(7)]} while (of2 == of1);
-        for (let property in of1) {
-          if (typeof of1[property] == "object") fighter2a[property] = JSON.parse(JSON.stringify(of1[property])); //Perform a "deep copy" so object can be modified without changing original
-          else fighter2a[property] = of1[property];
-        }
-        for (let property in of2) {
-          if (typeof of2[property] == "object") fighter2b[property] = JSON.parse(JSON.stringify(of2[property])); //Perform a "deep copy" so object can be modified without changing original
-          else fighter2b[property] = of2[property];
-        }
-        ///et*/
-
         while (me.items.length < 3) {
           let random = pickRandom(itemsArr.length);
           me.items.push(itemsArr[random]);
@@ -1516,19 +1571,22 @@
 
         document.getElementById("matchCode").innerText = matchCode;
 
-        if (document.getElementById("chatCheckbox").checked) {
+        let public = document.getElementById("chatCheckbox").checked;
+
+        if (public) {
           let message = `${me.name} is looking for a Fighter opponent. <button class="inline popOut" onclick="window.open('/games/fighter?match=${matchCode}');">Join match</button>`;
           sendMessage(message, "all");
         }
 
         if (rematchCode) sendPlayerReady();
 
-        request.open("POST", "/createfightermatch?code=" + matchCode + "&name=" + me.name);
+        request.open("POST", `/createfightermatch?code=${matchCode}&name=${me.name}&public=${public}`);
         request.send();
 
         let tips = [
           "While in a match, look at the bottom of the screen for instructions.",
           "Pay attention to the game chat; it contains useful information.",
+          "If you leave an item slot empty, you will get a random item.",
           "Using an item won't end your turn.",
           "You can't use items while charging an attack.",
           "You can hover over items and effects for more information.",
@@ -1539,20 +1597,6 @@
 
         let randomTip = pickRandom(tips.length);
         document.getElementById("tip").innerText = tips[randomTip];
-
-        /*//for testing
-        receivePlayerReady({
-          name: "Player 2",
-          team: 2,
-          fighters: [fighter2a, fighter2b],
-          defeated: [],
-          items: ["heal", "attackBoost", "fastTimer"],
-          effects: {},
-          wins: 0,
-          losses: 0,
-          winStreak: 0,
-        });
-        ///et*/
       }
 
       function receivePlayerReady(player) {
@@ -1571,7 +1615,6 @@
         fighters = [fighter1a, fighter1b, fighter2a, fighter2b];
         fighters.forEach(fighter => fighter.el = document.getElementById("fighter" + fighter.name));
 
-        ////!get ready at same time
         if (me.rematch) window.location = "/games/fighter?match=" + matchCode; //Join match if you are player 2 and waiting for rematch
         startMatch();
       }
@@ -1581,6 +1624,7 @@
         document.getElementById("starting").classList.add("hidden");
         document.getElementById("border").classList.add("hidden");
         document.getElementById("gameContainer").classList.remove("hidden");
+        document.getElementById("playerInfo").classList.remove("hidden");
         document.getElementById("gameChat").classList.remove("hidden");
 
         window.onbeforeunload = () => true; //Show warning before leaving page
@@ -1596,6 +1640,7 @@
         updateStats();
 
         //Add a loss and reset win streak if player leaves during match
+        //TO DO: This doesn't work. You may be able to use Flask-SocketIO to see when someone disconnects.
         window.onunload = () => {
           let request1 = new XMLHttpRequest();
           request1.open("POST", "/updateuser?field=fighterLosses&value=" + me.losses + 1);
@@ -1604,6 +1649,14 @@
           let request2 = new XMLHttpRequest();
           request2.open("POST", "/updateuser?field=fighterWinStreak&value=0");
           request2.send();
+
+          if (!matchOver) {
+            sendMove({
+              move: "disconnect",
+              winner: opponent
+            });
+          }
+          sendMessage(me.name + " left the match.");
         };
 
         players = [player1, player2];
@@ -1659,17 +1712,11 @@
       }
 
       function startTurn() {
-
         if (matchOver) return;
 
         active == me ? inactive = opponent : inactive = me;
 
         console.log(`${active.name}'s turn started at ${Date.now()}`);
-
-        /*//for testing
-        me = active;
-        opponent = inactive;
-        ///et*/
 
         let activeNameEl = document.getElementById("p" + active.team + "-name");
         activeNameEl.style.color = "var(--light-red)";
@@ -1706,6 +1753,11 @@
           }
         });
 
+        if (active.effects.noItems) {
+          let containerEl = document.getElementById("p" + active.team + "-items");
+          containerEl.classList.add("unselectable");
+        }
+
         if (active == me) {
           if (me.effects.skipTurn) {
             sendMove({});
@@ -1731,10 +1783,7 @@
               return;
             }
           }
-          if (me.effects.noItems) {
-            let containerEl = document.getElementById("p" + me.team + "-items");
-            containerEl.classList.add("unselectable");
-          } else {
+          if (!me.effects.noItems) {
             let containerEl = document.getElementById("p" + me.team + "-items");
             containerEl.classList.remove("unselectable");
             me.items.forEach((item, i) => { //Enable items
@@ -1813,14 +1862,12 @@
                   color: fighter.color,
                   move: moveObj.name
                 };
-                ////!
                 for (let move in opponent.moves) {
                   let moveObj = fighter.moves[move];
                   moveObj.el.classList.remove("enabled");
                   moveObj.el.onclick = null;
                 }
                 clickFunction();
-                ////! click copymove while selecting
                 event.stopPropagation();
               }
               else moveObj.el.onclick = () => clickFunction();
@@ -2017,6 +2064,12 @@
         if (data.move == "give up") {
           matchOver = true;
           endMatch(data.winner);
+        }
+
+        if (data.move == "disconnect") {
+          matchOver = true;
+          endMatch(data.winner);
+          document.getElementById("rematchButton").classList.add("unselectable");
         }
 
         else if (data.move) {
@@ -2228,14 +2281,6 @@
             slot: slot
           }
         });
-
-        /*//for testing
-        receiveItem({
-          item: item,
-          target: target,
-          slot: slot
-        });
-        ///et*/
       }
 
       function removeItemtargets() {
@@ -2278,7 +2323,6 @@
       }
 
       function disableFightersAndItems() {
-        //Disable moves and items
         fighters.forEach(fighter => {
           for (let move in fighter.moves) {
             let moveObj = fighter.moves[move];
@@ -2297,9 +2341,13 @@
 
       function damage(target, amount) {
         let changeEl = document.getElementById(target.name + "-HPNumChange");
-        changeEl.style.color = "var(--color-red)";
-        changeEl.innerText = "−" + amount;
-        changeEl.classList.add("showHPChange");
+        try {
+          changeEl.style.color = "var(--color-red)";
+          changeEl.innerText = "−" + amount;
+          changeEl.classList.add("showHPChange");
+        } catch {
+          console.error(`ERROR: Can't find element with id "${target.name + "-HPNumChange"}"`);
+        }
         function decreaseHP() {
           setTimeout(() => {
             try {
@@ -2318,13 +2366,21 @@
 
       function heal(target, amount) {
         let changeEl = document.getElementById(target.name + "-HPNumChange");
-        changeEl.style.color = "var(--color-green)";
-        changeEl.innerText = "+" + amount;
-        changeEl.classList.add("showHPChange");
+        try {
+          changeEl.style.color = "var(--color-green)";
+          changeEl.innerText = "+" + amount;
+          changeEl.classList.add("showHPChange");
+        } catch {
+          console.error(`ERROR: Can't find element with id "${target.name + "-HPNumChange"}"`);
+        }
         function increaseHP() {
           setTimeout(() => {
             if (target.hp < 100) {
-              document.getElementById(target.name + "-HPNum").innerText = ++target.hp;
+              try {
+                document.getElementById(target.name + "-HPNum").innerText = ++target.hp;
+              } catch {
+                console.error(`ERROR: Can't find element with id "${target.name + "-HPNum"}"`);
+              }
               fillHPBar(target, document.getElementById(target.name + "-HPBar"));
               if (--amount) increaseHP(); //Repeat this function until amount is 0
             }
@@ -2337,7 +2393,7 @@
       function defeat(target) {
         for (let effect in target.effects) removeEffect(effect, target);
         let targetTeammate = getTeammate(target);
-        if (targetTeammate?.color == "yellow") unselectable(targetTeammate.moves.other); ////!doesn't always work
+        if (targetTeammate?.color == "yellow") unselectable(targetTeammate.moves.other);
         fighters.splice(fighters.indexOf(target), 1);
         defeated.push(target);
         if (target.team == me.team) {
@@ -2385,7 +2441,7 @@
             document.getElementById(target.name + "-" + effectProperty).classList.add("hidden");
             allEffectsEl.classList.remove("hidden");
             //List all effects in title
-            allEffectsEl.title += effects[effectProperty].name; ////!correct order
+            allEffectsEl.title += effects[effectProperty].name;
             if (--i) allEffectsEl.title += ", ";
           }
           allEffectsEl.innerText = Object.keys(target.effects).length; //Display the total number of effects
@@ -2469,7 +2525,9 @@
         document.getElementById("matchOver").classList.remove("hidden");
 
         window.onbeforeunload = null;
-        window.onunload = null;
+
+        document.getElementById("p1-name").style.color = "white";
+        document.getElementById("p2-name").style.color = "white";
 
         winner = (me.team == winner.team) ? me : opponent;
 
@@ -2492,15 +2550,17 @@
         }
         updateStats();
 
-        let request2 = new XMLHttpRequest();
-        request2.open("POST", "/removefightermatch?code=" + matchCode);
-        request2.send();
+        if (me.team == 1) {
+          let request2 = new XMLHttpRequest();
+          request2.open("POST", "/removefightermatch?code=" + matchCode);
+          request2.send();
+        }
       }
 
       function rematchButton() {
-        ////
         alert("This feature is not available yet.");
         return;
+        //TO DO: If both players press this button, start a new match
         let el = document.getElementById("rematchButton");
         el.classList.add("pressed");
         el.onclick = null;
@@ -2515,199 +2575,6 @@
         }));
         sendMessage(me.name + " wants to rematch.");
       }
-
-      function opponentDisconnected() { ////!
-        if (opponent.fighters) { //If in match
-          sendMessage(opponent.name + " disconnected.");
-          document.getElementById("rematchButton").classList.add("unselectable");
-          if (!matchOver) {
-            matchOver = true;
-            endMatch(me);
-          }
-        } else if (me.team == 1 && !rematchCode) { //If waiting for player
-          document.getElementById("opponentStatus").innerText = "Waiting for opponent…"
-        } else { //If joining player
-          alert(opponent.name + " disconnected.");
-          window.location = "/games/fighter";
-        }
-      }
-
-      ////delete own matches on disconnect
     }
-
-    let testPlayer = {
-    name: "Oley456",
-    defeated: [],
-    colors: [
-        {
-            color: "red",
-            effective: "yellow",
-            weak: "blue",
-            moves: {
-                main: {
-                    damage: 14,
-                    doubleTarget: true,
-                    description: "Deals [damage] damage to both opponent fighters.",
-                    name: "main attack",
-                    id: "main",
-                    charged: 0
-                },
-                special: {
-                    charge: 1,
-                    minDamage: 45,
-                    maxDamage: 65,
-                    description: "Deals at least [minDamage] and up to [maxDamage] damage.",
-                    name: "special attack",
-                    id: "special",
-                    charged: 0
-                },
-                other: {
-                    type: "revenge",
-                    revengeDuration: 2,
-                    selfTarget: true,
-                    description: "Opponents will take 50% of the damage they inflict on this fighter. Lasts for 2 turns.",
-                    name: "other move",
-                    id: "other",
-                    charged: 0
-                }
-            },
-            hp: 100,
-            attackFactor: 1,
-            effects: {}
-        },
-        {
-            color: "yellow",
-            effective: "green",
-            weak: "red",
-            moves: {
-                main: {
-                    damage: 20,
-                    critDamage: 40,
-                    critChance: 10,
-                    description: "Deals [damage] damage. 10% chance of a critical hit, which deals [critDamage] damage.",
-                    name: "main attack",
-                    id: "main",
-                    charged: 0
-                },
-                alt: {
-                    damage: 7,
-                    doubleTarget: true,
-                    healing: true,
-                    description: "Deals [damage] damage to both opponent fighters. Dealt damage is added to this fighter's HP.",
-                    name: "alt attack",
-                    id: "alt",
-                    charged: 0
-                },
-                other: {
-                    type: "sacrifice",
-                    selfTarget: true,
-                    description: "Sacrifice this fighter. Teammate's attack power increases by 1% for each remaining HP.",
-                    name: "other move",
-                    id: "other",
-                    charged: 0
-                }
-            },
-            hp: 100,
-            attackFactor: 1,
-            effects: {}
-        }
-    ],
-    items: [
-        "attackBoost",
-        "fastTimer",
-        "cleanse"
-    ],
-    effects: {},
-    wins: 0,
-    losses: 0,
-    winStreak: 0,
-    team: 2,
-    fighters: [
-        {
-            team: 2,
-            name: "2a",
-            color: "red",
-            effective: "yellow",
-            weak: "blue",
-            moves: {
-                main: {
-                    damage: 14,
-                    doubleTarget: true,
-                    description: "Deals [damage] damage to both opponent fighters.",
-                    name: "main attack",
-                    id: "main",
-                    charged: 0,
-                    el: {}
-                },
-                special: {
-                    charge: 1,
-                    minDamage: 45,
-                    maxDamage: 65,
-                    description: "Deals at least [minDamage] and up to [maxDamage] damage.",
-                    name: "special attack",
-                    id: "special",
-                    charged: 0,
-                    el: {}
-                },
-                other: {
-                    type: "revenge",
-                    revengeDuration: 2,
-                    selfTarget: true,
-                    description: "Opponents will take 50% of the damage they inflict on this fighter. Lasts for 2 turns.",
-                    name: "other move",
-                    id: "other",
-                    charged: 0,
-                    el: {}
-                }
-            },
-            hp: 100,
-            attackFactor: 1,
-            effects: {},
-            el: {}
-        },
-        {
-            team: 2,
-            name: "2b",
-            color: "yellow",
-            effective: "green",
-            weak: "red",
-            moves: {
-                main: {
-                    damage: 20,
-                    critDamage: 40,
-                    critChance: 10,
-                    description: "Deals [damage] damage. 10% chance of a critical hit, which deals [critDamage] damage.",
-                    name: "main attack",
-                    id: "main",
-                    charged: 0,
-                    el: {}
-                },
-                alt: {
-                    damage: 7,
-                    doubleTarget: true,
-                    healing: true,
-                    description: "Deals [damage] damage to both opponent fighters. Dealt damage is added to this fighter's HP.",
-                    name: "alt attack",
-                    id: "alt",
-                    charged: 0,
-                    el: {}
-                },
-                other: {
-                    type: "sacrifice",
-                    selfTarget: true,
-                    description: "Sacrifice this fighter. Teammate's attack power increases by 1% for each remaining HP.",
-                    name: "other move",
-                    id: "other",
-                    charged: 0,
-                    el: {}
-                }
-            },
-            hp: 100,
-            attackFactor: 1,
-            effects: {},
-            el: {}
-        }
-    ]
-}
   </script>
 {% endblock %}

@@ -201,20 +201,19 @@
         <button class="inline popOut" onclick="startPoll('text')">Essay</button><br>
         <span id="textLink" class="hidden">Click <a href="/advanced?page=users">here</a> to see essays</span>
       </div>
-      <button class="inline popOut" onclick="window.open('/advanced?page=settings');">All settings 🡆</button>
     </div>
     <br><br>
     <div>
       <h1>Help tickets</h1>
       <span id="ticketsText"></span><br>
-      <button class="inline popOut" onclick="window.open('/advanced?page=users');">All tickets 🡆</button>
     </div>
     <br><br>
     <div>
       <h1>Users</h1>
       <span id="usersText"></span><br>
-      <button class="inline popOut" onclick="window.open('/advanced?page=users');">All users 🡆</button>
     </div>
+    <br><br>
+    <button class="inline popOut" onclick="window.open('/advanced?page=controlpanel');">Go to the control panel 🡆</button>
   </div>
 
   <iframe src="/chat" id="chat" class="hidden"></iframe>
@@ -401,7 +400,6 @@
         newMessages++;
         document.title = `(${newMessages}) Formbar Quick Panel`;
         if (visibleSection != "chat") document.getElementById("newMessages").innerText = "(" + newMessages + ")";
-        }
       }
     });
 

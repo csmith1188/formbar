@@ -122,6 +122,28 @@ colorDict = {
         '56': (0, 192, 192),
         }
 
+#Set pollID based on the number of polls in the database
+db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+dbcmd = db.cursor()
+pollCount = dbcmd.execute("SELECT COUNT(*) FROM polls").fetchone()
+if pollCount:
+    sD.pollID = pollCount[0] + 1
+db.close()
+
+#Get settings from database
+db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+dbcmd = db.cursor()
+data = dbcmd.execute("SELECT * FROM settings").fetchone()
+db.close()
+sD.settings['perms']['say'] = data[0]
+sD.settings['perms']['games'] = data[1]
+sD.settings['perms']['bar'] = data[2]
+sD.settings['perms']['sfx'] = data[3]
+sD.settings['perms']['bgm'] = data[4]
+sD.settings['perms']['api'] = data[5]
+sD.settings['locked'] = data[6]
+sD.settings['blind'] = data[7]
+sD.settings['showinc'] = data[8]
 
 
 # ███████ ██    ██ ███    ██  ██████ ████████ ██  ██████  ███    ██ ███████
@@ -222,6 +244,7 @@ def newStudent(remote, username, bot=False):
                 else:
                     sD.studentDict[remote]['perms'] = int(user[3])
 
+        socket_.emit('alert', json.dumps(packMSG('all', 'server', sD.studentDict[request.remote_addr]['name'] + " logged in...")), namespace=chatnamespace)
         playSFX("sfx_up02")
 
 def flushUsers():
@@ -254,6 +277,7 @@ def refreshUsers(selectedStudent='', category=''):
 
 def changeMode(newMode='', direction='next'):
     clearString()
+    sD.pollType = None
     # Clear answers
     for student in sD.studentDict:
         sD.studentDict[student]['thumb'] = ''
@@ -290,6 +314,7 @@ def changeMode(newMode='', direction='next'):
     elif sD.settings['barmode'] == 'playtime':
         clearString()
         showString(sD.activePhrase)
+    socket_.emit('modeChanged', {'mode': sD.settings['barmode']}, namespace=apinamespace)
     return render_template("message.html", message = 'Changed mode to ' + (newMode or direction) + '.')
 
 #This function Allows you to choose and play whatever sound effect you want
@@ -800,7 +825,11 @@ def endpoint_root():
 
 @app.route('/2048')
 def endpoint_2048():
-    return redirect('/games/2048')
+    if request.args.get('advanced'):
+        advanced = '?advanced=true'
+    else:
+        advanced = ''
+    return redirect('/games/2048' + advanced)
 
 #  █████
 # ██   ██
@@ -828,6 +857,7 @@ def endpoint_abcd():
                         sD.studentDict[request.remote_addr]['letter'] = vote
                         playSFX("sfx_blip01")
                         abcdBar()
+                        socket_.emit('letter', {'name': sD.studentDict[request.remote_addr]['name'], 'letter': vote}, namespace=apinamespace)
                         return render_template("message.html", message = "Thank you for your tasty bytes... (" + vote + ")")
                     else:
                         return render_template("message.html", message = "You've already submitted an answer... (" + sD.studentDict[request.remote_addr]['letter'] + ")")
@@ -836,6 +866,7 @@ def endpoint_abcd():
                         sD.studentDict[request.remote_addr]['letter'] = ''
                         playSFX("sfx_hit01")
                         abcdBar()
+                        socket_.emit('letter', {'name': sD.studentDict[request.remote_addr]['name'], 'letter': ''}, namespace=apinamespace)
                         return render_template("message.html", message = "I won\'t mention it if you don\'t")
                     else:
                         return render_template("message.html", message = "You don't have an answer to erase.")
@@ -894,7 +925,11 @@ def endpoint_advanced():
 
 @app.route('/api')
 def endpoint_api():
-    return redirect('/debug')
+    if request.args.get('advanced'):
+        advanced = '?advanced=true'
+    else:
+        advanced = ''
+    return redirect('/debug' + advanced)
 
 @app.route('/api/bgm')
 def endpoint_api_bgm():
@@ -993,6 +1028,32 @@ def endpoint_api_quizname():
         else:
             return '{"error": "No quiz is currently loaded."}'
 
+@app.route('/api/polls')
+def endpoint_api_polls():
+    if not request.remote_addr in sD.studentDict:
+        return '{"error": "You are not logged in."}'
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
+        return '{"error": "Insufficient permissions."}'
+    else:
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        polls = dbcmd.execute("SELECT * FROM polls").fetchall()
+        db.close()
+        return json.dumps(polls)
+
+@app.route('/api/pollresponses')
+def endpoint_api_pollresponses():
+    if not request.remote_addr in sD.studentDict:
+        return '{"error": "You are not logged in."}'
+    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['api']:
+        return '{"error": "Insufficient permissions."}'
+    else:
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        responses = dbcmd.execute("SELECT * FROM responses").fetchall()
+        db.close()
+        return json.dumps(responses)
+
 #This endpoints shows the actions the students did EX:TUTD up
 @app.route('/api/students')
 def endpoint_api_students():
@@ -1048,36 +1109,36 @@ def endpoint_bgm():
                         startBGM(bgm_file, bgm_volume)
                     else:
                         startBGM(bgm_file)
-                    return render_template("message.html", message = 'Playing: ' + bgm_file, forward = '/bgm')
+                    return render_template("message.html", message = 'Playing: ' + bgm_file)
                 else:
                     if request.args.get('return') == 'json':
                         return '{error: "It has only been ' + str(int(time.time() - sD.bgm['lastTime'])) + ' seconds since the last song started. Please wait at least 60 seconds."}'
-                    return render_template("message.html", message = "It has only been " + str(int(time.time() - sD.bgm['lastTime'])) + " seconds since the last song started. Please wait at least 60 seconds.", forward = '/bgm')
+                    return render_template("message.html", message = "It has only been " + str(int(time.time() - sD.bgm['lastTime'])) + " seconds since the last song started. Please wait at least 60 seconds.")
             else:
-                return render_template("message.html", message = "Cannot find that filename!", forward = '/bgm')
+                return render_template("message.html", message = "Cannot find that filename!")
         elif request.args.get('voladj'):
             if request.args.get('voladj') == 'up':
                 volBGM('up')
-                return render_template("message.html", message = 'Music volume increased by one increment.', forward = '/bgm')
+                return render_template("message.html", message = 'Music volume increased by one increment.')
             elif request.args.get('voladj') == 'down':
                 volBGM('down')
-                return render_template("message.html", message = 'Music volume decreased by one increment.', forward = '/bgm')
+                return render_template("message.html", message = 'Music volume decreased by one increment.')
             else:
                 try:
                     bgm_volume = float(request.args.get('voladj'))
                     volBGM(bgm_volume)
-                    return render_template("message.html", message = 'Music volume set to ' + request.args.get('voladj') + '.', forward = '/bgm')
+                    return render_template("message.html", message = 'Music volume set to ' + request.args.get('voladj') + '.')
                 except:
-                    return render_template("message.html", message = 'Invalid voladj. Use \'up\', \'down\', or a number from 0.0 to 1.0.', forward = '/bgm')
+                    return render_template("message.html", message = 'Invalid voladj. Use \'up\', \'down\', or a number from 0.0 to 1.0.')
         elif request.args.get('playpause'):
             playpauseBGM()
             if sD.bgm['paused']:
-                return render_template("message.html", message = 'Music resumed.', forward = '/bgm')
+                return render_template("message.html", message = 'Music resumed.')
             else:
-                return render_template("message.html", message = 'Music paused.', forward = '/bgm')
+                return render_template("message.html", message = 'Music paused.')
         elif request.args.get('rewind'):
             rewindBGM()
-            return render_template("message.html", message = 'Music rewound.', forward = '/bgm')
+            return render_template("message.html", message = 'Music rewound.')
         else:
             resString = '<a href="/bgmstop">Stop Music</a>'
             resString += '<h2>Now playing: ' + sD.bgm['nowplaying'] + '</h2>'
@@ -1096,11 +1157,15 @@ def endpoint_bgm():
 def endpoint_bgmstop():
     sD.bgm['paused'] = False
     stopBGM()
-    return render_template("message.html", message = 'Stopped music...', forward = '/bgm')
+    return render_template("message.html", message = 'Stopped music...')
 
 @app.route('/bitshifter')
 def endpoint_bitshifter():
-    return redirect('/games/bitshifter')
+    if request.args.get('advanced'):
+        advanced = '?advanced=true'
+    else:
+        advanced = ''
+    return redirect('/games/bitshifter' + advanced)
 
 '''
     /break
@@ -1117,12 +1182,13 @@ def endpoint_break():
             if sD.studentDict[request.remote_addr]['perms'] == sD.settings['perms']['teacher']:
                 return render_template("message.html", message = "Teachers can't request bathroom breaks.")
             if sD.studentDict[request.remote_addr]['help']['type']:
-                return render_template("message.html", message = "You already have a help ticket or break request in.", forward = request.path)
+                return render_template("message.html", message = "You already have a help ticket or break request in.")
             else:
                 sD.studentDict[request.remote_addr]['help']['type'] = 'break'
                 sD.studentDict[request.remote_addr]['help']['time'] = time.time()
                 playSFX("sfx_pickup02")
-                return render_template("message.html", message = "Your request was sent. The teacher still needs to approve it.", forward = request.path)
+                socket_.emit('help', sD.studentDict[request.remote_addr]['help'], namespace=apinamespace)
+                return render_template("message.html", message = "Your request was sent. The teacher still needs to approve it.")
         elif request.args.get('action') == 'end':
             if name != sD.studentDict[request.remote_addr]['name'] and sD.studentDict[request.remote_addr]['perms'] != sD.settings['perms']['teacher']:
                 return render_template("message.html", message = "Only teachers can end other people's breaks.")
@@ -1137,7 +1203,7 @@ def endpoint_break():
                         return render_template("break.html", excluded = sD.studentDict[request.remote_addr]['excluded'], ticket = json.dumps(sD.studentDict[request.remote_addr]['help']))
                     else:
                         return render_template("message.html", message = "This student is not currently taking a bathroom break.")
-            return render_template("message.html", message = 'Student not found.', forward = request.path)
+            return render_template("message.html", message = 'Student not found.')
         else:
             if sD.studentDict[request.remote_addr]['perms'] == sD.settings['perms']['teacher']:
                 return render_template("message.html", message = "Teachers can't request bathroom breaks. To see students' tickets, go to /controlpanel.")
@@ -1233,7 +1299,7 @@ def endpoint_cleartable():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['teacher']:
-        return render_template("message.html", message = "You do not have high enough permissions to do this right now.", forward = '/controlpanel')
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
     table = request.args.get('table')
     if table:
         db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
@@ -1242,9 +1308,9 @@ def endpoint_cleartable():
         db.commit()
         db.close()
         playSFX("sfx_explode01")
-        return render_template("message.html", message = "Data in " + table + " deleted.", forward = '/controlpanel')
+        return render_template("message.html", message = "Data in " + table + " deleted.")
     else:
-        return render_template("message.html", message = "Missing table argument.", forward = '/controlpanel')
+        return render_template("message.html", message = "Missing table argument.")
 
 '''
     /color
@@ -1298,6 +1364,11 @@ def endpoint_controlpanel():
                     if arg in sD.settings:
                         sD.settings[arg] = argVal
                         resString += 'Set <i>' + arg + '</i> to: <i>' + str(argVal) + "</i>"
+                        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+                        dbcmd = db.cursor()
+                        dbcmd.execute("UPDATE settings SET " + arg + "=:value", {"value": argVal})
+                        db.commit()
+                        db.close()
                     else:
                         resString += 'There is no setting that takes \'true\' or \'false\' named: <i>' + arg + "</i>"
                 else:
@@ -1308,6 +1379,11 @@ def endpoint_controlpanel():
                                 resString += "Permission value out of range! "
                             else:
                                 sD.settings['perms'][arg] = argInt
+                                db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+                                dbcmd = db.cursor()
+                                dbcmd.execute("UPDATE settings SET " + arg + "Perm=:value", {"value": argInt})
+                                db.commit()
+                                db.close()
                     except:
                         pass
 
@@ -1330,11 +1406,11 @@ def endpoint_controlpanel():
             else:
                 resString += 'No setting called ' + sD.settings['barmode']
         if resString == '':
-            return render_template("controlpanel.html")
+            return render_template("controlpanel.html", data = json.dumps(sD.settings))
         else:
             playSFX("sfx_pickup01")
             resString += ""
-            return resString
+            return render_template("message.html", message = resString)
 
 
 @app.route('/countdown')
@@ -1353,7 +1429,7 @@ def endpoint_createaccount():
     userFound = dbcmd.execute("SELECT * FROM users WHERE username=:uname", {"uname": name}).fetchall()
     db.close()
     if userFound:
-        return render_template("message.html", message = 'There is already a user with that name.', forward = '/users')
+        return render_template("message.html", message = 'There is already a user with that name.')
     else:
         password = request.args.get('password')
         passwordCrypt = cipher.encrypt(password.encode())
@@ -1362,14 +1438,18 @@ def endpoint_createaccount():
         dbcmd.execute("INSERT INTO users (username, password, permissions, bot) VALUES (?, ?, ?, ?)", (name, passwordCrypt, sD.settings['perms']['anyone'], "False"))
         db.commit()
         db.close()
-        return render_template("message.html", message = 'Account created.', forward = '/users')
+        return render_template("message.html", message = 'Account created.')
 
 @app.route('/createfightermatch', methods = ['POST'])
 def endpoint_createfightermatch():
     code = request.args.get('code')
     name = request.args.get('name')
-    sD.fighter['match' + code] = {} #Create new object for match
-    sD.fighter['match' + code]['creator'] = name #Set "creator" of object to arg "name"
+    public = request.args.get('public')
+    if code in sD.fighter:
+        return render_template("message.html", message = 'A match with this code already exists.')
+    sD.fighter[code] = {} #Create new object for match
+    sD.fighter[code]['creator'] = name #Set "creator" of object to arg "name"
+    sD.fighter[code]['public'] = public
     return render_template("message.html", message = 'Match ' + code + ' created by ' + name + '.')
 
 # ██████
@@ -1406,6 +1486,30 @@ def endpoint_emptyblocks():
     return render_template("message.html", message = "Emptied blocks")
 '''
 
+#Start a poll
+@app.route('/endpoll')
+def endpoll():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['mod']:
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
+    else:
+        if not sD.pollType:
+            return render_template("message.html", message = 'There is no active poll right now.')
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        dbcmd.execute("INSERT INTO polls ('type', 'time') VALUES (?, ?)", (sD.pollType, int(time.time() * 1000)))
+        for user in sD.studentDict:
+            if sD.studentDict[user]['perms'] == sD.settings['perms']['student']:
+                response = sD.studentDict[user]['thumb'] or sD.studentDict[user]['letter'] or sD.studentDict[user]['essay']
+                response = response.replace('"', '\\"') #Escape quotes
+                dbcmd.execute("INSERT INTO responses ('poll', 'name', 'response') VALUES (?, ?, ?)", (sD.pollID, sD.studentDict[user]['name'], response))
+        db.commit()
+        db.close()
+        changeMode('poll')
+        repeatMode()
+        return render_template("message.html", message = 'Poll ended. Results saved.')
+
 '''
 /essay
 '''
@@ -1425,6 +1529,7 @@ def endpoint_essay():
                     playSFX("sfx_hit01")
                 sD.studentDict[request.remote_addr]['essay'] = essay
                 textBar()
+                socket_.emit('essay', {'name': sD.studentDict[request.remote_addr]['name'], 'essay': essay}, namespace=apinamespace)
                 return render_template("message.html", message = "Response submitted.")
             else:
                 return render_template("message.html", message = "Not in Essay mode.")
@@ -1445,7 +1550,11 @@ def endpoint_expert():
 
 @app.route('/fighter')
 def endpoint_fighter():
-    return redirect('/games/fighter')
+    if request.args.get('advanced'):
+        advanced = '?advanced=true'
+    else:
+        advanced = ''
+    return redirect('/games/fighter' + advanced)
 
 
 '''
@@ -1453,7 +1562,11 @@ def endpoint_fighter():
 '''
 @app.route('/flashcards')
 def endpoint_flashcards():
-    return redirect('/games/flashcards')
+    if request.args.get('advanced'):
+        advanced = '?advanced=true'
+    else:
+        advanced = ''
+    return redirect('/games/flashcards' + advanced)
 
 '''
     /flush
@@ -1467,7 +1580,7 @@ def endpoint_flush():
     else:
         flushUsers()
         sD.refresh()
-        return render_template("message.html", message = "Session was restarted.", forward = '/controlpanel')
+        return render_template("message.html", message = "Session was restarted.")
 
 #  ██████
 # ██
@@ -1512,15 +1625,36 @@ def endpoint_games_bitshifter():
             highScore = 0
         return render_template('games/bitshifter.html', highScore = highScore)
 
-@app.route('/games/fighter')
+@app.route('/games/fighter', methods = ['GET', 'POST'])
 def endpoint_games_fighter():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
     if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
     else:
+        username = sD.studentDict[request.remote_addr]['name']
+        if request.form:
+            action = request.form['action']
+            password = request.form['password']
+        else:
+            action = request.args.get('action')
+            password = ''
+        authenticated = False
+        if action == 'resetStats':
+            if password:
+                db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+                dbcmd = db.cursor()
+                user = dbcmd.execute("SELECT * FROM users WHERE username=:uname", {"uname": username}).fetchone()
+                db.close()
+                #Check if the password is correct
+                if password == cipher.decrypt(user[2]).decode():
+                    authenticated = True
+                else:
+                    return render_template("message.html", message = "Your password is incorrect.")
+            else:
+                return render_template('authenticate.html', forward = request.path, action = action)
+
         try:
-            username = sD.studentDict[request.remote_addr]['name']
             db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
             dbcmd = db.cursor()
             wins = dbcmd.execute("SELECT fighterWins FROM users WHERE username=:uname", {"uname": username}).fetchone()[0] or 0
@@ -1528,7 +1662,7 @@ def endpoint_games_fighter():
             winStreak = dbcmd.execute("SELECT fighterWinStreak FROM users WHERE username=:uname", {"uname": username}).fetchone()[0] or 0
             goldUnlocked = dbcmd.execute("SELECT goldUnlocked FROM users WHERE username=:uname", {"uname": username}).fetchone()[0] or 0
             db.close()
-            return render_template('games/fighter.html', username = username, wins = wins, losses = losses, winStreak = winStreak, goldUnlocked = goldUnlocked)
+            return render_template('games/fighter.html', username = username, wins = wins, losses = losses, winStreak = winStreak, goldUnlocked = goldUnlocked, action = action, authenticated = authenticated)
         except Exception as e:
             print("[error] " + "Error: " + str(e))
 
@@ -1640,24 +1774,36 @@ def endpoint_games_ttt():
     else:
         opponent = request.args.get('opponent')
 
+        if opponent == sD.studentDict[request.remote_addr]['name']:
+            return render_template("message.html", message = "You can't enter your own name.")
+
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        wins = dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='ttt' ORDER BY score DESC", {"uname": sD.studentDict[request.remote_addr]['name']}).fetchone()
+        if wins:
+            wins = wins[3]
+        else:
+            wins = 0
+        db.close()
+
         #Loop through all existing games
         for game in sD.ttt:
             #If the user and the opponent is in an existing player list
             if sD.studentDict[request.remote_addr]['name'] in game.players and opponent in game.players:
                 #Then you have found the right game and can edit it here
-                return render_template("games/ttt.html", game = str(game))
+                return render_template("games/ttt.html", game = json.dumps(game.__dict__), username = sD.studentDict[request.remote_addr]['name'], wins = wins)
                 #return the response here
-
 
         #Creating a new game
         for student in sD.studentDict:
             if sD.studentDict[student]['name'] == opponent:
                 sD.ttt.append(sessions.TTTGame([sD.studentDict[request.remote_addr]['name'], opponent]))
-                return render_template("ttt.html", game = json.dumps(sD.ttt[-1].__dict__))
+                return render_template("games/ttt.html", game = json.dumps(sD.ttt[-1].__dict__), username = sD.studentDict[request.remote_addr]['name'], wins = wins)
 
+        if opponent:
+            return render_template("message.html", message = "There are no users with that name.")
 
-        #If there is no game with these players
-        return render_template("message.html", message = "No game found")
+        return render_template("tttstart.html")
 
 @app.route('/games/wordle')
 def endpoint_games_wordle():
@@ -1702,7 +1848,11 @@ def endpoint_getword():
 
 @app.route('/hangman')
 def endpoint_hangman():
-    return redirect('/games/hangman')
+    if request.args.get('advanced'):
+        advanced = '?advanced=true'
+    else:
+        advanced = ''
+    return redirect('/games/hangman' + advanced)
 
 @app.route('/help', methods = ['POST', 'GET'])
 def endpoint_help():
@@ -1720,6 +1870,7 @@ def endpoint_help():
             sD.studentDict[request.remote_addr]['help']['time'] = time.time()
             sD.studentDict[request.remote_addr]['help']['message'] = request.args.get('message');
             playSFX("sfx_up04")
+            socket_.emit('help', sD.studentDict[request.remote_addr]['help'], namespace=apinamespace)
             return render_template("message.html", message = "Your ticket was sent. Keep working on the problem the best you can while you wait.", forward = sD.mainPage)
         else:
             return render_template("help.html")
@@ -1770,13 +1921,21 @@ def endpoint_lesson():
             else:
                 f = request.files['file']
                 f.save(os.path.join('lessondata', secure_filename(f.filename.strip(' '))))
-                return redirect('/lesson')
+                if request.args.get('advanced'):
+                    advanced = '?advanced=true'
+                else:
+                    advanced = ''
+                return redirect('/lesson' + advanced)
         elif request.args.get('load'):
             try:
                 sD.refresh()
                 sD.lessonList = lessons.updateFiles()
                 sD.lesson = lessons.readBook(request.args.get('load'))
-                return redirect('/lesson')
+                if request.args.get('advanced'):
+                    advanced = '?advanced=true'
+                else:
+                    advanced = ''
+                return redirect('/lesson' + advanced)
             except Exception as e:
                 print(traceback.format_exc())
                 print("[error] " + e)
@@ -1789,7 +1948,11 @@ def endpoint_lesson():
                     return render_template("message.html", message = 'End of lesson!')
                 else:
                     updateStep()
-                    return redirect('/lesson')
+                    if request.args.get('advanced'):
+                        advanced = '?advanced=true'
+                    else:
+                        advanced = ''
+                    return redirect('/lesson' + advanced)
             elif request.args.get('action') == 'prev':
                 sD.currentStep -= 1
                 if sD.currentStep <= 0:
@@ -1797,14 +1960,22 @@ def endpoint_lesson():
                     return render_template("message.html", message = 'Already at start of lesson!')
                 else:
                     updateStep()
-                    return redirect('/lesson')
+                    if request.args.get('advanced'):
+                        advanced = '?advanced=true'
+                    else:
+                        advanced = ''
+                    return redirect('/lesson' + advanced)
             elif request.args.get('action') == 'unload':
                 sD.refresh()
                 return render_template("message.html", message = 'Unloaded lesson.')
             elif request.args.get('action') == 'upload':
                 return render_template('general.html', content='<form method=post enctype=multipart/form-data><input type=file name=file accept=".xlsx"><input type=submit value=Upload></form>')
             else:
-                return redirect('/lesson')
+                if request.args.get('advanced'):
+                    advanced = '?advanced=true'
+                else:
+                    advanced = ''
+                return redirect('/lesson' + advanced)
         else:
             if not sD.lesson:
                 sD.lessonList = lessons.updateFiles()
@@ -1960,6 +2131,7 @@ def endpoint_login():
             #If the user is logged in, log them out
             if remote in sD.studentDict:
                 print("[info] " + sD.studentDict[request.remote_addr]['name'] + " logged out.")
+                socket_.emit('alert', json.dumps(packMSG('all', 'server', sD.studentDict[request.remote_addr]['name'] + " logged out...")), namespace=chatnamespace)
                 del sD.studentDict[request.remote_addr]
                 playSFX('sfx_laser01')
             if request.args.get('name'): ##needs update
@@ -1979,12 +2151,20 @@ def endpoint_logout():
 
 @app.route('/minesweeper')
 def endpoint_minesweeper():
-    return redirect('/games/minesweeper')
+    if request.args.get('advanced'):
+        advanced = '?advanced=true'
+    else:
+        advanced = ''
+    return redirect('/games/minesweeper' + advanced)
 
 
 @app.route('/mnsw')
 def endpoint_mnsw():
-    return redirect('/games/minesweeper')
+    if request.args.get('advanced'):
+        advanced = '?advanced=true'
+    else:
+        advanced = ''
+    return redirect('/games/minesweeper' + advanced)
 
 '''
     /mobile
@@ -2035,24 +2215,32 @@ def endpoint_profile():
         return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
     else:
         name = request.args.get('user') or sD.studentDict[request.remote_addr]['name']
+        userFound = False
         for x in sD.studentDict:
             user = sD.studentDict[x]
             if user['name'].strip() == name:
-                username = sD.studentDict[request.remote_addr]['name']
-                db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
-                dbcmd = db.cursor()
-                highScores = {
-                    "2048": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='2048' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
-                    "bitshifter": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='bitshifter' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
-                    "hangman": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='hangman' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
-                    "minesweeper": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='minesweeper' ORDER BY score ASC", {"uname": user['name']}).fetchone(),
-                    "speedtype": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='speedtype' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
-                    "towerdefense": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='towerdefense' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
-                    "fighter": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='towerdefense' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
-                    "wordle": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='wordle' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
-                }
-                db.close()
-                return render_template("profile.html", username = user['name'], perms = sD.settings['permname'][user['perms']], bot = user['bot'], highScores = json.dumps(highScores))
+                userFound = True
+        if not userFound:
+            db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+            dbcmd = db.cursor()
+            userFound = dbcmd.execute("SELECT * FROM users WHERE username=:uname", {"uname": name}).fetchall()
+            db.close()
+        if userFound:
+            db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+            dbcmd = db.cursor()
+            highScores = {
+                "2048": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='2048' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
+                "bitshifter": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='bitshifter' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
+                "hangman": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='hangman' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
+                "minesweeper": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='minesweeper' ORDER BY score ASC", {"uname": user['name']}).fetchone(),
+                "speedtype": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='speedtype' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
+                "towerdefense": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='towerdefense' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
+                "ttt": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='ttt' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
+                "fighter": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='fighter' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
+                "wordle": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='wordle' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
+            }
+            db.close()
+            return render_template("profile.html", username = user['name'], perms = sD.settings['permname'][user['perms']], bot = user['bot'], highScores = json.dumps(highScores))
         #If there are no matches
         return render_template("message.html", message = "There are no users with that name.")
 
@@ -2135,11 +2323,28 @@ def endpoint_quiz():
         else:
             return render_template("message.html", message = "No quiz is currently loaded.")
 
+# ██████
+# ██   ██
+# ██████
+# ██   ██
+# ██   ██
+
 @app.route('/removefightermatch', methods = ['POST'])
 def endpoint_removefightermatch():
     code = request.args.get('code')
-    del sD.fighter['match' + code]
-    return render_template("message.html", message = 'Match ' + code + ' removed.')
+    if code in sD.fighter:
+        del sD.fighter[code]
+        return render_template("message.html", message = 'Match ' + code + ' removed.')
+    return render_template("message.html", message = 'Could not remove match.')
+
+@app.route('/removetttmatch', methods = ['POST'])
+def endpoint_removetttmatch():
+    opponent = request.args.get('opponent')
+    for game in sD.ttt:
+        if sD.studentDict[request.remote_addr]['name'] in game.players and opponent in game.players:
+            sD.ttt.remove(game)
+            return render_template("message.html", message = 'Match removed.')
+    return render_template("message.html", message = 'Match not found.')
 
 # ███████
 # ██
@@ -2286,7 +2491,11 @@ def endpoint_setdefault():
 
 @app.route('/settings')
 def endpoint_settings():
-    return redirect('/controlpanel')
+    if request.args.get('advanced'):
+        advanced = '?advanced=true'
+    else:
+        advanced = ''
+    return redirect('/controlpanel' + advanced)
 
 #This endpoint leads to the Sound Effect page
 @app.route('/sfx')
@@ -2314,14 +2523,18 @@ def endpoint_socket():
 
 @app.route('/speedtype')
 def endpoint_speedtype():
-    return redirect('/games/speedtype')
+    if request.args.get('advanced'):
+        advanced = '?advanced=true'
+    else:
+        advanced = ''
+    return redirect('/games/speedtype' + advanced)
 
 
 @app.route('/standard')
 def endpoint_standard():
     return redirect('/home')
 
-#Start a thumbs poll
+#Start a poll
 @app.route('/startpoll')
 def endpoint_startpoll():
     if not request.remote_addr in sD.studentDict:
@@ -2336,6 +2549,7 @@ def endpoint_startpoll():
             return render_template("message.html", message = "Invalid poll type.")
         changeMode(type)
         repeatMode()
+        sD.pollType = type
         return render_template("message.html", message = 'Started a new ' + type + ' poll.')
 
 # ████████
@@ -2347,15 +2561,27 @@ def endpoint_startpoll():
 
 @app.route('/td')
 def endpoint_td():
-    return redirect('/games/towerdefense')
+    if request.args.get('advanced'):
+        advanced = '?advanced=true'
+    else:
+        advanced = ''
+    return redirect('/games/towerdefense' + advanced)
 
 @app.route('/towerdefense')
 def endpoint_towerdefense():
-    return redirect('/games/towerdefense')
+    if request.args.get('advanced'):
+        advanced = '?advanced=true'
+    else:
+        advanced = ''
+    return redirect('/games/towerdefense' + advanced)
 
 @app.route('/ttt')
 def endpoint_ttt():
-    return redirect('/games/ttt')
+    if request.args.get('advanced'):
+        advanced = '?advanced=true'
+    else:
+        advanced = ''
+    return redirect('/games/ttt' + advanced)
 
 '''
     /tutd
@@ -2375,6 +2601,7 @@ def endpoint_tutd():
                     if sD.studentDict[request.remote_addr]['thumb'] != thumb:
                         sD.studentDict[request.remote_addr]['thumb'] = thumb
                         tutdBar()
+                        socket_.emit('thumb', {'name': sD.studentDict[request.remote_addr]['name'], 'thumb': thumb}, namespace=apinamespace)
                         return render_template("message.html", message = "Thank you for your tasty bytes... (" + thumb + ")")
                     else:
                         return render_template("message.html", message = "You've already submitted this answer... (" + thumb + ")")
@@ -2383,6 +2610,7 @@ def endpoint_tutd():
                         sD.studentDict[request.remote_addr]['thumb'] = ''
                         playSFX("sfx_hit01")
                         tutdBar()
+                        socket_.emit('thumb', {'name': sD.studentDict[request.remote_addr]['name'], 'thumb': ''}, namespace=apinamespace)
                         return render_template("message.html", message = "I won\'t mention it if you don\'t")
                     else:
                         return render_template("message.html", message = "You don't have an answer to erase.")
@@ -2442,7 +2670,7 @@ def endpoint_users():
                 db.close()
                 if user in sD.studentDict:
                     del sD.studentDict[user]
-                return render_template("message.html", message = "User deleted.", forward = '/users')
+                return render_template("message.html", message = "User deleted.")
             if action == 'changePw':
                 password = request.args.get('password')
                 if password:
@@ -2452,23 +2680,27 @@ def endpoint_users():
                     dbcmd.execute("UPDATE users SET password=:pw WHERE username=:uname", {"uname": request.args.get('name'), "pw": passwordCrypt})
                     db.commit()
                     db.close()
-                    return render_template("message.html", message = "Password reset.", forward = '/users')
+                    return render_template("message.html", message = "Password reset.")
                 else:
-                    return render_template("message.html", message = "New password reqired.", forward = '/users')
+                    return render_template("message.html", message = "New password reqired.")
             if not user:
-                return render_template("message.html", message = "That user was not found by their name.", forward = '/users')
+                return render_template("message.html", message = "That user was not found by their name.")
         if request.args.get('ip'):
             if request.args.get('ip') in sD.studentDict:
                 user = request.args.get('ip')
             else:
-                return render_template("message.html", message = "That user was not found by their IP address.", forward = '/users')
+                return render_template("message.html", message = "That user was not found by their IP address.")
         if action == 'removeNP':
             if request.args.get('name') in newPasswords:
                 del newPasswords[request.args.get('name')]
             else:
                 return render_template("message.html", message = "That user was has not requested a new password.")
             if request.args.get('acceptNP'):
-                return redirect('/users?action=changePw&name=' + request.args.get('name') + '&password=' + request.args.get('password'))
+                if request.args.get('advanced'):
+                    advanced = '&advanced=true'
+                else:
+                    advanced = ''
+                return redirect('/users?action=changePw&name=' + request.args.get('name') + '&password=' + request.args.get('password') + '&advanced=' + advanced)
             else:
                 return render_template("message.html", message = "Request rejected.")
         if user:
@@ -2488,7 +2720,10 @@ def endpoint_users():
                     #server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', name, 'server', 'The teacher rejected your break request.')))
             if action == 'kick':
                 if user in sD.studentDict:
+                    print("[info] " + sD.studentDict[request.remote_addr]['name'] + " was removed by the teacher.")
+                    socket_.emit('alert', json.dumps(packMSG('all', 'server', sD.studentDict[request.remote_addr]['name'] + " was removed by the teacher...")), namespace=chatnamespace)
                     del sD.studentDict[user]
+                    playSFX('sfx_laser01')
                     return render_template("message.html", message = "User removed")
                 else:
                     return render_template("message.html", message = "User not in list.")
@@ -2580,7 +2815,11 @@ def endpoint_wawd():
 
 @app.route('/wordle')
 def endpoint_wordle():
-    return redirect('/games/wordle')
+    if request.args.get('advanced'):
+        advanced = '?advanced=true'
+    else:
+        advanced = ''
+    return redirect('/games/wordle' + advanced)
 
 
 # ███████  ██████   ██████ ██   ██ ███████ ████████ ████████  ██████
@@ -2609,14 +2848,12 @@ def packMSG(rx, tx, content, now = int(time.time() * 1000)):
     }
     return msgOUT
 
-
 @socket_.on('connect', namespace=chatnamespace)
 def connect():
     try:
         if request.remote_addr in sD.studentDict:
             sD.studentDict[request.remote_addr]['sid'] = request.sid
             print("[info] " + sD.studentDict[request.remote_addr]['name'] + " connected and was given id \"" + request.sid + "\"")
-            emit('alert', json.dumps(packMSG('all', 'server', sD.studentDict[request.remote_addr]['name'] + " has joined the server...")), broadcast=True)
             emit('userlist', json.dumps(packMSG('all', 'server', chatUsers())), broadcast=True)
     except Exception as e:
         print("[error] " + "Error finding user in list: " + str(e))
@@ -2628,7 +2865,6 @@ def disconnect():
             if 'sid' in sD.studentDict[request.remote_addr]:
                 del sD.studentDict[request.remote_addr]['sid']
                 print("[info] " + sD.studentDict[request.remote_addr]['name'] + " disconnected")
-                emit('alert', json.dumps(packMSG('all', 'server', sD.studentDict[request.remote_addr]['name'] + " has left the server...")), broadcast=True)
                 emit('userlist', json.dumps(packMSG('all', 'server', chatUsers())), broadcast=True)
     except Exception as e:
         print("[error] " + "Error finding user in list: " + str(e))
@@ -2735,6 +2971,29 @@ def message(message):
 def fighter(message):
     try:
         emit('fighter', message, broadcast=True)
+    except Exception as e:
+        print("[error] " + 'Error: ' + str(e))
+
+@socket_.on('ttt', namespace=chatnamespace)
+def ttt(message):
+    try:
+        emit('ttt', message, broadcast=True)
+        message = json.loads(message)
+        for game in sD.ttt:
+            #If the user and the opponent is in an existing player list
+            if message['from'] in game.players and message['to'] in game.players:
+                square = message['content']['square']
+                rBox = math.floor(square / 3);
+                cBox = square % 3;
+                if game.turn == 1:
+                    game.turn = 2
+                else:
+                    game.turn = 1
+                if message['from'] == game.players[0]:
+                    shape = 'X'
+                else:
+                    shape = 'O'
+                game.gameboard[rBox][cBox] = shape
     except Exception as e:
         print("[error] " + 'Error: ' + str(e))
 

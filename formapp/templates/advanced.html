@@ -335,7 +335,7 @@
     </div>
   </div>
 
-  <iframe id="chatSidebar" class="hidden" src="/chat?sidebar=true"></iframe>
+  <iframe id="chatSidebar" class="hidden"></iframe>
 
   <div id="otherSidebar" class="hidden">
     Name: <a id="name"></a><span id="excluded"></span><br>
@@ -371,7 +371,7 @@
       <div id="hangmanTab" class="tab" onclick="openPage('games/hangman');">Hangman</div>
       <div id="minesweeperTab" class="tab" onclick="openPage('games/minesweeper');">Minesweeper</div>
       <div id="speedtypeTab" class="tab" onclick="openPage('games/speedtype');">Speed Typer</div>
-      <div id="tttTab" class="tab hidden" onclick="openPage('games/ttt');">Tic-tac-toe</div>
+      <div id="tttTab" class="tab" onclick="openPage('games/ttt');">Tic-tac-toe</div>
       <div id="towerdefenseTab" class="tab" onclick="openPage('games/towerdefense');">Tower Defense</div>
       <div id="fighterTab" class="tab" onclick="openPage('games/fighter');">Turn-Based Fighter</div>
       <div id="wordleTab" class="tab" onclick="openPage('games/wordle');">Wordle</div>
@@ -385,7 +385,8 @@
       <div id="virtualbarTab" class="tab" onclick="openPage('virtualbar');">Virtual bar</div>
     </div>
     <div id="debugTab" class="tab" onclick="openPage('debug');"><img src="{{ url_for('static', filename='img/advanced/debug.png') }}" class="icon"> <span class="tabText">Debug data</span></div>
-    <div id="reload" class="tab" style="margin-left: auto;" onclick="document.getElementById('innerPage').requestFullscreen();"><img src="{{ url_for('static', filename='img/advanced/fullscreen.png') }}" class="icon"> <span class="tabText">Fullscreen</span></div>
+    <div class="tab" style="margin-left: auto;" onclick="document.getElementById('innerPage').contentWindow.location.reload();"><img src="{{ url_for('static', filename='img/advanced/reload.png') }}" class="icon"> <span class="tabText">Reload inner page</span></div>
+    <div class="tab" onclick="document.getElementById('innerPage').requestFullscreen();"><img src="{{ url_for('static', filename='img/advanced/fullscreen.png') }}" class="icon"> <span class="tabText">Fullscreen</span></div>
   </div>
 
   <div>
@@ -460,6 +461,7 @@
       }
     });
     if (id == "chat") {
+      document.getElementById("chatSidebar").src = "/chat?sidebar=true";
       document.title = `${innerPageTitle} - Formbar`;
       document.getElementById("newMessages").innerText = null;
       newMessages = 0;

@@ -2,7 +2,7 @@ const request = new XMLHttpRequest();
 request.open("GET", '/api/ip', false);
 request.send(null);
 const serverIp = JSON.parse(request.responseText).ip;
-const apiSocket = io("/apinamespace");
+const apiSocket = io("/apisocket");
 const chatSocket = io("/chat");
 
 chatSocket.on("disconnect", message => {

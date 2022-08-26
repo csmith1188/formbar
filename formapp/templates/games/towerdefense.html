@@ -37,7 +37,7 @@
     #game {
       position: absolute;
       width: 100%;
-      background: linear-gradient(to bottom right, #030, #300, #003);
+      background: linear-gradient(to bottom right, #040, #400, #004);
       background-size: 100%;
     }
 
@@ -45,7 +45,7 @@
       background: transparent;
     }
 
-    button:not(.inline):hover {
+    button:not(.inline):not(.unselectable):hover {
       background: #fff2;
     }
 
@@ -194,6 +194,10 @@
       border: 1px solid #555;
     }
 
+    td.gameButton {
+      cursor: pointer;
+    }
+
     td.droppable {
       background: #aaa5;
     }
@@ -223,6 +227,10 @@
       height: 50%;
     }
 
+    #alert.error b {
+      color: var(--color-red);
+    }
+
     #alertText {
       position: absolute;
       top: calc(5% * 16 / 9);
@@ -230,6 +238,11 @@
       width: 90%;
       height: 50%;
       overflow: auto;
+    }
+
+    #alert.large #alertText {
+      top: calc(5% * 16 / 15);
+      height: 70%;
     }
 
     #alert h1 {
@@ -256,6 +269,11 @@
       font-size: calc(400% / 3);
       font-weight: 500;
       filter: drop-shadow(2px 2px 1px #000c);
+    }
+    
+    #alert.large #ok {
+      height: 12%;
+      bottom: 6%;
     }
 
     #ok:hover {
@@ -394,6 +412,29 @@
     .invisible {
       visibility: hidden;
     }
+    
+    .powerReady {
+      animation: powerReady 1s;
+    }
+
+    @keyframes powerReady {
+      12.5% {
+        transform: rotate(1deg);
+      }
+      37.5% {
+        transform: rotate(-2deg);
+      }
+      50% {
+        background: #fff2;
+        color: white;
+      }
+      62.5% {
+        transform: rotate(2deg);
+      }
+      87.5% {
+        transform: rotate(-1deg);
+      }
+    }
   </style>
 {% endblock %}
 
@@ -506,7 +547,7 @@
           range: 2.5,
           speed: 1,
           strength: 1,
-          price: 35,
+          price: 30,
           extra1: {
             description: "Projectiles can bounce to up to three nearby enemies.",
             price: 60,
@@ -525,7 +566,7 @@
             description: "All Basic Towers attack 5× as fast for 10 seconds.",
             price: 75,
             use: function() {
-              towers.filter(tower => tower.name == "Basic Tower").forEach(tower => tower.speedBoost = 250);
+              towers.filter(tower => tower?.name == "Basic Tower").forEach(tower => tower.speedBoost = 250);
               sound.playSFX("powerUp2");
             }
           }
@@ -538,7 +579,7 @@
           speed: 1.92,
           strength: 0.5,
           slowing: true,
-          price: 30,
+          price: 25,
           extra1: {
             description: "Enemies lose all abilities while they are slowed down.",
             price: 45,
@@ -586,7 +627,7 @@
             }
           },
           power: {
-            description: "All onscreen enemeis move backward for 3 seconds.",
+            description: "All onscreen enemies move backward for 3 seconds.",
             price: 55,
             use: function() {
               enemies.forEach(enemy => enemy.reverse = 75);
@@ -677,7 +718,7 @@
             description: "Adds an extra $10 every 10 seconds.",
             price: 300,
             add: function() {
-              player.bonusMoney += 5;
+              player.bonusMoney += 10;
             }
           },
           extra2: {
@@ -769,7 +810,7 @@
             }
           },
           extra2: {
-            description: "Does 5× damage to boss enemies.",
+            description: "Does 2.5× damage to boss enemies.",
             price: 1000,
             add: function() {
               this.bossBonus = true;
@@ -922,177 +963,181 @@
           this.cooldown = 0; //Time until the tower can attack again
           //Display a menu with information and upgrade buttons
           this.showMenu = function() {
-            if (!paused) {
-              this.menuOpen = true;
+            if (paused) return;
+            this.menuOpen = true;
 
-              let menu = document.createElement("div");
-              menu.classList.add("menu");
-              menu.innerHTML = `
-                <h1>${type.name}</h1>
+            let menu = document.createElement("div");
+            menu.classList.add("menu");
+            menu.innerHTML = `
+              <h1>${type.name}</h1>
 
 
-                <h2><span id="sell" class="splitButton sellButton">
-                  <span class="buttonLeft">Sell</span><span class="buttonRight">+$${this.sellValue}</span>
-                </span></h2>
+              <h2><span id="sell" class="splitButton sellButton">
+                <span class="buttonLeft">Sell</span><span class="buttonRight">+$${this.sellValue}</span>
+              </span></h2>
 
-                <h2>
-                  Range: ${Math.round(this.range * 100) / 100}
-                  <span id="range" class="splitButton">
-                    <span class="buttonLeft">${(this.upgrades.range == 2 || this.range == Infinity) ? "Max" : "→&nbsp;" + Math.round(this.range * 1.25 * 100) / 100}</span><span class="buttonRight">$${this.upgradePrice("range")}</span>
-                  </span>
-                </h2>
+              <h2>
+                Range: ${Math.round(this.range * 100) / 100}
+                <span id="range" class="splitButton">
+                  <span class="buttonLeft">${(this.upgrades.range == 2 || this.range == Infinity) ? "Max" : "→&nbsp;" + Math.round(this.range * 1.25 * 100) / 100}</span><span class="buttonRight">$${this.upgradePrice("range")}</span>
+                </span>
+              </h2>
 
-                <h2>
-                  Speed: ${Math.round(this.speed * 100) / 100}
-                  <span id="speed" class="splitButton">
-                    <span class="buttonLeft">${(this.upgrades.speed == 2) ? "Max" : "→&nbsp;" + Math.round(this.speed * 1.5 * 100) / 100}</span><span class="buttonRight">$${this.upgradePrice("speed")}</span>
-                  </span>
-                </h2>
+              <h2>
+                Speed: ${Math.round(this.speed * 100) / 100}
+                <span id="speed" class="splitButton">
+                  <span class="buttonLeft">${(this.upgrades.speed == 2) ? "Max" : "→&nbsp;" + Math.round(this.speed * 1.5 * 100) / 100}</span><span class="buttonRight">$${this.upgradePrice("speed")}</span>
+                </span>
+              </h2>
 
-                <h2>
-                  Strength: ${Math.round(this.strength * 100) / 100}
-                  <span id="strength" class="splitButton">
-                    <span class="buttonLeft">${(this.upgrades.strength == 2) ? "Max" : "→&nbsp;" + Math.round(this.strength * 2 * 100) / 100}</span><span class="buttonRight">$${this.upgradePrice("strength")}</span>
-                  </span>
-                </h2>
+              <h2>
+                Strength: ${Math.round(this.strength * 100) / 100}
+                <span id="strength" class="splitButton">
+                  <span class="buttonLeft">${(this.upgrades.strength == 2) ? "Max" : "→&nbsp;" + Math.round(this.strength * 2 * 100) / 100}</span><span class="buttonRight">$${this.upgradePrice("strength")}</span>
+                </span>
+              </h2>
 
-                <h2>
-                  Extra ${this.extra1.bought ? "2" : "1"}
-                  <span id="extra" class="splitButton">
-                    <span class="buttonLeft">${this.extra2.bought ? "Bought" : "Add"}</span><span class="buttonRight">$${this.nextExtra.price}</span>
-                  </span>
-                </h2>
-                ${this.nextExtra.description ?? this.extra2.description}
+              <h2>
+                Extra ${this.extra1.bought ? "2" : "1"}
+                <span id="extra" class="splitButton">
+                  <span class="buttonLeft">${this.extra2.bought ? "Bought" : "Add"}</span><span class="buttonRight">$${this.nextExtra.price}</span>
+                </span>
+              </h2>
+              ${this.nextExtra.description ?? this.extra2.description}
 
-                <h2>
-                  Special power
-                  <span id="power" class="splitButton">
-                    <span class="buttonLeft">${difficulty == "hard" ? "Locked" : (this.power.bought ? "Bought" : "Unlock")}</span><span class="buttonRight">$${this.power.price}</span>
-                  </span>
-                </h2>
-                ${type.power.description}
-              `;
-              document.getElementById("container").append(menu);
+              <h2>
+                Special power
+                <span id="power" class="splitButton">
+                  <span class="buttonLeft">${difficulty == "hard" ? "Locked" : (this.power.bought ? "Bought" : "Unlock")}</span><span class="buttonRight">$${this.power.price}</span>
+                </span>
+              </h2>
+              ${type.power.description}
+            `;
+            document.getElementById("container").append(menu);
 
-              let sellButton = document.getElementById("sell");
-              let rangeButton = document.getElementById("range");
-              let speedButton = document.getElementById("speed");
-              let strengthButton = document.getElementById("strength");
-              let extraButton = document.getElementById("extra");
-              let powerButton = document.getElementById("power");
+            let sellButton = document.getElementById("sell");
+            let rangeButton = document.getElementById("range");
+            let speedButton = document.getElementById("speed");
+            let strengthButton = document.getElementById("strength");
+            let extraButton = document.getElementById("extra");
+            let powerButton = document.getElementById("power");
 
-              //Gray out upgrades that can't be bought
-              if (player.money < this.upgradePrice("range") || this.range == Infinity) rangeButton.classList.add("unselectable");
-              if (player.money < this.upgradePrice("speed")) speedButton.classList.add("unselectable");
-              if (player.money < this.upgradePrice("strength")) strengthButton.classList.add("unselectable");
-              if (player.money < this.nextExtra.price) extraButton.classList.add("unselectable");
-              if (player.money < this.power.price || this.power.bought || difficulty == "hard") powerButton.classList.add("unselectable");
+            //Gray out upgrades that can't be bought
+            if (player.money < this.upgradePrice("range") || this.range == Infinity) rangeButton.classList.add("unselectable");
+            if (player.money < this.upgradePrice("speed")) speedButton.classList.add("unselectable");
+            if (player.money < this.upgradePrice("strength")) strengthButton.classList.add("unselectable");
+            if (player.money < this.nextExtra.price) extraButton.classList.add("unselectable");
+            if (player.money < this.power.price || this.power.bought || difficulty == "hard") powerButton.classList.add("unselectable");
 
-              if (this.upgrades.range == 2 || this.range == Infinity) rangeButton.classList.add("bought");
-              if (this.upgrades.speed == 2) speedButton.classList.add("bought");
-              if (this.upgrades.strength == 2) strengthButton.classList.add("bought");
-              if (this.extra2.bought) extraButton.classList.add("bought");
-              if (this.power.bought || difficulty == "hard") powerButton.classList.add("bought");
+            if (this.upgrades.range == 2 || this.range == Infinity) rangeButton.classList.add("bought");
+            if (this.upgrades.speed == 2) speedButton.classList.add("bought");
+            if (this.upgrades.strength == 2) strengthButton.classList.add("bought");
+            if (this.extra2.bought) extraButton.classList.add("bought");
+            if (this.power.bought || difficulty == "hard") powerButton.classList.add("bought");
 
-              //Center the menu horizontally
-              menu.style.left = this.x / 1920 * 100 + "%";
-              menu.style.transform = "translateX(-50%)";
-              let menuRect = menu.getBoundingClientRect();
-              let gameRect = document.getElementById("game").getBoundingClientRect();
-              //If the menu is too far to the left or right, put it on the edge
-              if (menuRect.x < gameRect.x) {
-                menu.style.left = "0";
-                menu.style.transform = "";
-              } else if (menuRect.x + menuRect.width > gameRect.x + gameRect.width) {
-                menu.style.left = "";
-                menu.style.right = "0";
-                menu.style.transform = "";
-              }
-              menu.style.bottom = 100 - (this.y / 1080 * 100) + 10 + "%";
-              menuRect = menu.getBoundingClientRect(); //Get the menu position again
-              //If the menu goes above the top of the game, put it below the tower
-              if (menuRect.y < gameRect.y) {
-                menu.style.bottom = "";
-                menu.style.top = this.y / 1080 * 100 + 10 + "%";
-              }
-
-              //Remove the tower and give back 75% of all money spent on it
-              sellButton.onclick = () => {
-                towers[this.i] = null;
-                player.money += this.sellValue;
-                let row = Math.floor(this.y / 60);
-                let col = Math.floor(this.x / 60);
-                grid[row][col] = null; //Reset the grid square
-                menu.remove();
-                let squareEl = document.getElementById("r" + row + "c" + col);
-                squareEl.classList.remove("tower");
-                squareEl.onclick = null;
-                this.menuOpen = false;
-              };
-              rangeButton.onclick = () => {
-                if (this.upgrades.range < 2 && player.money >= this.upgradePrice("range") && this.range != Infinity) {
-                  player.money -= this.upgradePrice("range");
-                  this.value += this.upgradePrice("range");
-                  this.upgrades.range++;
-                  this.range *= 1.25;
-                  //Update the menu
-                  menu.remove();
-                  this.showMenu();
-                }
-              };
-              speedButton.onclick = () => {
-                if (this.upgrades.speed < 2 && player.money >= this.upgradePrice("speed")) {
-                  player.money -= this.upgradePrice("speed");
-                  this.value += this.upgradePrice("speed");
-                  this.upgrades.speed++;
-                  this.speed *= 1.5;
-                  //Update the menu
-                  menu.remove();
-                  this.showMenu();
-                }
-              };
-              strengthButton.onclick = () => {
-                if (this.upgrades.strength < 2 && player.money >= this.upgradePrice("strength")) {
-                  player.money -= this.upgradePrice("strength");
-                  this.value += this.upgradePrice("strength");
-                  this.upgrades.strength++;
-                  this.strength *= 2;
-                  //Update the menu
-                  menu.remove();
-                  this.showMenu();
-                }
-              };
-              extraButton.onclick = () => {
-                if (!this.extra2.bought && player.money >= this.nextExtra.price) {
-                  player.money -= this.nextExtra.price;
-                  this.value += this.nextExtra.price;
-                  this.nextExtra.add.bind(this)();
-                  this.nextExtra.bought = true;
-                  //Update the menu
-                  menu.remove();
-                  this.showMenu();
-                }
-              };
-              powerButton.onclick = () => {
-                  if (!this.power.bought && player.money >= this.power.price && difficulty == "normal") {
-                  player.money -= this.power.price;
-                  this.value += this.power.price;
-                  this.power.bought = true;
-                  //Update the menu
-                  menu.remove();
-                  this.showMenu();
-                }
-              };
-
-              this.closeMenu = () => {
-                menu.remove();
-                this.menuOpen = false;
-              }
-              document.getElementById("grid").onmousedown = this.closeMenu;
-              document.addEventListener("keydown", e => {
-                if (e.key == "Escape") this.closeMenu();
-              });
+            //Center the menu horizontally
+            menu.style.left = this.x / 1920 * 100 + "%";
+            menu.style.transform = "translateX(-50%)";
+            let menuRect = menu.getBoundingClientRect();
+            let gameRect = document.getElementById("game").getBoundingClientRect();
+            //If the menu is too far to the left or right, put it on the edge
+            if (menuRect.x < gameRect.x) {
+              menu.style.left = "0";
+              menu.style.transform = "";
+            } else if (menuRect.x + menuRect.width > gameRect.x + gameRect.width) {
+              menu.style.left = "";
+              menu.style.right = "0";
+              menu.style.transform = "";
             }
+            menu.style.bottom = 100 - (this.y / 1080 * 100) + 10 + "%";
+            menuRect = menu.getBoundingClientRect(); //Get the menu position again
+            //If the menu goes above the top of the game, put it below the tower
+            if (menuRect.y < gameRect.y) {
+              menu.style.bottom = "";
+              menu.style.top = this.y / 1080 * 100 + 10 + "%";
+            }
+
+            //Remove the tower and give back 75% of all money spent on it
+            sellButton.onclick = () => {
+              towers[this.i] = null;
+              player.money += this.sellValue;
+              let row = Math.floor(this.y / 60);
+              let col = Math.floor(this.x / 60);
+              grid[row][col] = null; //Reset the grid square
+              menu.remove();
+              let squareEl = document.getElementById("r" + row + "c" + col);
+              squareEl.classList.remove("tower");
+              squareEl.onclick = null;
+              this.menuOpen = false;
+              //Remove bonuses
+              if (this.name == "Money Tower") {
+                if (this.extra1.bought) player.bonusMoney -= 0;
+                if (this.extra2.bought) player.bonusLives -= 1;
+              }
+            };
+            rangeButton.onclick = () => {
+              if (this.upgrades.range < 2 && player.money >= this.upgradePrice("range") && this.range != Infinity) {
+                player.money -= this.upgradePrice("range");
+                this.value += this.upgradePrice("range");
+                this.upgrades.range++;
+                this.range *= 1.25;
+                //Update the menu
+                menu.remove();
+                this.showMenu();
+              }
+            };
+            speedButton.onclick = () => {
+              if (this.upgrades.speed < 2 && player.money >= this.upgradePrice("speed")) {
+                player.money -= this.upgradePrice("speed");
+                this.value += this.upgradePrice("speed");
+                this.upgrades.speed++;
+                this.speed *= 1.5;
+                //Update the menu
+                menu.remove();
+                this.showMenu();
+              }
+            };
+            strengthButton.onclick = () => {
+              if (this.upgrades.strength < 2 && player.money >= this.upgradePrice("strength")) {
+                player.money -= this.upgradePrice("strength");
+                this.value += this.upgradePrice("strength");
+                this.upgrades.strength++;
+                this.strength *= 2;
+                //Update the menu
+                menu.remove();
+                this.showMenu();
+              }
+            };
+            extraButton.onclick = () => {
+              if (!this.extra2.bought && player.money >= this.nextExtra.price) {
+                player.money -= this.nextExtra.price;
+                this.value += this.nextExtra.price;
+                this.nextExtra.add.bind(this)();
+                this.nextExtra.bought = true;
+                //Update the menu
+                menu.remove();
+                this.showMenu();
+              }
+            };
+            powerButton.onclick = () => {
+                if (!this.power.bought && player.money >= this.power.price && difficulty == "normal") {
+                player.money -= this.power.price;
+                this.value += this.power.price;
+                this.power.bought = true;
+                //Update the menu
+                menu.remove();
+                this.showMenu();
+              }
+            };
+
+            this.closeMenu = () => {
+              menu.remove();
+              this.menuOpen = false;
+            }
+            document.getElementById("grid").onmousedown = this.closeMenu;
+            document.addEventListener("keydown", e => {
+              if (e.key == "Escape") this.closeMenu();
+            });
           }
           this.upgradePrice = stat => {
             switch (this.upgrades[stat]) {
@@ -1181,7 +1226,8 @@
           this.poisoned = 0;
           this.hit = function(damage, tower, type) {
             if (this.stunned) damage *= 2;
-            if (!this.abilities.includes("shield") || type == "explosion" || type == "poison" || tower?.name == "Long-Range Tower") this.health -= damage; //Only explosions, poison, and Long-Range Towers can damage shielded enemies
+            let shieldProtection = this.abilities.includes("shield") && !this.noAbilities && type != "explosion" && type != "poison" && tower?.name != "Long-Range Tower" //Only explosions, poison, and Long-Range Towers can damage shielded enemies
+            if (!shieldProtection) this.health -= damage;
 
             if (this.health < 0.001) {
               let i = enemies.indexOf(this);
@@ -1271,7 +1317,7 @@
       //Sound settings and list of sound effects
       let sound = {
         enabled: true,
-        delay: 0.05,
+        delay: 0.05, //How long each sound effect must play before it can start over
         sfx: {
           powerReady: new Audio("../../static/sound/td/td_power_ready.wav"),
           blip: new Audio("../../static/sound/td/td_blip01.wav"),
@@ -1289,21 +1335,15 @@
           slowingHit: new Audio("../../static/sound/td/td_slow_hit.wav"),
           poisonHit: new Audio("../../static/sound/td/td_poison_hit.wav"),
           moneyHit: new Audio("../../static/sound/td/td_money_hit.wav"),
-          airHit: new Audio("../../static/sound/td/td_plane_hit.wav"),
+          planeHit: new Audio("../../static/sound/td/td_plane_hit.wav"),
           ultimateHit: new Audio("../../static/sound/td/td_ultimate_hit.wav"),
           longRangeHit: new Audio("../../static/sound/td/td_longrange_hit.wav")
         },
-        playSFX: function(name, towerName='default') {
+        playSFX: function(name) {
           if (this.enabled) {
-            let tempDelay = sound.delay;
-            if (towerName == "Ultimate Tower") {
-                let tempDelay = sound.delay / 2;
-            }
-            if (sound.sfx[name].currentTime >= sound.delay) {
-                sound.sfx[name].currentTime = 0;
-            } else {
-                sound.sfx[name].play();
-            }
+            let delay = this.sfx[name].delay || this.delay;
+            if (this.sfx[name].currentTime >= delay) this.sfx[name].currentTime = 0;
+            this.sfx[name].play();
           }
         }
       };
@@ -1311,10 +1351,16 @@
       for (const effect in sound.sfx) {
           sound.sfx[effect].volume = 0.2;
       }
-      //manual adjust a few volumes
+      //Manually adjust some sound effects
+      sound.sfx.ultimateHit.delay = sound.delay / 2;
       sound.sfx.blip.volume = 0.5;
-      sound.sfx.slowingHit.volume = 0.15;
+      sound.sfx.slowingHit.volume = 0.1;
+      sound.sfx.longRangeHit.volume = 0.15;
+      sound.sfx.planeHit.volume = 0.15;
+      sound.sfx.ultimateHit.volume = 0.4;
+      sound.sfx.shoot.volume = 0.6;
       for (let type in towerTypes) towerTypes[type].hitSound = type + "Hit"; //Give all towers except for Cannon Towers different hit sounds
+      towerTypes.air.hitSound = "planeHit";
 
       let canvas = document.getElementById("game");
       let ctx = canvas.getContext("2d");
@@ -1409,46 +1455,66 @@
 
         //Fullscreen button
         ctx.drawImage(document.fullscreenElement ? images.buttons.exitFullscreen : images.buttons.fullscreen, 15, 15, 30, 30);
-        document.getElementById("r0c0").onclick = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+        document.getElementById("r0c0").classList.add("gameButton");
+        document.getElementById("r0c0").onclick = () => {
+          if (!paused) {
+            if (document.fullscreenElement) document.exitFullscreen();
+            else document.documentElement.requestFullscreen();
+          } else {
+            //Resume button
+            paused = false;
+            animate = setInterval(update, fastForward ? 10 : 40);
+            document.getElementById("towers").classList.remove("hidden");
+            if (document.getElementById("alert")) hideAlert(); //If there is an alert, hide it
+          }
+        };
         //Sound button
         ctx.drawImage(sound.enabled ? images.buttons.sound : images.buttons.noSound, 75, 15, 30, 30);
-        document.getElementById("r0c1").onclick = () => sound.enabled = !sound.enabled;
+        document.getElementById("r0c1").classList.add("gameButton");
+        document.getElementById("r0c1").onclick = () => {
+          if (!paused) sound.enabled = !sound.enabled
+        };
         //Alerts button
         ctx.drawImage(noAlerts ? images.buttons.noAlerts : images.buttons.showAlerts, 135, 15, 30, 30);
+        document.getElementById("r0c2").classList.add("gameButton");
         document.getElementById("r0c2").onclick = () => {
-          if (noAlerts === undefined) gameAlert("No more alerts will be shown.");
-          noAlerts = !noAlerts;
+          if (!paused) {
+            if (noAlerts === undefined) gameAlert("No more alerts will be shown.");
+            noAlerts = !noAlerts;
+          }
         };
-        //Pause/play button
+        //Pause button
         ctx.drawImage(images.buttons.pause, 195, 15, 30, 30);
+        document.getElementById("r0c3").classList.add("gameButton");
         document.getElementById("r0c3").onclick = () => {
-          paused = !paused;
-          if (paused) {
+          if (!paused) {
+            paused = true;
             clearInterval(animate);
             document.getElementById("towers").classList.add("hidden");
+            for (let i = 1; i < 5; i++) document.getElementById("r0c" + i).classList.remove("gameButton");
             //Prevent placing towers while paused
             grid.forEach((row, i) => row.forEach((square, j) => {
               let squareEl = document.getElementById("r" + i + "c" + j);
               if (squareEl.ondragleave) squareEl.ondragleave();
             }));
             for (let tower in towerTypes) if (towerTypes[tower].dragging) document.getElementById(tower).ondragend();
-          } else {
-            animate = setInterval(update, fastForward ? 10 : 40);
-            document.getElementById("towers").classList.remove("hidden");
+            //If a tower's menu is open, close it
+            let menuTower = towers.find(tower => tower?.menuOpen);
+            menuTower?.closeMenu();
+            ctx.clearRect(0, 0, 300, 60);
+            ctx.drawImage(fastForward ? images.buttons.fastForward : images.buttons.play, 15, 15, 30, 30);
           }
-          let menuTower = towers.find(tower => tower?.menuOpen);
-          menuTower?.closeMenu();
-          if (document.getElementById("alert")) hideAlert(); //If there is an alert, hide it
-          ctx.clearRect(180, 0, 120, 60);
-          ctx.drawImage(fastForward ? images.buttons.fastForward : images.buttons.play, 195, 15, 30, 30);
         };
         //Fast forward button (normal mode only)
         if (difficulty == "normal") {
           ctx.drawImage(fastForward ? images.buttons.play : images.buttons.fastForward, 255, 15, 30, 30);
+          document.getElementById("r0c4").classList.add("gameButton");
           document.getElementById("r0c4").onclick = () => {
-            fastForward = !fastForward;
-            clearInterval(animate);
-            animate = setInterval(update, fastForward ? 10 : 40); //If fast forward is turned on, play at 4x the normal speed
+            if (!paused) {
+              fastForward = !fastForward;
+              clearInterval(animate);
+              animate = setInterval(update, fastForward ? 10 : 40); //If fast forward is turned on, play at 4x the normal speed
+            }
           };
         }
 
@@ -1486,15 +1552,16 @@
             if (!map.waves[currentWave + 1]) { //If there are no waves left
               //Once all enemies are defeated, end the game
               if (enemies.length) {
-                map.waves[currentWave + 1] = [null];
+                map.waves[currentWave].push(null);
               } else {
                 endGame(true);
                 return;
               }
+            } else {
+              currentWave++;
+              currentEnemy = 0;
             }
-            if (currentWave < map.waves.length) currentWave++;
-            currentEnemy = 0;
-            //if (currentWave = 50) for (let type in enemyTypes) enemyTypes[type].health *= 2; //All enemy types get double health for the last 25 rounds of hard mode
+            //if (currentWave == 50) for (let type in enemyTypes) enemyTypes[type].health *= 2; //All enemy types get double health for the last 25 rounds of hard mode
           }
         }
 
@@ -1549,9 +1616,9 @@
             ctx.drawImage(img, enemy.x - 40, enemy.y - 40);
             ctx.globalAlpha = 1;
             //Draw ability symbols inside the enemy
-            if (enemy.abilities.includes("healing")) ctx.drawImage(images.abilitySymbols.healing, enemy.x - 40, enemy.y - 40);
-            if (enemy.abilities.includes("shield")) ctx.drawImage(images.abilitySymbols.shield, enemy.x - 40, enemy.y - 40);
-            if (enemy.abilities.includes("acceleration")) ctx.drawImage(images.abilitySymbols.acceleration, enemy.x - 40, enemy.y - 40);
+            if (enemy.abilities.includes("healing") && !enemy.noAbilities) ctx.drawImage(images.abilitySymbols.healing, enemy.x - 40, enemy.y - 40);
+            if (enemy.abilities.includes("shield") && !enemy.noAbilities) ctx.drawImage(images.abilitySymbols.shield, enemy.x - 40, enemy.y - 40);
+            if (enemy.abilities.includes("acceleration") && !enemy.noAbilities) ctx.drawImage(images.abilitySymbols.acceleration, enemy.x - 40, enemy.y - 40);
           }
 
           if (enemy.abilities.includes("healing") && enemy.health < enemy.type.health && !enemy.noAbilities) {
@@ -1569,160 +1636,160 @@
         });
 
         towers.forEach(tower => {
-          if (tower) { //If the tower has not been sold
-            ctx.drawImage(tower.img, tower.x - 30, tower.y - 30);
+          if (!tower) return; //If the tower has been sold, skip this
+          ctx.drawImage(tower.img, tower.x - 30, tower.y - 30);
 
-            if (tower.name == "Air Tower") {
-              tower.planeDistance += 8;
-              tower.planeX = tower.planeStartX;
-              tower.planeY = tower.planeStartY;
-              let img;
-              for (let i = 0; i < Math.round(tower.planeDistance); i++) {
-                let j = i;
-                while (j >= planePathArr.length) j -= planePathArr.length;
-                switch (planePathArr[j]) {
-                  case "right":
-                    tower.planeX++;
-                    break;
-                  case "left":
-                    tower.planeX--;
-                    break;
-                  case "down":
-                    tower.planeY++;
-                    break;
-                  case "up":
-                    tower.planeY--;
-                }
-                img = images.planes[planePathArr[j]];
+          if (tower.name == "Air Tower") {
+            tower.planeDistance += 8;
+            tower.planeX = tower.planeStartX;
+            tower.planeY = tower.planeStartY;
+            let img;
+            for (let i = 0; i < Math.round(tower.planeDistance); i++) {
+              let j = i;
+              while (j >= planePathArr.length) j -= planePathArr.length;
+              switch (planePathArr[j]) {
+                case "right":
+                  tower.planeX++;
+                  break;
+                case "left":
+                  tower.planeX--;
+                  break;
+                case "down":
+                  tower.planeY++;
+                  break;
+                case "up":
+                  tower.planeY--;
               }
-              ctx.drawImage(img, tower.planeX - 30, tower.planeY - 30);
+              img = images.planes[planePathArr[j]];
             }
+            ctx.drawImage(img, tower.planeX - 30, tower.planeY - 30);
+          }
 
-            if (tower.menuOpen) {
-              //Show the tower's range
-              ctx.lineWidth = 1;
-              ctx.strokeStyle = "white";
-              ctx.fillStyle = "#aaa5";
-              let x = (tower.name == "Air Tower") ? tower.planeX : tower.x;
-              let y = (tower.name == "Air Tower") ? tower.planeY : tower.y;
-              let range = tower.range;
-              if (towers.find(owned => owned?.rangeBoosted == tower)) range *= 1.25;
-              if (tower.ultimateBoost) range *= 2;
-              ctx.drawCircle(x, y, range * 60);
-            }
+          if (tower.menuOpen) {
+            //Show the tower's range
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = "white";
+            ctx.fillStyle = "#aaa5";
+            let x = (tower.name == "Air Tower") ? tower.planeX : tower.x;
+            let y = (tower.name == "Air Tower") ? tower.planeY : tower.y;
+            let range = tower.range;
+            if (towers.find(owned => owned?.rangeBoosted == tower)) range *= 1.25;
+            if (tower.ultimateBoost) range *= 2;
+            ctx.drawCircle(x, y, range * 60);
+          }
 
-            if (tower.rangeBoosting) {
-              let otherTowers = towers.filter(owned => owned && owned != tower && owned.range != Infinity); //Remove this tower, sold towers, and Long-Range Towers
-              let closest = otherTowers.sort((a, b) => ((tower.planeX - a.x) ** 2 + (tower.planeY - a.y) ** 2) - ((tower.planeX - b.x) ** 2 + (tower.planeY - b.y) ** 2))[0];
-              tower.rangeBoosted = closest;
-            }
+          if (tower.rangeBoosting) {
+            let otherTowers = towers.filter(owned => owned && owned != tower && owned.range != Infinity); //Remove this tower, sold towers, and Long-Range Towers
+            let closest = otherTowers.sort((a, b) => ((tower.planeX - a.x) ** 2 + (tower.planeY - a.y) ** 2) - ((tower.planeX - b.x) ** 2 + (tower.planeY - b.y) ** 2))[0];
+            tower.rangeBoosted = closest;
+          }
 
-            if (tower.cooldown > 1) {
-              let reduceCooldown = 1;
-              if (tower.speedBoost) reduceCooldown *= 5;
-              if (tower.ultimateBoost) reduceCooldown *= 2;
-              tower.cooldown -= reduceCooldown;
-            } else {
-              let x = (tower.name == "Air Tower") ? tower.planeX : tower.x;
-              let y = (tower.name == "Air Tower") ? tower.planeY : tower.y;
-              let range = tower.range;
-              if (towers.find(owned => owned?.rangeBoosted == tower)) range *= 1.25; //Range boost from Air Tower
-              if (tower.ultimateBoost) range *= 2;
-              let inRange = enemies.filter(enemy => Math.sqrt((x - enemy.x) ** 2 + (y - enemy.y) ** 2) < range * 60); //Use the Pythagorean Theorem to determine if each enemy is inside the tower's range
-              if (!tower.seeInvisible) inRange = inRange.filter(enemy => enemy.visible);
-              if (inRange.length) {
-                let furthest = inRange.sort((a, b) => b.distance - a.distance)[0]; //Sort inRange from highest to lowest distance and get the first item
-                let strong = inRange.sort((a, b) => b.health - a.health); //Sort inRange from highest to lowest health
-                let strongest = strong.find(enemy => enemy.abilities.includes("shield")) || strong[0]; //Target shielded enemies
-                let target = (tower.name == "Long-Range Tower") ? strongest : furthest;
-                let damage = tower.strength;
-                if (tower.crowdBonus) damage *= 1 + enemies.length / 100; //Increase the damage by 1% for each enemy onscreen
-                if (tower.bossBonus && target.boss) damage *= 5;
-                if (tower.ultimateBoost) damage *= 2;
-                target.hit(damage, tower);
+          if (tower.cooldown > 1) {
+            let reduceCooldown = 1;
+            if (tower.speedBoost) reduceCooldown *= 5;
+            if (tower.ultimateBoost) reduceCooldown *= 2;
+            tower.cooldown -= reduceCooldown;
+          } else {
+            let x = (tower.name == "Air Tower") ? tower.planeX : tower.x;
+            let y = (tower.name == "Air Tower") ? tower.planeY : tower.y;
+            let range = tower.range;
+            if (towers.find(owned => owned?.rangeBoosted == tower)) range *= 1.25; //Range boost from Air Tower
+            if (tower.ultimateBoost) range *= 2;
+            let inRange = enemies.filter(enemy => Math.sqrt((x - enemy.x) ** 2 + (y - enemy.y) ** 2) < range * 60); //Use the Pythagorean Theorem to determine if each enemy is inside the tower's range
+            if (!tower.seeInvisible) inRange = inRange.filter(enemy => enemy.visible);
+            if (inRange.length) {
+              let furthest = inRange.sort((a, b) => b.distance - a.distance)[0]; //Sort inRange from highest to lowest distance and get the first item
+              let strong = inRange.sort((a, b) => b.health - a.health); //Sort inRange from highest to lowest health
+              let strongest = strong.find(enemy => enemy.abilities.includes("shield")) || strong[0]; //Target shielded enemies
+              let target = (tower.name == "Long-Range Tower") ? strongest : furthest;
+              let damage = tower.strength;
+              if (tower.crowdBonus) damage *= 1 + enemies.length / 100; //Increase the damage by 1% for each enemy onscreen
+              console.log(target)
+              if (tower.bossBonus && target.type.boss) damage *= 2.5;
+              if (tower.ultimateBoost) damage *= 2;
+              target.hit(damage, tower);
 
-                if (sound.sfx[tower.hitSound]) sound.playSFX(tower.hitSound, tower.name); //Play hit sound
+              if (sound.sfx[tower.hitSound]) sound.playSFX(tower.hitSound, tower.name); //Play hit sound
 
-                if (tower.slowing && !target.abilities.includes("acceleration")) target.slowed = tower.permSlow ? Infinity : 250;
-                if (tower.abilityBlocking && !target.abilities.includes("acceleration")) target.noAbilities = tower.permSlow ? Infinity : 250;
-                if (tower.poison && !target.abilities.includes("healing")) {
-                  target.poisoned = 125; //Poison the target for 125 frames
+              if (tower.slowing && !target.abilities.includes("acceleration")) target.slowed = tower.permSlow ? Infinity : 250;
+              if (tower.abilityBlocking && !target.abilities.includes("acceleration")) target.noAbilities = tower.permSlow ? Infinity : 250;
+              if (tower.poison && !target.abilities.includes("healing")) {
+                target.poisoned = 125; //Poison the target for 125 frames
+                if (tower.doublePoison) target.doublePoisoned = true;
+              }
+              if (tower.bounce) {
+                let bouncePath = [target]; //Make an array of all enemies hit so they aren't bounced to again
+                let close = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < 100 && !bouncePath.includes(enemy) && enemy.visible);
+                let bouncesLeft = tower.bounce;
+                while (close.length && bouncesLeft) { //While the projectile can still bounce and there are enemies to bounce to
+                  let closest = close.sort((a, b) => ((target.x - a.x) ** 2 + (target.y - a.y) ** 2) - ((target.x - b.x) ** 2 + (target.y - b.y) ** 2))[0];
+                  let distance = Math.sqrt((target.x - closest.x) ** 2 + (target.y - closest.y) ** 2);
+                  let oldTarget = target;
+                  target = closest;
+
+                  ctx.lineWidth = 4;
+                  ctx.strokeStyle = tower.color;
+                  ctx.beginPath();
+                  ctx.moveTo(oldTarget.x, oldTarget.y);
+                  ctx.lineTo(target.x, target.y);
+                  ctx.stroke();
+
+                  damage = tower.strength;
+                  if (tower.ultimateBoost) damage *= 2;
+                  target.hit(damage, tower);
+                  bouncePath.push(target);
+                  close = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < 100 && !bouncePath.includes(enemy) && enemy.visible);
+                  bouncesLeft--;
+                }
+              }
+              if (tower.poisonSplash) {
+                let close = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < 100 && enemy != target && enemy.visible);
+                if (close.length) {
+                  let closest = close.sort((a, b) => ((target.x - a.x) ** 2 + (target.y - a.y) ** 2) - ((target.x - b.x) ** 2 + (target.y - b.y) ** 2))[0];
+                  let distance = Math.sqrt((target.x - closest.x) ** 2 + (target.y - closest.y) ** 2);
+                  target = closest;
+                  target.poisoned = 125;
                   if (tower.doublePoison) target.doublePoisoned = true;
                 }
-                if (tower.bounce) {
-                  let bouncePath = [target]; //Make an array of all enemies hit so they aren't bounced to again
-                  let close = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < 100 && !bouncePath.includes(enemy) && enemy.visible);
-                  let bouncesLeft = tower.bounce;
-                  while (close.length && bouncesLeft) { //While the projectile can still bounce and there are enemies to bounce to
-                    let closest = close.sort((a, b) => ((target.x - a.x) ** 2 + (target.y - a.y) ** 2) - ((target.x - b.x) ** 2 + (target.y - b.y) ** 2))[0];
-                    let distance = Math.sqrt((target.x - closest.x) ** 2 + (target.y - closest.y) ** 2);
-                    let oldTarget = target;
-                    target = closest;
-
-                    ctx.lineWidth = 4;
-                    ctx.strokeStyle = tower.color;
-                    ctx.beginPath();
-                    ctx.moveTo(oldTarget.x, oldTarget.y);
-                    ctx.lineTo(target.x, target.y);
-                    ctx.stroke();
-
-                    damage = tower.strength;
-                    if (tower.ultimateBoost) damage *= 2;
-                    target.hit(damage, tower);
-                    bouncePath.push(target);
-                    close = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < 100 && !bouncePath.includes(enemy) && enemy.visible);
-                    bouncesLeft--;
-                  }
-                }
-                if (tower.poisonSplash) {
-                  let close = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < 100 && enemy != target && enemy.visible);
-                  if (close.length) {
-                    let closest = close.sort((a, b) => ((target.x - a.x) ** 2 + (target.y - a.y) ** 2) - ((target.x - b.x) ** 2 + (target.y - b.y) ** 2))[0];
-                    let distance = Math.sqrt((target.x - closest.x) ** 2 + (target.y - closest.y) ** 2);
-                    target = closest;
-                    target.poisoned = 125;
-                    if (tower.doublePoison) target.doublePoisoned = true;
-                  }
-                }
-                if (tower.nextExplosion === 0) tower.explosionSize = 75;
-                if (tower.explosionSize) { //If the hit causes an explosion
-                  //Create an explosion centered around the target enemy
-                  let inExplosion = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < tower.explosionSize);
-                  let explosionDamage = tower.powerfulExplosions ? tower.strength : 1;
-                  inExplosion.forEach(enemy => enemy.hit(explosionDamage, tower, "explosion")); //Do damage to every enemy inside the explosion
-                  //Draw the explosion as an orange circle
-                  ctx.strokeStyle = "transparent";
-                  ctx.fillStyle = "#ff8f4055";
-                  ctx.drawCircle(target.x, target.y, tower.explosionSize);
-                  sound.playSFX("explode1");
-                }
-                if (tower.nextExplosion) {
-                  tower.nextExplosion--;
-                } else if (tower.nextExplosion === 0) {
-                  delete tower.explosionSize;
-                  tower.nextExplosion = 5;
-                }
-
-                ctx.drawImage(tower.activeImg, tower.x - 30, tower.y - 30); //Light up the firing tower for 1 frame
-
-                //Draw line of fire
-                ctx.lineWidth = 4;
-                ctx.strokeStyle = tower.color;
-                ctx.beginPath(); //Start a new path
-                if (tower.name == "Air Tower") ctx.moveTo(tower.planeX, tower.planeY);
-                else ctx.moveTo(tower.x, tower.y);
-                ctx.lineTo(target.x, target.y);
-                ctx.stroke(); //Render the path
-
-                tower.cooldown += 25 / tower.speed;
               }
+              if (tower.nextExplosion === 0) tower.explosionSize = 75;
+              if (tower.explosionSize) { //If the hit causes an explosion
+                //Create an explosion centered around the target enemy
+                let inExplosion = enemies.filter(enemy => Math.sqrt((target.x - enemy.x) ** 2 + (target.y - enemy.y) ** 2) < tower.explosionSize);
+                let explosionDamage = tower.powerfulExplosions ? tower.strength : 1;
+                inExplosion.forEach(enemy => enemy.hit(explosionDamage, tower, "explosion")); //Do damage to every enemy inside the explosion
+                //Draw the explosion as an orange circle
+                ctx.strokeStyle = "transparent";
+                ctx.fillStyle = "#ff8f4055";
+                ctx.drawCircle(target.x, target.y, tower.explosionSize);
+                sound.playSFX("explode1");
+              }
+              if (tower.nextExplosion) {
+                tower.nextExplosion--;
+              } else if (tower.nextExplosion === 0) {
+                delete tower.explosionSize;
+                tower.nextExplosion = 5;
+              }
+
+              ctx.drawImage(tower.activeImg, tower.x - 30, tower.y - 30); //Light up the firing tower for 1 frame
+
+              //Draw line of fire
+              ctx.lineWidth = 4;
+              ctx.strokeStyle = tower.color;
+              ctx.beginPath(); //Start a new path
+              if (tower.name == "Air Tower") ctx.moveTo(tower.planeX, tower.planeY);
+              else ctx.moveTo(tower.x, tower.y);
+              ctx.lineTo(target.x, target.y);
+              ctx.stroke(); //Render the path
+
+              tower.cooldown += 25 / tower.speed;
             }
-
-            if (tower.speedBoost) tower.speedBoost--;
-            if (tower.ultimateBoost) tower.ultimateBoost--;
-
-            if (tower.upgrades.range == 2 && tower.upgrades.speed == 2 && tower.upgrades.strength == 2 && tower.extra2.bought) gameAchievements[2] = 1;
           }
+
+          if (tower.speedBoost) tower.speedBoost--;
+          if (tower.ultimateBoost) tower.ultimateBoost--;
+
+          if (tower.upgrades.range == 2 && tower.upgrades.speed == 2 && tower.upgrades.strength == 2 && tower.extra2.bought) gameAchievements[2] = 1;
         });
 
         if (superPlane) {
@@ -1758,7 +1825,7 @@
               if (inRange.length) {
                 let target = inRange.sort((a, b) => b.distance - a.distance)[0];
                 target.hit(superPlane.strength);
-                sound.playSFX("airHit");
+                sound.playSFX("planeHit");
                 ctx.lineWidth = 4;
                 ctx.strokeStyle = "#ff6860";
                 ctx.beginPath();
@@ -1777,7 +1844,12 @@
 
           if (towerTypes[tower].power.cooldown) {
             towerTypes[tower].power.cooldown--;
-            if (!towerTypes[tower].power.cooldown) sound.playSFX("powerReady");
+            if (!towerTypes[tower].power.cooldown) {
+              let powerEl = document.getElementById(tower + "Power");
+              powerEl.classList.add("powerReady");
+              setTimeout(() => powerEl.classList.remove("powerReady"), 1000);
+              sound.playSFX("powerReady");
+            }
           }
 
           if (player.money >= towerTypes[tower].price) {
@@ -1893,7 +1965,7 @@
       let achievements = "{{ achievements }}" || "0000000"; //1 means earned, 0 means not earned
       achievements = achievements.split("");
       let player = {
-        money: 75,
+        money: 75000,
         lives: 100,
         bonusMoney: 0,
         bonusLives: 0
@@ -2041,7 +2113,7 @@
           listText += `<li class=${earned ? "earned" : ""}><${tag}>${achievement}</${tag}></li>`;
         });
         listText += "</ul>";
-        gameAlert(listText);
+        gameAlert(listText, true);
       }
       achvText.append(achvButton);
       progressEl.append(achvText);
@@ -2164,6 +2236,21 @@
       }
 
       function startGame() {
+        //Alerts for maps with errors
+        let errorMessage;
+        if (!map.start || map.start.length != 2) errorMessage = "No start position given.";
+        else if (!map.start.every(pos => Math.abs(pos % 1) == 0.5)) errorMessage = "Invalid start position. Path must start in the middle of a square.";
+        else if (!map.lines || !map.lines.length) errorMessage = "No path given.";
+        else if (!map.lines.every(line => ["up", "down", "left", "right"].includes(line[0]) && !isNaN(line[1]))) errorMessage = "Invalid path. Use the format [direction, length] for each segment of the path.";
+        else if (!Array.isArray(map.waves)) errorMessage = "No waves included.";
+        else if (map.waves.length < 75) errorMessage = "Not enough waves. Maps must include 75 waves.";
+        else if (map.waves.length > 75) errorMessage = "Too many waves. Maps must include 75 waves.";
+        else if (!map.waves.every(wave => Array.isArray(wave))) errorMessage = "Each wave must be contained inside an array.";
+        if (errorMessage) {
+          gameAlert("<b>Map error:</b> " + errorMessage, false, true);
+          return;
+        }
+
         document.getElementById("back").remove();
         document.getElementById("prevMap").remove();
         document.getElementById("nextMap").remove();
@@ -2264,13 +2351,14 @@
         this.onclick = null;
       };
 
-      function gameAlert(message, large) {
+      function gameAlert(message, large, error) {
         document.getElementById("r0c3")?.click(); //Pause the game
         let alertBox = document.createElement("div");
         alertBox.id = "alert";
         alertBox.classList.add("centered");
         alertBox.classList.add("light");
         if (large) alertBox.classList.add("large");
+        if (error) alertBox.classList.add("error");
         let alertText = document.createElement("div");
         alertText.id = "alertText";
         alertText.innerHTML = message;
@@ -2286,7 +2374,7 @@
 
       function hideAlert() {
         document.getElementById("alert").remove(); //Hide the alert box
-        if (paused) document.getElementById("r0c3").click(); //Unpause the game
+        if (paused) document.getElementById("r0c0").click(); //Unpause the game
         document.removeEventListener("keydown", hideAlert);
       }
 

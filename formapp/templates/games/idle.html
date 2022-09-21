@@ -3,80 +3,45 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <!-- <link rel="stylesheet" href="style.css"> -->
-        <!-- <script src="java.js" charset="utf-8"></script> -->
+        <link rel="icon" href="../../static/img/idle/favicon.png">
+        <title>Idle Business</title>
         <style>
         body{
-             background-color: #000015;
+            background-color: #000015;
             height: 100%;
-        }
-        #content  {
+        }#content  {
           display: flex;
           justify-content: center;
           align-items: center;
           flex-direction: column;
           user-select: none;
-        }
-        #game{
-          /* margin: 0 5% 0 5%; */
-          display: flex;
-        justify-content: center;
-        border: 5px solid #78756f;
-        /* box-shadow: 5px 10px 8px 10px #888888; */
-        /* box-shadow: 2px 2px #696764; */
-        border-radius: 5px;
-        padding-top: 1%;
-        padding-left: 2%;
-        padding-right: 5%;
-        padding-bottom: 1%;
-        flex-direction: column;
-        background-color: #b3b0aa;
-        box-shadow: 2px 2px #737170;
-        font-family: OCR A;
-        font-weight: normal;
-        /* margin-top: 5%; */
-            /* display: block;
-            position: fixed;
-            top: 5%;
-            left: 20%;
-            /* bottom: 10%; */
-            /* border: 5px solid black;
-            padding-left: 1%;
-            padding-right: 39%; */
-            /* padding-top: 5%; */
-            /* padding-bottom: 2%;
-            background-color:#ffffff; */
-        }
-        /* #leaderboard{
-            position: fixed;
-            top: 5%;
-            left: 80%;
-            border: 5px solid black;
-            padding-left: 20px;
-            padding-right: 20px;
-            padding-top: 5px;
-            padding-bottom: 10px;
-            background-color:#ffffff;
-        }
-         */
-         #back {
-           margin-bottom: 2%;
-         }
-         #settingsbox{
-           display: none;
-         }
-         /* #settingpic {
+        }#game{
           display: flex;
           justify-content: center;
-          position: absolute;
-        } */
-        h5 {
+          border: 5px solid #78756f;
+          border-radius: 5px;
+          padding-top: 1%;
+          padding-left: 2%;
+          padding-right: 5%;
+          padding-bottom: 1%;
+          flex-direction: column;
+          background-color: #b3b0aa;
+          box-shadow: 2px 2px #737170;
+          font-family: OCR A;
+          font-weight: normal;
+        }#back{
+          margin-bottom: 2%;
+        }#settingsbox{
+           display: none;
+         }#settingpic {
+          display: flex;
+          justify-content: center;
+          position: sticky;
+        }h5 {
           margin-top: 1%;
-        }
-        .gens {
+        }.gens {
           margin: 7% 0 7% 0;
-        }
-        #headerbox {
+        }#headerbox {
           display: flex;
           justify-content: center;
           margin-top: 2%;
@@ -85,8 +50,7 @@
           text-shadow: 2px 2px #737170;
           font-family: OCR A;
           font-weight: bold;
-        }
-        #inv {
+        }#inv {
           display: flex;
           justify-content: space-around;
           flex-direction: row;
@@ -94,24 +58,17 @@
           gap: 10px;
           min-width: 35%;
           min-height: 25%;
-          /* flex-wrap: wrap; */
-        }
-
-        .invbox {
+        }.invbox {
           display: flex;
           border: 3px solid #78756f;
           border-radius: 5px;
-          /* gap: 5px; */
           padding: 10px;
           background-color: #b3b0aa;
           position: sticky;
           box-shadow: 4px 2px #737170;
           min-width: 35%;
-          font-family: OCR A;
           min-height: 25%;
-          /* flex-direction: row; */
-        }
-        button {
+        }button {
           border-radius: 8px;
           border: 2px solid gray;
           transition-duration: 0.4s;
@@ -120,15 +77,11 @@
           box-shadow: 0 4px #999;
           font-family: OCR A;
           font-weight: bold;
-        }
-
-        button:active {
+        }button:active {
           transform: translateY(3px);
           box-shadow: 0 2px #737170;
-          /* background-color: #4CAF50; Green */
           color: black;
         }
-
         </style>
         <script>
         var point = 0;
@@ -144,7 +97,6 @@
         var gen3gain = 7;
         var prestigeLevel = 0;
         var prestigeCost = 25000;
-
         function update() {
             document.getElementById("showPoint").innerText = point;
             document.getElementById("prescost").innerText = prestigeCost;
@@ -181,14 +133,7 @@
             }else {
               document.getElementById('prest').style.backgroundColor = '#4CAF50';
             }
-            // document.getElementById("numba1").innerHTML = username + prestigeLevel;
         }
-        // let username = prompt("Please enter a username");
-        // if (username != null) {
-        //   document.getElementById("numba1").innerHTML = username + ":" + prestigeLevel;
-        // }
-
-
         function save() {
           var save = {
             point: point,
@@ -205,11 +150,8 @@
             prestigeLevel: prestigeLevel,
             prestigeCost: prestigeCost,
           }
-        //   var dataToWrite = "Hello World!";
-        // saveAs("./saves/data.txt", dataToWrite);
           localStorage.setItem("save",JSON.stringify(save));
         }
-
         function load() {
           var savegame = JSON.parse(localStorage.getItem("save"));
           if (typeof savegame.point !== "undefined") point = savegame.point;
@@ -226,30 +168,19 @@
           if (typeof savegame.prestigeLevel !== "undefined") prestigeLevel = savegame.prestigeLevel;
           if (typeof savegame.prestigeCost !== "undefined") prestigeCost = savegame.prestigeCost;
         }
-
         function delSave() {
           localStorage.removeItem("save")
           location.reload()
         }
-
         setInterval(function() {
           update();
             if (gen1s >= 1){
             point += pointPerSecond * .25;
-            // point /= 1
-
             }
         }, 250)
-
-        // setInterval(function() {
-        //     parseFloat(point.toFixed(2))
-        // }, 0)
-
         setInterval(function() {
             save();
         }, 1000)
-
-
         function buygen1() {
           if (point >= gen1Cost) {
             point -= gen1Cost;
@@ -284,7 +215,6 @@
           }else {
           }
         }
-
         function prestige() {
           if (confirm("Are you sure?") == true){
         if (point >= prestigeCost) {
@@ -306,55 +236,37 @@
           gen3gain = Math.round(gen3gain)
           update();
         } else {
-        }
-        }
-        }
 
+        }
+      }
+    }
         function setting() {
-            document.getElementById("settingsbox").style.display = "block";
+          document.getElementById("settingsbox").style.display = "block";
             document.getElementById("gam2").style.display = "none";
           }
-
           function back() {
               document.getElementById("settingsbox").style.display = "none";
               document.getElementById("gam2").style.display = "block";
             }
 </script>
-        <link rel="icon" href="../static/img/idle/business.png">
-  <title>Business Builder</title>
     </head>
     <body onload="load()">
+      <table>
         <div id="content">
           <div id="headerbox">
-              <h1>Business Builder</h1>
+              <h1>Idle Business</h1>
           </div>
-          <!-- <div id="leaderboard">
-            <h2>Prestige Leaderboard</h2>
-            <h3>#1. You : <span id="showplvl"></span></h3>
-            <h4>#2.</h4>
-            <h5>#3.</h5>
-            <h6>4.</h6>
-            <h6>5.</h6>
-            <h6>6.</h6>
-            <h6>7.</h6>
-            <h6>8.</h6>
-            <h6>9.</h6>
-            <h6>10.</h6>
-          </div> -->
           <div id="inv">
               <p class="invbox">Money :&nbsp<span id="showPoint">0</span></p>
               <p class="invbox">Per Second :&nbsp<span id="showpsec">0</span></p>
               <p class="invbox">Business :&nbsp#<span id="showplvl">0</span></p>
           </div>
             <div id="game">
-              <img id='settingpic' src="../static/img/idle/gear.png" alt="Settings" width="5%" length="5%" onclick='setting()'>
+              <img id='settingpic' src="../../static/img/idle/gear.png" alt="Settings" width="50px" length="50px" onclick='setting()'>
     <div id="settingsbox">
         <button id='back' onclick='back()'> &lt-- </button>
         <div id="savebox">
-        <!-- <button onclick="save()">Save Game</button>
-        <button onclick="load()">Load Save</button> -->
-
-        <h2>Game Explanation</h2>You just bought your first business!<br>Hire workers to get more money. Once you get enough money, you can <br>start a new business and get a boost in earnings.<br>Can you come out on top?<br><br><br><br><br><br><br><br><p>Made by: Tommy Blount</p>Discord: parsifaal#8008<br>Dm me with any suggestions<br><br>
+        <h2>Game Explanation</h2>You just bought your first business!<br>Hire workers to get more money. Once you get enough money, you can <br>start a new business and get a boost in earnings.<br>Can you come out on top?<br><br><br><br><br><br><p>Made by: Tommy Blount</p>Discord: parsifaal#8008<br>Dm me with any suggestions<br><br>
         <button onclick="delSave()">Delete Save</button>
     </div>
     </div>
@@ -381,18 +293,8 @@
                       <h5>Costs <span id="prescost">25000</span> money and resets your progress, but boosts your earnings by 1.5x</h5>
                       <br>
                   </div>
-
-                <!-- <div id="inv">
-                    <p id="point">Gold : <span id="showPoint">0</span></p>
-                    <p id="pps">Gold Per Second : <span id="showpsec">0</span></p>
-                    <p id="pres">Prestige : <span id="showplvl2">0</span></p>
-                </div> -->
-                <!-- <div id="savebox">
-                    <button onclick="save()">Save Game</button>
-                    <button onclick="load()">Load Save</button>
-                    <button onclick="delSave()">Delete Save</button>
-                </div> -->
 </div>
         </div>
+      </table>
     </body>
 </html>

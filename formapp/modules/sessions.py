@@ -3,6 +3,9 @@ class Session():
         self.refresh()
         self.ip = ip
         self.studentDict = {}
+        self.mainPage = '/home'
+        self.pollType = None
+        self.pollID = 1
         self.bgm = {
             'nowplaying': '',
             'lastTime': 0,
@@ -14,13 +17,14 @@ class Session():
         self.ttt = []
         self.fighter = {}
         self.settings = {
+            #If you change the default values here, you'll need to update the database too
             'perms': {
                 'admin' : 0,
                 'users' : 1,
                 'api' : 3,
                 'sfx' : 1,
                 'bgm' : 1,
-                'say' : 3,
+                'say' : 2,
                 'bar' : 1,
                 'games': 2,
                 'teacher': 0,
@@ -40,8 +44,8 @@ class Session():
             'upcolor': 'green',
             'wigglecolor': 'blue',
             'downcolor': 'red',
-            'barmode': 'tutd',
-            'modes': ['tutd', 'survey', 'quiz', 'essay', 'progress', 'playtime'],
+            'barmode': 'playtime',
+            'modes': ['poll', 'tutd', 'abcd', 'text', 'quiz', 'essay', 'progress', 'playtime'],
             'whitelist': [
                 '127.0.0.1',
                 '172.21.3.5'
@@ -50,7 +54,7 @@ class Session():
 
     def refresh(self):
         self.currentStep = 0
-        self.wawdLink = '/'
+        self.wawdLink = ''
         self.agendaStep = 0
         self.activePhrase = ''
         self.activePrompt = ''
@@ -65,13 +69,22 @@ class Student():
     def __init__(self, username):
         self.name = username
         self.help = False
+        self.breakReq = False
         self.thumb = ''
-        self.survey = ''
+        self.letter = ''
+        self.textRes = ''
         self.progress = []
         self.perms = 2
         self.quizResults = {}
+        self.preferredHomepage = None
 
 
 class TTTGame():
     def __init__(self, players):
         self.players = players
+        self.turn = 1
+        self.gameboard = [
+            [None, None, None],
+            [None, None, None],
+            [None, None, None]
+        ]

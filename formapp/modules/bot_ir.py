@@ -3,7 +3,7 @@ import requests
 import time
 
 #Wait a minute before logging in.
-time.sleep(1)
+time.sleep(60)
 #This will be changed once there is a better login method in the main app.py
 
 #Send a login POST request

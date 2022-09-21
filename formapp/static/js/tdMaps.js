@@ -13,8 +13,36 @@
     [direction, length],
     [direction, length],
     …
-  ]
+  ],
+  waves: Waves array (see below) or wavesDefault
 }*/
+
+//Waves array example:
+/*[
+  //Each array is a wave. You must include 75 waves.
+  ["g", pause, "y", pause, "o"], //A green, a yellow, and an orange, with pauses in between
+  [[10, "r"], ["alert", "This is a message that will be shown onscreen."]], //10 reds followed by a message for the player
+  [[5, "pa", "bh"]], //A purple with acceleration and a brown with healing, repeated 5 times
+  …
+]*/
+
+//ENEMY CODES:
+//Types (first charcter):
+//"g" — green
+//"y" — yellow
+//"o" — orange
+//"r" — red
+//"p" — purple
+//"b" — brown
+//"x" — boss
+//"z" — brown-boss
+//"u" — purple-boss
+//Abilities (second character):
+//"h" — healing
+//"a" — acceleration
+//"s" — split
+//"k" — blink
+//"d" — shield
 
 let maps = [
   {
@@ -42,7 +70,8 @@ let maps = [
       ["left", 4],
       ["down", 2],
       ["right", 8]
-    ]
+    ],
+    waves: wavesDefault
   },
   {
     name: "Map #02",
@@ -64,7 +93,8 @@ let maps = [
       ["right", 6],
       ["up", 10],
       ["right", 9]
-    ]
+    ],
+    waves: wavesDefault
   },
   {
     name: "Map #03",
@@ -98,7 +128,8 @@ let maps = [
       ["up", 1],
       ["right", 1],
       ["up", 2]
-    ]
+    ],
+    waves: wavesDefault
   },
   {
     name: "Map #04",
@@ -127,7 +158,8 @@ let maps = [
       ["right", 4],
       ["up", 1],
       ["left", 22]
-    ]
+    ],
+    waves: wavesDefault
   },
   {
     name: "Map #05",
@@ -151,7 +183,8 @@ let maps = [
       ["left", 4],
       ["down", 2],
       ["left", 4]
-    ]
+    ],
+    waves: wavesDefault
   },
   {
     name: "Celtic Knot",
@@ -175,7 +208,8 @@ let maps = [
       ["left", 5],
       ["down", 7],
       ["right", 9]
-    ]
+    ],
+    waves: wavesDefault
   },
   {
     name: "Outer Loop",
@@ -197,7 +231,8 @@ let maps = [
       ["up", 13],
       ["left", 13],
       ["up", 2]
-    ]
+    ],
+    waves: wavesDefault
   },
   {
     name: "Where'dja Go?",
@@ -244,7 +279,8 @@ let maps = [
       ["right", 4],
       ["left", 2],
       ["right", 9]
-    ]
+    ],
+    waves: wavesDefault
   },
   {
     name: "Jiggle'n'Juke",
@@ -315,8 +351,90 @@ let maps = [
       ["right", 2],
       ["left", 1],
       ["right", 2]
+    ],
+    waves: [
+
+
+
+      [[4, "y"]],
+      [[6, "y"]],
+      [[8, "y"]],
+      [[10, "y"]],
+      [[12, "y"]],
+      [[14, "y"]],
+      [[16, "y"]],
+      [[18, "y"]],
+      [[20, "y"]],
+      [[22, "y"]],
+      [[24, "y"]],
+      [[26, "y"]],
+      [[28, "y"]],
+      [[30, "y"]],
+      [[32, "y"]],
+      [[34, "y"]],
+      [[36, "y"]],
+      [[38, "y"]],
+      [[40, "y"]],
+      [[45, "y"]],
+      [[50, "y"]],
+      [[55, "y"]],
+      [[60, "y"]],
+      [[65, "y"]],
+      [[70, "y"]],
+      [[75, "y"]],
+      [[80, "y"]],
+      [[85, "y"]],
+      [[90, "y"]],
+      [[95, "y"]],
+      [[100, "o"]],
+      [[110, "o"]],
+      [[120, "o"]],
+      [[130, "o"]],
+      [[140, "o"]],
+      [[150, "o"]],
+      [[160, "o"]],
+      [[170, "o"]],
+      [[180, "o"]],
+      [[190, "o"]],
+      [[200, "o"]],
+      [[220, "o"]],
+      [[240, "o"]],
+      [[260, "o"]],
+      [[280, "o"]],
+      [[300, "o"]],
+      [[320, "o"]],
+      [[340, "o"]],
+      [[360, "o"]],
+      [[400, "o"]],
+      //Hard mode only
+      [[400, "r"]],
+      [[500, "r"]],
+      [[600, "r"]],
+      [[700, "r"]],
+      [[800, "r"]],
+      [[900, "r"]],
+      [[1000, "r"]],
+      [[1000, "r"]],
+      [[1000, "r"]],
+      [[1000, "r"]],
+      [[1000, "r"]],
+      [[1000, "r"]],
+      [[1000, "r"]],
+      [[1000, "r"]],
+      [[1000, "r"]],
+      [[1000, "r"]],
+      [[1000, "r"]],
+      [[1000, "r"]],
+      [[1000, "r"]],
+      [[1000, "r"]],
+      [[1000, "r"]],
+      [[1000, "r"]],
+      [[1000, "r"]],
+      [[1000, "r"]],
+      [[1000, "r"]]
     ]
   },
 
   //↑ New maps go here ↑
 ];
+maps[8].waves.forEach(wave => wave.unshift([8, pause])); //Add a break at the start of each wave

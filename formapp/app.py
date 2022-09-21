@@ -1704,6 +1704,16 @@ def endpoint_games_hangman():
             highScore = 0
         return render_template("games/hangman.html", wordObj=wordObj, highScore = highScore)
 
+'''
+    /games/idle
+'''
+@app.route('/games/idle')
+def endpoint_games_idle():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    else:
+        return render_template('games/idle.html')
+
 @app.route('/games/minesweeper')
 def endpoint_games_minesweeper():
     if not request.remote_addr in sD.studentDict:

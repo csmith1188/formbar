@@ -1593,7 +1593,7 @@ def endpoint_flush():
 def endpoint_games_2048():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
-    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
+    elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
     else:
         username = sD.studentDict[request.remote_addr]['name']
@@ -1611,7 +1611,7 @@ def endpoint_games_2048():
 def endpoint_games_bitshifter():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
-    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
+    elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
     else:
         username = sD.studentDict[request.remote_addr]['name']
@@ -1632,14 +1632,16 @@ def endpoint_games_bitshifter():
 def endpoint_games_dinogame():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
+    elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
     else:
-        return render_template('games/dinoGame.html')
+        return render_template('dinoGame.html')
 
 @app.route('/games/fighter', methods = ['GET', 'POST'])
 def endpoint_games_fighter():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
-    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
+    elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
     else:
         username = sD.studentDict[request.remote_addr]['name']
@@ -1691,7 +1693,7 @@ def endpoint_games_flashcards():
 def endpoint_games_hangman():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
-    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
+    elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
     else:
         if sD.lesson:
@@ -1721,6 +1723,8 @@ def endpoint_games_hangman():
 def endpoint_games_idle():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
+    elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
     else:
         return render_template('games/idle.html')
 
@@ -1758,8 +1762,10 @@ def endpoint_games_minesweeper():
 def endpoint_games_slope():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
+    elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
+        return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
     else:
-        return render_template('games/slope.html')
+        return render_template('slope.html')
 
 @app.route('/games/speedtype')
 def endpoint_games_speedtype():
@@ -1783,7 +1789,7 @@ def endpoint_games_speedtype():
 def endpoint_games_towerdefense():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
-    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
+    elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
     else:
         username = sD.studentDict[request.remote_addr]['name']
@@ -1799,7 +1805,7 @@ def endpoint_games_towerdefense():
 def endpoint_games_ttt():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
-    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['student']:
+    elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['student']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
     else:
         opponent = request.args.get('opponent')
@@ -1839,7 +1845,7 @@ def endpoint_games_ttt():
 def endpoint_games_wordle():
     if not request.remote_addr in sD.studentDict:
         return redirect('/login?forward=' + request.path)
-    if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
+    elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['games']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
     else:
         username = sD.studentDict[request.remote_addr]['name']
@@ -2481,7 +2487,6 @@ def endpoint_segment():
             pixels.show()
         return render_template("message.html", message = "Color sent!")
 
-'''
 @app.route('/sendblock')
 def endpoint_sendblock():
     if not sD.settings['barmode'] == 'blockchest':
@@ -2498,7 +2503,6 @@ def endpoint_sendblock():
             return render_template("message.html", message = "Bad block Id")
     else:
         return render_template("message.html", message = "Bad Arguments. Requires 'id' and 'data'")
-'''
 
 #Choose the user's default homepage
 @app.route('/setdefault', methods = ['POST', 'GET'])

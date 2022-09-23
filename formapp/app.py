@@ -1624,6 +1624,16 @@ def endpoint_games_bitshifter():
         else:
             highScore = 0
         return render_template('games/bitshifter.html', highScore = highScore)
+    
+'''
+    /games/dinogame
+'''
+@app.route('/games/dinogame')
+def endpoint_games_dinogame():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    else:
+        return render_template('games/dinoGame.html')
 
 @app.route('/games/fighter', methods = ['GET', 'POST'])
 def endpoint_games_fighter():
@@ -1740,6 +1750,16 @@ def endpoint_games_minesweeper():
         else:
             bestTime = 0
         return render_template("games/mnsw.html", cols=cols, rows=rows, dense=dense, bestTime=bestTime)
+
+'''
+    /games/slope
+'''
+@app.route('/games/slope')
+def endpoint_games_slope():
+    if not request.remote_addr in sD.studentDict:
+        return redirect('/login?forward=' + request.path)
+    else:
+        return render_template('games/slope.html')
 
 @app.route('/games/speedtype')
 def endpoint_games_speedtype():

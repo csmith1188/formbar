@@ -86,7 +86,6 @@
     right: 0;
     padding: 10px;
     overflow: auto;
-    pointer-events:auto;
   }
 
   #ulHeading {
@@ -258,15 +257,6 @@
     height: 140px;
   }
 
- /* The css for the content menu  */
-  .menu {
-    display: none;
-    position: absolute;
-    padding: 10px;
-    background-color: #ddd;
-    border: 1px solid #000;
-}
-
   .small #controlChat.disabled {
     padding: 17px 0;
   }
@@ -297,8 +287,6 @@
   .small #notifications {
     display: none;
   }
-
-  
 </style>
 {% endblock %}
 
@@ -323,12 +311,6 @@
 <div id="notifications">
   <input type="checkbox" id="notificationsCheckbox"><label for="notificationsCheckbox">Desktop notifications</label>
 </div>
- <!-- make a menu for the right click  -->
-<div class="menu">
-  <li>Private chat</li>
-  <li id="profile">Profile</li>
-  <li>Fighter</li>
-</div>
 {% endblock %}
 
 <!-- Extra javascript here -->
@@ -336,22 +318,6 @@
 <script type="text/javascript">
     var username = "{{ username }}";
     var receiver = 'all';
- 
-    //make the context menu show up in userlist only.
-    $("#userlist").bind("contextmenu", function(e) {
-      console.log("test")
-      //because ulHover constantly getting update one grab/check is not enough.
-      //userlist is how ever constant on grab only
-      console.log($('div.msg.ulName.them.ulHover'))
-      if($('div.msg.ulName.them.ulHover').length == 1){
-        $('.menu').css({
-    top: e.pageY+'px',
-    left: e.pageX+'px'
-    }).show();
-      }
-    
-return false ;
-});
 
     //Get old messages from the database
     let messages = "{{ messages }}".replaceAll("&#34;", "\"");
@@ -461,12 +427,6 @@ return false ;
               profileButton.innerText = "View profile";
               profileButton.classList.add("profileButton");
               profileButton.onmouseover = event => event.stopPropagation();
-              document.getElementById("profile").onclick = event => {
-                let advancedParam = urlParams.get("advanced") ? "&advanced=true" : "";
-                window.location = `/profile?user=${name}${advancedParam}`;
-                event.stopPropagation();
-              };
-              // share very familier code with the profilebutton
               profileButton.onclick = event => {
                 let advancedParam = urlParams.get("advanced") ? "&advanced=true" : "";
                 window.location = `/profile?user=${name}${advancedParam}`;

@@ -263,8 +263,8 @@
     display: none;
     position: absolute;
     padding: 10px;
-    background-color: #ddd;
-    border: 1px solid #000;
+    background-color: rgb(54, 51, 51);
+    border: 1px solid black;
 }
 
   .small #controlChat.disabled {
@@ -325,7 +325,7 @@
 </div>
  <!-- make a menu for the right click  -->
 <div class="menu">
-  <li>Private chat</li>
+  <li id="private">Private chat</li>
   <li id="profile">Profile</li>
   <li>Fighter</li>
 </div>
@@ -339,11 +339,14 @@
  
     //make the context menu show up in userlist only.
     $("#userlist").bind("contextmenu", function(e) {
-      console.log("test")
       //because ulHover constantly getting update one grab/check is not enough.
       //userlist is how ever constant on grab only
-      console.log($('div.msg.ulName.them.ulHover'))
       if($('div.msg.ulName.them.ulHover').length == 1){
+        // grab the element data for proper profile sending.
+        let Profilename = $('div.msg.ulName.them.ulHover').attr("onclick")
+        console.log(Profilename);
+        //import the onclick to private on the context menu
+        $('.menu #private').attr('onclick', `${Profilename}`)
         $('.menu').css({
     top: e.pageY+'px',
     left: e.pageX+'px'
@@ -352,6 +355,16 @@
     
 return false ;
 });
+// three function below all have the purpose to close down the context menu
+  $(document).bind('contextmenu click', function() {
+    $(".menu").hide();
+  });
+  $(".menu").bind('contextmenu click', function() {
+    $(".menu").hide();
+  });
+  $(window).bind('beforeunload', function(){
+    $(".menu").hide();
+  });
 
     //Get old messages from the database
     let messages = "{{ messages }}".replaceAll("&#34;", "\"");
@@ -461,17 +474,14 @@ return false ;
               profileButton.innerText = "View profile";
               profileButton.classList.add("profileButton");
               profileButton.onmouseover = event => event.stopPropagation();
-              document.getElementById("profile").onclick = event => {
-                let advancedParam = urlParams.get("advanced") ? "&advanced=true" : "";
-                window.location = `/profile?user=${name}${advancedParam}`;
-                event.stopPropagation();
-              };
+              
               // share very familier code with the profilebutton
               profileButton.onclick = event => {
                 let advancedParam = urlParams.get("advanced") ? "&advanced=true" : "";
                 window.location = `/profile?user=${name}${advancedParam}`;
                 event.stopPropagation();
               };
+              
               newUser.appendChild(profileButton);
               newUser.onmouseover = function() {this.classList.add("ulHover");};
               newUser.onmouseout = function() {this.classList.remove("ulHover");};
@@ -662,4 +672,5 @@ return false ;
       }
     };
 </script>
+
 {% endblock %}

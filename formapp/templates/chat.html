@@ -324,7 +324,7 @@
   <input type="checkbox" id="notificationsCheckbox"><label for="notificationsCheckbox">Desktop notifications</label>
 </div>
  <!-- make a menu for the right click  -->
-<div class="menu">
+<div class="menu" id="menu">
   <li id="private">Private chat</li>
   <li id="profile">Profile</li>
   <li>Fighter</li>
@@ -471,11 +471,21 @@ return false ;
               newUser.setAttribute("onclick", "changeRec('" + name + "', this)");
               newUser.title = "Send a private message";
               let profileButton = document.createElement("button");
+              let profile = document.getElementById("profile");
+              let menu = document.getElementById("menu");
               profileButton.innerText = "View profile";
               profileButton.classList.add("profileButton");
               profileButton.onmouseover = event => event.stopPropagation();
               
               // share very familier code with the profilebutton
+              profile.onclick = event => {
+                console.log("test");
+                let advancedParam = urlParams.get("advanced") ? "&advanced=true" : "";
+                window.location = `/profile?user=${name}${advancedParam}`;
+                event.stopPropagation();
+              };
+
+
               profileButton.onclick = event => {
                 let advancedParam = urlParams.get("advanced") ? "&advanced=true" : "";
                 window.location = `/profile?user=${name}${advancedParam}`;

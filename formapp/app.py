@@ -2238,6 +2238,8 @@ def endpoint_profile():
         if userFound:
             db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
             dbcmd = db.cursor()
+            digipogs = dbcmd.execute("SELECT digipogs FROM users WHERE username=:uname AND digipogs",  {"uname": user['name']}).fetchone()
+            print(digipogs[0])
             highScores = {
                 "2048": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='2048' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
                 "bitshifter": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='bitshifter' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
@@ -2249,8 +2251,9 @@ def endpoint_profile():
                 "fighter": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='fighter' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
                 "wordle": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='wordle' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
             }
+            print(highScores)
             db.close()
-            return render_template("profile.html", username = user['name'], perms = sD.settings['permname'][user['perms']], bot = user['bot'], highScores = json.dumps(highScores))
+            return render_template("profile.html", username = user['name'], perms = sD.settings['permname'][user['perms']], bot = user['bot'], highScores = json.dumps(highScores), digipogs = digipogs[0])
         #If there are no matches
         return render_template("message.html", message = "There are no users with that name.")
 
@@ -2672,6 +2675,17 @@ def endpoint_users():
                 if request.args.get('name') == sD.studentDict[key]['name']:
                     user = key
                     break
+            if action == 'updateDP':
+                db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+                dbcmd = db.cursor()
+                digipogs = dbcmd.execute("SELECT digipogs FROM users WHERE username=:uname AND digipogs",  {"uname": request.args.get('name')}).fetchone()
+                addDigi = request.args.get('digipogs')
+                digiAmount =  int(''.join(map(str, digipogs))) + int(addDigi)
+                print(digiAmount)
+                dbcmd.execute("UPDATE users SET digipogs=:digipogs WHERE username=:uname", {"uname": request.args.get('name'), "digipogs": digiAmount})
+                db.commit()
+                db.close()
+                return render_template("message.html", message = "Added Digipogs")
             if action == 'delete':
                 db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
                 dbcmd = db.cursor()

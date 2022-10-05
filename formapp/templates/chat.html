@@ -361,10 +361,16 @@
           link = $(index).children(".inline.popOut");
           // goes to the buttom data,
           if (tempname[0] == getname){
-            // import the fighter link into the menu fighter data.
+            // import the fighter link into the menu fighter data. and show the fighter option
+            $(".menu #fighter").show()
             $('.menu #fighter').attr('onclick', $(link).attr("onclick") )
+          } else {
+            //if false. hide the fighter option.
+            $(".menu #fighter").hide()
           };
         });
+       
+        
        
 
 
@@ -386,6 +392,17 @@
     
 return false ;
 });
+
+// it was going to add in a way to remove the join match buttom. can't figure out a way where they information save to.
+// $(document).ready(function() {
+//   $(".msg.alert .content .inline.popOut").click( function(){
+//       $(this).hide();
+//       $(this).parent().text("THE Oppenment have been found")
+//       $(this).closest('.msg.alert').attr('class', 'msg them')
+//     });
+// });
+
+
 // three function below all have the purpose to close down the context menu
   $(document).bind('contextmenu click', function() {
     $(".menu").hide();

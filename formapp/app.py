@@ -32,7 +32,7 @@ from config import *
 # 3 - anyone
 # 4 - banned
 
-NEWACCOUNTPERMISSIONS = 3
+NEWACCOUNTPERMISSIONS = 2
 
 #Importing external modules
 from flask import Flask, redirect, url_for, request, render_template, session, copy_current_request_context
@@ -2062,7 +2062,7 @@ def endpoint_login():
             userType = request.form['userType']
             forward = request.form['forward']
             bot = request.form['bot']
-            bot = bot.lower() == "true"
+            bot = bot.lower() == "true" 
 
 
             if userType == "login":

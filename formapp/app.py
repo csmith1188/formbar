@@ -2679,7 +2679,6 @@ def endpoint_users():
                 digipogs = dbcmd.execute("SELECT digipogs FROM users WHERE username=:uname AND digipogs",  {"uname": request.args.get('name')}).fetchone()
                 addDigi = request.args.get('digipogs')
                 digiAmount =  int(''.join(map(str, digipogs))) + int(addDigi)
-                print(digiAmount)
                 dbcmd.execute("UPDATE users SET digipogs=:digipogs WHERE username=:uname", {"uname": request.args.get('name'), "digipogs": digiAmount})
                 db.commit()
                 db.close()

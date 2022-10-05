@@ -208,7 +208,7 @@
     <div id="permsContainer">
       <div class="permBox">
         <h3>Chat</h3>
-        <select onchange="updatePerm(this)" id="saypermsDrop" name="saypermsDrop" style="margin-top: 8px;">
+        <select onchange="updatePerm(this); location.reload()" id="saypermsDrop" name="saypermsDrop" style="margin-top: 8px;">
           <option value="/controlpanel?say=0">Teacher</option>
           <option value="/controlpanel?say=1">Mod</option>
           <option value="/controlpanel?say=2" selected>Student</option>
@@ -220,7 +220,7 @@
       </div>
       <div class="permBox">
         <h3>Games</h3>
-        <select onchange="updatePerm(this)" id="gamespermsDrop" name="gamespermsDrop" style="margin-top: 8px;">
+        <select onchange="updatePerm(this); location.reload()" id="gamespermsDrop" name="gamespermsDrop" style="margin-top: 8px;">
           <option value="/controlpanel?games=0">Teacher</option>
           <option value="/controlpanel?games=1">Mod</option>
           <option value="/controlpanel?games=2" selected>Student</option>
@@ -232,7 +232,7 @@
       </div>
       <div class="permBox">
         <h3>LED bar</h3>
-        <select onchange="updatePerm(this)" id="barpermsDrop" name="barpermsDrop" style="margin-top: 8px;">
+        <select onchange="updatePerm(this); location.reload()" id="barpermsDrop" name="barpermsDrop" style="margin-top: 8px;">
           <option value="/controlpanel?bar=0" selected>Teacher</option>
           <option value="/controlpanel?bar=1">Mod</option>
           <option value="/controlpanel?bar=2">Student</option>
@@ -244,7 +244,7 @@
       </div>
       <div class="permBox">
         <h3>Sounds</h3>
-        <select onchange="updatePerm(this)" id="sfxpermsDrop" name="sfxpermsDrop" style="margin-top: 8px;">
+        <select onchange="updatePerm(this); location.reload()" id="sfxpermsDrop" name="sfxpermsDrop" style="margin-top: 8px;">
           <option value="/controlpanel?sfx=0" selected>Teacher</option>
           <option value="/controlpanel?sfx=1">Mod</option>
           <option value="/controlpanel?sfx=2">Student</option>
@@ -256,7 +256,7 @@
       </div>
       <div class="permBox">
         <h3>Music</h3>
-        <select onchange="updatePerm(this)" id="bgmpermsDrop" name="bgmpermsDrop" style="margin-top: 8px;">
+        <select onchange="updatePerm(this); location.reload()" id="bgmpermsDrop" name="bgmpermsDrop" style="margin-top: 8px;">
           <option value="/controlpanel?bgm=0" selected>Teacher</option>
           <option value="/controlpanel?bgm=1">Mod</option>
           <option value="/controlpanel?bgm=2">Student</option>
@@ -268,7 +268,7 @@
       </div>
       <div class="permBox">
         <h3>API</h3>
-        <select onchange="updatePerm(this)" id="apipermsDrop" name="apipermsDrop" style="margin-top: 8px;">
+        <select onchange="updatePerm(this); location.reload()" id="apipermsDrop" name="apipermsDrop" style="margin-top: 8px;">
           <option value="/controlpanel?api=0">Teacher</option>
           <option value="/controlpanel?api=1">Mod</option>
           <option value="/controlpanel?api=2">Student</option>
@@ -282,7 +282,7 @@
         </p>
       </div>
     </div>
-    <button id="resetPerms" class="inline popOut" onclick="resetPerms();">Reset permissions</button>
+    <button id="resetPerms" class="inline popOut" onclick="resetPerms(); location.reload()">Reset permissions</button>
   </div>
   <div id="tabs-5">
     <h2>Lock Formbar</h2>

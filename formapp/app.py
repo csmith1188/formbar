@@ -2761,6 +2761,10 @@ def endpoint_users():
                                 db.close()
                                 print("[info] " + "")
                                 return render_template("message.html", message = "Changed user permission.")
+                                # If they are not a teacher / admin, refresh their page
+                                # Controlpanel.html already has a refreshing feature for each button
+                                if perm > 1:
+                                    location.reload()
                         else:
                             return render_template("message.html", message = "User not in list.")
                     except:

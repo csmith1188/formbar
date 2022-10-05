@@ -10,7 +10,12 @@ you have successfully started the formbar. now go to your localhost or type in t
 
 
 How to setup and run in Linux-
-For this you must use the linux terminal(CTRL+ALT+T)
-open the formbar folder in your terminal. in your terminal type 'sh formbarSetup_Linux.sh'.
-Once that is completed, type in 'sh formbarStart_Linux.sh'
-*WAITING FOR FURTHER INSTRUCTIONS*
+open the formbar folder in terminal.
+type into the terminal "sh formbarSetup_Linux.sh"
+let the file run its course. then type in the command "sh formbarStart_Linx.sh".
+copy the long string of letters using CTRL + SHIFT + CTRL
+next you go to formapp/key.py 
+in key.py, in line 5 remove the '' and paste in the long string of letters from earlier with CTRL + V
+save the file and go back to the formbar folder
+now type in "sh formbarStart_Linux.sh" 
+you have now successfully set up and run the formbar. 

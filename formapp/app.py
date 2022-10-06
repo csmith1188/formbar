@@ -2608,6 +2608,7 @@ def endpoint_tutd():
             if sD.settings['barmode'] == 'tutd':
                 # print("[info] " + "Recieved " + thumb + " from " + name + " at ip: " + ip)
                 if thumb in ['up', 'down', 'wiggle']:
+                    # emit('message', json.dumps({"thumb": thumb}), broadcast=True)
                     if sD.studentDict[request.remote_addr]['thumb'] != thumb:
                         sD.studentDict[request.remote_addr]['thumb'] = thumb
                         tutdBar()
@@ -2962,6 +2963,34 @@ def message(message):
         emit('alert', client, json.dumps(packMSG('alert', sD.studentDict[request.remote_addr]['name'], 'server', 'Only the server can send alerts!')))
     except Exception as e:
         print("[error] " + 'Error: ' + str(e))
+
+@socket_.on('teacherAlert', namespace=chatnamespace)
+def message(message):
+    print(message)
+
+@socket_.on('tutd', namespace=chatnamespace)
+def message(message):
+    message = json.loads(message)
+    print(message['content'])
+    if content == message:
+        def handle_message(message):
+            send(message, namespace='/controlpanel'):
+
+@socketio.on('connect')
+def test_connect(auth):
+    emit('my response', {'data': 'Connected'})
+    if 'Connected' == true:
+        def message(message):
+    message = "User Connected"
+        def handle_message(message):
+            send(message, namespace='/controlpanel')
+
+@socketio.on('disconnect')
+def test_disconnect():
+    print('Client disconnected')
+    message = "User disconnected"
+    def handle_message(message):
+            send(message, namespace='/controlpanel')
 
 @socket_.on('help', namespace=chatnamespace)
 def message(message):

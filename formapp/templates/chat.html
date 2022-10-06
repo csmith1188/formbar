@@ -509,7 +509,12 @@
                 // args = text.split(" ");
                 // args.shift();
                 chatSocket.emit("help", packMSG(receiver, username, text));
-            } else {
+            } else  if (text.startsWith("!#tutd")) {
+                // text.splice(0, 2);
+                args = text.split(" ");
+                // args.shift();
+                chatSocket.emit("tutd", packMSG(receiver, username, {command: args[0], thumb: arg[1]}));
+            }else {
                 chatSocket.emit("message", packMSG(receiver, username, text));
             }
             boxes.inputBox.value = "";

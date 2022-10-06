@@ -49,9 +49,10 @@ import time, math
 import threading
 import logging
 
-
+#This import allows for the time to be printed to console. The second line is the line of code used to update the time so whenever something gets printed the time will be accurate. If adding new print lines add the 2nd line here directly above the print line so that it updates the time. The third line is an example of a print line
 import datetime
 now = datetime.datetime.now()
+#print(now.strftime("%Y-%m-%d %H:%M:%S") + " [info] " +"Bot successful login. Made them a guest: " + username)
 
 import traceback
 import sqlite3
@@ -188,7 +189,7 @@ def dbug(message='Checkpoint Reached'):
     global DEBUG
     if DEBUG:
         now = datetime.datetime.now()
-        print(now.strftime("%Y-%m-%d %H:%M:%S") + " [DEBUG] " + str(message))
+        print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [DEBUG] " + str(message))
 
 def newStudent(remote, username, bot=False):
     global NEWACCOUNTPERMISSIONS
@@ -226,7 +227,7 @@ def newStudent(remote, username, bot=False):
         #Login bots as guest
         if bot:
             now = datetime.datetime.now()
-            print(now.strftime("%Y-%m-%d %H:%M:%S") + " [info] " +"Bot successful login. Made them a guest: " + username)
+            print(now.strftime("[%Y-%m-%d %H:%M:%S]") + " [info] " +"Bot successful login. Made them a guest: " + username)
             sD.studentDict[remote]['perms'] = sD.settings['perms']['anyone']
 
         #Login as teacher if there is no teacher yet
@@ -276,6 +277,9 @@ def refreshUsers(selectedStudent='', category=''):
             except Exception as e:
                 now = datetime.datetime.now()
                 print(now.strftime("%Y-%m-%d %H:%M:%S") + " [error] " +e)
+                f = open('demofile.txt', 'a')
+                f.write(str(Argument))
+                f.close()
                 return False
         else:
             sD.studentDict[student]['thumb'] = '',
@@ -331,9 +335,13 @@ def changeMode(newMode='', direction='next'):
 #This function Allows you to choose and play whatever sound effect you want
 def playSFX(sound):
     try:
-        pygame.mixer.Sound(sfx.sound[sound]).play()
+        moe.ron()
         return "Successfully played: "
-    except:
+    except Exception as e:
+        f = open('demofile.txt', 'a')
+        f.write(str(e) + "\n")
+        f.close()
+        print(e)
         return "Invalid format: "
 
 def stopSFX():

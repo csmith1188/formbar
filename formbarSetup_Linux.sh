@@ -20,6 +20,6 @@ sudo pip3 install cryptography
 sudo pip3 --default-timeout=1000 install pandas
 sudo pip3 install rpi_ws281x adafruit-circuitpython-neopixel
 sudo python3 -m pip install --force-reinstall adafruit-blinka
-mv formapp/data/database_template.db data/database.db
-mv formapp/key_template.py formapp/key.py
-mv formapp/config_template.py formapp/config.py
+cp formapp/data/database_template.db data/database.db
+cp formapp/key_template.py data/key.py
+cp formapp/config_template.py data/config.py

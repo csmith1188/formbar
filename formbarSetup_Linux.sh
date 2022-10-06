@@ -19,6 +19,6 @@ sudo pip3 install openpyxl
 sudo pip3 install netifaces
 sudo pip3 install cryptography
 sudo pip3 --default-timeout=1000 install pandas
-mv formapp/data/database_template.db data/database.db
-mv formapp/key_template.py formapp/key.py
-mv formapp/config_template.py formapp/config.py
+cp formapp/data/database_template.db formapp/data/database.db
+cp formapp/key_template.py formapp/key.py
+cp formapp/config_template.py formapp/config.py

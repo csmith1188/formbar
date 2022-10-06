@@ -266,6 +266,7 @@
     padding: 10px;
     background-color: rgb(54, 51, 51);
     border: 1px solid black;
+    font-weight: bold;
 }
 
   .small #controlChat.disabled {
@@ -356,14 +357,18 @@
           // start for each fighter alert, index is the element data jquery.
         tempname = $(index).text().split(" ");
         // get the first word of the text line since it always say their username
-          console.log(tempname[0] == getname);
           // compare the click name and the temporary fighter name
-          link = $(index).children(".inline.popOut");
           // goes to the buttom data,
           if (tempname[0] == getname){
             // import the fighter link into the menu fighter data. and show the fighter option
+            link = $(index).children(".inline.popOut");
+            let msgid  = $(index).parent().attr('id').slice(3);
+            //true link provide a function to join the game and to delete the message.
+            let truelink = $(link).attr("onclick") + `; chatSocket.emit('delete', ${msgid}) ` 
+            console.log(truelink);
             $(".menu #fighter").show()
-            $('.menu #fighter').attr('onclick', $(link).attr("onclick") )
+            // insert the onclick to the fighter tab
+            $('.menu #fighter').attr('onclick', truelink );
           } else {
             //if false. hide the fighter option.
             $(".menu #fighter").hide()
@@ -393,17 +398,17 @@
 return false ;
 });
 
-// it was going to add in a way to remove the join match buttom. can't figure out a way where they information save to.
-// $(document).ready(function() {
-//   $(".msg.alert .content .inline.popOut").click( function(){
-//       $(this).hide();
-//       $(this).parent().text("THE Oppenment have been found")
-//       $(this).closest('.msg.alert').attr('class', 'msg them')
-//     });
-// });
+ //it was going to add in a way to remove the join match buttom. can't figure out a way where they information save to.
+ $(document).ready(function() {
+   $(".msg.alert .content .inline.popOut").click( function(){
+    //it will delete the fighter links. when the button is click.    
+    chatSocket.emit('delete', $(this).parent().parent().attr('id').slice(3),);
+       $(this).hide();
+     });
+ });
 
 
-// three function below all have the purpose to close down the context menu
+// three function below all have the purpose to close down the context menu. click anywhere on the page will close down the menu.
   $(document).bind('contextmenu click', function() {
     $(".menu").hide();
   });
@@ -413,6 +418,34 @@ return false ;
   $(window).bind('beforeunload', function(){
     $(".menu").hide();
   });
+
+  //when the mouse over the tabs of the menu. it will do a class thing like the orginal thing like mouse hover but jquery.
+  //happens when the mouse enter their box
+    $(".menu #private").mouseenter(function(){
+      $(".menu #private").css({"background-color": "lightblue","color":"black"})
+    });
+    //happen when the box leave
+    $(".menu #private").mouseleave(function(){
+      $(".menu #private").css({"background-color": "rgb(54, 51, 51)","color":"white"})
+    })
+
+    $(".menu #fighter").mouseenter(function(){
+      $(".menu #fighter").css({"background-color": "lightblue","color":"black"})
+    });
+    
+    $(".menu #fighter").mouseleave(function(){
+      $(".menu #fighter").css({"background-color": "rgb(54, 51, 51)","color":"white"})
+    })
+
+    $(".menu #profile").mouseenter(function(){
+      $(".menu #profile").css({"background-color": "lightblue","color":"black"})
+    });
+
+    $(".menu #profile").mouseleave(function(){
+      $(".menu #profile").css({"background-color": "rgb(54, 51, 51)","color":"white"})
+    })
+
+
 
     //Get old messages from the database
     let messages = "{{ messages }}".replaceAll("&#34;", "\"");

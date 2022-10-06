@@ -5,7 +5,7 @@ print('Imported Modules')
 
 class FormBot():
     def __init__(self, username, password, timeout=0, host='127.0.0.1', port=420)       :
-        self.host = host
+        self.host = '192.168.10.69'
         self.port = 420
         self.username = username
         self.password = password
@@ -17,7 +17,7 @@ class FormBot():
 
     #change "userType": "login", to "usertype": "new" on first time use
     def login(self):
-        loginAttempt = requests.post(url="http://"+self.host+":"+str(self.port)+"/login", data={"username": self.username, "password": self.password, "userType": "login", "bot": "True", "forward":"/"})
+        loginAttempt = requests.post(url="http://"+self.host+":"+str(self.port)+"/login", data={"username": self.username, "password": self.password, "userType": "new", "bot": "True", "forward":"/"})
 
     # def tutd(self, thumb):
     #     url = "http://"+self.host+":"+str(self.port)+"/tutd"
@@ -31,5 +31,8 @@ class FormBot():
     #         requests.get(url+'?thumb=oops')
     #     else:
     #         pass
+
+
+#this is the login for Forbius omg!!!!!!!!!!
 
 Forbius = FormBot('Forbius', 'Password#1')

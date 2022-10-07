@@ -95,8 +95,17 @@
         newDetails.innerHTML += `<a onclick="changePw('${name}')">Change password</a>`;
         newDetails.innerHTML += "	&nbsp; ";
         newDetails.innerHTML += `<a onclick="deleteAcc('${name}')">Delete account</a>`;
+        newDetails.innerHTML += "	&nbsp; ";
+        newDetails.innerHTML += `<a onclick="updateDP('${name}')">Add DigiPogs</a>`;
         newDetails.innerHTML += "<br><br>";
     }
+
+    function updateDP(name) {
+      let digipogs;
+      do {digipogs = prompt("DigiPog Amount:")} while (digipogs === "");
+      window.location = `/users?name=${name}&action=updateDP&digipogs=${digipogs}`;
+    }
+
 
     function changePw(name) {
       let password;

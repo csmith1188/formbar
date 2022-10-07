@@ -407,6 +407,12 @@
         output(message);
     });
 
+    // When the page needs to refresh, send a signal to chat which will then refresh everyone's page
+    chatSocket.on("refresh", message => {
+      console.log('work')
+      location.reload();
+    });
+
     chatSocket.on("userlist", message => {
         message = JSON.parse(message);
         console.log("userlist");

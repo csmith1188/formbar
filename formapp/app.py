@@ -1364,11 +1364,13 @@ def endpoint_controlpanel():
                     if arg in sD.settings:
                         sD.settings[arg] = argVal
                         resString += 'Set <i>' + arg + '</i> to: <i>' + str(argVal) + "</i>"
+                        emit('refresh', json.dumps(packMSG('all', 'server', ''), broadcast=True))
                         db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
                         dbcmd = db.cursor()
                         dbcmd.execute("UPDATE settings SET " + arg + "=:value", {"value": argVal})
                         db.commit()
                         db.close()
+
                     else:
                         resString += 'There is no setting that takes \'true\' or \'false\' named: <i>' + arg + "</i>"
                 else:
@@ -2761,10 +2763,6 @@ def endpoint_users():
                                 db.close()
                                 print("[info] " + "")
                                 return render_template("message.html", message = "Changed user permission.")
-                                # If they are not a teacher / admin, refresh their page
-                                # Controlpanel.html already has a refreshing feature for each button
-                                if perm > 1:
-                                    location.reload()
                         else:
                             return render_template("message.html", message = "User not in list.")
                     except:

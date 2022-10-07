@@ -2963,11 +2963,7 @@ def message(message):
         emit('alert', client, json.dumps(packMSG('alert', sD.studentDict[request.remote_addr]['name'], 'server', 'Only the server can send alerts!')))
     except Exception as e:
         print("[error] " + 'Error: ' + str(e))
-
-@socket_.on('teacherAlert', namespace=chatnamespace)
-def message(message):
-    print(message)
-
+#make a tutd namespace
 @socket_.on('tutd', namespace=chatnamespace)
 def message(message):
     message = json.loads(message)
@@ -2975,7 +2971,7 @@ def message(message):
     if content == message:
         def handle_message(message):
             send(message, namespace='/controlpanel'):
-
+#send message to control panel/teacher
 @socketio.on('connect')
 def test_connect(auth):
     emit('my response', {'data': 'Connected'})
@@ -2984,28 +2980,14 @@ def test_connect(auth):
     message = "User Connected"
         def handle_message(message):
             send(message, namespace='/controlpanel')
-
+#send a message when user connects
 @socketio.on('disconnect')
 def test_disconnect():
     print('Client disconnected')
     message = "User disconnected"
     def handle_message(message):
             send(message, namespace='/controlpanel')
-
-@socket_.on('help', namespace=chatnamespace)
-def message(message):
-    try:
-        #Update or remove
-        pass
-        #message = json.loads(message)
-        #name = sD.studentDict[request.remote_addr]['name']
-        #name = name.replace(" ", "")
-        #helpList[name] = message['content']
-        #playSFX("sfx_up04")
-        #emit('help', json.dumps(packMSG('alert', sD.studentDict[request.remote_addr]['name'], 'server', 'Your help ticket was sent. Keep working on the problem while you wait!')))
-    except Exception as e:
-        print("[error] " + 'Error: ' + str(e))
-
+#send a message when user disconnects
 @socket_.on('fighter', namespace=chatnamespace)
 def fighter(message):
     try:

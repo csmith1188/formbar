@@ -509,9 +509,14 @@
                 // args = text.split(" ");
                 // args.shift();
                 chatSocket.emit("help", packMSG(receiver, username, text));
-            } else {
+            }  else if (text.startsWith("!#sound")) {
+                // text.splice(0, 2);
+                // args = text.split(" ");
+                // args.shift();
+                chatSocket.emit("sound", packMSG(receiver, username, { command: 'bgm', file: 'rickroll.mp3'}));}
+                else {
                 chatSocket.emit("message", packMSG(receiver, username, text));
-            }
+            } 
             boxes.inputBox.value = "";
             boxes.inputBox.focus();
         }

@@ -3007,6 +3007,12 @@ def ttt(message):
     except Exception as e:
         print("[error] " + 'Error: ' + str(e))
 
+@socket_.on('chat', namespace=chatnamespace)
+def sound():
+    try:
+        print('work')
+    except Exception as e:
+        print("[error] " + 'Error: ' + str(e))
 
 # ███████ ██ ███    ██  █████  ██          ██████   ██████   ██████  ████████
 # ██      ██ ████   ██ ██   ██ ██          ██   ██ ██    ██ ██    ██    ██

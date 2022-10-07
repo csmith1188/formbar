@@ -465,7 +465,7 @@ def repeatMode():
         completeBar()
     elif sD.settings['barmode'] == 'progress':
         for student in sD.studentDict:
-            for task in sD.lesson.progList[step['Prompt']]['task']:
+            for task in sD.lesson.progList['step'['Prompt']]['task']:
                 sD.studentDict[student]['progress'].append(False)
         percFill(sD.lesson.checkProg(stripUser('admin')))
     elif sD.settings['barmode'] == 'playtime':
@@ -473,6 +473,11 @@ def repeatMode():
         clearString()
         showString(sD.activePhrase)
     playSFX("sfx_success01")
+def endMode():
+    clearBar()
+    showString("Idle")
+
+
 
 #This function clears(default) the color from the formbar
 def clearBar():
@@ -1486,7 +1491,7 @@ def endpoint_emptyblocks():
     return render_template("message.html", message = "Emptied blocks")
 '''
 
-#Start a poll
+#End a poll
 @app.route('/endpoll')
 def endpoll():
     if not request.remote_addr in sD.studentDict:
@@ -1507,7 +1512,7 @@ def endpoll():
         db.commit()
         db.close()
         changeMode('poll')
-        repeatMode()
+        endMode()
         return render_template("message.html", message = 'Poll ended. Results saved.')
 
 '''

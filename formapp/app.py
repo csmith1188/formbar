@@ -277,7 +277,7 @@ def refreshUsers(selectedStudent='', category=''):
             except Exception as e:
                 now = datetime.datetime.now()
                 print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " +e)
-                f = open('demofile.txt', 'a')
+                f = open('errorlog.txt', 'a')
                 f.write(str(e))
                 f.close()
                 return False
@@ -340,7 +340,7 @@ def playSFX(sound):
     except Exception as e:
         now = datetime.datetime.now()
         print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " +e)
-        f = open('demofile.txt', 'a')
+        f = open('errorlog.txt', 'a')
         f.write(str(e) + "\n")
         f.close()
         return "Invalid format: "
@@ -1129,7 +1129,7 @@ def endpoint_bgm():
                     except Exception as e:
                         now = datetime.datetime.now()
                         print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [warning] " + "Could not convert volume to float. Setting to default.")
-                        f = open('demofile.txt', 'a')
+                        f = open('errorlog.txt', 'a')
                         f.write(str(e))
                         f.close()
                         bgm_volume = 0.5
@@ -1160,7 +1160,7 @@ def endpoint_bgm():
                 except Exception as e:
                     now = datetime.datetime.now()
                     print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " +e)
-                    f = open('demofile.txt', 'a')
+                    f = open('errorlog.txt', 'a')
                     f.write(str(e))
                     f.close()
                     return render_template("message.html", message = 'Invalid voladj. Use \'up\', \'down\', or a number from 0.0 to 1.0.')
@@ -1369,7 +1369,7 @@ def endpoint_color():
         except Exception as e:
             now = datetime.datetime.now()
             print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " +e)
-            f = open('demofile.txt', 'a')
+            f = open('errorlog.txt', 'a')
             f.write(str(e))
             f.close()
             r = ''
@@ -1428,7 +1428,7 @@ def endpoint_controlpanel():
                     except Exception as e:
                         now = datetime.datetime.now()
                         print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " +e)
-                        f = open('demofile.txt', 'a')
+                        f = open('errorlog.txt', 'a')
                         f.write(str(e))
                         f.close()
                         pass
@@ -1712,7 +1712,7 @@ def endpoint_games_fighter():
         except Exception as e:
             now = datetime.datetime.now()
             print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + str(e))
-            f = open('demofile.txt', 'a')
+            f = open('errorlog.txt', 'a')
             f.write(str(e))
             f.close()
 
@@ -1896,7 +1896,7 @@ def endpoint_getword():
         except Exception as e:
             now = datetime.datetime.now()
             print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + "Could not convert number. " + str(e))
-            f = open('demofile.txt', 'a')
+            f = open('errorlog.txt', 'a')
             f.write(str(e))
             f.close()
             return render_template("message.html", message = "Could not convert number. " + str(e))
@@ -2006,7 +2006,7 @@ def endpoint_lesson():
                 print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + traceback.format_exc())
                 now = datetime.datetime.now()
                 print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + "[error] " + e)
-                f = open('demofile.txt', 'a')
+                f = open('errorlog.txt', 'a')
                 f.write(str(e))
                 f.close()
                 return render_template("message.html", message = '<b>Error:</b> ' + str(e))
@@ -2274,7 +2274,7 @@ def endpoint_perc():
         except Exception as e:
             now = datetime.datetime.now()
             print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " +e)
-            f = open('demofile.txt', 'a')
+            f = open('errorlog.txt', 'a')
             f.write(str(e))
             f.close()
             return render_template("message.html", message = "<b>amount</b> must be an integer between 0 and 100 \'/perc?amount=<b>50</b>\'", forward = '/home')
@@ -2342,7 +2342,7 @@ def endpoint_progress():
             except Exception as e:
                 now = datetime.datetime.now()
                 print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + e)
-                f = open('demonfile.txt', 'a')
+                f = open('errorlog.txt', 'a')
                 f.write(str(e))
                 f.close()
                 return render_template("message.html", message = '<b>Error:</b> ' + str(e))
@@ -2453,7 +2453,7 @@ def endpoint_savescore():
     except Exception as e:
         now = datetime.datetime.now()
         print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + "Error: " + str(e))
-        f = open('demofile.txt', 'a')
+        f = open('errorlog.txt', 'a')
         f.write(str(e))
         f.close()
 
@@ -2508,7 +2508,7 @@ def endpoint_segment():
             except Exception as e:
                 now = datetime.datetime.now()
                 print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " +e)
-                f = open('demofile.txt', 'a')
+                f = open('errorlog.txt', 'a')
                 f.write(str(e))
                 f.close()
                 return render_template("message.html", message = "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=FF00FF</b> (start and end must be and integer)")
@@ -2739,7 +2739,7 @@ def endpoint_updateuser():
     except Exception as e:
         now = datetime.datetime.now()
         print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + "Error: " + str(e))
-        f = open('demofile.txt', 'a')
+        f = open('errorlog.txt', 'a')
         f.write(str(e))
         f.close()
 
@@ -2867,7 +2867,7 @@ def endpoint_users():
                     except Exception as e:
                         now = datetime.datetime.now()
                         print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " +e)
-                        f = open('demofile.txt', 'a')
+                        f = open('errorlog.txt', 'a')
                         f.write(str(e))
                         f.close()
                         return render_template("message.html", message = "Perm was not an integer.")
@@ -2975,7 +2975,7 @@ def connect():
     except Exception as e:
         now = datetime.datetime.now()
         print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + "Error finding user in list: " + str(e))
-        f = open('demofile.txt', 'a')
+        f = open('errorlog.txt', 'a')
         f.write(str(e))
         f.close()
 
@@ -2992,7 +2992,7 @@ def disconnect():
     except Exception as e:
         now = datetime.datetime.now()
         print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + "Error finding user in list: " + str(e))
-        f = open('demofile.txt', 'a')
+        f = open('errorlog.txt', 'a')
         f.write(str(e))
         f.close()
 
@@ -3036,7 +3036,7 @@ def message(message):
     except Exception as e:
         now = datetime.datetime.now()
         print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + str(e))
-        f = open('demofile.txt', 'a')
+        f = open('errorlog.txt', 'a')
         f.write(str(e))
         f.close()
 
@@ -3059,7 +3059,7 @@ def edit(timeSent, newContent):
     except Exception as e:
         now = datetime.datetime.now()
         print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + str(e))
-        f = open('demofile.txt', 'a')
+        f = open('errorlog.txt', 'a')
         f.write(str(e))
         f.close()
 
@@ -3079,7 +3079,7 @@ def delete(timeSent):
     except Exception as e:
         now = datetime.datetime.now()
         print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + str(e))
-        f = open('demofile.txt', 'a')
+        f = open('errorlog.txt', 'a')
         f.write(str(e))
         f.close()
 
@@ -3091,7 +3091,7 @@ def message(message):
     except Exception as e:
         now = datetime.datetime.now()
         print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + str(e))
-        f = open('demofile.txt', 'a')
+        f = open('errorlog.txt', 'a')
         f.write(str(e))
         f.close()
 
@@ -3103,7 +3103,7 @@ def message(message):
     except Exception as e:
         now = datetime.datetime.now()
         print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + str(e))
-        f = open('demofile.txt', 'a')
+        f = open('errorlog.txt', 'a')
         f.write(str(e))
         f.close()
 
@@ -3122,7 +3122,7 @@ def message(message):
     except Exception as e:
         now = datetime.datetime.now()
         print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + str(e))
-        f = open('demofile.txt', 'a')
+        f = open('errorlog.txt', 'a')
         f.write(str(e))
         f.close()
 
@@ -3134,7 +3134,7 @@ def fighter(message):
     except Exception as e:
         now = datetime.datetime.now()
         print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + str(e))
-        f = open('demofile.txt', 'a')
+        f = open('errorlog.txt', 'a')
         f.write(str(e))
         f.close()
 
@@ -3162,7 +3162,7 @@ def ttt(message):
     except Exception as e:
         now = datetime.datetime.now()
         print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + str(e))
-        f = open('demofile.txt', 'a')
+        f = open('errorlog.txt', 'a')
         f.write(str(e))
         f.close()
 

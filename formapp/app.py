@@ -1370,6 +1370,7 @@ def endpoint_controlpanel():
                         dbcmd.execute("UPDATE settings SET " + arg + "=:value", {"value": argVal})
                         db.commit()
                         db.close()
+
                     else:
                         resString += 'There is no setting that takes \'true\' or \'false\' named: <i>' + arg + "</i>"
                 else:

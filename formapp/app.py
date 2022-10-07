@@ -54,6 +54,7 @@ if ONRPi:
     import board, neopixel
 
 #Importing customs modules
+import re
 from modules import letters
 from modules import sfx
 from modules import bgm
@@ -181,7 +182,7 @@ def endpoint_anitest():
 def dbug(message='Checkpoint Reached'):
     global DEBUG
     if DEBUG:
-        print("[DEBUG] " + str(message))
+        print("[DEBUG] " + str(message))    
 
 def newStudent(remote, username, bot=False):
     global NEWACCOUNTPERMISSIONS
@@ -208,6 +209,7 @@ def newStudent(remote, username, bot=False):
             'preferredHomepage': None,
             'sid': ''
         }
+    
         #Track if the teacher is logged in
         teacher = False
 
@@ -236,13 +238,21 @@ def newStudent(remote, username, bot=False):
         db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
         dbcmd = db.cursor()
         userFound = dbcmd.execute("SELECT * FROM users WHERE username=:uname", {"uname": username}).fetchall()
-        db.close()
+        auth = dbcmd.execute("SELECT username FROM users").fetchall()
+        nameCheck = re.compile('[@_!$%^&*()<>?/\|}{~:]#')
+        for username in auth:
+            if nameCheck.search(username) == None:
+              print("Vaild")
+            else:
+              print("Invaild")
+              db.close()
         for user in userFound:
             if username in user:
                 if not teacher:
                     sD.studentDict[remote]['perms'] = sD.settings['perms']['admin']
                 else:
                     sD.studentDict[remote]['perms'] = int(user[3])
+                    
 
         socket_.emit('alert', json.dumps(packMSG('all', 'server', sD.studentDict[request.remote_addr]['name'] + " logged in...")), namespace=chatnamespace)
         playSFX("sfx_up02")
@@ -3025,7 +3035,7 @@ if '--silent' not in str(sys.argv):
 
 def start_flask():
     global DEBUG
-    app.run(host='0.0.0.0', port=420, use_reloader=False, debug=DEBUG)
+    app.run(host='0.0.0.0', port=421, use_reloader=False, debug=DEBUG)
 
 def start_IR():
     while True:

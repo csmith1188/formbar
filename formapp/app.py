@@ -278,7 +278,7 @@ def refreshUsers(selectedStudent='', category=''):
                 now = datetime.datetime.now()
                 print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " +e)
                 f = open('demofile.txt', 'a')
-                f.write(str(Argument))
+                f.write(str(e))
                 f.close()
                 return False
         else:
@@ -338,10 +338,11 @@ def playSFX(sound):
         pygame.mixer.Sound(sfx.sound[sound]).play()
         return "Successfully played: "
     except Exception as e:
+        now = datetime.datetime.now()
+        print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " +e)
         f = open('demofile.txt', 'a')
         f.write(str(e) + "\n")
         f.close()
-        print(e)
         return "Invalid format: "
 
 def stopSFX():
@@ -1125,9 +1126,12 @@ def endpoint_bgm():
                     try:
                         if request.args.get('volume'):
                             bgm_volume = float(bgm_volume)
-                    except:
+                    except Exception as e:
                         now = datetime.datetime.now()
                         print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [warning] " + "Could not convert volume to float. Setting to default.")
+                        f = open('demofile.txt', 'a')
+                        f.write(str(e))
+                        f.close()
                         bgm_volume = 0.5
                     sD.bgm['nowplaying']= bgm_file
                     if bgm_volume and type(bgm_volume) is float:
@@ -1153,7 +1157,12 @@ def endpoint_bgm():
                     bgm_volume = float(request.args.get('voladj'))
                     volBGM(bgm_volume)
                     return render_template("message.html", message = 'Music volume set to ' + request.args.get('voladj') + '.')
-                except:
+                except Exception as e:
+                    now = datetime.datetime.now()
+                    print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " +e)
+                    f = open('demofile.txt', 'a')
+                    f.write(str(e))
+                    f.close()
                     return render_template("message.html", message = 'Invalid voladj. Use \'up\', \'down\', or a number from 0.0 to 1.0.')
         elif request.args.get('playpause'):
             playpauseBGM()
@@ -1357,7 +1366,12 @@ def endpoint_color():
             r = int(request.args.get('r'))
             g = int(request.args.get('g'))
             b = int(request.args.get('b'))
-        except:
+        except Exception as e:
+            now = datetime.datetime.now()
+            print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " +e)
+            f = open('demofile.txt', 'a')
+            f.write(str(e))
+            f.close()
             r = ''
             g = ''
             b = ''
@@ -1411,7 +1425,12 @@ def endpoint_controlpanel():
                                 dbcmd.execute("UPDATE settings SET " + arg + "Perm=:value", {"value": argInt})
                                 db.commit()
                                 db.close()
-                    except:
+                    except Exception as e:
+                        now = datetime.datetime.now()
+                        print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " +e)
+                        f = open('demofile.txt', 'a')
+                        f.write(str(e))
+                        f.close()
                         pass
 
         ###
@@ -1692,7 +1711,11 @@ def endpoint_games_fighter():
             return render_template('games/fighter.html', username = username, wins = wins, losses = losses, winStreak = winStreak, goldUnlocked = goldUnlocked, action = action, authenticated = authenticated)
         except Exception as e:
             now = datetime.datetime.now()
-            print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + "Error: " + str(e))
+            print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + str(e))
+            f = open('demofile.txt', 'a')
+            f.write(str(e))
+            f.close()
+
 
 '''
     /games/flashcards
@@ -1873,6 +1896,9 @@ def endpoint_getword():
         except Exception as e:
             now = datetime.datetime.now()
             print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + "Could not convert number. " + str(e))
+            f = open('demofile.txt', 'a')
+            f.write(str(e))
+            f.close()
             return render_template("message.html", message = "Could not convert number. " + str(e))
     else:
         word = random.choice(list(words.keys()))
@@ -1980,6 +2006,9 @@ def endpoint_lesson():
                 print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + traceback.format_exc())
                 now = datetime.datetime.now()
                 print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + "[error] " + e)
+                f = open('demofile.txt', 'a')
+                f.write(str(e))
+                f.close()
                 return render_template("message.html", message = '<b>Error:</b> ' + str(e))
         elif request.args.get('action'):
             if request.args.get('action') == 'next':
@@ -2242,7 +2271,12 @@ def endpoint_perc():
         try:
             percAmount = int(percAmount)
             percFill(percAmount)
-        except:
+        except Exception as e:
+            now = datetime.datetime.now()
+            print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " +e)
+            f = open('demofile.txt', 'a')
+            f.write(str(e))
+            f.close()
             return render_template("message.html", message = "<b>amount</b> must be an integer between 0 and 100 \'/perc?amount=<b>50</b>\'", forward = '/home')
         return render_template("message.html", message = "Set perecentage to: " + str(percAmount) + ".", forward = '/home')
 
@@ -2308,6 +2342,9 @@ def endpoint_progress():
             except Exception as e:
                 now = datetime.datetime.now()
                 print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + e)
+                f = open('demonfile.txt', 'a')
+                f.write(str(e))
+                f.close()
                 return render_template("message.html", message = '<b>Error:</b> ' + str(e))
         else:
             if sD.activeProgress:
@@ -2416,6 +2453,9 @@ def endpoint_savescore():
     except Exception as e:
         now = datetime.datetime.now()
         print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + "Error: " + str(e))
+        f = open('demofile.txt', 'a')
+        f.write(str(e))
+        f.close()
 
 
 @app.route('/say')
@@ -2465,7 +2505,12 @@ def endpoint_segment():
             try:
                 start = int(start)
                 end = int(end)
-            except:
+            except Exception as e:
+                now = datetime.datetime.now()
+                print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " +e)
+                f = open('demofile.txt', 'a')
+                f.write(str(e))
+                f.close()
                 return render_template("message.html", message = "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=FF00FF</b> (start and end must be and integer)")
         if start > BARPIX or end > BARPIX:
             return render_template("message.html", message = "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=FF00FF</b> (Your start or end was higher than the number of pixels: " + str(BARPIX) + ")")
@@ -2694,6 +2739,9 @@ def endpoint_updateuser():
     except Exception as e:
         now = datetime.datetime.now()
         print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + "Error: " + str(e))
+        f = open('demofile.txt', 'a')
+        f.write(str(e))
+        f.close()
 
 #This endpoint allows us to see which user(Student) is logged in.
 @app.route('/users')
@@ -2816,7 +2864,12 @@ def endpoint_users():
                                 return render_template("message.html", message = "Changed user permission.")
                         else:
                             return render_template("message.html", message = "User not in list.")
-                    except:
+                    except Exception as e:
+                        now = datetime.datetime.now()
+                        print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " +e)
+                        f = open('demofile.txt', 'a')
+                        f.write(str(e))
+                        f.close()
                         return render_template("message.html", message = "Perm was not an integer.")
             if request.args.get('refresh'):
                 refresh = request.args.get('refresh')
@@ -2922,6 +2975,10 @@ def connect():
     except Exception as e:
         now = datetime.datetime.now()
         print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + "Error finding user in list: " + str(e))
+        f = open('demofile.txt', 'a')
+        f.write(str(e))
+        f.close()
+
 
 @socket_.on('disconnect', namespace=chatnamespace)
 def disconnect():
@@ -2935,6 +2992,10 @@ def disconnect():
     except Exception as e:
         now = datetime.datetime.now()
         print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + "Error finding user in list: " + str(e))
+        f = open('demofile.txt', 'a')
+        f.write(str(e))
+        f.close()
+
 
 @socket_.on('message', namespace=chatnamespace)
 def message(message):
@@ -2974,7 +3035,11 @@ def message(message):
             print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [info] " + message['from'] + " said to " + message['to'] + ": " + message['content'])
     except Exception as e:
         now = datetime.datetime.now()
-        print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + 'Error: ' + str(e))
+        print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + str(e))
+        f = open('demofile.txt', 'a')
+        f.write(str(e))
+        f.close()
+
 
 @socket_.on('edit', namespace=chatnamespace)
 def edit(timeSent, newContent):
@@ -2993,7 +3058,11 @@ def edit(timeSent, newContent):
         emit('edit', [timeSent, newContent], broadcast=True)
     except Exception as e:
         now = datetime.datetime.now()
-        print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + 'Error: ' + str(e))
+        print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + str(e))
+        f = open('demofile.txt', 'a')
+        f.write(str(e))
+        f.close()
+
 
 @socket_.on('delete', namespace=chatnamespace)
 def delete(timeSent):
@@ -3009,7 +3078,11 @@ def delete(timeSent):
         emit('delete', timeSent, broadcast=True)
     except Exception as e:
         now = datetime.datetime.now()
-        print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + 'Error: ' + str(e))
+        print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + str(e))
+        f = open('demofile.txt', 'a')
+        f.write(str(e))
+        f.close()
+
 
 @socket_.on('userlist', namespace=chatnamespace)
 def message(message):
@@ -3017,7 +3090,11 @@ def message(message):
         emit('userlist', json.dumps(packMSG('userlist', sD.studentDict[request.remote_addr]['name'], 'server', chatUsers())), broadcast=True)
     except Exception as e:
         now = datetime.datetime.now()
-        print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + 'Error: ' + str(e))
+        print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + str(e))
+        f = open('demofile.txt', 'a')
+        f.write(str(e))
+        f.close()
+
 
 @socket_.on('alert', namespace=chatnamespace)
 def message(message):
@@ -3025,7 +3102,11 @@ def message(message):
         emit('alert', client, json.dumps(packMSG('alert', sD.studentDict[request.remote_addr]['name'], 'server', 'Only the server can send alerts!')))
     except Exception as e:
         now = datetime.datetime.now()
-        print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + 'Error: ' + str(e))
+        print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + str(e))
+        f = open('demofile.txt', 'a')
+        f.write(str(e))
+        f.close()
+
 
 @socket_.on('help', namespace=chatnamespace)
 def message(message):
@@ -3040,7 +3121,11 @@ def message(message):
         #emit('help', json.dumps(packMSG('alert', sD.studentDict[request.remote_addr]['name'], 'server', 'Your help ticket was sent. Keep working on the problem while you wait!')))
     except Exception as e:
         now = datetime.datetime.now()
-        print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + 'Error: ' + str(e))
+        print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + str(e))
+        f = open('demofile.txt', 'a')
+        f.write(str(e))
+        f.close()
+
 
 @socket_.on('fighter', namespace=chatnamespace)
 def fighter(message):
@@ -3048,7 +3133,11 @@ def fighter(message):
         emit('fighter', message, broadcast=True)
     except Exception as e:
         now = datetime.datetime.now()
-        print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + 'Error: ' + str(e))
+        print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + str(e))
+        f = open('demofile.txt', 'a')
+        f.write(str(e))
+        f.close()
+
 
 @socket_.on('ttt', namespace=chatnamespace)
 def ttt(message):
@@ -3072,7 +3161,11 @@ def ttt(message):
                 game.gameboard[rBox][cBox] = shape
     except Exception as e:
         now = datetime.datetime.now()
-        print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + 'Error: ' + str(e))
+        print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + str(e))
+        f = open('demofile.txt', 'a')
+        f.write(str(e))
+        f.close()
+
 
 
 # ███████ ██ ███    ██  █████  ██          ██████   ██████   ██████  ████████

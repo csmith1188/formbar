@@ -80,6 +80,7 @@
         newDetails.classList.add('user');
         let userPerms = user[3];
         newDetails.innerHTML += `
+            Default permissions:
             <select onchange="updatePerm(this)" id="userpermsDrop" name="userpermsDrop">
             <option value="/updateuser?name=${user[1]}&field=permissions&value=0" ${userPerms === 0 ? "selected" : ""}>${permNames[0]}</option>
             <option value="/updateuser?name=${user[1]}&field=permissions&value=1" ${userPerms === 1 ? "selected" : ""}>${permNames[1]}</option>

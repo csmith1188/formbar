@@ -403,6 +403,7 @@ return false ;
    $(".msg.alert .content .inline.popOut").click( function(){
     //it will delete the fighter links. when the button is click.    
     chatSocket.emit('delete', $(this).parent().parent().attr('id').slice(3),);
+    //hide the button
        $(this).hide();
      });
  });
@@ -420,26 +421,30 @@ return false ;
   });
 
   //when the mouse over the tabs of the menu. it will do a class thing like the orginal thing like mouse hover but jquery.
-  //happens when the mouse enter their box
+  //three function below happens when the mouse enter their box
     $(".menu #private").mouseenter(function(){
       $(".menu #private").css({"background-color": "lightblue","color":"black"})
     });
-    //happen when the box leave
-    $(".menu #private").mouseleave(function(){
-      $(".menu #private").css({"background-color": "rgb(54, 51, 51)","color":"white"})
-    })
 
     $(".menu #fighter").mouseenter(function(){
       $(".menu #fighter").css({"background-color": "lightblue","color":"black"})
     });
+
+    $(".menu #profile").mouseenter(function(){
+      $(".menu #profile").css({"background-color": "lightblue","color":"black"})
+    });
+    //three function below happen when the mouse leave the box
+    $(".menu #private").mouseleave(function(){
+      $(".menu #private").css({"background-color": "rgb(54, 51, 51)","color":"white"})
+    })
+
+
     
     $(".menu #fighter").mouseleave(function(){
       $(".menu #fighter").css({"background-color": "rgb(54, 51, 51)","color":"white"})
     })
 
-    $(".menu #profile").mouseenter(function(){
-      $(".menu #profile").css({"background-color": "lightblue","color":"black"})
-    });
+
 
     $(".menu #profile").mouseleave(function(){
       $(".menu #profile").css({"background-color": "rgb(54, 51, 51)","color":"white"})

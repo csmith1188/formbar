@@ -1364,7 +1364,6 @@ def endpoint_controlpanel():
                     if arg in sD.settings:
                         sD.settings[arg] = argVal
                         resString += 'Set <i>' + arg + '</i> to: <i>' + str(argVal) + "</i>"
-                        emit('refresh', json.dumps(packMSG('all', 'server', ''), broadcast=True))
                         db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
                         dbcmd = db.cursor()
                         dbcmd.execute("UPDATE settings SET " + arg + "=:value", {"value": argVal})

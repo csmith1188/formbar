@@ -411,12 +411,6 @@
         message = JSON.parse(message);
         console.log("userlist");
         console.log(message);
-
-    // When the page needs to refresh, send a signal to chat which will then refresh everyone's page
-    chatSocket.on("refresh", message => {
-      console.log('work')
-      location.reload();
-    });
         boxes.userlist.innerHTML = '<h2 id="ulHeading">Online</h2>'
         for (user in message.content) {
             let newUser = document.createElement('div');

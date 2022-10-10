@@ -32,7 +32,7 @@ from config import *
 # 3 - anyone
 # 4 - banned
 
-NEWACCOUNTPERMISSIONS = 2
+NEWACCOUNTPERMISSIONS = 3
 
 #Importing external modules
 from flask import Flask, redirect, url_for, request, render_template, session, copy_current_request_context

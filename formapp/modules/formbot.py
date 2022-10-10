@@ -19,6 +19,6 @@ class FormBot():
 
 
 
-#this is the login for Forbius omg!!!!!!!!!!
+#forbius login
 
 Forbius = FormBot('Forbius', 'Password#1')

@@ -24,13 +24,13 @@
   }
 
   .controls {
-    padding: 8px;
+    padding: 8px 8px 0;
     background: var(--bg-dark-highlight);
     margin-bottom: 16px;
   }
 
   .controls button {
-    margin: 0 4px;
+    margin: 0 8px 8px 0;
     font-size: 14px;
   }
 
@@ -366,9 +366,9 @@
       request.send();
     }
     if (document.getElementById("countdown").checked) {
-      alert("This feature is not available yet.");
       document.getElementById("playtime").checked = true;
-      ////document.getElementById("countdownTime").classList.remove("hidden");
+      alert("This feature is not available yet.");
+      //document.getElementById("countdownTime").classList.remove("hidden");
     } else {
       document.getElementById("countdownTime").classList.add("hidden");
     }
@@ -703,7 +703,7 @@
                 helpTicket.appendChild(acceptButton);
                 helpTicket.appendChild(rejectButton);
               } else {
-                helpTicket.innerHTML += help.message || "<i>Sent a help ticket</i>";
+                helpTicket.innerHTML += student.help.message || "<i>Sent a help ticket</i>";
                 let removeButton = document.createElement("button");
                 removeButton.id = "e"
                 removeButton.classList.add("inline", "popOut");

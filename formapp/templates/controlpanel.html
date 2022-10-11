@@ -68,6 +68,13 @@
     margin-right: 8px;
   }
 
+  .permsIcon {
+    height: 1.2em;
+    display: inline-block;
+    vertical-align: text-bottom;
+    margin-right: 8px;
+  }
+
   #history > span, #history > b {
     display: inline-block;
     width: 100px;
@@ -645,6 +652,17 @@
           for (student of studentList) {
             let newStudent = document.createElement('h3');
             let icons = "";
+            let pictureIcon = ""
+
+            //change image based upon persons permissions
+            let perms = student['perms']
+            if (perms) var permsIcons = document.createElement("img");
+            if (perms == 0) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/teacher.png') }}" class="permsIcon" title="teacher">`
+            if (perms == 1) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/mod.png') }}" class="permsIcon" title="mod">`
+            if (perms == 2) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/student.png') }}" class="permsIcon" title="student">`
+            if (perms == 3) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/anyone.png') }}" class="permsIcon" title="anyone">`
+            if (perms == 4) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/banned.png') }}" class="permsIcon" title="banned">`
+
 
             //Change student color according to thumb response
             let thumb = student['thumb'];
@@ -667,7 +685,7 @@
 
             if (student['complete']) icons += `<img src="{{ url_for('static', filename='img/controlpanel/complete.png') }}" class="icon" title="Complete">`;
 
-            newStudent.innerHTML = icons + student.name;
+            newStudent.innerHTML = pictureIcon + icons + student.name;
             let newDetails = document.createElement('span');
             newDetails.classList.add('user');
             if (collapsed) newDetails.classList.add("hidden");

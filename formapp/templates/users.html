@@ -95,7 +95,7 @@
             if (perms == 4) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/banned.png') }}" class="permsIcon" title="banned">`
 
 
-         newStudent.innerHTML = user[1] + pictureIcon;
+         newStudent.innerHTML = pictureIcon + user[1] ;
 
         let newDetails = document.createElement('span');
         newDetails.classList.add('user');

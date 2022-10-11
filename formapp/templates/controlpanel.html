@@ -685,7 +685,7 @@
 
             if (student['complete']) icons += `<img src="{{ url_for('static', filename='img/controlpanel/complete.png') }}" class="icon" title="Complete">`;
 
-            newStudent.innerHTML = icons + student.name + '' + pictureIcon;
+            newStudent.innerHTML = pictureIcon + icons + student.name;
             let newDetails = document.createElement('span');
             newDetails.classList.add('user');
             if (collapsed) newDetails.classList.add("hidden");

@@ -75,10 +75,12 @@ flasklog = logging.getLogger('werkzeug')
 flasklog.setLevel(logging.ERROR)
 
 #Display IP address to console for user connection. Updates the Time as well
-def time(status, comment):
-    print(now = datetime.datetime.now() + "[" + now.strftime("%Y-%m-%d %H:%M:%S") + "] " + status + " " + comment) 
-now = datetime.datetime.now()
-print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [info] " +'Running formbar server on:' + ip)
+def getTime(status, comment ):
+    now = datetime.datetime.now()
+    print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "] " + "[" + status + "]" +  " " + comment) 
+#now = datetime.datetime.now()
+#print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [info] " +'Running formbar server on:' + ip)
+getTime("Info", "Running formbar server on:")
 
 
 # ██       ██████   █████  ██████  ██ ███    ██  ██████
@@ -234,8 +236,9 @@ def newStudent(remote, username, bot=False):
 
         #Login as teacher if there is no teacher yet
         elif not teacher:
-            now = datetime.datetime.now()
-            print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [info] " +username + " logged in. Made them the teacher...")
+            getTime("Info", "logged in. Made them the teacher...")
+            # now = datetime.datetime.now()
+            # print("[" + now.strftime("%Y-%m-%d %H:%M:%S") + "]" + " [info] " +username + " logged in. Made them the teacher...")
             sD.studentDict[remote]['perms'] = sD.settings['perms']['admin']
 
         #Login other users as guests (students until database is installed)

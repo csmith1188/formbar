@@ -473,6 +473,11 @@ def repeatMode():
         clearString()
         showString(sD.activePhrase)
     playSFX("sfx_success01")
+def endMode():
+    clearBar()
+    showString("Idle")
+
+
 
 #This function clears(default) the color from the formbar
 def clearBar():
@@ -1487,7 +1492,7 @@ def endpoint_emptyblocks():
     return render_template("message.html", message = "Emptied blocks")
 '''
 
-#Start a poll
+#End a poll
 @app.route('/endpoll')
 def endpoll():
     if not request.remote_addr in sD.studentDict:
@@ -1509,7 +1514,7 @@ def endpoll():
         db.close()
         sD.pollID += 1
         changeMode('poll')
-        repeatMode()
+        endMode()
         return render_template("message.html", message = 'Poll ended. Results saved.')
 
 '''

@@ -7,6 +7,7 @@
 
 <!-- Extra style declarations here -->
 {% block style %}
+
 <style>
   #outputBox {
     position: fixed;
@@ -86,6 +87,7 @@
     right: 0;
     padding: 10px;
     overflow: auto;
+    pointer-events:auto;
   }
 
   #ulHeading {
@@ -257,6 +259,16 @@
     height: 140px;
   }
 
+ /* The css for the content menu  */
+  .menu {
+    display: none;
+    position: absolute;
+    padding: 10px;
+    background-color: rgb(54, 51, 51);
+    border: 1px solid black;
+    font-weight: bold;
+}
+
   .small #controlChat.disabled {
     padding: 17px 0;
   }
@@ -287,6 +299,8 @@
   .small #notifications {
     display: none;
   }
+
+  
 </style>
 {% endblock %}
 
@@ -311,6 +325,12 @@
 <div id="notifications">
   <input type="checkbox" id="notificationsCheckbox"><label for="notificationsCheckbox">Desktop notifications</label>
 </div>
+ <!-- make a menu for the right click  -->
+<div class="menu" id="menu">
+  <li id="private">Private chat</li>
+  <li id="profile">Profile</li>
+  <li id="fighter">Fighter</li>
+</div>
 {% endblock %}
 
 <!-- Extra javascript here -->
@@ -318,6 +338,119 @@
 <script type="text/javascript">
     var username = "{{ username }}";
     var receiver = 'all';
+    //get the name use for profile sending
+    var getname = "";
+    // the temporary name after scaning and use for comparing
+    let tempname = "";
+    //fighter link
+    let link = "";
+    //make the context menu show up in userlist only.
+    $("#userlist").bind("contextmenu", function(e) {
+      //because ulHover constantly getting update one grab/check is not enough.
+      //userlist is how ever constant on grab only
+      
+      if($('div.msg.ulName.them.ulHover').length == 1){
+        //get the name of the profile for sending them to the right profile.
+        getname = $('div.msg.ulName.them.ulHover').clone().children().remove().end().text();
+        // grab the element data for proper profile sending. just grab their name and just the name.
+        $(".msg.alert .content").each(function(element, index){
+          // start for each fighter alert, index is the element data jquery.
+        tempname = $(index).text().split(" ");
+        // get the first word of the text line since it always say their username
+          // compare the click name and the temporary fighter name
+          // goes to the buttom data,
+          if (tempname[0] == getname){
+            // import the fighter link into the menu fighter data. and show the fighter option
+            link = $(index).children(".inline.popOut");
+            let msgid  = $(index).parent().attr('id').slice(3);
+            //true link provide a function to join the game and to delete the message.
+            let truelink = $(link).attr("onclick") + `; chatSocket.emit('delete', ${msgid}) ` 
+            console.log(truelink);
+            $(".menu #fighter").show()
+            // insert the onclick to the fighter tab
+            $('.menu #fighter').attr('onclick', truelink );
+          } else {
+            //if false. hide the fighter option.
+            $(".menu #fighter").hide()
+          };
+        });
+       
+        
+       
+
+
+
+
+
+
+        let Profilename = $('div.msg.ulName.them.ulHover').attr("onclick")
+        //grab the onlclick function from the private name feature.
+        console.log(Profilename);
+        //import the onclick to private on the context menu
+        $('.menu #private').attr('onclick', `${Profilename}`)
+        $('.menu').css({
+          //goes to our cursor
+    top: e.pageY+'px',
+    left: e.pageX+'px'
+    }).show();
+      }
+    
+return false ;
+});
+
+ //it was going to add in a way to remove the join match buttom. can't figure out a way where they information save to.
+ $(document).ready(function() {
+   $(".msg.alert .content .inline.popOut").click( function(){
+    //it will delete the fighter links. when the button is click.    
+    chatSocket.emit('delete', $(this).parent().parent().attr('id').slice(3),);
+    //hide the button
+       $(this).hide();
+     });
+ });
+
+
+// three function below all have the purpose to close down the context menu. click anywhere on the page will close down the menu.
+  $(document).bind('contextmenu click', function() {
+    $(".menu").hide();
+  });
+  $(".menu").bind('contextmenu click', function() {
+    $(".menu").hide();
+  });
+  $(window).bind('beforeunload', function(){
+    $(".menu").hide();
+  });
+
+  //when the mouse over the tabs of the menu. it will do a class thing like the orginal thing like mouse hover but jquery.
+  //three function below happens when the mouse enter their box
+    $(".menu #private").mouseenter(function(){
+      $(".menu #private").css({"background-color": "lightblue","color":"black"})
+    });
+
+    $(".menu #fighter").mouseenter(function(){
+      $(".menu #fighter").css({"background-color": "lightblue","color":"black"})
+    });
+
+    $(".menu #profile").mouseenter(function(){
+      $(".menu #profile").css({"background-color": "lightblue","color":"black"})
+    });
+    //three function below happen when the mouse leave the box
+    $(".menu #private").mouseleave(function(){
+      $(".menu #private").css({"background-color": "rgb(54, 51, 51)","color":"white"})
+    })
+
+
+    
+    $(".menu #fighter").mouseleave(function(){
+      $(".menu #fighter").css({"background-color": "rgb(54, 51, 51)","color":"white"})
+    })
+
+
+
+    $(".menu #profile").mouseleave(function(){
+      $(".menu #profile").css({"background-color": "rgb(54, 51, 51)","color":"white"})
+    })
+
+
 
     //Get old messages from the database
     let messages = "{{ messages }}".replaceAll("&#34;", "\"");
@@ -430,14 +563,27 @@
               newUser.setAttribute("onclick", "changeRec('" + name + "', this)");
               newUser.title = "Send a private message";
               let profileButton = document.createElement("button");
+              let profile = document.getElementById("profile");
+              let menu = document.getElementById("menu");
               profileButton.innerText = "View profile";
               profileButton.classList.add("profileButton");
+              //should stop the name variable from updating.
               profileButton.onmouseover = event => event.stopPropagation();
+              menu.onmouseover = event => event.stopPropagation();
+              // share very familier code with the profilebutton only difference is the different id element and a different variable name.
+              profile.onclick = event => {
+                let advancedParam = urlParams.get("advanced") ? "&advanced=true" : "";
+                window.location = `/profile?user=${getname}${advancedParam}`;
+                event.stopPropagation();
+              };
+
+
               profileButton.onclick = event => {
                 let advancedParam = urlParams.get("advanced") ? "&advanced=true" : "";
                 window.location = `/profile?user=${name}${advancedParam}`;
                 event.stopPropagation();
               };
+              
               newUser.appendChild(profileButton);
               newUser.onmouseover = function() {this.classList.add("ulHover");};
               newUser.onmouseout = function() {this.classList.remove("ulHover");};
@@ -628,4 +774,5 @@
       }
     };
 </script>
+
 {% endblock %}

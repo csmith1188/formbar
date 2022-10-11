@@ -465,7 +465,7 @@ def repeatMode():
         completeBar()
     elif sD.settings['barmode'] == 'progress':
         for student in sD.studentDict:
-            for task in sD.lesson.progList['step'['Prompt']]['task']:
+            for task in sD.lesson.progList[step['Prompt']]['task']:
                 sD.studentDict[student]['progress'].append(False)
         percFill(sD.lesson.checkProg(stripUser('admin')))
     elif sD.settings['barmode'] == 'playtime':

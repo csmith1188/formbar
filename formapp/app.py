@@ -74,14 +74,14 @@ flasklog = logging.getLogger('werkzeug')
 flasklog.setLevel(logging.ERROR)
 
 #Display IP address to console for user connection. Updates the Time as well
-# def logError(message):
-#     now = datetime.datetime.now()
-#     f = open('errorlog.txt', 'a')
-#     f.write(now + message)
-#     f.close()
+def logError(type, message):
+    now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    f = open('log.txt', 'a')
+    f.write("[" + str(now) + "]" + " [" + type + "] " + message)
+    f.close()
+    print("[" + str(now) + "]" + " [" + type + "] " + message)
 
-print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [info] " +'Running formbar server on:' + ip)
-# logError(ip + username + error)
+logError('info', "Running formbar on ip: " + ip)
 
 
 # ██       ██████   █████  ██████  ██ ███    ██  ██████

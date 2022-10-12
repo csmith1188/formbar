@@ -289,7 +289,7 @@
         </p>
       </div>
     </div>
-    <button id="resetPerms" class="inline popOut" onclick="resetPerms(); emit('refresh', json.dumps(packMSG('all', 'server', ''), broadcast=True))">Reset permissions</button>
+    <button id="resetPerms" class="inline popOut" onclick="resetPerms(); emit('reload', json.dumps(packMSG('all', 'server', ''), broadcast=True))">Reset permissions</button>
   </div>
   <div id="tabs-5">
     <h2>Lock Formbar</h2>

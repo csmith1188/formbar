@@ -215,7 +215,7 @@
     <div id="permsContainer">
       <div class="permBox">
         <h3>Chat</h3>
-        <select onchange="updatePerm(this); emit('reload', json.dumps(packMSG('all', 'server', ''), broadcast=True))" id="saypermsDrop" name="saypermsDrop" style="margin-top: 8px;">
+        <select onchange="updatePerm(this)" id="saypermsDrop" name="saypermsDrop" style="margin-top: 8px;">
           <option value="/controlpanel?say=0">Teacher</option>
           <option value="/controlpanel?say=1">Mod</option>
           <option value="/controlpanel?say=2" selected>Student</option>
@@ -227,7 +227,7 @@
       </div>
       <div class="permBox">
         <h3>Games</h3>
-        <select onchange="updatePerm(this); emit('reload', json.dumps(packMSG('all', 'server', ''), broadcast=True))" id="gamespermsDrop" name="gamespermsDrop" style="margin-top: 8px;">
+        <select onchange="updatePerm(this)" id="gamespermsDrop" name="gamespermsDrop" style="margin-top: 8px;">
           <option value="/controlpanel?games=0">Teacher</option>
           <option value="/controlpanel?games=1">Mod</option>
           <option value="/controlpanel?games=2" selected>Student</option>

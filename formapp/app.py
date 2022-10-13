@@ -2982,13 +2982,6 @@ def message(message):
     except Exception as e:
         print("[error] " + 'Error: ' + str(e))
 
- @socket_.on('reload', namespace=chatnamespace)
- def message(message):
-     try:
-         emit('userlist', json.dumps(packMSG('userlist', sD.studentDict[request.remote_addr]['name'], 'server', chatUsers())), broadcast=True)
-     except Exception as e:
-         print("[error] " + 'Error: ' + str(e))
-
 @socket_.on('alert', namespace=chatnamespace)
 def message(message):
     try:

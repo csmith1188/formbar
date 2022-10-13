@@ -110,18 +110,6 @@
     color: var(--bg-color);
   }
 
-  button.profileButton {
-    position: absolute;
-    vertical-align: top;
-    right: 3px;
-    top: 3px;
-    font-size: 14px;
-  }
-
-  :not(.ulHover) > button.profileButton:not(:hover) {
-    display: none;
-  }
-
   #controlChat {
     background-color: var(--bg-color);
     border-top: 1px solid var(--theme-color);
@@ -330,6 +318,7 @@
   <li id="private">Private chat</li>
   <li id="profile">Profile</li>
   <li id="fighter">Fighter</li>
+  <li id="ttt">start ttt </li>
 </div>
 {% endblock %}
 
@@ -346,10 +335,12 @@
     let link = "";
     //make the context menu show up in userlist only.
     $("#userlist").bind("contextmenu", function(e) {
-      //because ulHover constantly getting update one grab/check is not enough.
       //userlist is how ever constant on grab only
+      // userlist with the users are on the same level so it grabbing all of them. the ulhover seperate them
       
       if($('div.msg.ulName.them.ulHover').length == 1){
+        $(".menu #private").show()
+        $(".menu #ttt").show()
         //get the name of the profile for sending them to the right profile.
         getname = $('div.msg.ulName.them.ulHover').clone().children().remove().end().text();
         // grab the element data for proper profile sending. just grab their name and just the name.
@@ -359,13 +350,13 @@
         // get the first word of the text line since it always say their username
           // compare the click name and the temporary fighter name
           // goes to the buttom data,
-          if (tempname[0] == getname){
+           //If there is a alert from the Spefically from the fighters. it will start up a game.
+          if (tempname[0] == getname && $(index).children(".inline.popOut").length == 1){
             // import the fighter link into the menu fighter data. and show the fighter option
             link = $(index).children(".inline.popOut");
             let msgid  = $(index).parent().attr('id').slice(3);
             //true link provide a function to join the game and to delete the message.
             let truelink = $(link).attr("onclick") + `; chatSocket.emit('delete', ${msgid}) ` 
-            console.log(truelink);
             $(".menu #fighter").show()
             // insert the onclick to the fighter tab
             $('.menu #fighter').attr('onclick', truelink );
@@ -382,23 +373,36 @@
 
 
 
-
-        let Profilename = $('div.msg.ulName.them.ulHover').attr("onclick")
         //grab the onlclick function from the private name feature.
-        console.log(Profilename);
+        let Profilename = $('div.msg.ulName.them.ulHover').attr("onclick")
+
+
         //import the onclick to private on the context menu
         $('.menu #private').attr('onclick', `${Profilename}`)
+        let tictac = `window.open('/games/ttt?opponent=${getname}&advanced=') `
+        $('.menu #ttt').attr('onclick',tictac )
         $('.menu').css({
           //goes to our cursor
     top: e.pageY+'px',
     left: e.pageX+'px'
     }).show();
       }
-    
+      // when you want to view your own profile
+      if ($('div.msg.ulName.me.ulHover').length == 1){
+        $(".menu #ttt").hide()
+        $(".menu #private").hide()
+        $(".menu #fighter").hide()
+        getname = $('div.msg.ulName.me.ulHover').clone().children().remove().end().text();
+        $('.menu').css({
+          //goes to our cursor
+         top: e.pageY+'px',
+          left: e.pageX+'px'
+          }).show();
+      }
 return false ;
 });
 
- //it was going to add in a way to remove the join match buttom. can't figure out a way where they information save to.
+//delete the fighter message
  $(document).ready(function() {
    $(".msg.alert .content .inline.popOut").click( function(){
     //it will delete the fighter links. when the button is click.    
@@ -416,9 +420,13 @@ return false ;
   $(".menu").bind('contextmenu click', function() {
     $(".menu").hide();
   });
-  $(window).bind('beforeunload', function(){
+  $(".menu").children().bind('contextmenu click', function() {
     $(".menu").hide();
   });
+  //Not needed since we are opening new tabs.
+  // $(window).bind('beforeunload', function(){
+  //   $(".menu").hide();
+  // });
 
   //when the mouse over the tabs of the menu. it will do a class thing like the orginal thing like mouse hover but jquery.
   //three function below happens when the mouse enter their box
@@ -438,13 +446,9 @@ return false ;
       $(".menu #private").css({"background-color": "rgb(54, 51, 51)","color":"white"})
     })
 
-
-    
     $(".menu #fighter").mouseleave(function(){
       $(".menu #fighter").css({"background-color": "rgb(54, 51, 51)","color":"white"})
     })
-
-
 
     $(".menu #profile").mouseleave(function(){
       $(".menu #profile").css({"background-color": "rgb(54, 51, 51)","color":"white"})
@@ -540,12 +544,6 @@ return false ;
         output(message);
     });
 
-    // When the page needs to refresh, send a signal to chat which will then refresh everyone's page
-    chatSocket.on("refresh", message => {
-      console.log('work')
-      location.reload();
-    });
-
     chatSocket.on("userlist", message => {
         message = JSON.parse(message);
         console.log("userlist");
@@ -562,32 +560,21 @@ return false ;
               newUser.classList.add('them')
               newUser.setAttribute("onclick", "changeRec('" + name + "', this)");
               newUser.title = "Send a private message";
-              let profileButton = document.createElement("button");
               let profile = document.getElementById("profile");
               let menu = document.getElementById("menu");
-              profileButton.innerText = "View profile";
-              profileButton.classList.add("profileButton");
-              //should stop the name variable from updating.
-              profileButton.onmouseover = event => event.stopPropagation();
               menu.onmouseover = event => event.stopPropagation();
               // share very familier code with the profilebutton only difference is the different id element and a different variable name.
               profile.onclick = event => {
+                console.log("test");
                 let advancedParam = urlParams.get("advanced") ? "&advanced=true" : "";
-                window.location = `/profile?user=${getname}${advancedParam}`;
+                window.open(`/profile?user=${getname}${advancedParam}`);
                 event.stopPropagation();
               };
 
-
-              profileButton.onclick = event => {
-                let advancedParam = urlParams.get("advanced") ? "&advanced=true" : "";
-                window.location = `/profile?user=${name}${advancedParam}`;
-                event.stopPropagation();
-              };
-              
-              newUser.appendChild(profileButton);
-              newUser.onmouseover = function() {this.classList.add("ulHover");};
-              newUser.onmouseout = function() {this.classList.remove("ulHover");};
             }
+            //have been move to affect our name as well. since the rightclick anywhere in the userlist affect the all the username except ulHover.
+            newUser.onmouseover = function() {this.classList.add("ulHover");};
+              newUser.onmouseout = function() {this.classList.remove("ulHover");};
         }
     });
 
@@ -598,12 +585,6 @@ return false ;
             content: 'Disconnected...',
             time: Date.now()
         });
-    });
-
-    // When the page needs to refresh, send a signal to chat which will then refresh everyone's page
-    chatSocket.on("reload", message => {
-      console.log('work');
-      location.reload();
     });
 
     //When there is an error
@@ -633,6 +614,17 @@ return false ;
           //sendButton.value = "Send to " + receiver;
           //el.classList.add('whisper');
           document.getElementById("removeRec").style.display = "initial";
+          //look at each profile and see which one is in private. if they did this function right after. it should 
+          $("div.msg.ulName.them").each(function(element, index){
+              console.log($(index).clone().children().remove().end().text());
+              if (receiver == $(index).clone().children().remove().end().text()) {
+                console.log("yay");
+                $(index).css({"background-color": "#00e7ffc4"})
+              } else {
+                console.log("boo");
+                $(index).css({"background-color": ""})
+              }
+          })
     }
 
     function removeRec() {
@@ -642,7 +634,11 @@ return false ;
         boxes.sendButton.classList.remove("rec");
         //sendButton.value = "Send";
         //el.classList.remove('whisper');
+        // remove all the hihglight for private profile.
         document.getElementById("removeRec").style.display = "none";
+        $("div.msg.ulName.them").each(function(element, index){
+          $(index).css({"background-color": ""})
+        })
     }
 
     function atBottom(ele) {

@@ -49,7 +49,7 @@ import time, math
 import threading
 import logging
 
-#This import allows for the time to be printed to console. If adding new print lines add the 2nd line here directly after the print open parenthese so that it prints the time along with updating it. The 2nd line is an example of a print line
+#This import allows for the time to be printed to console. If you need to add a new print line the 2nd line is an example of how to use the logFile() function to make it print to console and to the log file
 import datetime
 #logFile("Info", "Bot successful login. Made them a guest: " + username)
 

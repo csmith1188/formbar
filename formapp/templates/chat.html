@@ -541,7 +541,7 @@ return false ;
     });
 
     // When the page needs to refresh, send a signal to chat which will then refresh everyone's page
-    chatSocket.on("refresh", message => {
+    chatSocket.on("reload", message => {
       console.log('work')
       location.reload();
     });

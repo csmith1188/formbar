@@ -215,7 +215,7 @@
     <div id="permsContainer">
       <div class="permBox">
         <h3>Chat</h3>
-        <select onchange="updatePerm(this)" id="saypermsDrop" name="saypermsDrop" style="margin-top: 8px;">
+        <select onchange="updatePerm(this); emit('reload', json.dumps(packMSG('all', 'server', ''), broadcast=True))" id="saypermsDrop" name="saypermsDrop" style="margin-top: 8px;">
           <option value="/controlpanel?say=0">Teacher</option>
           <option value="/controlpanel?say=1">Mod</option>
           <option value="/controlpanel?say=2" selected>Student</option>
@@ -227,7 +227,7 @@
       </div>
       <div class="permBox">
         <h3>Games</h3>
-        <select onchange="updatePerm(this)" id="gamespermsDrop" name="gamespermsDrop" style="margin-top: 8px;">
+        <select onchange="updatePerm(this); emit('reload', json.dumps(packMSG('all', 'server', ''), broadcast=True))" id="gamespermsDrop" name="gamespermsDrop" style="margin-top: 8px;">
           <option value="/controlpanel?games=0">Teacher</option>
           <option value="/controlpanel?games=1">Mod</option>
           <option value="/controlpanel?games=2" selected>Student</option>
@@ -239,7 +239,7 @@
       </div>
       <div class="permBox">
         <h3>LED bar</h3>
-        <select onchange="updatePerm(this)" id="barpermsDrop" name="barpermsDrop" style="margin-top: 8px;">
+        <select onchange="updatePerm(this); emit('reload', json.dumps(packMSG('all', 'server', ''), broadcast=True))" id="barpermsDrop" name="barpermsDrop" style="margin-top: 8px;">
           <option value="/controlpanel?bar=0" selected>Teacher</option>
           <option value="/controlpanel?bar=1">Mod</option>
           <option value="/controlpanel?bar=2">Student</option>
@@ -251,7 +251,7 @@
       </div>
       <div class="permBox">
         <h3>Sounds</h3>
-        <select onchange="updatePerm(this)" id="sfxpermsDrop" name="sfxpermsDrop" style="margin-top: 8px;">
+        <select onchange="updatePerm(this); emit('reload', json.dumps(packMSG('all', 'server', ''), broadcast=True))" id="sfxpermsDrop" name="sfxpermsDrop" style="margin-top: 8px;">
           <option value="/controlpanel?sfx=0" selected>Teacher</option>
           <option value="/controlpanel?sfx=1">Mod</option>
           <option value="/controlpanel?sfx=2">Student</option>
@@ -263,7 +263,7 @@
       </div>
       <div class="permBox">
         <h3>Music</h3>
-        <select onchange="updatePerm(this)" id="bgmpermsDrop" name="bgmpermsDrop" style="margin-top: 8px;">
+        <select onchange="updatePerm(this); emit('reload', json.dumps(packMSG('all', 'server', ''), broadcast=True))" id="bgmpermsDrop" name="bgmpermsDrop" style="margin-top: 8px;">
           <option value="/controlpanel?bgm=0" selected>Teacher</option>
           <option value="/controlpanel?bgm=1">Mod</option>
           <option value="/controlpanel?bgm=2">Student</option>
@@ -275,7 +275,7 @@
       </div>
       <div class="permBox">
         <h3>API</h3>
-        <select onchange="updatePerm(this)" id="apipermsDrop" name="apipermsDrop" style="margin-top: 8px;">
+        <select onchange="updatePerm(this); emit('reload', json.dumps(packMSG('all', 'server', ''), broadcast=True))" id="apipermsDrop" name="apipermsDrop" style="margin-top: 8px;">
           <option value="/controlpanel?api=0">Teacher</option>
           <option value="/controlpanel?api=1">Mod</option>
           <option value="/controlpanel?api=2">Student</option>

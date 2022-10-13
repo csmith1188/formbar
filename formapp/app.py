@@ -2806,6 +2806,11 @@ def endpoint_users():
             db.close()
             return render_template("users.html", users = users)
 
+@app.route('/usermanual')
+def endpoint_usermanual():
+     return render_template("user-manual.html")
+
+
 # ██    ██
 # ██    ██
 # ██    ██

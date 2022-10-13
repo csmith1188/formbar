@@ -51,7 +51,7 @@ import logging
 
 #This import allows for the time to be printed to console. If adding new print lines add the 2nd line here directly after the print open parenthese so that it prints the time along with updating it. The 2nd line is an example of a print line
 import datetime
-#print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [info] " +"Bot successful login. Made them a guest: " + username)
+#logFile("Info", "Bot successful login. Made them a guest: " + username)
 
 import traceback
 import sqlite3
@@ -74,14 +74,14 @@ flasklog = logging.getLogger('werkzeug')
 flasklog.setLevel(logging.ERROR)
 
 #Display IP address to console for user connection. Updates the Time as well
-def logError(type, message):
+def logFile(type, message):
     now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     f = open('log.txt', 'a')
-    f.write("[" + str(now) + "]" + " [" + type + "] " + message)
+    f.write("[" + str(now) + "]" + " [" + type + "] " + message + "\n")
     f.close()
     print("[" + str(now) + "]" + " [" + type + "] " + message)
 
-logError('info', "Running formbar on ip: " + ip)
+logFile('Info', "Running formbar on ip: " + ip)
 
 
 # ██       ██████   █████  ██████  ██ ███    ██  ██████
@@ -193,7 +193,7 @@ def endpoint_anitest():
 def dbug(message='Checkpoint Reached'):
     global DEBUG
     if DEBUG:
-        print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [DEBUG] " + str(message))
+        logFile(" [DEBUG] " + str(message))
 
 def newStudent(remote, username, bot=False):
     global NEWACCOUNTPERMISSIONS
@@ -230,17 +230,17 @@ def newStudent(remote, username, bot=False):
 
         #Login bots as guest
         if bot:
-            print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [info] " +"Bot successful login. Made them a guest: " + username)
+            logFile("Info", "Bot successful login. Made them a guest: " + username)
             sD.studentDict[remote]['perms'] = sD.settings['perms']['anyone']
 
         #Login as teacher if there is no teacher yet
         elif not teacher:
-            print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [info] " +username + " logged in. Made them the teacher...")
+            logFile("Info", username + " logged in. Made them the teacher...")
             sD.studentDict[remote]['perms'] = sD.settings['perms']['admin']
 
         #Login other users as guests (students until database is installed)
         else:
-            print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [info] " +username + " logged in.")
+            logFile("Info", username + " logged in.")
             sD.studentDict[remote]['perms'] = NEWACCOUNTPERMISSIONS
 
         #Overwrite permissions with those retrieved from database here
@@ -276,10 +276,7 @@ def refreshUsers(selectedStudent='', category=''):
                 sD.studentDict[student][category] = ''
                 return True
             except Exception as e:
-                print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " +e)
-                f = open('errorlog.txt', 'a')
-                f.write(str(e))
-                f.close()
+                logFile("Error", + e)
                 return False
         else:
             sD.studentDict[student]['thumb'] = '',
@@ -338,10 +335,7 @@ def playSFX(sound):
         pygame.mixer.Sound(sfx.sound[sound]).play()
         return "Successfully played: "
     except Exception as e:
-        print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " +e)
-        f = open('errorlog.txt', 'a')
-        f.write(str(e) + "\n")
-        f.close()
+        logFile("Error", + e)
         return "Invalid format: "
 
 def stopSFX():
@@ -537,9 +531,9 @@ def printLetter(letter, startLocation, fg=colors['fg'], bg=colors['bg']):
                     pixels[j] = bg
 
         else:
-            print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [warning] " + "Warning! Letter ", letter, " not found.")
+            logFile(" [warning] ", "Warning! Letter " + letter + " not found.")
     else:
-        print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [warning] " + "Warning! Not enough space for this letter!")
+        logFile(" [warning] ", "Warning! Not enough space for this letter!")
 
 #Shows results of test when done with abcdBar
 def abcdBar():
@@ -919,9 +913,9 @@ def endpoint_addfile():
             title = request.form['title']
             file = request.form['file']
             list = request.form['list']
-            print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " Title: " + title)
-            print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " Filename: " + file)
-            print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " List: " + list)
+            logFile(" Title: ", + title)
+            logFile(" Filename: ", + file)
+            logFile(" List: ", + list)
             return render_template("message.html", message = 'File submitted to teacher.')
         else:
             return render_template('addfile.html')
@@ -1121,10 +1115,7 @@ def endpoint_bgm():
                         if request.args.get('volume'):
                             bgm_volume = float(bgm_volume)
                     except Exception as e:
-                        print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [warning] " + "Could not convert volume to float. Setting to default.")
-                        f = open('errorlog.txt', 'a')
-                        f.write(str(e))
-                        f.close()
+                        logFile(" [warning] ", "Could not convert volume to float. Setting to default.")
                         bgm_volume = 0.5
                     sD.bgm['nowplaying']= bgm_file
                     if bgm_volume and type(bgm_volume) is float:
@@ -1151,10 +1142,7 @@ def endpoint_bgm():
                     volBGM(bgm_volume)
                     return render_template("message.html", message = 'Music volume set to ' + request.args.get('voladj') + '.')
                 except Exception as e:
-                    print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " +e)
-                    f = open('errorlog.txt', 'a')
-                    f.write(str(e))
-                    f.close()
+                    logFile("Error", +e)
                     return render_template("message.html", message = 'Invalid voladj. Use \'up\', \'down\', or a number from 0.0 to 1.0.')
         elif request.args.get('playpause'):
             playpauseBGM()
@@ -1246,8 +1234,8 @@ def endpoint_break():
 def endpoint_changemode():
     newMode = request.args.get('newMode') or ''
     direction = request.args.get('direction') or 'next'
-    print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + newMode)
-    print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + direction)
+    logFile(newMode)
+    logFile(direction)
     return changeMode(newMode, direction)
 
 @app.route('/changepassword', methods = ['POST', 'GET'])
@@ -1357,10 +1345,7 @@ def endpoint_color():
             g = int(request.args.get('g'))
             b = int(request.args.get('b'))
         except Exception as e:
-            print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " +e)
-            f = open('errorlog.txt', 'a')
-            f.write(str(e))
-            f.close()
+            logFile("Error", e)
             r = ''
             g = ''
             b = ''
@@ -1415,10 +1400,7 @@ def endpoint_controlpanel():
                                 db.commit()
                                 db.close()
                     except Exception as e:
-                        print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " +e)
-                        f = open('errorlog.txt', 'a')
-                        f.write(str(e))
-                        f.close()
+                        logFile("Error", e)
                         pass
 
         ###
@@ -1698,10 +1680,7 @@ def endpoint_games_fighter():
             db.close()
             return render_template('games/fighter.html', username = username, wins = wins, losses = losses, winStreak = winStreak, goldUnlocked = goldUnlocked, action = action, authenticated = authenticated)
         except Exception as e:
-            print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + str(e))
-            f = open('errorlog.txt', 'a')
-            f.write(str(e))
-            f.close()
+            logFile("Error", str(e))
 
 
 '''
@@ -1881,10 +1860,7 @@ def endpoint_getword():
                 wordlist.append(random.choice(list(words.keys())))
             return json.dumps(wordlist)
         except Exception as e:
-            print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + "Could not convert number. " + str(e))
-            f = open('errorlog.txt', 'a')
-            f.write(str(e))
-            f.close()
+            logFile("Error", "Could not convert number. " + str(e))
             return render_template("message.html", message = "Could not convert number. " + str(e))
     else:
         word = random.choice(list(words.keys()))
@@ -1988,11 +1964,8 @@ def endpoint_lesson():
                     advanced = ''
                 return redirect('/lesson' + advanced)
             except Exception as e:
-                print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + traceback.format_exc())
-                print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + "[error] " + e)
-                f = open('errorlog.txt', 'a')
-                f.write(str(e))
-                f.close()
+                logFile("Error", traceback.format_exc())
+                logFile("Error", e)
                 return render_template("message.html", message = '<b>Error:</b> ' + str(e))
         elif request.args.get('action'):
             if request.args.get('action') == 'next':
@@ -2184,7 +2157,7 @@ def endpoint_login():
         else:
             #If the user is logged in, log them out
             if remote in sD.studentDict:
-                print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [info] " + sD.studentDict[request.remote_addr]['name'] + " logged out.")
+                logFile("Info " + sD.studentDict[request.remote_addr]['name'],  " logged out.")
                 socket_.emit('alert', json.dumps(packMSG('all', 'server', sD.studentDict[request.remote_addr]['name'] + " logged out...")), namespace=chatnamespace)
                 del sD.studentDict[request.remote_addr]
                 playSFX('sfx_laser01')
@@ -2255,10 +2228,7 @@ def endpoint_perc():
             percAmount = int(percAmount)
             percFill(percAmount)
         except Exception as e:
-            print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " +e)
-            f = open('errorlog.txt', 'a')
-            f.write(str(e))
-            f.close()
+            logFile("Error", e)
             return render_template("message.html", message = "<b>amount</b> must be an integer between 0 and 100 \'/perc?amount=<b>50</b>\'", forward = '/home')
         return render_template("message.html", message = "Set perecentage to: " + str(percAmount) + ".", forward = '/home')
 
@@ -2322,10 +2292,7 @@ def endpoint_progress():
                     percFill(percAmount)
                 return str(check) + " was toggled."
             except Exception as e:
-                print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + e)
-                f = open('errorlog.txt', 'a')
-                f.write(str(e))
-                f.close()
+                logFile("Error", e)
                 return render_template("message.html", message = '<b>Error:</b> ' + str(e))
         else:
             if sD.activeProgress:
@@ -2432,10 +2399,7 @@ def endpoint_savescore():
         else:
             return render_template("message.html", message = "Missing arguments.")
     except Exception as e:
-        print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + "Error: " + str(e))
-        f = open('errorlog.txt', 'a')
-        f.write(str(e))
-        f.close()
+        logFile("Error", "Error: " + str(e))
 
 
 @app.route('/say')
@@ -2486,10 +2450,7 @@ def endpoint_segment():
                 start = int(start)
                 end = int(end)
             except Exception as e:
-                print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " +e)
-                f = open('errorlog.txt', 'a')
-                f.write(str(e))
-                f.close()
+                logFile("Error", e)
                 return render_template("message.html", message = "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=FF00FF</b> (start and end must be and integer)")
         if start > BARPIX or end > BARPIX:
             return render_template("message.html", message = "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=FF00FF</b> (Your start or end was higher than the number of pixels: " + str(BARPIX) + ")")
@@ -2666,7 +2627,7 @@ def endpoint_tutd():
         if thumb:
             if sD.settings['barmode'] == 'tutd':
                 # This commented lines if made un-commented will allow for the host of the server to see who sent what reaction, along with their ip address. 
-                #print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [info] " + "Recieved " + thumb + " from " + name + " at ip: " + ip)
+                #logFile("Info",  "Recieved " + thumb + " from " + name + " at ip: " + ip)
                 if thumb in ['up', 'down', 'wiggle']:
                     if sD.studentDict[request.remote_addr]['thumb'] != thumb:
                         sD.studentDict[request.remote_addr]['thumb'] = thumb
@@ -2715,7 +2676,7 @@ def endpoint_updateuser():
         else:
             return render_template("message.html", message = "Missing arguments.")
     except Exception as e:
-        print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + "Error: " + str(e))
+        logFile("Error", "Error: " + str(e))
         f = open('errorlog.txt', 'a')
         f.write(str(e))
         f.close()
@@ -2806,7 +2767,7 @@ def endpoint_users():
                     #server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', name, 'server', 'The teacher rejected your break request.')))
             if action == 'kick':
                 if user in sD.studentDict:
-                    print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [info] " + sD.studentDict[request.remote_addr]['name'] + " was removed by the teacher.")
+                    logFile("Info", sD.studentDict[request.remote_addr]['name'] + " was removed by the teacher.")
                     socket_.emit('alert', json.dumps(packMSG('all', 'server', sD.studentDict[request.remote_addr]['name'] + " was removed by the teacher...")), namespace=chatnamespace)
                     del sD.studentDict[user]
                     playSFX('sfx_laser01')
@@ -2835,12 +2796,12 @@ def endpoint_users():
                                 dbcmd.execute("UPDATE users SET permissions=:perms WHERE username=:uname", {"uname": sD.studentDict[user]['name'], "perms": sD.studentDict[user]['perms']})
                                 db.commit()
                                 db.close()
-                                print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + "]" + " [info] " + "")
+                                logFile("Info", "Permissions Changed")
                                 return render_template("message.html", message = "Changed user permission.")
                         else:
                             return render_template("message.html", message = "User not in list.")
                     except Exception as e:
-                        print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " +e)
+                        logFile("Error", e)
                         f = open('errorlog.txt', 'a')
                         f.write(str(e))
                         f.close()
@@ -2943,13 +2904,10 @@ def connect():
     try:
         if request.remote_addr in sD.studentDict:
             sD.studentDict[request.remote_addr]['sid'] = request.sid
-            print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [info] " + sD.studentDict[request.remote_addr]['name'] + " connected and was given id \"" + request.sid + "\"")
+            logFile("Info", sD.studentDict[request.remote_addr]['name'] + " connected and was given id \"" + request.sid + "\"")
             emit('userlist', json.dumps(packMSG('all', 'server', chatUsers())), broadcast=True)
     except Exception as e:
-        print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + "Error finding user in list: " + str(e))
-        f = open('errorlog.txt', 'a')
-        f.write(str(e))
-        f.close()
+        logFile("Error", "Error finding user in list: " + str(e))
 
 
 @socket_.on('disconnect', namespace=chatnamespace)
@@ -2958,10 +2916,10 @@ def disconnect():
         if request.remote_addr in sD.studentDict:
             if 'sid' in sD.studentDict[request.remote_addr]:
                 del sD.studentDict[request.remote_addr]['sid']
-                print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [info] " + sD.studentDict[request.remote_addr]['name'] + " disconnected")
+                logFile("Info", sD.studentDict[request.remote_addr]['name'] + " disconnected")
                 emit('userlist', json.dumps(packMSG('all', 'server', chatUsers())), broadcast=True)
     except Exception as e:
-        print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + "Error finding user in list: " + str(e))
+        logFile("Error", "Error finding user in list: " + str(e))
         f = open('errorlog.txt', 'a')
         f.write(str(e))
         f.close()
@@ -2997,15 +2955,12 @@ def message(message):
                 for student in sD.studentDict:
                     if sD.studentDict[student]['name'] == message['to'] or sD.studentDict[student]['name'] == message['from']:
                         messageOut = packMSG(message['to'], message['from'], message['content'], now)
-                        print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + "]" + messageOut)
+                        logFile("Chat", messageOut)
                         emit('message', json.dumps(messageOut), to=sD.studentDict[student]['sid'])
                         break
-            print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [info] " + message['from'] + " said to " + message['to'] + ": " + message['content'])
+            logFile("Info", message['from'] + " said to " + message['to'] + ": " + message['content'])
     except Exception as e:
-        print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + str(e))
-        f = open('errorlog.txt', 'a')
-        f.write(str(e))
-        f.close()
+        logFile("Error", str(e))
 
 
 @socket_.on('edit', namespace=chatnamespace)
@@ -3024,10 +2979,7 @@ def edit(timeSent, newContent):
         db.close()
         emit('edit', [timeSent, newContent], broadcast=True)
     except Exception as e:
-        print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + str(e))
-        f = open('errorlog.txt', 'a')
-        f.write(str(e))
-        f.close()
+        logFile("Error", str(e))
 
 
 @socket_.on('delete', namespace=chatnamespace)
@@ -3043,10 +2995,7 @@ def delete(timeSent):
         db.close()
         emit('delete', timeSent, broadcast=True)
     except Exception as e:
-        print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + str(e))
-        f = open('errorlog.txt', 'a')
-        f.write(str(e))
-        f.close()
+        logFile("Error", str(e))
 
 
 @socket_.on('userlist', namespace=chatnamespace)
@@ -3054,10 +3003,7 @@ def message(message):
     try:
         emit('userlist', json.dumps(packMSG('userlist', sD.studentDict[request.remote_addr]['name'], 'server', chatUsers())), broadcast=True)
     except Exception as e:
-        print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + str(e))
-        f = open('errorlog.txt', 'a')
-        f.write(str(e))
-        f.close()
+        logFile("Error", str(e))
 
 
 @socket_.on('alert', namespace=chatnamespace)
@@ -3065,10 +3011,10 @@ def message(message):
     try:
         emit('alert', client, json.dumps(packMSG('alert', sD.studentDict[request.remote_addr]['name'], 'server', 'Only the server can send alerts!')))
     except Exception as e:
-        print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + str(e))
-        f = open('errorlog.txt', 'a')
-        f.write(str(e))
-        f.close()
+        logFile("Error", str(e))
+        
+        
+        
 
 
 @socket_.on('help', namespace=chatnamespace)
@@ -3083,21 +3029,17 @@ def message(message):
         #playSFX("sfx_up04")
         #emit('help', json.dumps(packMSG('alert', sD.studentDict[request.remote_addr]['name'], 'server', 'Your help ticket was sent. Keep working on the problem while you wait!')))
     except Exception as e:
-        print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + str(e))
-        f = open('errorlog.txt', 'a')
-        f.write(str(e))
-        f.close()
-
+        logFile("Error", str(e))
 
 @socket_.on('fighter', namespace=chatnamespace)
 def fighter(message):
     try:
         emit('fighter', message, broadcast=True)
     except Exception as e:
-        print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + str(e))
-        f = open('errorlog.txt', 'a')
-        f.write(str(e))
-        f.close()
+        logFile("Error", str(e))
+        
+        
+        
 
 
 @socket_.on('ttt', namespace=chatnamespace)
@@ -3121,10 +3063,7 @@ def ttt(message):
                     shape = 'O'
                 game.gameboard[rBox][cBox] = shape
     except Exception as e:
-        print("[" + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "]" + " [error] " + str(e))
-        f = open('errorlog.txt', 'a')
-        f.write(str(e))
-        f.close()
+        logFile("Error", str(e))
 
 
 

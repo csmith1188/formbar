@@ -19,9 +19,6 @@ import traceback
 import sqlite3
 import board, neopixel
 
-#Importing customs modules
-from modules import ir
-
 # Change the built-in logging for flask
 flasklog = logging.getLogger('werkzeug')
 flasklog.setLevel(logging.ERROR)

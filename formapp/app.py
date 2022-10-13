@@ -2985,7 +2985,7 @@ def message(message):
 @socket_.on('reload', namespace=chatnamespace)
 def message(message):
     try:
-        emit('reload', json.dumps(packMSG('reload', sD.studentDict[request.remote_addr]['name'], 'server', chatUsers())), broadcast=True)
+        emit('reload', message, broadcast=True)
     except Exception as e:
         print("[error] " + 'Error: ' + str(e))
 

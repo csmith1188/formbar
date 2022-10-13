@@ -541,9 +541,10 @@ return false ;
     });
 
     // When the page needs to refresh, send a signal to chat which will then refresh everyone's page
-    chatSocket.on("refresh", message => {
-      console.log('work')
-      location.reload();
+    chatSocket.on("reload", message => {
+      //check message.content for permission level, and see if it matches this user's permission to see fi they need to change
+        console.log('work test')
+        location.reload()
     });
 
     chatSocket.on("userlist", message => {
@@ -598,12 +599,6 @@ return false ;
             content: 'Disconnected...',
             time: Date.now()
         });
-    });
-
-    // When the page needs to refresh, send a signal to chat which will then refresh everyone's page
-    chatSocket.on("reload", message => {
-      console.log('work');
-      location.reload();
     });
 
     //When there is an error

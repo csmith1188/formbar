@@ -475,7 +475,7 @@ def repeatMode():
     playSFX("sfx_success01")
 def endMode():
     clearBar()
-    showString("Idle")
+    showString(ip + "  Idle")
 
 
 
@@ -1584,6 +1584,7 @@ def endpoint_flush():
         return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
     else:
         flushUsers()
+        endMode()
         sD.refresh()
         return render_template("message.html", message = "Session was restarted.")
 

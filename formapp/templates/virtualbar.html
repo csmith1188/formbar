@@ -1,41 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"
+    integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <title>virtualBar</title>
   <style>
-    
-</style>
+
+  </style>
 </head>
+
 <body>
   <div class="container"></div>
   <canvas id='virtualbar'></canvas>
-  <script>
-
-
-
-    let mychart = document.getElementById('virtualbar').getContext("2d");
-
-    let doughnutChart = new Chart(mychart, {
-      type:'doughnut',
-      data:{
-      labels:["Thumbs Up","Thumbs Down","Wiggle","Essay"],
-      datasets:[{
-        label:"",
-        data:[
-           5,
-        ]
-      }]
-      },
-      options:{
-        maintainAspectRatio: false,
-      }
-    });
-  </script>
 </body>
+
 </html>
 <!-- {% extends 'header_fullscreen.html' %} -->
 <!-- ^^ This means add this file into the contents of the header page -->
@@ -46,7 +29,7 @@
 
 <!-- Extra style declarations here -->
 <!-- {% block style %} -->
-  <!-- <style>
+<!-- <style>
     body {
       user-select: none;
       background: var(--bg-dark-blue);
@@ -56,7 +39,7 @@
       width: calc(100% - 32px);
     } -->
 
-    <!-- #text {
+<!-- #text {
       width: 10ch;
       padding: 0 4px;
       border: 1px white;
@@ -84,42 +67,77 @@
 
 <!-- Main content here -->
 <!-- {% block main %} -->
-  <!-- <div id="virtualBar" class="vCentered"> -->
-    <!-- <div id="text">Text goes here</div> -->
-    <!-- <span id="pixBox"></span> -->
-  <!-- </div> --> 
+<!-- <div id="virtualBar" class="vCentered"> -->
+<!-- <div id="text">Text goes here</div> -->
+<!-- <span id="pixBox"></span> -->
+<!-- </div> -->
 <!-- {% endblock %} -->
 
 <!-- Extra JavaScript here -->
 <!-- {% block script %} -->
 
-  <script>
-    function update() {
-      // Update the virtual bar
-      let pixRequest = new XMLHttpRequest();
-      pixRequest.open("GET", '/api/students');
-      pixRequest.onload = () => {
-        console.log(pixRequest);
-        let pixRes = JSON.parse(pixRequest.responseText);
-      }
-      pixRequest.send(null);
+<script>
+  var mychart = document.getElementById('virtualbar').getContext("2d");
+
+  var doughnutChart = new Chart(mychart, {
+    type: 'doughnut',
+    data: {
+      labels: ["up", "wiggle", "down"],
+      datasets: [{
+        backgroundColor: [
+          "#00ff00",
+          "#00ffff",
+          "#ff0000"],
+        data: [0, 0, 0]
+      }]
+    },
+    options: {
+      maintainAspectRatio: false,
     }
+  });
+  let pixRes;
+  function update() {
+    // Update the virtual bar
+    let pixRequest = new XMLHttpRequest();
+    pixRequest.open("GET", '/api/students');
+    pixRequest.onload = () => {
+      pixRes = JSON.parse(pixRequest.responseText);
+      console.log(pixRes);
 
-      //Update the virtual bar's text
-      let textRequest = new XMLHttpRequest();
-      textRequest.open("GET", '/api/phrase');
-      textRequest.onload = () => {
-        let phraseRes = JSON.parse(textRequest.responseText);
-        let phrase = phraseRes.phrase;
-        let text = document.getElementById("virtualbar");
-        text.innerText = phrase;
+      var up = 0
+      var wiggle = 0
+      var down = 0
+
+      for (const key of Object.keys(pixRes)) {
+        console.log(key);
+        console.log(pixRes[key]); console.log(pixRes[key].thumb);
+        if (pixRes[key].thumb = "up"); {
+          up++
+          console.log(up)
+        }
       }
-      textRequest.send(null);
+      doughnutChart.data.datasets.data = [up, wiggle, down];
+      console.log(doughnutChart.data.datasets.data);
+    }
+    pixRequest.send(null);
+    doughnutChart.update();
+  }
 
-        
-  
-    update();
-    setInterval(update, 1000);
-  </script>
+  //Update the virtual bar's text
+  let textRequest = new XMLHttpRequest();
+  textRequest.open("GET", '/api/phrase');
+  textRequest.onload = () => {
+    let phraseRes = JSON.parse(textRequest.responseText);
+    let phrase = phraseRes.phrase;
+    let text = document.getElementById("virtualbar");
+    text.innerText = phrase;
+  }
+  textRequest.send(null);
+
+
+
+
+  update();
+  setInterval(update, 1000);
+</script>
 <!-- {% endblock %} -->
-

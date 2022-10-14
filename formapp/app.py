@@ -238,14 +238,16 @@ def newStudent(remote, username, bot=False):
         db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
         dbcmd = db.cursor()
         userFound = dbcmd.execute("SELECT * FROM users WHERE username=:uname", {"uname": username}).fetchall()
+        #Checks if any special characters are in username
         auth = dbcmd.execute("SELECT username FROM users").fetchall()
-        nameCheck = re.compile('[@_!$%^&*()<>?/\|}{~:]#')
-        for username in auth:
-            if nameCheck.search(username) == None:
-              print("Vaild")
+        regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
+        for users in auth:
+        #Checks if username has no special characters    
+            if (regex.search(username) == None):
+                print("Vaild")
             else:
-              print("Invaild")
-              db.close()
+                print("Invaild: " + username + " has special characters")
+                dbcmd.execute("DELETE FROM users WHERE username = '{username}'")
         for user in userFound:
             if username in user:
                 if not teacher:
@@ -1446,10 +1448,10 @@ def endpoint_createaccount():
         db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
         dbcmd = db.cursor()
         dbcmd.execute("INSERT INTO users (username, password, permissions, bot) VALUES (?, ?, ?, ?)", (name, passwordCrypt, sD.settings['perms']['anyone'], "False"))
+        return render_template("message.html", message = 'Account created.')
         db.commit()
         db.close()
-        return render_template("message.html", message = 'Account created.')
-
+            
 @app.route('/createfightermatch', methods = ['POST'])
 def endpoint_createfightermatch():
     code = request.args.get('code')
@@ -3035,7 +3037,7 @@ if '--silent' not in str(sys.argv):
 
 def start_flask():
     global DEBUG
-    app.run(host='0.0.0.0', port=421, use_reloader=False, debug=DEBUG)
+    app.run(host='0.0.0.0', port=420, use_reloader=False, debug=DEBUG)
 
 def start_IR():
     while True:

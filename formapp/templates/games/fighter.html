@@ -721,7 +721,9 @@
 {% block script %}
   <script>
     //Comments beginning with "TO DO" indicate parts of the code that need to be worked on.
-
+    chatSocket.on("reload", message => {
+      location.reload();
+    });
     {
       let red = {
         color: "red",

@@ -76,6 +76,8 @@ def logFile(type, message):
     f.write("[" + str(now) + "]" + " [" + type + "] " + message + "\n")
     f.close()
     print("[" + str(now) + "]" + " [" + type + "] " + message)
+#This import allows for the time to be printed to console. If you need to add a new print line the 2nd line is an example of how to use the logFile() function to make it print to console and to the log file
+#logFile("Info", "Bot successful login. Made them a guest: " + username)
 
 logFile('Info', "Running formbar on ip: " + ip)
 

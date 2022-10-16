@@ -48,11 +48,7 @@ import pygame
 import time, math
 import threading
 import logging
-
-#This import allows for the time to be printed to console. If you need to add a new print line the 2nd line is an example of how to use the logFile() function to make it print to console and to the log file
 import datetime
-#logFile("Info", "Bot successful login. Made them a guest: " + username)
-
 import traceback
 import sqlite3
 if ONRPi:
@@ -2696,19 +2692,6 @@ def endpoint_users():
                 if request.args.get('name') == sD.studentDict[key]['name']:
                     user = key
                     break
-            if action == 'updateDP':
-                if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['users']:
-                    return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
-                else:
-                    db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
-                    dbcmd = db.cursor()
-                    digipogs = dbcmd.execute("SELECT digipogs FROM users WHERE username=:uname AND digipogs",  {"uname": request.args.get('name')}).fetchone()
-                    addDigi = request.args.get('digipogs')
-                    digiAmount =  int(''.join(map(str, digipogs))) + int(addDigi)
-                    dbcmd.execute("UPDATE users SET digipogs=:digipogs WHERE username=:uname", {"uname": request.args.get('name'), "digipogs": digiAmount})
-                    db.commit()
-                    db.close()
-                    return render_template("message.html", message = "Added Digipogs")
             if action == 'delete':
                 db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
                 dbcmd = db.cursor()

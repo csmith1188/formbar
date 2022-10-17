@@ -2793,7 +2793,7 @@ def endpoint_users():
 
 @app.route('/usermanual')
 def endpoint_usermanual():
-     return render_template("user-manual.html")
+     return render_template("usermanual.html")
 
 
 # ██    ██

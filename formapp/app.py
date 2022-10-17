@@ -1883,7 +1883,7 @@ def endpoint_hangman():
 
 @app.route('/help', methods = ['POST', 'GET'])
 def endpoint_help():
-    loginResult = loginCheck(request.remote_addr, 'teacher')
+    loginResult = loginCheck(request.remote_addr, 'student')
     if loginResult:
         return loginResult
     else:

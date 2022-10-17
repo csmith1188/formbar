@@ -663,6 +663,10 @@
 <!-- Extra javascript here -->
 {% block script %}
 <script>
+  // When the page needs to refresh, send a signal to chat which will then refresh everyone's page
+  chatSocket.on("reload", message => {
+    location.reload();
+  });
   {
     document.getElementById("highScore").innerHTML = {{ highScore }};
 
@@ -768,6 +772,7 @@
         document.onkeydown = null;
         request.open("POST", "/savescore?game=2048&score=" + this.points.score);
         request.send();
+
       },
       moveTo: function(obj1, obj2) {
         obj2.boxObj = obj1.boxObj;

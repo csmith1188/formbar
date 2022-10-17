@@ -23,6 +23,7 @@
 #  ██████  ██████  ██   ████ ██      ██  ██████   ██████  ██   ██ ██   ██    ██    ██  ██████  ██   ████
 
 
+from cmath import log
 from config import *
 
 #Permission levels are as follows:
@@ -216,7 +217,9 @@ def newStudent(remote, username, bot=False):
             },
             'excluded': False,
             'preferredHomepage': None,
-            'sid': ''
+            'sid': '',
+            'class': 'none',
+            'session': 'none'
         }
         #Track if the teacher is logged in
         teacher = False
@@ -801,6 +804,11 @@ def updateStep():
         sD.wawdLink = '/progress'
     changeMode(sD.settings['barmode'])
 
+def checkClass(remote):
+    if sD.studentDict[remote]['class'] == 'none':
+        return redirect('/selectclass')
+    if sD.studentDict[remote]['session'] == 'none':
+        return redirect('/selectsession')
 
 def loginCheck(remAdd, perm=False): 
     if not remAdd in sD.studentDict:
@@ -1907,8 +1915,8 @@ def endpoint_home():
     loginResult = loginCheck(request.remote_addr)
     if loginResult:
         return loginResult
-    else:
-        return render_template("index.html")
+    if sD.studentDict[request.remote_addr]['class'] == 'none':
+        return redirect('/selectclass')
 
 # ██
 # ██
@@ -2481,6 +2489,61 @@ def endpoint_segment():
         if ONRPi:
             pixels.show()
         return render_template("message.html", message = "Color sent!")
+
+@app.route('/selectclass', methods = ['POST', 'GET'])
+def endpoint_selectclass():
+    if sD.studentDict[request.remote_addr]['perms'] == 0:
+        return redirect('/createclass')
+    else:
+        if request.method == "POST":
+            className = request.form['className']
+            db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+            dbcmd = db.cursor()
+            nameofClass = dbcmd.execute("SELECT name FROM classes WHERE name=?", [className])
+            db.close()
+            print(nameofClass)
+            if nameofClass:
+                sD.studentDict[request.remote_addr]['class'] = className
+                return redirect('/home')
+            return render_template("message.html", message = "No class with that name")
+        else:
+            return render_template('selectclass.html')
+
+@app.route('/createclass', methods = ['POST', 'GET'])
+def endpoint_createclass():
+    if request.method == "POST":
+        className = str(request.form['className'])
+        print(className)
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        dbcmd.execute("INSERT INTO classes (name) VALUES (?)", [className])
+        db.commit()
+        classID = dbcmd.execute("SELECT uid FROM classes WHERE name=?", [className]).fetchone()
+        userID = dbcmd.execute("SELECT uid FROM users WHERE username=?", [sD.studentDict[request.remote_addr]['name']]).fetchone()
+        dbcmd.execute("INSERT INTO classusers (userid, classid) VALUES (?, ?)", [userID[0], classID[0]])
+        db.commit()
+        db.close()
+        sD.studentDict[request.remote_addr]['class'] = className
+        return redirect('/home')
+    else:
+        return render_template('createclass.html')
+
+@app.route('/selectsession', methods = ['POST', 'GET'])
+def endpoint_selectsession():
+    if request.method == "POST":
+        sessionName = request.form['sessionName']
+        sD.studentDict[request.remote_addr]['session'] = sessionName
+        return redirect('/home')
+    else:
+        return render_template('selectsession.html')
+
+@app.route('/createsession', methods = ['POST', 'GET'])
+def endpoint_createsession():
+    if request.method == "POST":
+        return redirect('/home')
+    else:
+        return render_template('createsession.html')
+
 
 '''
 @app.route('/sendblock')

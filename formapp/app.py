@@ -3013,9 +3013,35 @@ def message(message):
         logFile("Error", str(e))
         
         
+@socket_.on('tutd')
+def message(message):
+    message = json.loads(thumb)
+    print(message['thumb'])
+    userip = request.remote_addr
+    if thumb:
+        if sD.settings['barmode'] == 'tutd':
+            # print("[info] " + "Recieved " + thumb + " from " + name + " at ip: " + ip)
+                if sD.studentDict[request.remote_addr]['thumb'] != message['thumb']:
+                    sD.studentDict[request.remote_addr]['thumb'] = message['thumb']
+                    tutdBar()
+                    socket_.emit('sessionUpdate', json.dumps(packMSG('all', 'server', sD.studentDict)))     
+
+@socket_.on('permsReload')
+def message(message):
+    message = json.loads(perms)
+    print(message['thumb'])
+    userip = request.remote_addr
+    if sD.studentDict[request.remote_addr]['perms'] <= sD.settings['perms']['admin']:
+        socket_.emit('sessionUpdate', json.dumps(packMSG('all', 'server', sD.studentDict)))
+
+@socket_.on('loginReload')
+def message(message):
+    message = json.loads(perms)
+    print(message['thumb'])
+    loginResult = loginCheck(request.remote_addr, 'users')
+    if loginResult:
+        socket_.emit('sessionUpdate', json.dumps(packMSG('all', 'server', sD.studentDict)))
         
-
-
 @socket_.on('help', namespace=chatnamespace)
 def message(message):
     try:

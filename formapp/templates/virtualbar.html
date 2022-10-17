@@ -75,6 +75,7 @@
       pixRequest.send(null);
 
       //Update the virtual bar's text
+      
       let textRequest = new XMLHttpRequest();
       textRequest.open("GET", '/api/phrase');
       textRequest.onload = () => {
@@ -87,7 +88,13 @@
       textRequest.send(null);
     }
 
+    // When the page needs to refresh, send a signal to chat which will then refresh everyone's page
+    chatSocket.on("sessionUpdate", message => {
+      console.log(message);
+      location.reload();
+    });
+
     update();
-    setInterval(update, 1000);
+    // setInterval(update, 1000);
   </script>
 {% endblock %}

@@ -177,7 +177,7 @@
       <label>
         <div>
           <input type="radio" id="progress" name="mode">
-          <h3 style="display: inline;">Progess</h3><br>
+          <h3 style="display: inline;">Progress</h3><br>
           <span style="margin-left: 25px;">Description</span><br>
         </div>
       </label>
@@ -205,6 +205,14 @@
           <span style="margin-left: 25px;">Students can change the colors of the bar.</span><br>
         </div>
       </label>
+
+      <label>
+        <div>
+          <input type="button" id="clear" name="mode">
+          <h3 style="display: inline;">Clear</h3><br>
+          <span style="margin-left: 25px;">Clear all responses</span><br>
+        </div>
+      </label>
     </div>
 
   </div>
@@ -217,7 +225,7 @@
     <div id="permsContainer">
       <div class="permBox">
         <h3>Chat</h3>
-        <select onchange="updatePerm(this)" id="saypermsDrop" name="saypermsDrop" style="margin-top: 8px;">
+        <select onchange="updatePerm(this);" id="saypermsDrop" name="saypermsDrop" style="margin-top: 8px;">
           <option value="/controlpanel?say=0">Teacher</option>
           <option value="/controlpanel?say=1">Mod</option>
           <option value="/controlpanel?say=2" selected>Student</option>
@@ -229,7 +237,7 @@
       </div>
       <div class="permBox">
         <h3>Games</h3>
-        <select onchange="updatePerm(this)" id="gamespermsDrop" name="gamespermsDrop" style="margin-top: 8px;">
+        <select onchange="updatePerm(this);" id="gamespermsDrop" name="gamespermsDrop" style="margin-top: 8px;">
           <option value="/controlpanel?games=0">Teacher</option>
           <option value="/controlpanel?games=1">Mod</option>
           <option value="/controlpanel?games=2" selected>Student</option>
@@ -241,7 +249,7 @@
       </div>
       <div class="permBox">
         <h3>LED bar</h3>
-        <select onchange="updatePerm(this)" id="barpermsDrop" name="barpermsDrop" style="margin-top: 8px;">
+        <select onchange="updatePerm(this);" id="barpermsDrop" name="barpermsDrop" style="margin-top: 8px;">
           <option value="/controlpanel?bar=0" selected>Teacher</option>
           <option value="/controlpanel?bar=1">Mod</option>
           <option value="/controlpanel?bar=2">Student</option>
@@ -253,7 +261,7 @@
       </div>
       <div class="permBox">
         <h3>Sounds</h3>
-        <select onchange="updatePerm(this)" id="sfxpermsDrop" name="sfxpermsDrop" style="margin-top: 8px;">
+        <select onchange="updatePerm(this);" id="sfxpermsDrop" name="sfxpermsDrop" style="margin-top: 8px;">
           <option value="/controlpanel?sfx=0" selected>Teacher</option>
           <option value="/controlpanel?sfx=1">Mod</option>
           <option value="/controlpanel?sfx=2">Student</option>
@@ -265,7 +273,7 @@
       </div>
       <div class="permBox">
         <h3>Music</h3>
-        <select onchange="updatePerm(this)" id="bgmpermsDrop" name="bgmpermsDrop" style="margin-top: 8px;">
+        <select onchange="updatePerm(this);" id="bgmpermsDrop" name="bgmpermsDrop" style="margin-top: 8px;">
           <option value="/controlpanel?bgm=0" selected>Teacher</option>
           <option value="/controlpanel?bgm=1">Mod</option>
           <option value="/controlpanel?bgm=2">Student</option>
@@ -277,7 +285,7 @@
       </div>
       <div class="permBox">
         <h3>API</h3>
-        <select onchange="updatePerm(this)" id="apipermsDrop" name="apipermsDrop" style="margin-top: 8px;">
+        <select onchange="updatePerm(this);" id="apipermsDrop" name="apipermsDrop" style="margin-top: 8px;">
           <option value="/controlpanel?api=0">Teacher</option>
           <option value="/controlpanel?api=1">Mod</option>
           <option value="/controlpanel?api=2">Student</option>
@@ -291,7 +299,7 @@
         </p>
       </div>
     </div>
-    <button id="resetPerms" class="inline popOut" onclick="resetPerms(); emit('reload', json.dumps(packMSG('all', 'server', ''), broadcast=True))">Reset permissions</button>
+    <button id="resetPerms" class="inline popOut" onclick="resetPerms();">Reset permissions</button>
   </div>
   <div id="tabs-5">
     <h2>Lock Formbar</h2>
@@ -344,12 +352,24 @@
 
   sendStudents();
 
+  function packMSG(rx, tx, content) {
+        let msgOUT = {
+            to: rx,
+            from: tx,
+            content: content
+        }
+        return JSON.stringify(msgOUT);
+    }
+
   function updatePerm(el) {
     request.open("GET", el.value);
+    console.log(el.value);
     request.onload = function() {
       // console.log(request.response);
     };
     request.send();
+    
+    chatSocket.emit('reload', JSON.stringify(packMSG('all', 'server', '')))
   }
 
   async function updateStudents() {

@@ -76,6 +76,10 @@
 <!-- Extra JavaScript here -->
 {% block script %}
 <script>
+  // When the page needs to refresh, send a signal to chat which will then refresh everyone's page
+  chatSocket.on("reload", message => {
+    location.reload();
+  });
   {
     let wordList = eval("{{ wordList }}".replaceAll("&#39;", "'").slice(10, -1)).filter(item => item.length == 5);
     let word;

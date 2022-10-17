@@ -688,8 +688,9 @@
             newStudent.innerHTML = pictureIcon + icons + student.name;
             let newDetails = document.createElement('span');
             newDetails.classList.add('user');
+            cleanText = student.essay.replace(/<|>/gi, "")
             if (collapsed) newDetails.classList.add("hidden");
-            if (student.essay) newDetails.innerHTML += "<div style='margin-bottom: 8px;'><pre> Essay: <br> " + student.essay + "</pre>" + "</div>";
+            if (student.essay) newDetails.innerHTML += "<div style='margin-bottom: 8px;'><pre> Essay: <br> " + cleanText + "</pre>" + "</div>";
             if (student.help.type) {
               let helpTicket = document.createElement("div");
               let ticketTime = new Date(student.help.time * 1000);

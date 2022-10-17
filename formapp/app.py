@@ -275,6 +275,8 @@ def refreshUsers(selectedStudent='', category=''):
             sD.studentDict[student]['essayRes'] = ''
             return True
 
+
+
 def changeMode(newMode='', direction='next'):
     clearString()
     sD.pollType = None
@@ -314,6 +316,7 @@ def changeMode(newMode='', direction='next'):
     elif sD.settings['barmode'] == 'playtime':
         clearString()
         showString(sD.activePhrase)
+        
     socket_.emit('modeChanged', {'mode': sD.settings['barmode']}, namespace=apinamespace)
     return render_template("message.html", message = 'Changed mode to ' + (newMode or direction) + '.')
 
@@ -1413,9 +1416,19 @@ def endpoint_controlpanel():
             return render_template("message.html", message = resString)
 
 
+
+
+
+
 @app.route('/countdown')
 def endpoint_countdown():
     return render_template("message.html", message = 'This feature is not available yet.')
+
+
+
+
+
+
 
 @app.route('/createaccount')
 def endpoint_createaccount():

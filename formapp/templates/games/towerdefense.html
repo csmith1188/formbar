@@ -454,6 +454,10 @@
 <!-- Extra javascript here -->
 {% block script %}
   <script>
+    // When the page needs to refresh, send a signal to chat which will then refresh everyone's page
+    chatSocket.on("reload", message => {
+      location.reload();
+    });
     let pause = [10, null];
 
     let wavesDefault = [

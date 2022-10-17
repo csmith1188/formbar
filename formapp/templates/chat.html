@@ -364,13 +364,6 @@
           }
         });
        
-        
-       
-
-
-
-
-
         //grab the onlclick function from the private name feature.
         let Profilename = $('div.msg.ulName.them.ulHover').attr("onclick")
 
@@ -544,6 +537,11 @@ return false ;
         output(message);
     });
 
+    // When the page needs to refresh, send a signal to chat which will then refresh everyone's page
+    chatSocket.on("reload", message => {
+      location.reload();
+    });
+      //check message.content for permission level, and see if it matches this user's permission to see if they need to change
     chatSocket.on("userlist", message => {
         message = JSON.parse(message);
         console.log("userlist");

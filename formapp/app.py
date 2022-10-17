@@ -2482,7 +2482,6 @@ def endpoint_segment():
             pixels.show()
         return render_template("message.html", message = "Color sent!")
 
-'''
 @app.route('/sendblock')
 def endpoint_sendblock():
     if not sD.settings['barmode'] == 'blockchest':
@@ -2499,7 +2498,6 @@ def endpoint_sendblock():
             return render_template("message.html", message = "Bad block Id")
     else:
         return render_template("message.html", message = "Bad Arguments. Requires 'id' and 'data'")
-'''
 
 #Choose the user's default homepage
 @app.route('/setdefault', methods = ['POST', 'GET'])

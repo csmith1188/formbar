@@ -182,7 +182,7 @@
         </div>
       </label>
       <br>
-
+    
       <label>
         <div>
           <input type="radio" id="countdown" name="mode">
@@ -622,7 +622,7 @@
       if (filters.includes("!break")) studentList = studentList.filter(student => !student.excluded);
       if (filters.includes("pollResponded")) studentList = studentList.filter(student => student.thumb || student.letter || student.essay);
       if (filters.includes("!pollResponded")) studentList = studentList.filter(student => !(student.thumb || student.letter || student.essay));
-
+    
       let thumbs, letters, helpTimes;
       switch (sort) {
         case "logIn":
@@ -714,8 +714,9 @@
             newStudent.innerHTML = pictureIcon + icons + student.name;
             let newDetails = document.createElement('span');
             newDetails.classList.add('user');
+            cleanText = student.essay.replace(/<|>/gi, "")
             if (collapsed) newDetails.classList.add("hidden");
-            if (student.essay) newDetails.innerHTML += "<div style='margin-bottom: 8px;'><b>Essay: </b>" + student.essay + "</div>";
+            if (student.essay) newDetails.innerHTML += "<div style='margin-bottom: 8px;'><pre> Essay: <br> " + cleanText + "</pre>" + "</div>";
             if (student.help.type) {
               let helpTicket = document.createElement("div");
               let ticketTime = new Date(student.help.time * 1000);

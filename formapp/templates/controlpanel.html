@@ -24,13 +24,13 @@
   }
 
   .controls {
-    padding: 8px;
+    padding: 8px 8px 0;
     background: var(--bg-dark-highlight);
     margin-bottom: 16px;
   }
 
   .controls button {
-    margin: 0 4px;
+    margin: 0 8px 8px 0;
     font-size: 14px;
   }
 
@@ -62,6 +62,13 @@
   }
 
   .icon {
+    height: 1.2em;
+    display: inline-block;
+    vertical-align: text-bottom;
+    margin-right: 8px;
+  }
+
+  .permsIcon {
     height: 1.2em;
     display: inline-block;
     vertical-align: text-bottom;
@@ -135,7 +142,9 @@
       <button id="perms" class="sort">Permissions</button>
     </div>
     <button id="collapseButton" class="inline popOut hidden">Collapse all</button>
+
     <div id="students">
+      <%sD.studentDict[request.remote_addr]['help']['message'] = request.args.get('message')-%>
     </div>
 
     <h2>Restart session</h2>
@@ -282,7 +291,7 @@
         </p>
       </div>
     </div>
-    <button id="resetPerms" class="inline popOut" onclick="resetPerms();">Reset permissions</button>
+    <button id="resetPerms" class="inline popOut" onclick="resetPerms(); emit('reload', json.dumps(packMSG('all', 'server', ''), broadcast=True))">Reset permissions</button>
   </div>
   <div id="tabs-5">
     <h2>Lock Formbar</h2>
@@ -366,9 +375,9 @@
       request.send();
     }
     if (document.getElementById("countdown").checked) {
-      alert("This feature is not available yet.");
       document.getElementById("playtime").checked = true;
-      ////document.getElementById("countdownTime").classList.remove("hidden");
+      alert("This feature is not available yet.");
+      //document.getElementById("countdownTime").classList.remove("hidden");
     } else {
       document.getElementById("countdownTime").classList.add("hidden");
     }
@@ -645,6 +654,17 @@
           for (student of studentList) {
             let newStudent = document.createElement('h3');
             let icons = "";
+            let pictureIcon = ""
+
+            //change image based upon persons permissions
+            let perms = student['perms']
+            if (perms) var permsIcons = document.createElement("img");
+            if (perms == 0) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/teacher.png') }}" class="permsIcon" title="teacher">`
+            if (perms == 1) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/mod.png') }}" class="permsIcon" title="mod">`
+            if (perms == 2) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/student.png') }}" class="permsIcon" title="student">`
+            if (perms == 3) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/anyone.png') }}" class="permsIcon" title="anyone">`
+            if (perms == 4) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/banned.png') }}" class="permsIcon" title="banned">`
+
 
             //Change student color according to thumb response
             let thumb = student['thumb'];
@@ -667,7 +687,7 @@
 
             if (student['complete']) icons += `<img src="{{ url_for('static', filename='img/controlpanel/complete.png') }}" class="icon" title="Complete">`;
 
-            newStudent.innerHTML = icons + student.name;
+            newStudent.innerHTML = pictureIcon + icons + student.name;
             let newDetails = document.createElement('span');
             newDetails.classList.add('user');
             if (collapsed) newDetails.classList.add("hidden");
@@ -703,7 +723,11 @@
                 helpTicket.appendChild(acceptButton);
                 helpTicket.appendChild(rejectButton);
               } else {
-                helpTicket.innerHTML += help.message || "<i>Sent a help ticket</i>";
+                console.log(student.help.message)
+                if (student.help.message) 
+                  helpTicket.innerHTML += student.help.message
+                else
+                  "<i>Sent a help ticket</i>";
                 let removeButton = document.createElement("button");
                 removeButton.id = "e"
                 removeButton.classList.add("inline", "popOut");

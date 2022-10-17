@@ -49,6 +49,13 @@
   #users {
     margin-bottom: 8px;
   }
+
+  .permsIcon {
+    height: 1.2em;
+    display: inline-block;
+    vertical-align: text-bottom;
+    margin-right: 8px;
+  }
 </style>
 {% endblock %}
 
@@ -75,11 +82,26 @@
     for (let user of users) {
         let newStudent = document.createElement('h3');
 
-        newStudent.innerHTML = user[1];
+
+        let pictureIcon = ""
+
+            //change image based upon persons permissions
+            let perms = user[3]
+            if (perms) var permsIcons = document.createElement("img");
+            if (perms == 0) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/teacher.png') }}" class="permsIcon" title="teacher">`
+            if (perms == 1) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/mod.png') }}" class="permsIcon" title="mod">`
+            if (perms == 2) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/student.png') }}" class="permsIcon" title="student">`
+            if (perms == 3) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/anyone.png') }}" class="permsIcon" title="anyone">`
+            if (perms == 4) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/banned.png') }}" class="permsIcon" title="banned">`
+
+
+         newStudent.innerHTML = pictureIcon + user[1] ;
+
         let newDetails = document.createElement('span');
         newDetails.classList.add('user');
         let userPerms = user[3];
         newDetails.innerHTML += `
+            Default permissions:
             <select onchange="updatePerm(this)" id="userpermsDrop" name="userpermsDrop">
             <option value="/updateuser?name=${user[1]}&field=permissions&value=0" ${userPerms === 0 ? "selected" : ""}>${permNames[0]}</option>
             <option value="/updateuser?name=${user[1]}&field=permissions&value=1" ${userPerms === 1 ? "selected" : ""}>${permNames[1]}</option>
@@ -94,8 +116,17 @@
         newDetails.innerHTML += `<a onclick="changePw('${name}')">Change password</a>`;
         newDetails.innerHTML += "	&nbsp; ";
         newDetails.innerHTML += `<a onclick="deleteAcc('${name}')">Delete account</a>`;
+        newDetails.innerHTML += "	&nbsp; ";
+        newDetails.innerHTML += `<a onclick="updateDP('${name}')">Add DigiPogs</a>`;
         newDetails.innerHTML += "<br><br>";
     }
+
+    function updateDP(name) {
+      let digipogs;
+      do {digipogs = prompt("DigiPog Amount:")} while (digipogs === "");
+      window.location = `/users?name=${name}&action=updateDP&digipogs=${digipogs}`;
+    }
+
 
     function changePw(name) {
       let password;

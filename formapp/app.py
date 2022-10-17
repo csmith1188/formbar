@@ -473,11 +473,10 @@ def repeatMode():
         clearString()
         showString(sD.activePhrase)
     playSFX("sfx_success01")
+    
 def endMode():
     clearBar()
     showString(ip + "  Idle")
-
-
 
 #This function clears(default) the color from the formbar
 def clearBar():
@@ -1354,7 +1353,7 @@ def endpoint_color():
 @app.route('/controlpanel', methods = ['POST', 'GET'])
 def endpoint_controlpanel():
     if not request.remote_addr in sD.studentDict:
-        return redirect('/login?forward=' + request.path)
+        return redirect('/login?forward=' + request.path) 
     elif sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['admin']:
         return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
     else:
@@ -1491,7 +1490,7 @@ def endpoint_emptyblocks():
     return render_template("message.html", message = "Emptied blocks")
 '''
 
-#End a poll
+#Start a poll
 @app.route('/endpoll')
 def endpoll():
     if not request.remote_addr in sD.studentDict:
@@ -1512,7 +1511,7 @@ def endpoll():
         db.commit()
         db.close()
         changeMode('poll')
-        endMode()
+        repeatMode()
         return render_template("message.html", message = 'Poll ended. Results saved.')
 
 '''
@@ -1882,9 +1881,9 @@ def endpoint_help():
         if sD.studentDict[request.remote_addr]['help']['type']:
             return render_template("message.html", message = "You already have a help ticket or break request in. If your problem is time-sensitive, or your last ticket was not cleared, please get the teacher's attention manually.")
         elif request.method == 'POST':
-            sD.studentDict[request.remote_addr]['help']['type'] = 'help';
+            sD.studentDict[request.remote_addr]['help']['type'] = 'help'
             sD.studentDict[request.remote_addr]['help']['time'] = time.time()
-            sD.studentDict[request.remote_addr]['help']['message'] = request.args.get('message');
+            sD.studentDict[request.remote_addr]['help']['message'] = request.args.get('message')
             playSFX("sfx_up04")
             socket_.emit('help', sD.studentDict[request.remote_addr]['help'], namespace=apinamespace)
             return render_template("message.html", message = "Your ticket was sent. Keep working on the problem the best you can while you wait.", forward = sD.mainPage)
@@ -2791,6 +2790,11 @@ def endpoint_users():
             users = dbcmd.execute("SELECT * FROM users").fetchall()
             db.close()
             return render_template("users.html", users = users)
+
+@app.route('/usermanual')
+def endpoint_usermanual():
+     return render_template("user-manual.html")
+
 
 # ██    ██
 # ██    ██

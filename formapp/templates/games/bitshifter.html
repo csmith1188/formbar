@@ -94,6 +94,10 @@
 <!-- Extra JavaScript here -->
 {% block script %}
   <script type="text/javascript">
+  // When the page needs to refresh, send a signal to chat which will then refresh everyone's page
+  chatSocket.on("reload", message => {
+    location.reload();
+  });
     {
       let score = 0;
       let hiscore = {{ highScore }};

@@ -98,6 +98,8 @@
   }
   window.addEventListener("load", contentHeight);
   window.addEventListener("resize", contentHeight);
+  new ResizeObserver(contentHeight).observe(document.getElementById("content")); //Execute contentHeight when #content is resized
+
 </script>
 {% block script %}{% endblock %}
 

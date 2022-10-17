@@ -1391,6 +1391,7 @@ def endpoint_controlpanel():
                         dbcmd.execute("UPDATE settings SET " + arg + "=:value", {"value": argVal})
                         db.commit()
                         db.close()
+
                     else:
                         resString += 'There is no setting that takes \'true\' or \'false\' named: <i>' + arg + "</i>"
                 else:
@@ -1509,7 +1510,7 @@ def endpoint_emptyblocks():
     return render_template("message.html", message = "Emptied blocks")
 '''
 
-#Start a poll
+#End a poll
 @app.route('/endpoll')
 def endpoll():
     loginResult = loginCheck(request.remote_addr, 'mod')
@@ -1528,8 +1529,9 @@ def endpoll():
                 dbcmd.execute("INSERT INTO responses ('poll', 'name', 'response') VALUES (?, ?, ?)", (sD.pollID, sD.studentDict[user]['name'], response))
         db.commit()
         db.close()
+        sD.pollID += 1
         changeMode('poll')
-        repeatMode()
+        endMode()
         return render_template("message.html", message = 'Poll ended. Results saved.')
 
 '''
@@ -1892,9 +1894,9 @@ def endpoint_help():
         if sD.studentDict[request.remote_addr]['help']['type']:
             return render_template("message.html", message = "You already have a help ticket or break request in. If your problem is time-sensitive, or your last ticket was not cleared, please get the teacher's attention manually.")
         elif request.method == 'POST':
-            sD.studentDict[request.remote_addr]['help']['type'] = 'help'
+            sD.studentDict[request.remote_addr]['help']['type'] = 'help';
             sD.studentDict[request.remote_addr]['help']['time'] = time.time()
-            sD.studentDict[request.remote_addr]['help']['message'] = request.args.get('message')
+            sD.studentDict[request.remote_addr]['help']['message'] = request.args.get('message');
             playSFX("sfx_up04")
             socket_.emit('help', sD.studentDict[request.remote_addr]['help'], namespace=apinamespace)
             return render_template("message.html", message = "Your ticket was sent. Keep working on the problem the best you can while you wait.", forward = sD.mainPage)
@@ -2080,7 +2082,7 @@ def endpoint_login():
             userType = request.form['userType']
             forward = request.form['forward']
             bot = request.form['bot']
-            bot = bot.lower() == "true"
+            bot = bot.lower() == "true" 
 
 
             if userType == "login":
@@ -2249,28 +2251,33 @@ def endpoint_profile():
             user = sD.studentDict[x]
             if user['name'].strip() == name:
                 userFound = True
+                perms = user['perms']
+                bot = user['bot']
         if not userFound:
             db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
             dbcmd = db.cursor()
             userFound = dbcmd.execute("SELECT * FROM users WHERE username=:uname", {"uname": name}).fetchall()
             db.close()
+            if userFound:
+                perms = userFound[0][3]
+                bot = userFound[0][4]
         if userFound:
             db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
             dbcmd = db.cursor()
             digipogs = dbcmd.execute("SELECT digipogs FROM users WHERE username=:uname AND digipogs",  {"uname": user['name']}).fetchone()
             highScores = {
-                "2048": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='2048' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
-                "bitshifter": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='bitshifter' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
-                "hangman": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='hangman' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
-                "minesweeper": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='minesweeper' ORDER BY score ASC", {"uname": user['name']}).fetchone(),
-                "speedtype": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='speedtype' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
-                "towerdefense": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='towerdefense' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
-                "ttt": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='ttt' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
-                "fighter": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='fighter' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
-                "wordle": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='wordle' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
+                "2048": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='2048' ORDER BY score DESC", {"uname": name}).fetchone(),
+                "bitshifter": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='bitshifter' ORDER BY score DESC", {"uname": name}).fetchone(),
+                "hangman": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='hangman' ORDER BY score DESC", {"uname": name}).fetchone(),
+                "minesweeper": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='minesweeper' ORDER BY score ASC", {"uname": name}).fetchone(),
+                "speedtype": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='speedtype' ORDER BY score DESC", {"uname": name}).fetchone(),
+                "towerdefense": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='towerdefense' ORDER BY score DESC", {"uname": name}).fetchone(),
+                "ttt": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='ttt' ORDER BY score DESC", {"uname": name}).fetchone(),
+                "fighter": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='fighter' ORDER BY score DESC", {"uname": name}).fetchone(),
+                "wordle": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='wordle' ORDER BY score DESC", {"uname": name}).fetchone(),
             }
             db.close()
-            return render_template("profile.html", username = user['name'], perms = sD.settings['permname'][user['perms']], bot = user['bot'], highScores = json.dumps(highScores), digipogs = digipogs[0])
+            return render_template("profile.html", username = name, perms = sD.settings['permname'][perms], bot = bot, highScores = json.dumps(highScores), digipogs = digipogs[0])
         #If there are no matches
         return render_template("message.html", message = "There are no users with that name.")
 
@@ -2694,6 +2701,19 @@ def endpoint_users():
                 if request.args.get('name') == sD.studentDict[key]['name']:
                     user = key
                     break
+            if action == 'updateDP':
+                if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['users']:
+                    return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
+                else:
+                    db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+                    dbcmd = db.cursor()
+                    digipogs = dbcmd.execute("SELECT digipogs FROM users WHERE username=:uname AND digipogs",  {"uname": request.args.get('name')}).fetchone()
+                    addDigi = request.args.get('digipogs')
+                    digiAmount =  int(''.join(map(str, digipogs))) + int(addDigi)
+                    dbcmd.execute("UPDATE users SET digipogs=:digipogs WHERE username=:uname", {"uname": request.args.get('name'), "digipogs": digiAmount})
+                    db.commit()
+                    db.close()
+                    return render_template("message.html", message = "Added Digipogs")
             if action == 'delete':
                 db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
                 dbcmd = db.cursor()
@@ -3048,8 +3068,8 @@ def ttt(message):
             #If the user and the opponent is in an existing player list
             if message['from'] in game.players and message['to'] in game.players:
                 square = message['content']['square']
-                rBox = math.floor(square / 3);
-                cBox = square % 3;
+                rBox = math.floor(square / 3)
+                cBox = square % 3
                 if game.turn == 1:
                     game.turn = 2
                 else:

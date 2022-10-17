@@ -151,7 +151,7 @@ body, .light, .dark {
   border: solid 5px transparent;
 }
 
-.light::-webkit-scrollbar-thumb {
+:where(.light, .classic #content)::-webkit-scrollbar-thumb {
   box-shadow: inset 0 0 5px 5px var(--dark-gray);
   border: solid 5px transparent;
 }
@@ -160,7 +160,7 @@ body, .light, .dark {
   box-shadow: inset 0 0 5px 5px var(--main-color);
 }
 
-.light::-webkit-scrollbar-thumb:hover {
+:where(.light, .classic #content)::-webkit-scrollbar-thumb:hover {
   box-shadow: inset 0 0 5px 5px var(--bg-darker);
 }
 
@@ -169,7 +169,7 @@ body, .light, .dark {
   border: solid 2px transparent;
 }
 
-.light::-webkit-scrollbar-thumb:active {
+:where(.light, .classic #content)::-webkit-scrollbar-thumb:active {
   box-shadow: inset 0 0 13px 13px var(--bg-darker);
   border: solid 2px transparent;
 }

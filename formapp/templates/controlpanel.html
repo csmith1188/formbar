@@ -205,12 +205,12 @@
           <span style="margin-left: 25px;">Students can change the colors of the bar.</span><br>
         </div>
       </label>
-
-      <label>
+	  <br>
+	  <label>
         <div>
-          <input type="button" id="clear" name="mode">
-          <h3 style="display: inline;">Clear</h3><br>
-          <span style="margin-left: 25px;">Clear all responses</span><br>
+          <input type="radio" id="sendblock" name="mode">
+          <h3 style="display: inline;">Blockchest Mode</h3><br>
+          <span style="margin-left: 25px;">If you don't know, don't click it.</span><br>
         </div>
       </label>
     </div>
@@ -403,6 +403,10 @@
     }
     if (document.getElementById("playtime").checked) {
       request.open('GET', '/controlpanel?barmode=playtime');
+      request.send();
+    }
+	if (document.getElementById("sendblock").checked) {
+      request.open('GET', '/controlpanel?barmode=sendblock');
       request.send();
     }
   }
@@ -710,8 +714,9 @@
             newStudent.innerHTML = pictureIcon + icons + student.name;
             let newDetails = document.createElement('span');
             newDetails.classList.add('user');
+            cleanText = student.essay.replace(/<|>/gi, "")
             if (collapsed) newDetails.classList.add("hidden");
-            if (student.essay) newDetails.innerHTML += "<div style='margin-bottom: 8px;'><pre> Essay: <br> " + student.essay + "</pre>" + "</div>";
+            if (student.essay) newDetails.innerHTML += "<div style='margin-bottom: 8px;'><pre> Essay: <br> " + cleanText + "</pre>" + "</div>";
             if (student.help.type) {
               let helpTicket = document.createElement("div");
               let ticketTime = new Date(student.help.time * 1000);

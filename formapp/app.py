@@ -1894,7 +1894,7 @@ def endpoint_help():
         elif request.method == 'POST':
             sD.studentDict[request.remote_addr]['help']['type'] = 'help'
             sD.studentDict[request.remote_addr]['help']['time'] = time.time()
-            sD.studentDict[request.remote_addr]['help']['message'] = request.args.get('message')
+            sD.studentDict[request.remote_addr]['help']['message'] = request.form.get('message')
             playSFX("sfx_up04")
             socket_.emit('help', sD.studentDict[request.remote_addr]['help'], namespace=apinamespace)
             return render_template("message.html", message = "Your ticket was sent. Keep working on the problem the best you can while you wait.", forward = sD.mainPage)

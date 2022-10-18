@@ -45,7 +45,7 @@ class Session():
             'wigglecolor': 'blue',
             'downcolor': 'red',
             'barmode': 'playtime',
-            'modes': ['poll', 'tutd', 'abcd', 'text', 'quiz', 'essay', 'progress', 'playtime'],
+            'modes': ['poll', 'tutd', 'abcd', 'text', 'quiz', 'essay', 'progress', 'playtime', 'sendblock'],
             'whitelist': [
                 '127.0.0.1',
                 '172.21.3.5'

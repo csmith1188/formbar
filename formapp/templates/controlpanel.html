@@ -366,9 +366,12 @@
       request.send();
     }
     if (document.getElementById("countdown").checked) {
-      alert("This feature is not available yet.");
-      document.getElementById("playtime").checked = true;
+      //alert("This feature is not available yet.");
+      document.getElementById("countdown").checked = true;
+      request.open('GET', '/controlpanel?barmode=countdown')
+      request.send()
       ////document.getElementById("countdownTime").classList.remove("hidden");
+
     } else {
       document.getElementById("countdownTime").classList.add("hidden");
     }

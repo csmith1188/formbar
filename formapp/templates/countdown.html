@@ -1,0 +1,17 @@
+{% extends 'header_content.html' %}
+{% block title %}Countdown{% endblock %}
+
+
+
+
+{% block main %}
+
+<form action="/countdown" method="post" id="countdownTime" style="margin: 8px 0 0 21px;">
+    Time:
+    <input type="number" class="line" value="5" min="0" max="59"> minutes
+    <input type="number" class="line" value="0" min="0" max="59"> seconds
+    <input type="submit" class="button inline popOut" value="Start timer" style="margin-top: 8px;">
+</form>
+
+
+{%endblock %}

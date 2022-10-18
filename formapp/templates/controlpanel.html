@@ -144,7 +144,7 @@
     <button id="collapseButton" class="inline popOut hidden">Collapse all</button>
 
     <div id="students">
-      <%sD.studentDict[request.remote_addr]['help']['message'] = request.args.get('message')-%>
+      
     </div>
 
     <h2>Restart session</h2>
@@ -296,18 +296,6 @@
         </p>
         <p>
           The ability to access data from the server
-        </p>
-      </div>
-      <div class="permBox">
-        <h3>Tags</h3>
-        <select onchange="updatePerm(this)" id="tagpermsDrop" name="tagpermsDrop" style="margin-top: 8px;">
-          <option value="/controlpanel?tags=0" selected>Teacher</option>
-          <option value="/controlpanel?tags=1">Mod</option>
-          <option value="/controlpanel?tags=2">Student</option>
-          <option value="/controlpanel?tags=3">Anyone</option>
-        </select>
-        <p>
-          The ability to assign user tags
         </p>
       </div>
     </div>
@@ -718,8 +706,12 @@
             if (student['help'].type) icons += `<img src="{{ url_for('static', filename='img/controlpanel/help.png') }}" class="icon" title="Help ticket">`;
 
             if (student['complete']) icons += `<img src="{{ url_for('static', filename='img/controlpanel/complete.png') }}" class="icon" title="Complete">`;
+            
+            //Show tags if student has any
+            let tags = `<span style="font-weight: lighter; font-size: 13px;" >${student['tags']}</span>`
 
-            newStudent.innerHTML = pictureIcon + icons + student.name;
+            
+            newStudent.innerHTML = pictureIcon + icons + student.name + ' ' + tags;
             let newDetails = document.createElement('span');
             newDetails.classList.add('user');
             if (collapsed) newDetails.classList.add("hidden");

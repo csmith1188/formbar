@@ -454,10 +454,6 @@
 <!-- Extra javascript here -->
 {% block script %}
   <script>
-    // When the page needs to refresh, send a signal to chat which will then refresh everyone's page
-    chatSocket.on("reload", message => {
-      location.reload();
-    });
     let pause = [10, null];
 
     let wavesDefault = [
@@ -1969,7 +1965,7 @@
       let achievements = "{{ achievements }}" || "0000000"; //1 means earned, 0 means not earned
       achievements = achievements.split("");
       let player = {
-        money: 75,
+        money: 75000,
         lives: 100,
         bonusMoney: 0,
         bonusLives: 0

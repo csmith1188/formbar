@@ -117,7 +117,7 @@
 <h2>Essay</h2>
 <div class="container1-flex">
   <form action="/essay" method="POST" style="text-align: center;">
-    <textarea name="essay" id="essay" rows="4" cols="40" placeholder="Type your essay here"></textarea><br><br>
+    <textarea name="essay" rows="4" cols="40" placeholder="Type your essay here"></textarea><br><br>
     <input type="submit" class="button">
   </form>
 </div>
@@ -130,21 +130,4 @@
       Bathroom!<br>(/break)
   </div>
 </div>
-
-<script>
-     document.getElementById('essay').addEventListener('keydown', function(keyboard) {
-      if (keyboard.key == 'Tab') {
-        console.log("tab was pressed")
-        keyboard.preventDefault();
-        var start = this.selectionStart;
-        var end = this.selectionEnd;
-
-        this.value = this.value.substring(0, start) +
-          "\t" + this.value.substring(end);
-
-        this.selectionStart =
-          this.selectionEnd = start + 1;
-      };
-    });
-</script>
 {% endblock %}

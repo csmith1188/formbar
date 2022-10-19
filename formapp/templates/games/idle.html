@@ -84,6 +84,10 @@
         }
         </style>
         <script>
+          // When the page needs to refresh, send a signal to chat which will then refresh everyone's page
+        chatSocket.on("reload", message => {
+          location.reload();
+        });
         var point = 0;
         var pointPerSecond = 0;
         var gen1Cost = 0;

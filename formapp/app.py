@@ -1443,11 +1443,16 @@ def endpoint_controlpanel():
 
 
 
-@app.route('/countdown')
+@app.route('/countdown', methods=['GET', 'POST'])
 def endpoint_countdown():
+    #getMinutes = request.form.get('minutes')
+    #getSeconds = request.form.get('seconds')
+    minutes = document.getElementById(minutes)
+    print(minutes)
     #return render_template("message.html", message = 'This feature is not available yet.')
     return render_template("countdown.html", message="")
     
+
 
 
 

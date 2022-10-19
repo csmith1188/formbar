@@ -370,8 +370,8 @@
       document.getElementById("countdown").checked = true;
       request.open('GET', '/controlpanel?barmode=countdown')
       request.send()
-      ////document.getElementById("countdownTime").classList.remove("hidden");
-
+      document.getElementById("countdownTime").classList.remove("hidden");
+      
     } else {
       document.getElementById("countdownTime").classList.add("hidden");
     }

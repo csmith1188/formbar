@@ -1,13 +1,49 @@
-{% extends 'header_fullscreen.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <title>virtualBar</title>
+  <style>
+    
+</style>
+</head>
+<body>
+  <div class="container"></div>
+  <canvas id='virtualbar'></canvas>
+  <script>
+    let mychart = document.getElementById('virtualbar').getContext("2d");
+
+    let doughnutChart = new Chart(mychart, {
+      type:'doughnut',
+      data:{
+      labels:["Thumbs Up","Thumbs Down","Wiggle","Essay"],
+      datasets:[{
+        label:"",
+        data:[
+           5,
+        ]
+      }]
+      },
+      options:{
+        maintainAspectRatio: false,
+      }
+    });
+  </script>
+</body>
+</html>
+<!-- {% extends 'header_fullscreen.html' %} -->
 <!-- ^^ This means add this file into the contents of the header page -->
 <!-- This is where the title, top buttons, and stylesheet is located -->
 
 <!-- Change title here -->
-{% block title %}Virtual bar{% endblock %}
+<!-- {% block title %}Virtual bar{% endblock %} -->
 
 <!-- Extra style declarations here -->
-{% block style %}
-  <style>
+<!-- {% block style %} -->
+  <!-- <style>
     body {
       user-select: none;
       background: var(--bg-dark-blue);
@@ -15,9 +51,9 @@
 
     #virtualBar {
       width: calc(100% - 32px);
-    }
+    } -->
 
-    #text {
+    <!-- #text {
       width: 10ch;
       padding: 0 4px;
       border: 1px white;
@@ -38,41 +74,33 @@
       user-select: none;
     }
   </style>
-{% endblock %}
+{% endblock %} -->
 
 <!-- Change theme color here -->
-{% block color %}purple{% endblock %}
+<!-- {% block color %}purple{% endblock %} -->
 
 <!-- Main content here -->
-{% block main %}
-  <div id="virtualBar" class="vCentered">
-    <div id="text"><!--Text goes here--></div>
-    <span id="pixBox"></span>
-  </div>
-{% endblock %}
+<!-- {% block main %} -->
+  <!-- <div id="virtualBar" class="vCentered"> -->
+    <!-- <div id="text">Text goes here</div> -->
+    <!-- <span id="pixBox"></span> -->
+  <!-- </div> -->
+<!-- {% endblock %} -->
 
 <!-- Extra JavaScript here -->
-{% block script %}
+<!-- {% block script %} -->
+
   <script>
     function update() {
-      //Update the virtual bar
+      // Update the virtual bar
       let pixRequest = new XMLHttpRequest();
-      pixRequest.open("GET", '/api/pix');
+      pixRequest.open("GET", '/api/students');
       pixRequest.onload = () => {
+        console.log(pixRequest);
         let pixRes = JSON.parse(pixRequest.responseText);
-        let pix = eval(pixRes.pixels.replaceAll("(", "[").replaceAll(")", "]"));
-        let pixBox = document.getElementById("pixBox");
-        pixBox.innerHTML = '';
-        for (let i = pix.length - 1; i >= 0; i--) {
-            for (let color = 0; color < pix[i].length; color++) {
-                pix[i][color] = pix[i][color].toString(16);
-                if (pix[i][color].length < 2)
-                    pix[i][color] = "0" + pix[i][color];
-            }
-            pixBox.innerHTML += "<div style='display: inline; flex-grow: 1; overflow: hidden; background-color: #" + pix[i][0] + "" + pix[i][1] + "" + pix[i][2] + ";'>&nbsp;</div>";
-        }
       }
       pixRequest.send(null);
+    }
 
       //Update the virtual bar's text
       let textRequest = new XMLHttpRequest();
@@ -80,14 +108,14 @@
       textRequest.onload = () => {
         let phraseRes = JSON.parse(textRequest.responseText);
         let phrase = phraseRes.phrase;
-        let text = document.getElementById("text");
+        let text = document.getElementById("virtualbar");
         text.innerText = phrase;
-        ////To do: update color
       }
       textRequest.send(null);
-    }
 
+        
+  
     update();
     setInterval(update, 1000);
   </script>
-{% endblock %}
+<!-- {% endblock %} -->

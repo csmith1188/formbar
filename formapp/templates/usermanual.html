@@ -1,0 +1,85 @@
+{% extends 'header_content.html' %}
+{% block title %}User Manual{% endblock %}
+{% block style %}
+<style>
+    #center-header{
+   text-align: center;
+    }
+   #hover h2:hover {
+  color: rgb(115, 211, 115);
+}
+    </style>
+    <link rel="stylesheet" href="/resources/demos/style.css">
+{% endblock %}
+{% block script %}
+<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+<script>
+$( function() {
+  $( "#accordion" ).accordion();
+} );
+</script>
+{% endblock %}
+<head>
+    <meta charset="UTF-8">
+    <title>User Manual</title>
+</head>
+{% block color %}green{% endblock %}
+{% block main %}
+<div id="center-header">
+    <h1>Official Formbar User Manual </h1>
+    <u><h2>Hello user! This is our user guide</h2></u>
+    <p>Here you can find everything necessary to understanding the formbar, this is a much more siplified version of our github wiki, we hope you enjoy using the formbar.</p>
+</div>
+<div id="hover">
+    <div id="accordion">
+        <u><h2>Students</h2></u>
+        <div>
+            <h3>Thumbspanel</h3>
+            <p>The thumbspanel will allow you to answer polls which are started by the teacher. You can also ask for help or to go to the bathroom from here.</p>
+            <h4> Types Of Polls</h4>
+            <p> The first time of poll, a thumbs poll, is answered with the up, down, and wiggle buttons which simulates the way a person moves their thumb in respons to a question.</p>
+            <p>The next is a 4 answer poll which uses the A, B, C, and D buttons, this is typically a multiple choice question.</p>
+            <p>The final type is an essay button which will take any response you input. This is of course for open ended questions, and more personal surveys.</p>
+            <h4>Other Thumbspanel Features</h4>
+            <p>By entering either the bathroom break or help sections, with a simple click you can let the teacher know you need help, or that you really gotta go to the bathroom. Remember if you send a help ticket, keep working out the issue until the teacher comes to your aid.</p>
+            <h3>Chat</h3>
+            <p>The chat is a place where students and teachers can interact, it allows for communication amongst all logged in users.</p>
+            <h3>What Are We Doing?</h3>
+            <p>This will display the lesson plans for that day, it will be updated every time a new day begins.</p>
+</div>
+<u><h2>Formbar</h2></u>
+<div>
+    <h3>Background Music and Sound Effects</h3>
+    <p>Both of these tabs display a list of sounds you can play. Background music is a collection songs added by students or teachers overtime. Sound effects is a collection of non-looping sounds you can play.</p>
+    <h3>Advanced Homepage/Advanced Mode</h3>
+    <p>Not reccomended for those who don't understand the formbar well, it'll allow you to do everything the normal formbar can in a much more compact interface. It's a lot more technical than the normal layout and, once again, not reccomended for new users.</p>
+    <h3>Set Default Homepage</h3>
+    <p>This will allow you to change the type of page you user, the default, advanced, or quick pages are dependant on user preference, we reccomend sticking with default until you understand the formbar completely.</p>
+    <h3>VirtualBar</h3>
+    <p>The virtualbar will allow you to view a visual list of all poll answers, it will not display names.</p>
+</div>
+<u><h2>Games</h2></u>
+<div>
+    <p>The game section is filled with fun little mini-games you can play on your downtime. These were all made from scratch and some even include fun trivia about the class!</p>
+    <h3>Leaderboards</h3>
+    <p>The Leaderboard displays all the scores for each game and ranks them from best to worst.</p>
+</div>
+<u><h2>Teacher</h2></u>
+<div>
+    <h3>Teacher Controls</h3>
+    <p>The control panel is where teachers can view a list of all students, change user permissions, manage user profiles, view poll history and help/bathroom tickets, and full reboot the formbar. </p>
+    <h3>User Accounts</h3>
+    <p>This will allow teachers to change a students password per their request, delete their accounts, and reward them with digipogs. You just have to click the corresponding link and it'll guide you from there.</p>
+    <h4>Changing Passwords</h4>
+    <p>To change a user's password, after the input box comes up, you will enter the desired new password and hit "OK" have the student login once again.</p>
+    <h4>Adding and Removing Digipogs</h4>
+    <p>To add digipogs simply enter a static whole number and hit "OK" to remove them put a minus sign before the number to make a negative and then hit "OK".</p>
+    <U><h3>End note</h3></U>
+    <p>if you're looking for a more technical user guide, we have one on our github page which you can access, you can also find developer contact info in case you cannot figure something out. <a href="https://github.com/csmith1188/formbar/wiki">here</a></p>
+</div>
+</div>
+<br>
+<p style= " text-align:right; font-size: 13px;">Worse Company™ 2021-2022</p>
+</div>
+{% endblock %}

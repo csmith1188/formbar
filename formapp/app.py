@@ -1449,8 +1449,23 @@ def endpoint_controlpanel():
 @app.route('/countdown', methods=['GET', 'POST'])
 def endpoint_countdown():
     getMinutes = request.form.get('minutes')
-    #getSeconds = request.form.get('seconds')
+    getSeconds = int(request.form.get('seconds'))
     
+
+
+    def countdown(time_sec):
+        while time_sec:
+            mins, secs = divmod(time_sec, 60)
+            timeformat = '{:02d}:{:02d}'.format(mins, secs)
+            print(timeformat, end='\r')
+            time.sleep(1)
+            time_sec -= 1
+            
+        print("stop")
+    print(getSeconds)
+    return render_template("countdown.html")
+    countdown(getSeconds)
+
     
 
 

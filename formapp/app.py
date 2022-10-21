@@ -254,7 +254,9 @@ def newStudent(remote, username, bot=False):
                     sD.studentDict[remote]['perms'] = sD.settings['perms']['admin']
                 else:
                     sD.studentDict[remote]['perms'] = int(user[3])
-                sD.studentDict[remote]['tags'] = json.loads(user[13])
+                
+                
+                    
 
         socket_.emit('alert', json.dumps(packMSG('all', 'server', sD.studentDict[request.remote_addr]['name'] + " logged in...")), namespace=chatnamespace)
         playSFX("sfx_up02")
@@ -1460,7 +1462,7 @@ def endpoint_createaccount():
             passwordCrypt = cipher.encrypt(password.encode())
             db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
             dbcmd = db.cursor()
-            dbcmd.execute("INSERT INTO users (username, password, permissions, bot) VALUES (?, ?, ?, ?)", (name, passwordCrypt, sD.settings['perms']['anyone'], "False"))
+            dbcmd.execute("INSERT INTO users (username, password, permissions, bot, tags) VALUES (?, ?, ?, ?, ?)", (name, passwordCrypt, sD.settings['perms']['anyone'], "False", "[ e ]"))
             db.commit()
             db.close()
             return render_template("message.html", message = 'Account created.')

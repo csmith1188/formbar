@@ -23,3 +23,4 @@ cp formapp/key_template.py formapp/key.py
 cp formapp/config_template.py formapp/config.py
 sudo pip3 install rpi_ws281x adafruit-circuitpython-neopixel
 sudo python3 -m pip install --force-reinstall adafruit-blinka
+sudo pip3 install playsound

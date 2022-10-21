@@ -1443,62 +1443,21 @@ def endpoint_controlpanel():
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+def timer(minutes, seconds):
+    finishedSound = "formapp/sfx_success01.wav"
+    while True:
+        print(minutes, seconds)
+        time.sleep(1)
+        seconds = seconds - 1
+        if seconds < 0:
+            minutes = minutes - 1
+            seconds = 3
+            if minutes == 0:
+                seconds = 3
+        if minutes < 0:
+            print("FINISHED")
+            playsound(finishedSound)
+            break
 
 
 
@@ -1515,62 +1474,10 @@ def endpoint_countdown():
     c1 = getMinutes
     c2 = getSeconds
 
-    def timer(minutes, seconds):
-        finishedSound = "sfx_success01.wav"
-        while True:
-            print(minutes, seconds)
-            time.sleep(1)
-            seconds = seconds - 1
-            if seconds < 0:
-                minutes = minutes - 1
-                seconds = 10
-                if minutes == 0:
-                    seconds = 10
-            if minutes < 0:
-                print("FINISHED")
-                playsound(finishedSound)
-                break
+
     timer(c1, c2)
     return render_template("countdown.html")
-   
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
-    
-
-
-
+  
 
 @app.route('/createaccount')
 def endpoint_createaccount():

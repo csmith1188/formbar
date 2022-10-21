@@ -41,6 +41,7 @@ from threading import Lock
 from werkzeug.utils import secure_filename
 from websocket_server import WebsocketServer
 from cryptography.fernet import Fernet
+from playsound import playsound
 import pandas, json, csv
 import random, sys, os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
@@ -1446,25 +1447,125 @@ def endpoint_controlpanel():
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route('/countdown', methods=['GET', 'POST'])
 def endpoint_countdown():
     getMinutes = request.form.get('minutes')
     getSeconds = int(request.form.get('seconds'))
+    getMinutes = int(getMinutes)
+    getSeconds = int(getSeconds)
+
+
+    c1 = getMinutes
+    c2 = getSeconds
+
+    def timer(minutes, seconds):
+        finishedSound = "sfx_success01.wav"
+        while True:
+            print(minutes, seconds)
+            time.sleep(1)
+            seconds = seconds - 1
+            if seconds < 0:
+                minutes = minutes - 1
+                seconds = 10
+                if minutes == 0:
+                    seconds = 10
+            if minutes < 0:
+                print("FINISHED")
+                playsound(finishedSound)
+                break
+    timer(c1, c2)
+    return render_template("countdown.html")
+   
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
 
-
-    def countdown(time_sec):
-        while time_sec:
-            mins, secs = divmod(time_sec, 60)
-            timeformat = '{:02d}:{:02d}'.format(mins, secs)
-            print(timeformat, end='\r')
-            time.sleep(1)
-            time_sec -= 1
-            
-        print("stop")
-    print(getSeconds)
-    return render_template("countdown.html")
-    countdown(getSeconds)
 
     
 

@@ -3,7 +3,7 @@ import time
 
 class FormBot():
     def __init__(self, username, password, timeout=0, host='127.0.0.1', port=420)       :
-        self.host = '192.168.10.30'
+        self.host = '192.168.10.69'
         self.port = 420
         self.username = username
         self.password = password

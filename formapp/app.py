@@ -341,7 +341,7 @@ def stopSFX():
 
 # This function allows you to choose wich background music you want
 def startBGM(bgm_filename, volume=sD.bgm['volume']):
-    sD.bgm['paused'] = True
+    sD.bgm['paused'] = False
     pygame.mixer.music.load(bgm.bgm[bgm_filename])
     pygame.mixer.music.set_volume(volume)
     pygame.mixer.music.play(loops=-1)
@@ -349,7 +349,7 @@ def startBGM(bgm_filename, volume=sD.bgm['volume']):
 
 #This function stops BGM
 def stopBGM():
-    sD.bgm['paused'] = False
+    sD.bgm['paused'] = True
     pygame.mixer.music.stop()
     sD.bgm['nowplaying'] = ''
     playSFX("sfx_pickup01")
@@ -1164,6 +1164,7 @@ def endpoint_bgm():
             resString = '<a href="/bgmstop">Stop Music</a>'
             resString += '<h2>Now playing: ' + sD.bgm['nowplaying'] + '</h2>'
             resString += '<h2>List of available background music files:</h2><ul>'
+
             for key, value in bgm.bgm.items():
                 resString += '<li><a href="/bgm?file=' + key + '">' + key + '</a></li>'
             resString += '</ul> You can play them by using \'<b>/bgm?file=&lt;sound file name&gt;&volume=&lt;0.0 - 1.0&gt;\'</b>'
@@ -1176,7 +1177,7 @@ def endpoint_bgm():
 '''
 @app.route('/bgmstop')
 def endpoint_bgmstop():
-    sD.bgm['paused'] = False
+    sD.bgm['paused'] = True
     stopBGM()
     return render_template("message.html", message = 'Stopped music...')
 

@@ -2879,15 +2879,12 @@ def endpoint_wordle():
     }
 
 '''
-
-def packMSG(rx, tx, content, now = int(time.time() * 1000)):
-    msgOUT = {
-        "to": rx,
-        "from": tx,
-        "content": content,
-        "time": now
-    }
-    return msgOUT
+@socket_.on('alert', namespace=chatnamespace)
+def message(message):
+    try:
+        emit('alert', client, json.dumps(packMSG('alert', sD.studentDict[request.remote_addr]['name'], 'server', 'Only the server can send alerts!')))
+    except Exception as e:
+        logFile("Error", str(e))
 
 @socket_.on('connect', namespace=chatnamespace)
 def connect():
@@ -2899,6 +2896,20 @@ def connect():
     except Exception as e:
         logFile("Error", "Error finding user in list: " + str(e))
 
+@socket_.on('delete', namespace=chatnamespace)
+def delete(timeSent):
+    try:
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        content = 'Message deleted'
+        contentCrypt = cipher.encrypt(content.encode())
+        dbcmd.execute("UPDATE messages SET content=:content WHERE time=" + str(timeSent), {"content": contentCrypt})
+        dbcmd.execute("UPDATE messages SET deleted=1 WHERE time=" + str(timeSent))
+        db.commit()
+        db.close()
+        emit('delete', timeSent, broadcast=True)
+    except Exception as e:
+        logFile("Error", str(e))
 
 @socket_.on('disconnect', namespace=chatnamespace)
 def disconnect():
@@ -2914,6 +2925,44 @@ def disconnect():
         f.write(str(e))
         f.close()
 
+@socket_.on('edit', namespace=chatnamespace)
+def edit(timeSent, newContent):
+    try:
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        content = newContent
+        if len(content) > 252:
+            content = content[:252]+'...'
+        content = content.replace('"', '\\"')
+        contentCrypt = cipher.encrypt(content.encode())
+        dbcmd.execute("UPDATE messages SET content=:content WHERE time=" + str(timeSent), {"content": contentCrypt})
+        dbcmd.execute("UPDATE messages SET edited=1 WHERE time=" + str(timeSent))
+        db.commit()
+        db.close()
+        emit('edit', [timeSent, newContent], broadcast=True)
+    except Exception as e:
+        logFile("Error", str(e))
+
+@socket_.on('fighter', namespace=chatnamespace)
+def fighter(message):
+    try:
+        emit('fighter', message, broadcast=True)
+    except Exception as e:
+        logFile("Error", str(e))
+
+@socket_.on('help', namespace=chatnamespace)
+def message(message):
+    try:
+        #Update or remove
+        pass
+        #message = json.loads(message)
+        #name = sD.studentDict[request.remote_addr]['name']
+        #name = name.replace(" ", "")
+        #helpList[name] = message['content']
+        #playSFX("sfx_up04")
+        #emit('help', json.dumps(packMSG('alert', sD.studentDict[request.remote_addr]['name'], 'server', 'Your help ticket was sent. Keep working on the problem while you wait!')))
+    except Exception as e:
+        logFile("Error", str(e))
 
 @socket_.on('message', namespace=chatnamespace)
 def message(message):
@@ -2952,49 +3001,14 @@ def message(message):
     except Exception as e:
         logFile("Error", str(e))
 
-
-@socket_.on('edit', namespace=chatnamespace)
-def edit(timeSent, newContent):
-    try:
-        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
-        dbcmd = db.cursor()
-        content = newContent
-        if len(content) > 252:
-            content = content[:252]+'...'
-        content = content.replace('"', '\\"')
-        contentCrypt = cipher.encrypt(content.encode())
-        dbcmd.execute("UPDATE messages SET content=:content WHERE time=" + str(timeSent), {"content": contentCrypt})
-        dbcmd.execute("UPDATE messages SET edited=1 WHERE time=" + str(timeSent))
-        db.commit()
-        db.close()
-        emit('edit', [timeSent, newContent], broadcast=True)
-    except Exception as e:
-        logFile("Error", str(e))
-
-
-@socket_.on('delete', namespace=chatnamespace)
-def delete(timeSent):
-    try:
-        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
-        dbcmd = db.cursor()
-        content = 'Message deleted'
-        contentCrypt = cipher.encrypt(content.encode())
-        dbcmd.execute("UPDATE messages SET content=:content WHERE time=" + str(timeSent), {"content": contentCrypt})
-        dbcmd.execute("UPDATE messages SET deleted=1 WHERE time=" + str(timeSent))
-        db.commit()
-        db.close()
-        emit('delete', timeSent, broadcast=True)
-    except Exception as e:
-        logFile("Error", str(e))
-
-
-@socket_.on('userlist', namespace=chatnamespace)
-def message(message):
-    try:
-        emit('userlist', json.dumps(packMSG('userlist', sD.studentDict[request.remote_addr]['name'], 'server', chatUsers())), broadcast=True)
-    except Exception as e:
-        logFile("Error", str(e))
-
+def packMSG(rx, tx, content, now = int(time.time() * 1000)):
+    msgOUT = {
+        "to": rx,
+        "from": tx,
+        "content": content,
+        "time": now
+    }
+    return msgOUT
 
 @socket_.on('reload', namespace=chatnamespace)
 def message(message):
@@ -3002,42 +3016,6 @@ def message(message):
         emit('reload', message, broadcast=True)
     except Exception as e:
         print("[error] " + 'Error: ' + str(e))
-
-@socket_.on('alert', namespace=chatnamespace)
-def message(message):
-    try:
-        emit('alert', client, json.dumps(packMSG('alert', sD.studentDict[request.remote_addr]['name'], 'server', 'Only the server can send alerts!')))
-    except Exception as e:
-        logFile("Error", str(e))
-        
-        
-        
-
-
-@socket_.on('help', namespace=chatnamespace)
-def message(message):
-    try:
-        #Update or remove
-        pass
-        #message = json.loads(message)
-        #name = sD.studentDict[request.remote_addr]['name']
-        #name = name.replace(" ", "")
-        #helpList[name] = message['content']
-        #playSFX("sfx_up04")
-        #emit('help', json.dumps(packMSG('alert', sD.studentDict[request.remote_addr]['name'], 'server', 'Your help ticket was sent. Keep working on the problem while you wait!')))
-    except Exception as e:
-        logFile("Error", str(e))
-
-@socket_.on('fighter', namespace=chatnamespace)
-def fighter(message):
-    try:
-        emit('fighter', message, broadcast=True)
-    except Exception as e:
-        logFile("Error", str(e))
-        
-        
-        
-
 
 @socket_.on('ttt', namespace=chatnamespace)
 def ttt(message):
@@ -3059,6 +3037,13 @@ def ttt(message):
                 else:
                     shape = 'O'
                 game.gameboard[rBox][cBox] = shape
+    except Exception as e:
+        logFile("Error", str(e))
+
+@socket_.on('userlist', namespace=chatnamespace)
+def message(message):
+    try:
+        emit('userlist', json.dumps(packMSG('userlist', sD.studentDict[request.remote_addr]['name'], 'server', chatUsers())), broadcast=True)
     except Exception as e:
         logFile("Error", str(e))
 

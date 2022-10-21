@@ -824,6 +824,7 @@ def page_not_found(e):
     /
     Redirect to the user's preferred homepage
 '''
+
 @app.route('/')
 def endpoint_root():
     if not request.remote_addr in sD.studentDict:
@@ -1036,16 +1037,17 @@ def endpoint_api_pix():
             global pixels
         return '{"pixels": "'+ str(pixels[:BARPIX]) +'"}'
 
-@app.route('/api/quizname')
-def endpoint_api_quizname():
+@app.route('/api/pollresponses')
+def endpoint_api_pollresponses():
     loginResult = loginCheck(request.remote_addr, 'api')
     if loginResult:
         return loginResult
     else:
-        if sD.activeQuiz:
-            return '{"quizname": "'+ str(sD.activeQuiz['name']) +'"}'
-        else:
-            return '{"error": "No quiz is currently loaded."}'
+        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        responses = dbcmd.execute("SELECT * FROM responses").fetchall()
+        db.close()
+        return json.dumps(responses)
 
 @app.route('/api/polls')
 def endpoint_api_polls():
@@ -1059,17 +1061,16 @@ def endpoint_api_polls():
         db.close()
         return json.dumps(polls)
 
-@app.route('/api/pollresponses')
-def endpoint_api_pollresponses():
+@app.route('/api/quizname')
+def endpoint_api_quizname():
     loginResult = loginCheck(request.remote_addr, 'api')
     if loginResult:
         return loginResult
     else:
-        db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
-        dbcmd = db.cursor()
-        responses = dbcmd.execute("SELECT * FROM responses").fetchall()
-        db.close()
-        return json.dumps(responses)
+        if sD.activeQuiz:
+            return '{"quizname": "'+ str(sD.activeQuiz['name']) +'"}'
+        else:
+            return '{"error": "No quiz is currently loaded."}'
 
 #This endpoints shows the actions the students did EX:TUTD up
 @app.route('/api/students')
@@ -1558,7 +1559,6 @@ def endpoint_essay():
                 return render_template("message.html", message = "Not in Essay mode.")
         else:
             return render_template('thumbsrental.html')
-
 
 @app.route('/expert')
 def endpoint_expert():
@@ -2680,6 +2680,10 @@ def endpoint_updateuser():
         except Exception as e:
             print("[error] " + "Error: " + str(e))
 
+@app.route('/usermanual')
+def endpoint_usermanual():
+     return render_template("usermanual.html")
+
 #This endpoint allows us to see which user(Student) is logged in.
 @app.route('/users')
 def endpoint_users():
@@ -2811,10 +2815,6 @@ def endpoint_users():
             users = dbcmd.execute("SELECT * FROM users").fetchall()
             db.close()
             return render_template("users.html", users = users)
-
-@app.route('/usermanual')
-def endpoint_usermanual():
-     return render_template("usermanual.html")
 
 
 # ██    ██

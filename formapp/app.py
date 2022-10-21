@@ -226,7 +226,7 @@ def newStudent(remote, username, bot=False):
         for user in sD.studentDict:
             if sD.studentDict[user]['perms'] == 0:
                 teacher = True
-
+    
         #Login bots as guest
         if bot:
             logFile("Info", "Bot successful login. Made them a guest: " + username)
@@ -252,6 +252,7 @@ def newStudent(remote, username, bot=False):
             if username in user:
                 if not teacher:
                     sD.studentDict[remote]['perms'] = sD.settings['perms']['admin']
+                if tags = True
                 else:
                     sD.studentDict[remote]['perms'] = int(user[3])
                 sD.studentDict[remote]['tags'] = json.loads(user[13])
@@ -2693,10 +2694,12 @@ def endpoint_users():
     else:
         action = request.args.get('action')
         user = '';
+        print(request.args.get('name'))
         if request.args.get('name'):
             for key, value in sD.studentDict.items():
                 if request.args.get('name') == sD.studentDict[key]['name']:
                     user = key
+                    print(user)
                     break
             if action == 'delete':
                 db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
@@ -2719,6 +2722,25 @@ def endpoint_users():
                     return render_template("message.html", message = "Password reset.")
                 else:
                     return render_template("message.html", message = "New password reqired.")
+            
+            # http://localhost:420/users?name=u1&action=addtag&tag=urmum
+            if action == 'addtag':
+                addTag = request.args.get('tag')
+                db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+                dbcmd = db.cursor()
+                sD.studentDict[user]['tags'].append(addTag)
+                dbcmd.execute("UPDATE users SET tags=:tags WHERE username=:uname", {"uname": request.args.get('name'), "tags": json.dumps(sD.studentDict[user]['tags'])})
+                db.commit()
+                db.close()
+            # http://localhost:420/users?name=u1&action=removetag&tag=urmum
+            if action == 'removetag':
+                remTag = request.args.get('tag')
+                db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+                dbcmd = db.cursor()
+                sD.studentDict[user]['tags'].remove(remTag)
+                dbcmd.execute("UPDATE users SET tags=:tags WHERE username=:uname", {"uname": request.args.get('name'), "tags": json.dumps(sD.studentDict[user]['tags'])})
+                db.commit()
+                db.close()
             if not user:
                 return render_template("message.html", message = "That user was not found by their name.")
         if request.args.get('ip'):

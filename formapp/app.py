@@ -1164,6 +1164,7 @@ def endpoint_bgm():
             resString = '<a href="/bgmstop">Stop Music</a>'
             resString += '<h2>Now playing: ' + sD.bgm['nowplaying'] + '</h2>'
             resString += '<h2>List of available background music files:</h2><ul>'
+            #pyautogui.hotkey('f5')
             for key, value in bgm.bgm.items():
                 resString += '<li><a href="/bgm?file=' + key + '">' + key + '</a></li>'
             resString += '</ul> You can play them by using \'<b>/bgm?file=&lt;sound file name&gt;&volume=&lt;0.0 - 1.0&gt;\'</b>'
@@ -2665,6 +2666,7 @@ def endpoint_updateuser():
         return loginResult
     else:
         try:
+            print(request.form['data'])
             field = request.args.get("field")
             value = request.args.get("value")
             username = request.args.get("name") or sD.studentDict[request.remote_addr]['name']
@@ -2681,14 +2683,14 @@ def endpoint_updateuser():
             print("[error] " + "Error: " + str(e))
 
 #This endpoint allows us to see which user(Student) is logged in.
-@app.route('/users')
+@app.route('/users', methods = ['POST', 'GET'])
 def endpoint_users():
     loginResult = loginCheck(request.remote_addr, 'users')
     if loginResult:
         return loginResult
     else:
         action = request.args.get('action')
-        user = '';
+        user = ''
         if request.args.get('name'):
             for key, value in sD.studentDict.items():
                 if request.args.get('name') == sD.studentDict[key]['name']:

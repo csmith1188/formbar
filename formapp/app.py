@@ -71,16 +71,16 @@ if ONRPi:
 flasklog = logging.getLogger('werkzeug')
 flasklog.setLevel(logging.ERROR)
 
-#Display IP address to console for user connection. Updates the Time as well
+# Use this to log information/errors
 def logFile(type, message):
+    #logFile("Info", "Bot successful login. Made them a guest: " + username)
     now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     f = open('log.txt', 'a')
     f.write("[" + str(now) + "]" + " [" + type + "] " + message + "\n")
     f.close()
     print("[" + str(now) + "]" + " [" + type + "] " + message)
-#This import allows for the time to be printed to console. If you need to add a new print line the 2nd line is an example of how to use the logFile() function to make it print to console and to the log file
-#logFile("Info", "Bot successful login. Made them a guest: " + username)
 
+#Display IP address to console for user connection. Updates the Time as well
 logFile('Info', "Running formbar on ip: " + ip)
 
 
@@ -1928,7 +1928,7 @@ def endpoint_hangman():
 
 @app.route('/help', methods = ['POST', 'GET'])
 def endpoint_help():
-    loginResult = loginCheck(request.remote_addr, 'teacher')
+    loginResult = loginCheck(request.remote_addr, 'student')
     if loginResult:
         return loginResult
     else:
@@ -1939,7 +1939,7 @@ def endpoint_help():
         elif request.method == 'POST':
             sD.studentDict[request.remote_addr]['help']['type'] = 'help'
             sD.studentDict[request.remote_addr]['help']['time'] = time.time()
-            sD.studentDict[request.remote_addr]['help']['message'] = request.args.get('message')
+            sD.studentDict[request.remote_addr]['help']['message'] = request.form.get('message')
             playSFX("sfx_up04")
             socket_.emit('help', sD.studentDict[request.remote_addr]['help'], namespace=apinamespace)
             return render_template("message.html", message = "Your ticket was sent. Keep working on the problem the best you can while you wait.", forward = sD.mainPage)
@@ -2526,7 +2526,7 @@ def endpoint_segment():
         if ONRPi:
             pixels.show()
         return render_template("message.html", message = "Color sent!")
-
+        
 @app.route('/selectclass', methods = ['POST', 'GET'])
 def endpoint_selectclass():
     if not request.remote_addr in sD.studentDict:
@@ -2547,7 +2547,6 @@ def endpoint_selectclass():
         else:
             return render_template('selectclass.html')
 
-'''
 @app.route('/sendblock')
 def endpoint_sendblock():
     if not sD.settings['barmode'] == 'blockchest':
@@ -2564,7 +2563,6 @@ def endpoint_sendblock():
             return render_template("message.html", message = "Bad block Id")
     else:
         return render_template("message.html", message = "Bad Arguments. Requires 'id' and 'data'")
-'''
 
 #Choose the user's default homepage
 @app.route('/setdefault', methods = ['POST', 'GET'])

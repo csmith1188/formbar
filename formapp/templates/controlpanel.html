@@ -8,7 +8,9 @@
 <!-- Extra style declarations here -->
 {% block style %}
 <style media="screen">
-  h2, h3, form {
+  h2,
+  h3,
+  form {
     margin: 0;
   }
 
@@ -19,6 +21,7 @@
   button {
     margin-right: 4px;
   }
+
   body {
     overflow-x: hidden;
   }
@@ -43,7 +46,7 @@
     left: 21px;
   }
 
-  .user > * {
+  .user>* {
     max-width: calc(100% - 21px);
     overflow-wrap: break-word;
   }
@@ -75,7 +78,8 @@
     margin-right: 8px;
   }
 
-  #history > span, #history > b {
+  #history>span,
+  #history>b {
     display: inline-block;
     width: 100px;
     margin-top: 8px;
@@ -87,21 +91,26 @@
     justify-content: space-evenly;
     padding: 0;
   }
+
   #tabBox li {
     display: inline;
   }
+
   #tabBox a {
     text-decoration: none;
   }
+
   #permsContainer {
     display: flex;
     justify-content: space-evenly;
     flex-wrap: wrap;
   }
+
   .permBox {
     width: 50%;
     margin: 0px;
   }
+
   #resetPerms {
     display: block;
     margin: 32px auto 0;
@@ -152,8 +161,10 @@
   </div>
   <div id="tabs-2">
     <h2>Number of students</h2>
-    <input type="number" id="studentNum" class="line" onchange="sendStudents();" name="studentNum" min="1" max="30">&nbsp;&nbsp;
-    <input type="checkbox" id="autoStudents" checked onchange="sendStudents();"><label for="autoStudents">Auto</label><br>
+    <input type="number" id="studentNum" class="line" onchange="sendStudents();" name="studentNum" min="1"
+      max="30">&nbsp;&nbsp;
+    <input type="checkbox" id="autoStudents" checked onchange="sendStudents();"><label
+      for="autoStudents">Auto</label><br>
 
     <div onchange="changeMode();">
       <h2>Bar mode</h2>
@@ -164,13 +175,15 @@
           <span style="margin-left: 25px;">Students' votes are displayed on the bar.</span><br>
         </div>
       </label>
-      <form id="pollType" class="hidden" style="margin: 8px 0 0 25px;" onchange="changePollType();">
+      <form id="pollType" method="post" class="hidden" style="margin: 8px 0 0 25px;" onchange="changePollType();">
         Type:
         <input type="radio" id="thumbs" name="type" checked style="margin-left: 8px;"><label for="thumbs">Thumbs</label>
         <input type="radio" id="letters" name="type" style="margin-left: 8px;"><label for="letters">Letters</label>
         <input type="radio" id="essay" name="type" style="margin-left: 8px;"><label for="essay">Essay</label><br>
         <span id="pollDescription">Students can choose between thumbs up, thumbs down, and wiggle</span><br>
-        <input type="button" id="pollButton" class="button inline popOut" value="Start new poll" style="margin-top: 8px;">
+        <input type="text" id="pollPrompt" name="prompt" placeholder="Prompt" style="color: black;">
+        <input type="button" id="pollButton" class="button inline popOut" value="Start new poll"
+          style="margin-top: 8px;">
       </form>
       <br>
 
@@ -182,7 +195,7 @@
         </div>
       </label>
       <br>
-    
+
       <label>
         <div>
           <input type="radio" id="countdown" name="mode">
@@ -205,8 +218,8 @@
           <span style="margin-left: 25px;">Students can change the colors of the bar.</span><br>
         </div>
       </label>
-	  <br>
-	  <label>
+      <br>
+      <label>
         <div>
           <input type="radio" id="sendblock" name="mode">
           <h3 style="display: inline;">Blockchest Mode</h3><br>
@@ -304,21 +317,30 @@
   <div id="tabs-5">
     <h2>Lock Formbar</h2>
     Only whitelisted users will be able to make changes.<br>
-    <input type="checkbox" id="lock" onchange="request.open('GET', '/controlpanel?locked=' + this.checked); request.send();"><label for="lock">Lock</label><br>
+    <input type="checkbox" id="lock"
+      onchange="request.open('GET', '/controlpanel?locked=' + this.checked); request.send();"><label
+      for="lock">Lock</label><br>
 
     <h2>Blind results</h2>
     Results won't be shown until the poll is complete.<br>
-    <input type="checkbox" id="blind" onchange="request.open('GET', '/controlpanel?blind=' + this.checked); request.send();"><label for="blind">Hide results</label><br>
+    <input type="checkbox" id="blind"
+      onchange="request.open('GET', '/controlpanel?blind=' + this.checked); request.send();"><label for="blind">Hide
+      results</label><br>
 
     <h2>Show missing votes</h2>
     When votes are missing, there will be empty spaces on the bar.<br>
-    <input type="checkbox" id="showMissing" checked onchange="request.open('GET', '/controlpanel?showinc=' + this.checked); request.send();"><label for="showMissing">Show</label><br>
+    <input type="checkbox" id="showMissing" checked
+      onchange="request.open('GET', '/controlpanel?showinc=' + this.checked); request.send();"><label
+      for="showMissing">Show</label><br>
 
     <h2>Clear data</h2>
     <b>Warning: These buttons will permanently delete data.</b><br>
-    <button class="inline popOut" style="margin-top: 12px;" onclick="clearTable('messages');">Clear all chat messages</button><br>
-    <button class="inline popOut" style="margin-top: 12px;" onclick="clearTable('scores');">Clear all game scores</button><br>
-    <button class="inline popOut" style="margin-top: 12px;" onclick="clearTable('users');">Clear all user accounts</button>
+    <button class="inline popOut" style="margin-top: 12px;" onclick="clearTable('messages');">Clear all chat
+      messages</button><br>
+    <button class="inline popOut" style="margin-top: 12px;" onclick="clearTable('scores');">Clear all game
+      scores</button><br>
+    <button class="inline popOut" style="margin-top: 12px;" onclick="clearTable('users');">Clear all user
+      accounts</button>
   </div>
 </div>
 {% endblock %}
@@ -353,22 +375,22 @@
   sendStudents();
 
   function packMSG(rx, tx, content) {
-        let msgOUT = {
-            to: rx,
-            from: tx,
-            content: content
-        }
-        return JSON.stringify(msgOUT);
+    let msgOUT = {
+      to: rx,
+      from: tx,
+      content: content
     }
+    return JSON.stringify(msgOUT);
+  }
 
   function updatePerm(el) {
     request.open("GET", el.value);
     console.log(el.value);
-    request.onload = function() {
+    request.onload = function () {
       // console.log(request.response);
     };
     request.send();
-    
+
     chatSocket.emit('reload', JSON.stringify(packMSG('all', 'server', '')))
   }
 
@@ -378,14 +400,23 @@
       document.getElementById("studentNum").value = Object.keys(res).length;
     }
   }
-
+  
   updateStudents();
   setInterval(updateStudents, 1000);
-
-  function changeMode() {
+  
+  let pollButton = document.getElementById("pollButton");
+  if (pollButton.value = "Start new poll"){
+    pollButton.onclick = startPoll
+  } else if (pollButton.value = "End poll"){
+    pollButton.onclick = endPoll
+  }
+  
+  function changeMode(type) {
     if (document.getElementById("poll").checked) {
-      request.open('GET', '/controlpanel?barmode=poll');
-      request.send();
+      let xhr = new XMLHttpRequest();
+      xhr.open("POST", "/controlpanel", true);
+      xhr.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
+      xhr.send(`barmode=${type}`);
       document.getElementById("pollType").classList.remove("hidden");
     } else {
       document.getElementById("pollType").classList.add("hidden");
@@ -405,42 +436,45 @@
       request.open('GET', '/controlpanel?barmode=playtime');
       request.send();
     }
-	if (document.getElementById("sendblock").checked) {
+    if (document.getElementById("sendblock").checked) {
       request.open('GET', '/controlpanel?barmode=sendblock');
       request.send();
     }
   }
 
   function changePollType() {
-    if (document.getElementById("thumbs").checked) document.getElementById("pollDescription").innerText = "Students can choose between thumbs up, thumbs down, and wiggle.";
-    else if (document.getElementById("letters").checked) document.getElementById("pollDescription").innerText = "Students can choose between A, B, C, and D.";
-    else if (document.getElementById("essay").checked) document.getElementById("pollDescription").innerHTML = "Students will type out short answers. View essays in the \"Users\" section.";
+    if (document.getElementById("thumbs").checked) document.getElementById("pollDescription").innerText =
+      "Students can choose between thumbs up, thumbs down, and wiggle.";
+    else if (document.getElementById("letters").checked) document.getElementById("pollDescription").innerText =
+      "Students can choose between A, B, C, and D.";
+    else if (document.getElementById("essay").checked) document.getElementById("pollDescription").innerHTML =
+      "Students will type out short answers. View essays in the \"Users\" section.";
   }
 
   function startPoll() {
     if (document.getElementById("thumbs").checked) {
-      request.open('GET', '/startpoll?type=tutd');
-      request.send();
+      let xhr = new XMLHttpRequest();
+      xhr.open("POST", "/startpoll", true);
+      xhr.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
+      xhr.send(`type=thumb&prompt=${document.getElementById('pollPrompt').value}`);
     } else if (document.getElementById("letters").checked) {
-      request.open('GET', '/startpoll?type=abcd');
-      request.send();
+      let xhr = new XMLHttpRequest();
+      xhr.open("POST", "/startpoll");
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhr.send(`type=letter&prompt=${document.getElementById('pollPrompt').value}`);
     } else if (document.getElementById("essay").checked) {
-      request.open('GET', '/startpoll?type=text');
-      request.send();
+      let xhr = new XMLHttpRequest();
+      xhr.open("POST", "/startpoll");
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhr.send(`type=essay&prompt=${document.getElementById('pollPrompt').value}`);
     }
-
-    let pollButton = document.getElementById("pollButton");
-    pollButton.value = "End poll";
-    pollButton.onclick = endPoll;
+    pollButton.value = "End poll"
   }
 
   function endPoll() {
+    pollButton.value = "Start new poll"
     request.open('GET', '/endpoll');
     request.send();
-
-    let pollButton = document.getElementById("pollButton");
-    pollButton.value = "Start new poll";
-    pollButton.onclick = startPoll;
   }
 
   function resetPerms() {
@@ -463,10 +497,9 @@
       case "poll":
         document.getElementById("poll").checked = true;
         document.getElementById("pollType").classList.remove("hidden");
-        document.getElementById("thumbs").checked = true;
         document.getElementById("pollButton").onclick = startPoll;
         break;
-      case "tutd":
+      case "thumb":
         document.getElementById("poll").checked = true;
         document.getElementById("pollType").classList.remove("hidden");
         document.getElementById("thumbs").checked = true;
@@ -474,7 +507,7 @@
         document.getElementById("pollButton").onclick = endPoll;
         changePollType();
         break;
-      case "abcd":
+      case "letters":
         document.getElementById("poll").checked = true;
         document.getElementById("pollType").classList.remove("hidden");
         document.getElementById("letters").checked = true;
@@ -482,7 +515,7 @@
         document.getElementById("pollButton").onclick = endPoll;
         changePollType();
         break;
-      case "text":
+      case "essay":
         document.getElementById("poll").checked = true;
         document.getElementById("pollType").classList.remove("hidden");
         document.getElementById("essay").checked = true;
@@ -529,7 +562,7 @@
   sortButtons.forEach(button => button.onclick = () => changeSort(button));
   changeSort(document.getElementById("logIn"));
 
-  collapseButton.onclick = function() {
+  collapseButton.onclick = function () {
     collapsed = !collapsed;
     let userDetails = Array.from(document.getElementsByClassName("user"));
     if (collapsed) {
@@ -544,7 +577,7 @@
   function checkUpdates(url) {
     let newRequest = new XMLHttpRequest();
     newRequest.open('GET', url);
-    newRequest.onload = function() {
+    newRequest.onload = function () {
       studentData = newRequest.response;
     };
     newRequest.send();
@@ -588,7 +621,8 @@
   function changeSort(el) {
     let newSort = el.id;
     sortButtons.forEach(button => {
-      if (button.innerText.endsWith("🡇") || button.innerText.endsWith("🡅")) button.innerText = button.innerText.slice(0, -2);
+      if (button.innerText.endsWith("🡇") || button.innerText.endsWith("🡅")) button.innerText = button.innerText
+        .slice(0, -2);
       if (button == el) {
         button.classList.add("pressed");
       } else {
@@ -605,7 +639,7 @@
     }
   }
 
-  setInterval(function() {
+  setInterval(function () {
     checkUpdates('/api/students');
     let studentBox = document.getElementById('students');
     if (studentData === undefined) {
@@ -620,9 +654,11 @@
       if (filters.includes("!help")) studentList = studentList.filter(student => !student.help.type);
       if (filters.includes("break")) studentList = studentList.filter(student => student.excluded);
       if (filters.includes("!break")) studentList = studentList.filter(student => !student.excluded);
-      if (filters.includes("pollResponded")) studentList = studentList.filter(student => student.thumb || student.letter || student.essay);
-      if (filters.includes("!pollResponded")) studentList = studentList.filter(student => !(student.thumb || student.letter || student.essay));
-    
+      if (filters.includes("pollResponded")) studentList = studentList.filter(student => student.thumb || student
+        .letter || student.essay);
+      if (filters.includes("!pollResponded")) studentList = studentList.filter(student => !(student.thumb || student
+        .letter || student.essay));
+
       let thumbs, letters, helpTimes;
       switch (sort) {
         case "logIn":
@@ -649,14 +685,16 @@
           thumbs = ["up", "wiggle", "down", ""];
           letters = ["a", "b", "c", "d", ""];
           studentList = studentList.sort((a, b) => thumbs.indexOf(a.thumb) - thumbs.indexOf(b.thumb)); //Thumbs poll
-          studentList = studentList.sort((a, b) => letters.indexOf(a.letter) - letters.indexOf(b.letter)); //Letters poll
+          studentList = studentList.sort((a, b) => letters.indexOf(a.letter) - letters.indexOf(b
+          .letter)); //Letters poll
           studentList = studentList.sort((a, b) => !!b.essay - !!a.essay); //Essay poll
           break;
         case "pollResRev":
           thumbs = ["down", "wiggle", "up", ""];
           letters = ["d", "c", "b", "a", ""];
           studentList = studentList.sort((a, b) => thumbs.indexOf(a.thumb) - thumbs.indexOf(b.thumb)); //Thumbs poll
-          studentList = studentList.sort((a, b) => letters.indexOf(a.letter) - letters.indexOf(b.letter)); //Letters poll
+          studentList = studentList.sort((a, b) => letters.indexOf(a.letter) - letters.indexOf(b
+          .letter)); //Letters poll
           studentList = studentList.reverse().sort((a, b) => !!b.essay - !!a.essay); //Essay poll
           break;
         case "perms":
@@ -683,40 +721,56 @@
             //change image based upon persons permissions
             let perms = student['perms']
             if (perms) var permsIcons = document.createElement("img");
-            if (perms == 0) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/teacher.png') }}" class="permsIcon" title="teacher">`
-            if (perms == 1) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/mod.png') }}" class="permsIcon" title="mod">`
-            if (perms == 2) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/student.png') }}" class="permsIcon" title="student">`
-            if (perms == 3) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/anyone.png') }}" class="permsIcon" title="anyone">`
-            if (perms == 4) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/banned.png') }}" class="permsIcon" title="banned">`
+            if (perms == 0) pictureIcon +=
+              `<img src="{{ url_for('static', filename='img/controlpanel/teacher.png') }}" class="permsIcon" title="teacher">`
+            if (perms == 1) pictureIcon +=
+              `<img src="{{ url_for('static', filename='img/controlpanel/mod.png') }}" class="permsIcon" title="mod">`
+            if (perms == 2) pictureIcon +=
+              `<img src="{{ url_for('static', filename='img/controlpanel/student.png') }}" class="permsIcon" title="student">`
+            if (perms == 3) pictureIcon +=
+              `<img src="{{ url_for('static', filename='img/controlpanel/anyone.png') }}" class="permsIcon" title="anyone">`
+            if (perms == 4) pictureIcon +=
+              `<img src="{{ url_for('static', filename='img/controlpanel/banned.png') }}" class="permsIcon" title="banned">`
 
 
             //Change student color according to thumb response
             let thumb = student['thumb'];
             if (thumb) var thumbIcon = document.createElement("img");
-            if (thumb == "up") icons += `<img src="{{ url_for('static', filename='img/controlpanel/up.png') }}" class="icon" title="Up">`;
-            if (thumb == "wiggle") icons += `<img src="{{ url_for('static', filename='img/controlpanel/wiggle.png') }}" class="icon" title="Wiggle">`;
-            if (thumb == "down") icons += `<img src="{{ url_for('static', filename='img/controlpanel/down.png') }}" class="icon" title="Down">`;
+            if (thumb == "up") icons +=
+              `<img src="{{ url_for('static', filename='img/controlpanel/up.png') }}" class="icon" title="Up">`;
+            if (thumb == "wiggle") icons +=
+              `<img src="{{ url_for('static', filename='img/controlpanel/wiggle.png') }}" class="icon" title="Wiggle">`;
+            if (thumb == "down") icons +=
+              `<img src="{{ url_for('static', filename='img/controlpanel/down.png') }}" class="icon" title="Down">`;
 
             //Change student letter according to letter response
             let letter = student['letter']
-            if (letter == "a") icons += `<img src="{{ url_for('static', filename='img/controlpanel/a.png') }}" class="icon" title="A">`;
-            if (letter == "b") icons += `<img src="{{ url_for('static', filename='img/controlpanel/b.png') }}" class="icon" title="B">`;
-            if (letter == "c") icons += `<img src="{{ url_for('static', filename='img/controlpanel/c.png') }}" class="icon" title="C">`;
-            if (letter == "d") icons += `<img src="{{ url_for('static', filename='img/controlpanel/d.png') }}" class="icon" title="D">`;
+            if (letter == "a") icons +=
+              `<img src="{{ url_for('static', filename='img/controlpanel/a.png') }}" class="icon" title="A">`;
+            if (letter == "b") icons +=
+              `<img src="{{ url_for('static', filename='img/controlpanel/b.png') }}" class="icon" title="B">`;
+            if (letter == "c") icons +=
+              `<img src="{{ url_for('static', filename='img/controlpanel/c.png') }}" class="icon" title="C">`;
+            if (letter == "d") icons +=
+              `<img src="{{ url_for('static', filename='img/controlpanel/d.png') }}" class="icon" title="D">`;
 
             //Show icon if student has submitted Essay
-            if (student.essay) icons += `<img src="{{ url_for('static', filename='img/controlpanel/text.png') }}" class="icon" title="Essay submitted">`;
+            if (student.essay) icons +=
+              `<img src="{{ url_for('static', filename='img/controlpanel/text.png') }}" class="icon" title="Essay submitted">`;
 
-            if (student['help'].type) icons += `<img src="{{ url_for('static', filename='img/controlpanel/help.png') }}" class="icon" title="Help ticket">`;
+            if (student['help'].type) icons +=
+              `<img src="{{ url_for('static', filename='img/controlpanel/help.png') }}" class="icon" title="Help ticket">`;
 
-            if (student['complete']) icons += `<img src="{{ url_for('static', filename='img/controlpanel/complete.png') }}" class="icon" title="Complete">`;
+            if (student['complete']) icons +=
+              `<img src="{{ url_for('static', filename='img/controlpanel/complete.png') }}" class="icon" title="Complete">`;
 
             newStudent.innerHTML = pictureIcon + icons + student.name;
             let newDetails = document.createElement('span');
             newDetails.classList.add('user');
             cleanText = student.essay.replace(/<|>/gi, "")
             if (collapsed) newDetails.classList.add("hidden");
-            if (student.essay) newDetails.innerHTML += "<div style='margin-bottom: 8px;'><pre> Essay: <br> " + cleanText + "</pre>" + "</div>";
+            if (student.essay) newDetails.innerHTML += "<div style='margin-bottom: 8px;'><pre> Essay: <br> " +
+              cleanText + "</pre>" + "</div>";
             if (student.help.type) {
               let helpTicket = document.createElement("div");
               let ticketTime = new Date(student.help.time * 1000);
@@ -749,7 +803,7 @@
                 helpTicket.appendChild(rejectButton);
               } else {
                 console.log(student.help.message)
-                if (student.help.message) 
+                if (student.help.message)
                   helpTicket.innerHTML += student.help.message
                 else
                   "<i>Sent a help ticket</i>";
@@ -855,7 +909,8 @@
     el.innerHTML = "";
     for (let student in npRequests) {
       let ticket = document.createElement("div");
-      ticket.innerHTML += `<i><b>${student}</b> requested a password change from the login page. Before you accept, confirm that this request is legitimate.</i>`;
+      ticket.innerHTML +=
+        `<i><b>${student}</b> requested a password change from the login page. Before you accept, confirm that this request is legitimate.</i>`;
       let acceptButton = document.createElement("button");
       let rejectButton = document.createElement("button");
       acceptButton.classList.add("inline", "popOut");
@@ -898,10 +953,12 @@
     if (
       student.name != meRes.name ||
       meRes.perms > el.value[el.value.length - 1] ||
-      confirm("If you lower your own permissions, you may not be able to change them back. If no users have teacher permissions, the next person to log in will become the teacher.")
+      confirm(
+        "If you lower your own permissions, you may not be able to change them back. If no users have teacher permissions, the next person to log in will become the teacher."
+        )
     ) {
       request.open("GET", el.value);
-      request.onload = function() {
+      request.onload = function () {
         console.log(request.response);
       };
       request.send();
@@ -961,7 +1018,8 @@
   async function downloadResponses(poll) {
     let responses = await getResponse("/api/pollresponses");
     responses = responses.filter(response => response[0] == poll);
-    responses = responses.map(response => [response[1], `"${response[2].replaceAll("\"", "\"\"")}"`]); //Escape quotes in values, then add quotes around each value
+    responses = responses.map(response => [response[1],
+    `"${response[2].replaceAll("\"", "\"\"")}"`]); //Escape quotes in values, then add quotes around each value
     let csv = "data:text/csv;charset=utf-8,";
     csv += responses.map(response => response.join(",")).join("\n");
     let link = document.createElement("a");
@@ -992,9 +1050,9 @@
 <script src="../static/jquery/external/jquery/jquery.js" charset="utf-8"></script>
 <script src="../static/jquery/jquery-ui.min.js" charset="utf-8"></script>
 <script>
-  $(function() {
+  $(function () {
     $("#tabs").tabs({
-      activate: function(event, ui) {
+      activate: function (event, ui) {
         let activeTab = $("#tabs").tabs("option", "active");
         $("#tabs .ui-tabs-nav a").each((i, el) => {
           if (i == activeTab) el.classList.add("pressed");

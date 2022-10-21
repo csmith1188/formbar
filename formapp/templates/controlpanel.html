@@ -369,7 +369,7 @@
     };
     request.send();
     
-    chatSocket.emit('reload', JSON.stringify(packMSG('all', 'server', '')))
+    chatSocket.emit('reload', packMSG('all', 'server', ''))
   }
 
   async function updateStudents() {
@@ -712,6 +712,7 @@
             if (student['complete']) icons += `<img src="{{ url_for('static', filename='img/controlpanel/complete.png') }}" class="icon" title="Complete">`;
 
             newStudent.innerHTML = pictureIcon + icons + student.name;
+            
             let newDetails = document.createElement('span');
             newDetails.classList.add('user');
             cleanText = student.essay.replace(/<|>/gi, "")
@@ -781,7 +782,7 @@
             }
             let studentPerms = student['perms'];
             newDetails.innerHTML += `
-              <select onchange="userPerm(this, '${student}')" id="userpermsDrop" name="userpermsDrop">
+              <select onchange="userPerm(this, '${student['name']}')" id="userpermsDrop" name="userpermsDrop">
                 <option value="/users?name=${student['name']}&action=perm&perm=0" ${studentPerms === 0 ? "selected" : ""}>${permNames[0]}</option>
                 <option value="/users?name=${student['name']}&action=perm&perm=1" ${studentPerms === 1 ? "selected" : ""}>${permNames[1]}</option>
                 <option value="/users?name=${student['name']}&action=perm&perm=2" ${studentPerms === 2 ? "selected" : ""}>${permNames[2]}</option>
@@ -895,8 +896,9 @@
   async function userPerm(el, student) {
     let meRes = await getResponse("/api/me");
     let permsRes = await getResponse("/api/permissions");
+
     if (
-      student.name != meRes.name ||
+      student != meRes.name ||
       meRes.perms > el.value[el.value.length - 1] ||
       confirm("If you lower your own permissions, you may not be able to change them back. If no users have teacher permissions, the next person to log in will become the teacher.")
     ) {
@@ -905,6 +907,9 @@
         console.log(request.response);
       };
       request.send();
+
+      chatSocket.emit('reload', packMSG(student, 'server', ''))
+
     } else {
       el.value = el.options[meRes.perms].value; //If perms are not updated, give el the correct value
     }

@@ -2925,6 +2925,7 @@ def message(message):
         else:
             now = int(time.time() * 1000)
             message = json.loads(message)
+            print(message)
             #Checking max message length here
             if len(message['content']) > 252:
                 message['content'] = message['content'][:252]+'...'
@@ -2999,9 +3000,22 @@ def message(message):
 @socket_.on('reload', namespace=chatnamespace)
 def message(message):
     try:
-        emit('reload', message, broadcast=True)
+        message = json.loads(message)
+        print(message)
+        if message['to'] == 'all':
+            print("refreshing for all")
+            emit('reload', message, broadcast=True)
+            
+        else:
+            for student in sD.studentDict:
+                if sD.studentDict[student]['name'] == message['to']:
+                    print("refreshing for " + sD.studentDict[student]['sid'])
+                    emit('reload', message, to=sD.studentDict[student]['sid'])
+                    
+
     except Exception as e:
         print("[error] " + 'Error: ' + str(e))
+
 
 @socket_.on('alert', namespace=chatnamespace)
 def message(message):

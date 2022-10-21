@@ -2925,7 +2925,6 @@ def message(message):
         else:
             now = int(time.time() * 1000)
             message = json.loads(message)
-            print(message)
             #Checking max message length here
             if len(message['content']) > 252:
                 message['content'] = message['content'][:252]+'...'

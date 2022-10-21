@@ -75,18 +75,13 @@ if ONRPi:
 flasklog = logging.getLogger('werkzeug')
 flasklog.setLevel(logging.ERROR)
 
-# Display IP address to console for user connection. Updates the Time as well
-
-
+# Use this to log information/errors
 def logFile(type, message):
     now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     f = open('log.txt', 'a')
     f.write("[" + str(now) + "]" + " [" + type + "] " + message + "\n")
     f.close()
     print("[" + str(now) + "]" + " [" + type + "] " + message)
-# This import allows for the time to be printed to console. If you need to add a new print line the 2nd line is an example of how to use the logFile() function to make it print to console and to the log file
-# logFile("Info", "Bot successful login. Made them a guest: " + username)
-
 
 logFile('Info', "Running formbar on ip: " + ip)
 

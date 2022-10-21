@@ -143,17 +143,6 @@
         newDetails.classList.add('user');
         console.log(el.value[el.value.length - 1]);
          window.location = `/users?name=${name}&action=perm&perm=${el.value[el.value.length - 1]}`
-      // let userPerms = users[1];
-      // let xhr = new XMLHttpRequest();
-      // xhr.open("POST", el.value)
-      // xhr.setRequestHeader("Accept", el.value );
-      // xhr.setRequestHeader("Content-Type", el.value );
-      // xhr.onload = () => console.log(xhr.responseText);
-      // let data = `{
-      //   "field": permissions ,
-      //   "value": ${permNames} ,
-      // }`;
-      // xhr.send();
     }
 
     document.getElementById("addUser").addEventListener("click", () => {

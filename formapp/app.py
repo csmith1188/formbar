@@ -3000,18 +3000,14 @@ def message(message):
 def message(message):
     try:
         message = json.loads(message)
-        print(message)
         if message['to'] == 'all':
-            print("refreshing for all")
             emit('reload', message, broadcast=True)
             
         else:
             for student in sD.studentDict:
                 if sD.studentDict[student]['name'] == message['to']:
-                    print("refreshing for " + sD.studentDict[student]['sid'])
                     emit('reload', message, to=sD.studentDict[student]['sid'])
                     
-
     except Exception as e:
         print("[error] " + 'Error: ' + str(e))
 

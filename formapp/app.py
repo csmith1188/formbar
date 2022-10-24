@@ -1442,26 +1442,21 @@ def endpoint_controlpanel():
 
 
 
-
-
 def timer(minutes, seconds):
     finishedSound = "formapp/sfx_success01.wav"
     while True:
-        print(minutes, seconds)
+        print(minutes,":", seconds)
         time.sleep(1)
         seconds = seconds - 1
         if seconds < 0:
             minutes = minutes - 1
-            seconds = 3
+            seconds = 59
             if minutes == 0:
-                seconds = 3
+                seconds = 59
         if minutes < 0:
             print("FINISHED")
             playsound(finishedSound)
             break
-
-
-
 
 
 @app.route('/countdown', methods=['GET', 'POST'])
@@ -1470,13 +1465,7 @@ def endpoint_countdown():
     getSeconds = int(request.form.get('seconds'))
     getMinutes = int(getMinutes)
     getSeconds = int(getSeconds)
-
-
-    c1 = getMinutes
-    c2 = getSeconds
-
-
-    timer(c1, c2)
+    timer(getMinutes, getSeconds)
     return render_template("countdown.html")
   
 

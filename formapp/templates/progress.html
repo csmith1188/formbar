@@ -22,7 +22,7 @@
     function sendCheck(el) {
         let request = new XMLHttpRequest();
         request.open("GET", '/progress?check=' + el.value);
-        request.onload = function() {
+        request.onload = function () {
             // console.log(request.response);
         };
         request.send();

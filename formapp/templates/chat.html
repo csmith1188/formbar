@@ -674,6 +674,7 @@
     chatSocket.emit("disconnect_request");
   }
 
+
   function dateString(time) {
     let date = new Date(time);
     let month = date.getMonth() + 1;
@@ -687,6 +688,7 @@
     } else {
       if (hour == 0) hour = 12;
       ampm = "AM";
+
     }
     return `${month}/${day}/${year} ${hour}:${minute} ${ampm}`;
   }

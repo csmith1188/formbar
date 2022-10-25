@@ -745,9 +745,15 @@
             if (student['help'].type) icons += `<img src="{{ url_for('static', filename='img/controlpanel/help.png') }}" class="icon" title="Help ticket">`;
 
             if (student['complete']) icons += `<img src="{{ url_for('static', filename='img/controlpanel/complete.png') }}" class="icon" title="Complete">`;
-
-            newStudent.innerHTML = pictureIcon + icons + student.name;
             
+            //Show tags if student has any
+              let tags = `<span style="font-weight: lighter; font-size: 13px;" >${student['tags']}</span>`
+
+
+            
+            
+            newStudent.innerHTML = pictureIcon + icons + student.name + ' ' + tags;
+
             let newDetails = document.createElement('span');
             newDetails.classList.add('user');
             cleanText = student.essay.replace(/<|>/gi, "")

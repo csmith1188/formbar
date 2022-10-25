@@ -29,7 +29,7 @@
         let nextRow = document.createElement('li')
         nextRow.innerHTML = `<h3>${quiz.questions[i]}</h3>`
         quiz.answers[i].forEach((answer, j) => {
-            nextRow.innerHTML += `<input type="radio" id="question_${i}_${j}" name="answer_${i}" value="${j+1}" required><label for="question_${i}_${j}">${answer}</label><br>`
+            nextRow.innerHTML += `<input type="radio" id="question_${i}_${j}" name="answer_${i}" value="${j + 1}" required><label for="question_${i}_${j}">${answer}</label><br>`
         });
         listString.appendChild(nextRow)
     }

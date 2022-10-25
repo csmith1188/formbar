@@ -2665,7 +2665,6 @@ def endpoint_updateuser():
         return loginResult
     else:
         try:
-            print(request.form['data'])
             field = request.args.get("field")
             value = request.args.get("value")
             username = request.args.get("name") or sD.studentDict[request.remote_addr]['name']

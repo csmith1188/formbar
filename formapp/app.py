@@ -249,16 +249,6 @@ def newStudent(remote, username, bot=False):
         db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
         dbcmd = db.cursor()
         userFound = dbcmd.execute("SELECT * FROM users WHERE username=:uname", {"uname": username}).fetchall()
-        #Checks if any special characters are in username
-        auth = dbcmd.execute("SELECT username FROM users").fetchall()
-        regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
-        for users in auth:
-        #Checks if username has no special characters    
-            if (regex.search(username) == None):
-                print("Vaild")
-            else:
-                print("Invaild: " + username + " has special characters")
-                dbcmd.execute("DELETE FROM users WHERE username = '{username}'")
         for user in userFound:
             if username in user:
                 if not teacher:

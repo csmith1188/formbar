@@ -41,7 +41,6 @@ from threading import Lock
 from werkzeug.utils import secure_filename
 from websocket_server import WebsocketServer
 from cryptography.fernet import Fernet
-from playsound import playsound
 import pandas, json, csv
 import random, sys, os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
@@ -339,7 +338,7 @@ def playSFX(sound):
     except Exception as e:
         logFile("Error", + e)
         return "Invalid format: "
-
+playSFX('sfx_success01.wav')
 def stopSFX():
     pygame.mixer.Sound.stop()
 
@@ -813,6 +812,22 @@ def loginCheck(remAdd, perm=False):
         return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
     else:
         return False
+
+def timer(minutes, seconds):
+    finishedSound = "formapp/sfx_success01.wav"
+    while True:
+        print(minutes,":", seconds)
+        time.sleep(1)
+        seconds = seconds - 1
+        if seconds < 0:
+            minutes = minutes - 1
+            seconds = 59
+            if minutes == 0:
+                seconds = 59
+        if minutes < 0:
+            print("FINISHED")
+            playSFX(finishedSound)
+            break
 
 # ███████ ███    ██ ██████  ██████   ██████  ██ ███    ██ ████████ ███████
 # ██      ████   ██ ██   ██ ██   ██ ██    ██ ██ ████   ██    ██    ██
@@ -1439,25 +1454,6 @@ def endpoint_controlpanel():
             playSFX("sfx_pickup01")
             resString += ""
             return render_template("message.html", message = resString)
-
-
-
-def timer(minutes, seconds):
-    finishedSound = "formapp/sfx_success01.wav"
-    while True:
-        print(minutes,":", seconds)
-        time.sleep(1)
-        seconds = seconds - 1
-        if seconds < 0:
-            minutes = minutes - 1
-            seconds = 59
-            if minutes == 0:
-                seconds = 59
-        if minutes < 0:
-            print("FINISHED")
-            playsound(finishedSound)
-            break
-
 
 @app.route('/countdown', methods=['GET', 'POST'])
 def endpoint_countdown():

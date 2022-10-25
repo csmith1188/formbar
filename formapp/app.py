@@ -338,6 +338,9 @@ def playSFX(sound):
     except Exception as e:
         logFile("Error", + e)
         return "Invalid format: "
+    
+playSFX("formbar/formbar/formapp/sfx_success01.wav")    
+
 def stopSFX():
     pygame.mixer.Sound.stop()
 
@@ -825,7 +828,7 @@ def timer(minutes, seconds):
                 seconds = 59
         if minutes < 0:
             print("FINISHED")
-            playSFX(finishedSound)
+            #playSFX(finishedSound)
             break
 
 # ███████ ███    ██ ██████  ██████   ██████  ██ ███    ██ ████████ ███████

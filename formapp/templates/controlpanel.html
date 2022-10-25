@@ -708,8 +708,9 @@
             if (student['complete']) icons += `<img src="{{ url_for('static', filename='img/controlpanel/complete.png') }}" class="icon" title="Complete">`;
             
             //Show tags if student has any
-            let tags = `<span style="font-weight: lighter; font-size: 13px;" >${student['tags']}</span>`
+              let tags = `<span style="font-weight: lighter; font-size: 13px;" >${student['tags']}</span>`
 
+            
             
             newStudent.innerHTML = pictureIcon + icons + student.name + ' ' + tags;
             let newDetails = document.createElement('span');

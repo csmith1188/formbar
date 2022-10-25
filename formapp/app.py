@@ -3069,13 +3069,6 @@ def ttt(message):
         logFile("Error", str(e))
 
 
-@socket_.on('chat', namespace=chatnamespace)
-def sound():
-    try:
-        print('work')
-    except Exception as e:
-        print("[error] " + 'Error: ' + str(e))
-
 # ███████ ██ ███    ██  █████  ██          ██████   ██████   ██████  ████████
 # ██      ██ ████   ██ ██   ██ ██          ██   ██ ██    ██ ██    ██    ██
 # █████   ██ ██ ██  ██ ███████ ██          ██████  ██    ██ ██    ██    ██

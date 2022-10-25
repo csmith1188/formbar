@@ -75,7 +75,6 @@
     let users = "{{ users }}".replaceAll("&#39;", "'").replaceAll("(", "[").replaceAll(")", "]").replaceAll("b'", "'").replaceAll("None", null);
     users = eval(users);
     let permNames = ['Teacher', 'Mod', 'Student', 'Guest'];
-    let tagNames = ['12th/Senior', '11th/Junior'];
     let usersBox = document.getElementById("users");
 
     usersBox.innerHTML = "";
@@ -110,12 +109,7 @@
             <option value="/updateuser?name=${user[1]}&field=permissions&value=3" ${userPerms === 3 ? "selected" : ""}>${permNames[3]}</option>
             </select>
         `;
-        let userTags = user[3];
-        newDetails.innerHTML += `
-            <select onchange="updateTag(this)" id="userTagsDrop" name="userTagsDrop">
-            <option value="/updateuser?name=${user[1]}&field=tags&value=0" ${userTags === 0 ? "selected" : ""}>${tagNames[0]}</option>
-            <option value="/updateuser?name=${user[1]}&field=tags&value=1" ${userTags === 1 ? "selected" : ""}>${tagNames[1]}</option>
-        `;
+       
         usersBox.appendChild(newStudent)
         usersBox.appendChild(newDetails)
         let name = user[1];

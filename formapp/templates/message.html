@@ -12,7 +12,7 @@
 <style>
   .ui-button.ui-corner-all.ui-widget.ui-button-icon-only.ui-dialog-titlebar-close {
     display: none;
-  }
+}
 </style>
 {{ style|safe }}{% endblock %}
 
@@ -35,22 +35,22 @@
 <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
 <script>
-  $(function () {
-    $("#dialog").dialog({
-      autoOpen: true
-    });
-    $(".selector").on("dialogclose", function (event, ui) { });
+$( function() {
+  $( "#dialog" ).dialog({
+    autoOpen: true
   });
+  $( ".selector" ).on( "dialogclose", function( event, ui ) {} );
+  } );
   function finish() {
-    let forward = "{{ forward }}";
-    let lastPage = document.referrer && new URL(document.referrer);
-    if (forward) location.href = forward;
-    else if (!lastPage || (lastPage.pathname == "/login" && window.location.pathname != "/login")) location.href = "/";
-    else window.history.back();
+  let forward = "{{ forward }}";
+  let lastPage = document.referrer && new URL(document.referrer);
+  if (forward) location.href = forward;
+  else if (!lastPage || (lastPage.pathname == "/login" && window.location.pathname != "/login")) location.href = "/";
+  else window.history.back();
   }
 </script>
 </script>
-<!-- <script>
+  <!-- <script>
     let message = "{{ message }}";
     
 

@@ -10,72 +10,70 @@
 <!-- Extra style declarations here -->
 {% block style %}
 <style>
-    #content {
-        width: 600px;
-        text-align: center;
-    }
+  #content {
+    width: 600px;
+    text-align: center;
+  }
 
-    .container1-flex {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-around;
-    }
+  .container1-flex {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+  }
 
-    .container2-flex {
-        display: flex;
-        justify-content: space-around;
-        flex-grow: 1;
-    }
+  .container2-flex {
+      display: flex;
+      justify-content: space-around;
+      flex-grow: 1;
+  }
 
 
-    .bigbutton,
-    .smallbutton {
-        margin: auto;
-        padding: 10px;
-        width: 100px;
-        height: 100px;
-        border-radius: 20px;
-        border: 2px solid var(--bg-dark-blue);
-        background-color: var(--dark-gray);
-        font-size: 1.2em;
-        font-weight: bolder;
-        text-align: center;
-        box-shadow: 8px 8px var(--dark-gray);
-        cursor: pointer;
-    }
+  .bigbutton, .smallbutton {
+      margin: auto;
+      padding: 10px;
+      width: 100px;
+      height: 100px;
+      border-radius: 20px;
+      border: 2px solid var(--bg-dark-blue);
+      background-color: var(--dark-gray);
+      font-size: 1.2em;
+      font-weight: bolder;
+      text-align: center;
+      box-shadow: 8px 8px var(--dark-gray);
+      cursor: pointer;
+  }
 
-    .smallbutton {
-        width: 25px;
-        height: 25px;
-        border-radius: 10px;
-        font-size: 0.6em;
-    }
+  .smallbutton {
+    width: 25px;
+    height: 25px;
+    border-radius: 10px;
+    font-size: 0.6em;
+  }
 
-    .bigbutton a {
-        margin: auto;
-        vertical-align: middle;
-    }
+  .bigbutton a {
+    margin: auto;
+    vertical-align: middle;
+  }
 
-    .bb-green {
-        background-color: #bfb;
-    }
+  .bb-green {
+      background-color: #bfb;
+  }
 
-    .bb-yellow {
-        background-color: #ffb;
-    }
+  .bb-yellow {
+      background-color: #ffb;
+  }
 
-    .bb-blue {
-        background-color: #bff;
-    }
+  .bb-blue {
+      background-color: #bff;
+  }
 
-    .bb-red {
-        background-color: #fbb;
-    }
+  .bb-red {
+      background-color: #fbb;
+  }
 
-    .bigbutton:hover,
-    .smallbutton:hover {
-        background-color: #ffffff;
-    }
+  .bigbutton:hover, .smallbutton:hover {
+      background-color: #ffffff;
+  }
 </style>
 {% endblock %}
 
@@ -118,35 +116,35 @@
 </div>
 <h2>Essay</h2>
 <div class="container1-flex">
-    <form action="/essay" method="POST" style="text-align: center;">
-        <textarea name="essay" id="essay" rows="4" cols="40" placeholder="Type your essay here"></textarea><br><br>
-        <input type="submit" class="button">
-    </form>
+  <form action="/essay" method="POST" style="text-align: center;">
+    <textarea name="essay" id="essay" rows="4" cols="40" placeholder="Type your essay here"></textarea><br><br>
+    <input type="submit" class="button">
+  </form>
 </div>
 <h2>Other</h2>
 <div class="container1-flex" style="width: 50%; transform: translateX(50%);">
-    <div class="bigbutton bb-red" onclick="window.location = '/help';">
-        Help!<br>(/help)
-    </div>
-    <div class="bigbutton bb-yellow" onclick="window.location = '/break';">
-        Bathroom!<br>(/break)
-    </div>
+  <div class="bigbutton bb-red" onclick="window.location = '/help';">
+      Help!<br>(/help)
+  </div>
+  <div class="bigbutton bb-yellow" onclick="window.location = '/break';">
+      Bathroom!<br>(/break)
+  </div>
 </div>
 
 <script>
-    document.getElementById('essay').addEventListener('keydown', function (keyboard) {
-        if (keyboard.key == 'Tab') {
-            console.log("tab was pressed")
-            keyboard.preventDefault();
-            var start = this.selectionStart;
-            var end = this.selectionEnd;
+     document.getElementById('essay').addEventListener('keydown', function(keyboard) {
+      if (keyboard.key == 'Tab') {
+        console.log("tab was pressed")
+        keyboard.preventDefault();
+        var start = this.selectionStart;
+        var end = this.selectionEnd;
 
-            this.value = this.value.substring(0, start) +
-                "\t" + this.value.substring(end);
+        this.value = this.value.substring(0, start) +
+          "\t" + this.value.substring(end);
 
-            this.selectionStart =
-                this.selectionEnd = start + 1;
-        };
+        this.selectionStart =
+          this.selectionEnd = start + 1;
+      };
     });
 </script>
 {% endblock %}

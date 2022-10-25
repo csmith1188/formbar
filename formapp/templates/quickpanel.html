@@ -69,8 +69,7 @@
     color: white;
   }
 
-  #studentPanel,
-  #teacherPanel {
+  #studentPanel, #teacherPanel {
     position: absolute;
     width: 100%;
     left: 0;
@@ -78,8 +77,7 @@
     text-align: center;
   }
 
-  #thumbs,
-  #letters {
+  #thumbs, #letters {
     width: 480px;
     display: flex;
     justify-content: space-between;
@@ -135,8 +133,7 @@
     margin: 0 0 4px;
   }
 
-  #teacherPanel button,
-  #teacherPanel select {
+  #teacherPanel button, #teacherPanel select {
     font-size: 20px;
     margin: 8px 4px;
   }
@@ -159,271 +156,260 @@
 
 <!-- Main content here -->
 {% block main %}
-<div id="topButtons" class="hidden">
-  <button id="panelButton"></button>
-  <button id="chatButton"><b id="newMessages" style="margin: 0;"></b> Chat</button>
-</div>
+  <div id="topButtons" class="hidden">
+    <button id="panelButton"></button>
+    <button id="chatButton"><b id="newMessages" style="margin: 0;"></b> Chat</button>
+  </div>
 
-<div id="studentPanel" class="hidden">
-  <h1 id="pollName"></h1>
-  <div id="thumbs" class="hidden">
-    <img src="{{ url_for('static', filename='img/basic/thumbButton0.png') }}" id="thumbButton0"
-      class="thumbButton button inline popOut moreDepth greenColor" title="Up" onclick="thumbsVote(0);" tabindex="0">
-    <img src="{{ url_for('static', filename='img/basic/thumbButton1.png') }}" id="thumbButton1"
-      class="thumbButton button inline popOut moreDepth cyanColor" title="Wiggle" onclick="thumbsVote(1);" tabindex="0">
-    <img src="{{ url_for('static', filename='img/basic/thumbButton2.png') }}" id="thumbButton2"
-      class="thumbButton button inline popOut moreDepth redColor" title="Down" onclick="thumbsVote(2);" tabindex="0">
-  </div>
-  <div id="letters" class="hidden">
-    <img src="{{ url_for('static', filename='img/basic/letterButton0.png') }}" id="letterButton0"
-      class="letterButton button inline popOut moreDepth redColor" title="Vote A" onclick="letterVote(0);" tabindex="0">
-    <img src="{{ url_for('static', filename='img/basic/letterButton1.png') }}" id="letterButton1"
-      class="letterButton button inline popOut moreDepth blueColor" title="Vote B" onclick="letterVote(1);"
-      tabindex="0">
-    <img src="{{ url_for('static', filename='img/basic/letterButton2.png') }}" id="letterButton2"
-      class="letterButton button inline popOut moreDepth yellowColor" title="Vote C" onclick="letterVote(2);"
-      tabindex="0">
-    <img src="{{ url_for('static', filename='img/basic/letterButton3.png') }}" id="letterButton3"
-      class="letterButton button inline popOut moreDepth greenColor" title="Vote D" onclick="letterVote(3);"
-      tabindex="0">
-  </div>
-  <div id="textBox" class="hidden">
-    <textarea id="essay" placeholder="Type your essay here" oninput="checkEssay();"></textarea><br>
-    <button id="submitEssay" class="inline popOut unselectable">Submit</button>
-  </div>
-  <h2 id="noPoll">There is no poll right now.</h2>
-  <br><br>
-  <h1>Other</h1>
-  <div id="other">
-    <button id="help" class="inline popOut moreDepth" title="Send the teacher a help ticket">Help!</button>
-    <button id="break" class="inline popOut moreDepth" title="Request a bathroom break">Bathroom!</button>
-  </div>
-</div>
-
-<div id="teacherPanel" class="hidden">
-  <div>
-    <h1>Mode</h1>
-    <select id="mode" onchange="changeMode();">
-      <option>Poll</option>
-      <option>Progress</option>
-      <option>Playtime</option>
-    </select><br>
-    <div id="newPoll" class="hidden">New poll:
-      <button class="inline popOut" onclick="startPoll('tutd')">Thumbs</button>
-      <button class="inline popOut" onclick="startPoll('abcd')">Letters</button>
-      <button class="inline popOut" onclick="startPoll('text')">Essay</button><br>
-      <span id="textLink" class="hidden">Click <a href="/advanced?page=users">here</a> to see essays</span>
+  <div id="studentPanel" class="hidden">
+    <h1 id="pollName"></h1>
+    <div id="thumbs" class="hidden">
+      <img src="{{ url_for('static', filename='img/basic/thumbButton0.png') }}" id="thumbButton0" class="thumbButton button inline popOut moreDepth greenColor" title="Up" onclick="thumbsVote(0);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/basic/thumbButton1.png') }}" id="thumbButton1" class="thumbButton button inline popOut moreDepth cyanColor" title="Wiggle" onclick="thumbsVote(1);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/basic/thumbButton2.png') }}" id="thumbButton2" class="thumbButton button inline popOut moreDepth redColor" title="Down" onclick="thumbsVote(2);" tabindex="0">
+    </div>
+    <div id="letters" class="hidden">
+      <img src="{{ url_for('static', filename='img/basic/letterButton0.png') }}" id="letterButton0" class="letterButton button inline popOut moreDepth redColor" title="Vote A" onclick="letterVote(0);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/basic/letterButton1.png') }}" id="letterButton1" class="letterButton button inline popOut moreDepth blueColor" title="Vote B" onclick="letterVote(1);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/basic/letterButton2.png') }}" id="letterButton2" class="letterButton button inline popOut moreDepth yellowColor" title="Vote C" onclick="letterVote(2);" tabindex="0">
+      <img src="{{ url_for('static', filename='img/basic/letterButton3.png') }}" id="letterButton3" class="letterButton button inline popOut moreDepth greenColor" title="Vote D" onclick="letterVote(3);" tabindex="0">
+    </div>
+    <div id="textBox" class="hidden">
+      <textarea id="essay" placeholder="Type your essay here" oninput="checkEssay();"></textarea><br>
+      <button id="submitEssay" class="inline popOut unselectable">Submit</button>
+    </div>
+    <h2 id="noPoll">There is no poll right now.</h2>
+    <br><br>
+    <h1>Other</h1>
+    <div id="other">
+      <button id="help" class="inline popOut moreDepth" title="Send the teacher a help ticket">Help!</button>
+      <button id="break" class="inline popOut moreDepth" title="Request a bathroom break">Bathroom!</button>
     </div>
   </div>
-  <br><br>
-  <div>
-    <h1>Help tickets</h1>
-    <span id="ticketsText"></span><br>
-  </div>
-  <br><br>
-  <div>
-    <h1>Users</h1>
-    <span id="usersText"></span><br>
-  </div>
-  <br><br>
-  <button class="inline popOut" onclick="window.open('/advanced?page=controlpanel');">Go to the control panel
-    🡆</button>
-</div>
 
-<iframe src="/chat" id="chat" class="hidden"></iframe>
+  <div id="teacherPanel" class="hidden">
+    <div>
+      <h1>Mode</h1>
+      <select id="mode" onchange="changeMode();">
+        <option>Poll</option>
+        <option>Progress</option>
+        <option>Playtime</option>
+      </select><br>
+      <div id="newPoll" class="hidden">New poll:
+        <button class="inline popOut" onclick="startPoll('tutd')">Thumbs</button>
+        <button class="inline popOut" onclick="startPoll('abcd')">Letters</button>
+        <button class="inline popOut" onclick="startPoll('text')">Essay</button><br>
+        <span id="textLink" class="hidden">Click <a href="/advanced?page=users">here</a> to see essays</span>
+      </div>
+    </div>
+    <br><br>
+    <div>
+      <h1>Help tickets</h1>
+      <span id="ticketsText"></span><br>
+    </div>
+    <br><br>
+    <div>
+      <h1>Users</h1>
+      <span id="usersText"></span><br>
+    </div>
+    <br><br>
+    <button class="inline popOut" onclick="window.open('/advanced?page=controlpanel');">Go to the control panel 🡆</button>
+  </div>
 
-<div id="banner">
-  <div id="bannerLeft" onclick="window.location = '/advanced';">Go to the advanced homepage to use all features</div>
-  <div id="bannerRight" onclick="window.location = '/setdefault';">Set default</div>
-</div>
+  <iframe src="/chat" id="chat" class="hidden"></iframe>
+
+  <div id="banner">
+    <div id="bannerLeft" onclick="window.location = '/advanced';">Go to the advanced homepage to use all features</div>
+    <div id="bannerRight" onclick="window.location = '/setdefault';">Set default</div>
+  </div>
 {% endblock %}
 
 <!-- Extra JavaScript here -->
 {% block script %}
 <script src="{{ url_for('static', filename='js/home.js') }}"></script>
-<script>
-  let visibleSection;
+  <script>
+    let visibleSection;
 
-  function init() {
-    showPanel();
-    updateVotes();
-    checkForPoll();
-    checkForHelpTicket();
-    updateMode();
-    usersText();
-    ticketsText();
-  };
-  getApiData(true);
+    function init() {
+      showPanel();
+      updateVotes();
+      checkForPoll();
+      checkForHelpTicket();
+      updateMode();
+      usersText();
+      ticketsText();
+    };
+    getApiData(true);
 
-  function update() {
-    checkIfRemoved();
-    updateVotes();
-    checkForPoll();
-    checkForHelpTicket();
-    updateMode();
-    usersText();
-    ticketsText();
-  };
-  setInterval(getApiData, 1000);
+    function update() {
+      checkIfRemoved();
+      updateVotes();
+      checkForPoll();
+      checkForHelpTicket();
+      updateMode();
+      usersText();
+      ticketsText();
+    };
+    setInterval(getApiData, 1000);
 
-  function showPanel() {
-    let button = document.getElementById("panelButton");
-    let container = document.getElementById("topButtons");
-    if (meRes.perms == permsRes.teacher) {
-      container.classList.add("teacher");
-      button.innerText = "Teacher panel";
-      button.onclick = () => showSection("teacherPanel");
-      showSection("teacherPanel");
-    } else {
-      button.innerText = "Student panel";
-      button.onclick = () => showSection("studentPanel");
-      showSection("studentPanel");
-    }
-    container.classList.remove("hidden");
-  }
-
-  function showSection(toShow) {
-    ["studentPanel", "teacherPanel", "chat"].forEach(section => {
-      let cl = document.getElementById(section).classList;
-      section == toShow ? cl.remove("hidden") : cl.add("hidden");
-    });
-
-    if (toShow == "studentPanel" || toShow == "teacherPanel") {
-      document.getElementById("panelButton").classList.add("pressed");
-      document.getElementById("chatButton").classList.remove("pressed");
-    } else {
-      document.getElementById("panelButton").classList.remove("pressed");
-      document.getElementById("chatButton").classList.remove("pressed");
-      document.getElementById(toShow + "Button").classList.add("pressed");
+    function showPanel() {
+      let button = document.getElementById("panelButton");
+      let container = document.getElementById("topButtons");
+      if (meRes.perms == permsRes.teacher) {
+        container.classList.add("teacher");
+        button.innerText = "Teacher panel";
+        button.onclick = () => showSection("teacherPanel");
+        showSection("teacherPanel");
+      } else {
+        button.innerText = "Student panel";
+        button.onclick = () => showSection("studentPanel");
+        showSection("studentPanel");
+      }
+      container.classList.remove("hidden");
     }
 
-    if (toShow == "chat") {
-      document.body.classList.remove("light");
-      document.body.classList.add("blue");
-      document.title = "Formbar Quick Panel";
-      document.getElementById("newMessages").innerText = null;
-      newMessages = 0;
-    } else {
-      document.body.classList.remove("blue");
-      document.body.classList.add("light");
+    function showSection(toShow) {
+      ["studentPanel", "teacherPanel", "chat"].forEach(section => {
+        let cl = document.getElementById(section).classList;
+        section == toShow ? cl.remove("hidden") : cl.add("hidden");
+      });
+
+      if (toShow == "studentPanel" || toShow == "teacherPanel") {
+        document.getElementById("panelButton").classList.add("pressed");
+        document.getElementById("chatButton").classList.remove("pressed");
+      } else {
+        document.getElementById("panelButton").classList.remove("pressed");
+        document.getElementById("chatButton").classList.remove("pressed");
+        document.getElementById(toShow + "Button").classList.add("pressed");
+      }
+
+      if (toShow == "chat") {
+        document.body.classList.remove("light");
+        document.body.classList.add("blue");
+        document.title = "Formbar Quick Panel";
+        document.getElementById("newMessages").innerText = null;
+        newMessages = 0;
+      } else {
+        document.body.classList.remove("blue");
+        document.body.classList.add("light");
+      }
+
+      visibleSection = toShow;
     }
 
-    visibleSection = toShow;
-  }
+    document.getElementById("chatButton").onclick = () => showSection("chat");
 
-  document.getElementById("chatButton").onclick = () => showSection("chat");
+    document.getElementById("help").onclick = requestHelp;
+    document.getElementById("break").onclick = requestBreak;
 
-  document.getElementById("help").onclick = requestHelp;
-  document.getElementById("break").onclick = requestBreak;
-
-  function checkForPoll() {
-    let mode = modeRes.mode;
-    let myPerms = meRes.perms;
-    let studentPerms = permsRes.student;
-    let pollName = document.getElementById("pollName");
-    let thumbs = document.getElementById("thumbs");
-    let letters = document.getElementById("letters");
-    let textBox = document.getElementById("textBox");
-    let noPoll = document.getElementById("noPoll");
-    if (mode == "tutd" || mode == "abcd" || mode == "text") {
-      if (myPerms == studentPerms) {
-        noPoll.classList.add("hidden");
-        if (mode == "tutd") {
-          thumbs.classList.remove("hidden");
-          pollName.innerText = "Poll: thumbs";
+    function checkForPoll() {
+      let mode = modeRes.mode;
+      let myPerms = meRes.perms;
+      let studentPerms = permsRes.student;
+      let pollName = document.getElementById("pollName");
+      let thumbs = document.getElementById("thumbs");
+      let letters = document.getElementById("letters");
+      let textBox = document.getElementById("textBox");
+      let noPoll = document.getElementById("noPoll");
+      if (mode == "tutd" || mode == "abcd" || mode == "text") {
+        if (myPerms == studentPerms) {
+          noPoll.classList.add("hidden");
+          if (mode == "tutd") {
+            thumbs.classList.remove("hidden");
+            pollName.innerText = "Poll: thumbs";
+          } else {
+            thumbs.classList.add("hidden");
+          }
+          if (mode == "abcd") {
+            letters.classList.remove("hidden");
+            pollName.innerText = "Poll: letters";
+          } else {
+            letters.classList.add("hidden");
+          }
+          if (mode == "text") {
+            textBox.classList.remove("hidden");
+            pollName.innerText = "Poll: Essay";
+          } else {
+            textBox.classList.add("hidden");
+          }
         } else {
-          thumbs.classList.add("hidden");
-        }
-        if (mode == "abcd") {
-          letters.classList.remove("hidden");
-          pollName.innerText = "Poll: letters";
-        } else {
-          letters.classList.add("hidden");
-        }
-        if (mode == "text") {
-          textBox.classList.remove("hidden");
-          pollName.innerText = "Poll: Essay";
-        } else {
-          textBox.classList.add("hidden");
+          pollName.innerText = "Poll";
+          noPoll.innerText = "Only students can vote in polls.";
+          noPoll.classList.remove("hidden");
         }
       } else {
         pollName.innerText = "Poll";
-        noPoll.innerText = "Only students can vote in polls.";
         noPoll.classList.remove("hidden");
       }
-    } else {
-      pollName.innerText = "Poll";
-      noPoll.classList.remove("hidden");
     }
-  }
 
-  function updateMode() {
-    let mode = modeRes.mode;
-    let el = document.getElementById("mode");
-    let ns = document.getElementById("newPoll").classList;
-    let tl = document.getElementById("textLink").classList;
-    if (el != document.activeElement) {
-      ns.add("hidden");
-      tl.add("hidden");
-      switch (mode) {
-        case "text":
-          tl.remove("hidden");
-        case "poll":
-        case "tutd":
-        case "abcd":
-          el.value = "Poll";
-          ns.remove("hidden");
-          break;
-        case "progress":
-          el.value = "Progress";
-          break;
-        case "playtime":
-          el.value = "Playtime";
+    function updateMode() {
+      let mode = modeRes.mode;
+      let el = document.getElementById("mode");
+      let ns = document.getElementById("newPoll").classList;
+      let tl = document.getElementById("textLink").classList;
+      if (el != document.activeElement) {
+        ns.add("hidden");
+        tl.add("hidden");
+        switch (mode) {
+          case "text":
+            tl.remove("hidden");
+          case "poll":
+          case "tutd":
+          case "abcd":
+            el.value = "Poll";
+            ns.remove("hidden");
+            break;
+          case "progress":
+            el.value = "Progress";
+            break;
+          case "playtime":
+            el.value = "Playtime";
+        }
+      } else if (el.value == "Poll") {
+        ns.remove("hidden");
+      } else {
+        ns.add("hidden");
       }
-    } else if (el.value == "Poll") {
-      ns.remove("hidden");
-    } else {
-      ns.add("hidden");
     }
-  }
 
-  function changeMode() {
-    let newMode = document.getElementById("mode").value;
-    switch (newMode) {
-      case "Poll":
-        request.open("GET", "/controlpanel?barmode=poll");
-        break;
-      case "Progress":
-        request.open("GET", "/controlpanel?barmode=progress");
-        break;
-      case "Playtime":
-        request.open("GET", "/controlpanel?barmode=playtime");
+    function changeMode() {
+      let newMode = document.getElementById("mode").value;
+      switch (newMode) {
+        case "Poll":
+          request.open("GET", "/controlpanel?barmode=poll");
+          break;
+        case "Progress":
+          request.open("GET", "/controlpanel?barmode=progress");
+          break;
+        case "Playtime":
+          request.open("GET", "/controlpanel?barmode=playtime");
+      }
+      request.send();
+      updateMode();
     }
-    request.send();
-    updateMode();
-  }
 
-  function startPoll(type) {
-    request.open("GET", "/startpoll?type=" + type);
-    request.send();
-  }
-
-  chatSocket.on("message", message => {
-    if (document.hidden || visibleSection != "chat") {
-      let data = JSON.parse(message);
-      newMessages++;
-      document.title = `(${newMessages}) Formbar Quick Panel`;
-      if (visibleSection != "chat") document.getElementById("newMessages").innerText = "(" + newMessages + ")";
+    function startPoll(type) {
+      request.open("GET", "/startpoll?type=" + type);
+      request.send();
     }
-  });
 
-  //When user goes to this page, if chat is open, remove number of new messages from title
-  document.addEventListener("visibilitychange", () => {
-    if (!document.hidden && visibleSection == "chat") {
-      document.title = "Formbar Quick Panel";
-      document.getElementById("newMessages").innerText = null;
-      newMessages = 0;
-    }
-  });
-</script>
+    chatSocket.on("message", message => {
+      if (document.hidden || visibleSection != "chat") {
+        let data = JSON.parse(message);
+        newMessages++;
+        document.title = `(${newMessages}) Formbar Quick Panel`;
+        if (visibleSection != "chat") document.getElementById("newMessages").innerText = "(" + newMessages + ")";
+      }
+    });
+
+    //When user goes to this page, if chat is open, remove number of new messages from title
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden && visibleSection == "chat") {
+        document.title = "Formbar Quick Panel";
+        document.getElementById("newMessages").innerText = null;
+        newMessages = 0;
+      }
+    });
+  </script>
 {% endblock %}

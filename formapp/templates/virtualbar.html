@@ -75,19 +75,27 @@
       }
     }
     pixRequest.send(null);
-
-    //Update the virtual bar's text
-    let textRequest = new XMLHttpRequest();
-    textRequest.open("GET", '/api/phrase');
-    textRequest.onload = () => {
-      let phraseRes = JSON.parse(textRequest.responseText);
-      let phrase = phraseRes.phrase;
-      let text = document.getElementById("text");
-      text.innerText = phrase;
-      ////To do: update color
+    
+      //Update the virtual bar's text
+      
+      let textRequest = new XMLHttpRequest();
+      textRequest.open("GET", '/api/phrase');
+      textRequest.onload = () => {
+        let phraseRes = JSON.parse(textRequest.responseText);
+        let phrase = phraseRes.phrase;
+        let text = document.getElementById("text");
+        text.innerText = phrase;
+        ////To do: update color
+      }
     }
     textRequest.send(null);
   }
+
+    // When the page needs to refresh, send a signal to chat which will then refresh everyone's page
+    chatSocket.on("sessionUpdate", message => {
+      console.log(message);
+      location.reload();
+    });
 
   update();
   setInterval(update, 1000);

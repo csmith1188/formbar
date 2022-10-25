@@ -40,7 +40,7 @@
     font-size: 14px;
     line-height: 14px;
     text-align: right;
-  	background-size: 200% 200%;
+    background-size: 200% 200%;
     animation: fillBar 3s linear infinite;
   }
 
@@ -48,6 +48,7 @@
     0% {
       background-position: 100% 50%;
     }
+
     100% {
       background-position: 0% 50%;
     }
@@ -59,11 +60,11 @@
 {% block color %}red{% endblock %}
 
 {% block main %}
-  <div id="buttonContainer"></div>
+<div id="buttonContainer"></div>
 
-  <div id="data"></div>
+<div id="data"></div>
 
-  <div id="updateBar">Updating in <span id="timeLeft">3</span></div>
+<div id="updateBar">Updating in <span id="timeLeft">3</span></div>
 {% endblock %}
 
 <!-- Extra JavaScript here -->
@@ -113,5 +114,5 @@
   countdown();
   setInterval(update, 3000);
   setInterval(countdown, 1000);
-  </script>
+</script>
 {% endblock %}

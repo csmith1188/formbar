@@ -404,13 +404,6 @@
   updateStudents();
   setInterval(updateStudents, 1000);
   
-  let pollButton = document.getElementById("pollButton");
-  if (pollButton.value = "Start new poll"){
-    pollButton.onclick = startPoll
-  } else if (pollButton.value = "End poll"){
-    pollButton.onclick = endPoll
-  }
-  
   function changeMode(type) {
     if (document.getElementById("poll").checked) {
       let xhr = new XMLHttpRequest();
@@ -422,8 +415,10 @@
       document.getElementById("pollType").classList.add("hidden");
     }
     if (document.getElementById("progress").checked) {
-      request.open('GET', '/controlpanel?barmode=progress');
-      request.send();
+      let xhr = new XMLHttpRequest();
+      xhr.open("POST", "/controlpanel", true);
+      xhr.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
+      xhr.send(`barmode=progress`);
     }
     if (document.getElementById("countdown").checked) {
       document.getElementById("playtime").checked = true;
@@ -433,50 +428,59 @@
       document.getElementById("countdownTime").classList.add("hidden");
     }
     if (document.getElementById("playtime").checked) {
-      request.open('GET', '/controlpanel?barmode=playtime');
-      request.send();
+      let xhr = new XMLHttpRequest();
+      xhr.open("POST", "/controlpanel", true);
+      xhr.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
+      xhr.send(`barmode=playtime`);
     }
     if (document.getElementById("sendblock").checked) {
-      request.open('GET', '/controlpanel?barmode=sendblock');
-      request.send();
+      let xhr = new XMLHttpRequest();
+      xhr.open("POST", "/controlpanel", true);
+      xhr.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
+      xhr.send(`barmode=sendBlock`);
     }
   }
-
+  
   function changePollType() {
     if (document.getElementById("thumbs").checked) document.getElementById("pollDescription").innerText =
-      "Students can choose between thumbs up, thumbs down, and wiggle.";
+    "Students can choose between thumbs up, thumbs down, and wiggle.";
     else if (document.getElementById("letters").checked) document.getElementById("pollDescription").innerText =
-      "Students can choose between A, B, C, and D.";
+    "Students can choose between A, B, C, and D.";
     else if (document.getElementById("essay").checked) document.getElementById("pollDescription").innerHTML =
-      "Students will type out short answers. View essays in the \"Users\" section.";
+    "Students will type out short answers. View essays in the \"Users\" section.";
   }
-
+  
   function startPoll() {
     if (document.getElementById("thumbs").checked) {
       let xhr = new XMLHttpRequest();
       xhr.open("POST", "/startpoll", true);
       xhr.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
-      xhr.send(`type=thumb&prompt=${document.getElementById('pollPrompt').value}`);
+      xhr.send(`type=tutd&prompt=${document.getElementById('pollPrompt').value}`);
     } else if (document.getElementById("letters").checked) {
       let xhr = new XMLHttpRequest();
       xhr.open("POST", "/startpoll");
       xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-      xhr.send(`type=letter&prompt=${document.getElementById('pollPrompt').value}`);
+      xhr.send(`type=abcd&prompt=${document.getElementById('pollPrompt').value}`);
     } else if (document.getElementById("essay").checked) {
       let xhr = new XMLHttpRequest();
       xhr.open("POST", "/startpoll");
       xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-      xhr.send(`type=essay&prompt=${document.getElementById('pollPrompt').value}`);
+      xhr.send(`type=text&prompt=${document.getElementById('pollPrompt').value}`);
     }
-    pollButton.value = "End poll"
+    let pollButton = document.getElementById("pollButton");
+    pollButton.value = "End poll";
+    pollButton.onclick = endPoll;
   }
-
+  
   function endPoll() {
-    pollButton.value = "Start new poll"
     request.open('GET', '/endpoll');
     request.send();
-  }
 
+    let pollButton = document.getElementById("pollButton");
+    pollButton.value = "Start new poll";
+    pollButton.onclick = startPoll;
+  }
+  
   function resetPerms() {
     document.getElementById("saypermsDrop").value = "/controlpanel?say=2";
     document.getElementById("gamespermsDrop").value = "/controlpanel?games=2";

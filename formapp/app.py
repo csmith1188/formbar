@@ -224,7 +224,6 @@ def newStudent(remote, username, bot=False):
                 'time': None,
                 'message': ''
             },
-            'pollPrompt': '',
             'excluded': False,
             'preferredHomepage': None,
             'sid': ''
@@ -305,7 +304,8 @@ def refreshUsers(selectedStudent='', category=''):
 
 def changeMode(newMode='', direction='next'):
     clearString()
-    sD.pollType = None
+    sD.pollType = ''
+    sD.pollPrompt = ''
     # Clear answers
     for student in sD.studentDict:
         sD.studentDict[student]['thumb'] = ''
@@ -846,13 +846,11 @@ def updateStep():
         sD.wawdLink = sD.lesson.links[int(step['Prompt'])]['URL']
     elif step['Type'] == 'TUTD':
         sD.settings['barmode'] = 'tutd'
-        sD.activePrompt = step['Prompt']
     elif step['Type'] == 'Essay':
         sD.settings['barmode'] = 'essay'
-        sD.activePrompt = step['Prompt']
     elif step['Type'] == 'poll':
         sD.settings['barmode'] = 'poll'
-        sD.activeQuiz = sD.lesson.quizList[step['Prompt']]
+        sD.activeQuiz = sD.lesson.quizList[sD.pollPrompt]
         pollIndex = int(sD.activeQuiz['name'].split(' ', 1))
         sD.activePrompt = sD.activeQuiz['questions'][pollIndex]
     elif step['Type'] == 'Quiz':
@@ -2712,18 +2710,13 @@ def endpoint_startpoll():
     loginResult = loginCheck(request.remote_addr, 'mod')
     if loginResult:
         return loginResult
-    elif request.method == 'POST':
-        type = json.dumps(request.form['type'])
-        print(type)
-    if not request.form['type']:
-        return render_template("message.html", message = "You need a poll type.")
-    if not (type == 'thumb' or type == 'letter' or type == 'essay'):
-        return render_template("message.html", message = "Invalid poll type.")
-    elif request.form['type'] != '':
-        changeMode(type)
-        repeatMode()
-        sD.pollType = type
-        return render_template("message.html", message = 'Started a new ' + type + ' poll.')
+    
+    changeMode(request.form['type'])
+    repeatMode()
+    sD.pollPrompt = request.form['prompt']
+    sD.pollType = request.form['type']
+    sD.settings['barmode'] = request.form['type']
+    return render_template("message.html", message = 'Started a new ' + sD.pollType + ' poll.')
 
 # ████████
 #    ██
@@ -2766,11 +2759,7 @@ def endpoint_tutd():
     if loginResult:
         return loginResult
     else:
-        pollPrompt = ''
-        if request.method == 'POST':
-            pollPrompt = request.form['prompt']
-        elif pollPrompt == '':
-            pollPrompt = 'No prompt'
+        pollPrompt = sD.pollPrompt
         ip = request.remote_addr
         thumb = request.args.get('thumb')
         if thumb:

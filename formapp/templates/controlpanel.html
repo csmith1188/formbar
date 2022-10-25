@@ -8,7 +8,9 @@
 <!-- Extra style declarations here -->
 {% block style %}
 <style media="screen">
-  h2, h3, form {
+  h2,
+  h3,
+  form {
     margin: 0;
   }
 
@@ -19,18 +21,19 @@
   button {
     margin-right: 4px;
   }
+
   body {
     overflow-x: hidden;
   }
 
   .controls {
-    padding: 8px;
+    padding: 8px 8px 0;
     background: var(--bg-dark-highlight);
     margin-bottom: 16px;
   }
 
   .controls button {
-    margin: 0 4px;
+    margin: 0 8px 8px 0;
     font-size: 14px;
   }
 
@@ -43,7 +46,7 @@
     left: 21px;
   }
 
-  .user > * {
+  .user>* {
     max-width: calc(100% - 21px);
     overflow-wrap: break-word;
   }
@@ -68,7 +71,15 @@
     margin-right: 8px;
   }
 
-  #history > span, #history > b {
+  .permsIcon {
+    height: 1.2em;
+    display: inline-block;
+    vertical-align: text-bottom;
+    margin-right: 8px;
+  }
+
+  #history>span,
+  #history>b {
     display: inline-block;
     width: 100px;
     margin-top: 8px;
@@ -80,21 +91,26 @@
     justify-content: space-evenly;
     padding: 0;
   }
+
   #tabBox li {
     display: inline;
   }
+
   #tabBox a {
     text-decoration: none;
   }
+
   #permsContainer {
     display: flex;
     justify-content: space-evenly;
     flex-wrap: wrap;
   }
+
   .permBox {
     width: 50%;
     margin: 0px;
   }
+
   #resetPerms {
     display: block;
     margin: 32px auto 0;
@@ -135,6 +151,7 @@
       <button id="perms" class="sort">Permissions</button>
     </div>
     <button id="collapseButton" class="inline popOut hidden">Collapse all</button>
+
     <div id="students">
     </div>
 
@@ -143,8 +160,10 @@
   </div>
   <div id="tabs-2">
     <h2>Number of students</h2>
-    <input type="number" id="studentNum" class="line" onchange="sendStudents();" name="studentNum" min="1" max="30">&nbsp;&nbsp;
-    <input type="checkbox" id="autoStudents" checked onchange="sendStudents();"><label for="autoStudents">Auto</label><br>
+    <input type="number" id="studentNum" class="line" onchange="sendStudents();" name="studentNum" min="1"
+      max="30">&nbsp;&nbsp;
+    <input type="checkbox" id="autoStudents" checked onchange="sendStudents();"><label
+      for="autoStudents">Auto</label><br>
 
     <div onchange="changeMode();">
       <h2>Bar mode</h2>
@@ -161,14 +180,15 @@
         <input type="radio" id="letters" name="type" style="margin-left: 8px;"><label for="letters">Letters</label>
         <input type="radio" id="essay" name="type" style="margin-left: 8px;"><label for="essay">Essay</label><br>
         <span id="pollDescription">Students can choose between thumbs up, thumbs down, and wiggle</span><br>
-        <input type="button" id="pollButton" class="button inline popOut" value="Start new poll" style="margin-top: 8px;">
+        <input type="button" id="pollButton" class="button inline popOut" value="Start new poll"
+          style="margin-top: 8px;">
       </form>
       <br>
 
       <label>
         <div>
           <input type="radio" id="progress" name="mode">
-          <h3 style="display: inline;">Progess</h3><br>
+          <h3 style="display: inline;">Progress</h3><br>
           <span style="margin-left: 25px;">Description</span><br>
         </div>
       </label>
@@ -196,6 +216,14 @@
           <span style="margin-left: 25px;">Students can change the colors of the bar.</span><br>
         </div>
       </label>
+      <br>
+      <label>
+        <div>
+          <input type="radio" id="sendblock" name="mode">
+          <h3 style="display: inline;">Blockchest Mode</h3><br>
+          <span style="margin-left: 25px;">If you don't know, don't click it.</span><br>
+        </div>
+      </label>
     </div>
 
   </div>
@@ -208,7 +236,7 @@
     <div id="permsContainer">
       <div class="permBox">
         <h3>Chat</h3>
-        <select onchange="updatePerm(this)" id="saypermsDrop" name="saypermsDrop" style="margin-top: 8px;">
+        <select onchange="updatePerm(this);" id="saypermsDrop" name="saypermsDrop" style="margin-top: 8px;">
           <option value="/controlpanel?say=0">Teacher</option>
           <option value="/controlpanel?say=1">Mod</option>
           <option value="/controlpanel?say=2" selected>Student</option>
@@ -220,7 +248,7 @@
       </div>
       <div class="permBox">
         <h3>Games</h3>
-        <select onchange="updatePerm(this)" id="gamespermsDrop" name="gamespermsDrop" style="margin-top: 8px;">
+        <select onchange="updatePerm(this);" id="gamespermsDrop" name="gamespermsDrop" style="margin-top: 8px;">
           <option value="/controlpanel?games=0">Teacher</option>
           <option value="/controlpanel?games=1">Mod</option>
           <option value="/controlpanel?games=2" selected>Student</option>
@@ -232,7 +260,7 @@
       </div>
       <div class="permBox">
         <h3>LED bar</h3>
-        <select onchange="updatePerm(this)" id="barpermsDrop" name="barpermsDrop" style="margin-top: 8px;">
+        <select onchange="updatePerm(this);" id="barpermsDrop" name="barpermsDrop" style="margin-top: 8px;">
           <option value="/controlpanel?bar=0" selected>Teacher</option>
           <option value="/controlpanel?bar=1">Mod</option>
           <option value="/controlpanel?bar=2">Student</option>
@@ -244,7 +272,7 @@
       </div>
       <div class="permBox">
         <h3>Sounds</h3>
-        <select onchange="updatePerm(this)" id="sfxpermsDrop" name="sfxpermsDrop" style="margin-top: 8px;">
+        <select onchange="updatePerm(this);" id="sfxpermsDrop" name="sfxpermsDrop" style="margin-top: 8px;">
           <option value="/controlpanel?sfx=0" selected>Teacher</option>
           <option value="/controlpanel?sfx=1">Mod</option>
           <option value="/controlpanel?sfx=2">Student</option>
@@ -256,7 +284,7 @@
       </div>
       <div class="permBox">
         <h3>Music</h3>
-        <select onchange="updatePerm(this)" id="bgmpermsDrop" name="bgmpermsDrop" style="margin-top: 8px;">
+        <select onchange="updatePerm(this);" id="bgmpermsDrop" name="bgmpermsDrop" style="margin-top: 8px;">
           <option value="/controlpanel?bgm=0" selected>Teacher</option>
           <option value="/controlpanel?bgm=1">Mod</option>
           <option value="/controlpanel?bgm=2">Student</option>
@@ -268,7 +296,7 @@
       </div>
       <div class="permBox">
         <h3>API</h3>
-        <select onchange="updatePerm(this)" id="apipermsDrop" name="apipermsDrop" style="margin-top: 8px;">
+        <select onchange="updatePerm(this);" id="apipermsDrop" name="apipermsDrop" style="margin-top: 8px;">
           <option value="/controlpanel?api=0">Teacher</option>
           <option value="/controlpanel?api=1">Mod</option>
           <option value="/controlpanel?api=2">Student</option>
@@ -287,21 +315,30 @@
   <div id="tabs-5">
     <h2>Lock Formbar</h2>
     Only whitelisted users will be able to make changes.<br>
-    <input type="checkbox" id="lock" onchange="request.open('GET', '/controlpanel?locked=' + this.checked); request.send();"><label for="lock">Lock</label><br>
+    <input type="checkbox" id="lock"
+      onchange="request.open('GET', '/controlpanel?locked=' + this.checked); request.send();"><label
+      for="lock">Lock</label><br>
 
     <h2>Blind results</h2>
     Results won't be shown until the poll is complete.<br>
-    <input type="checkbox" id="blind" onchange="request.open('GET', '/controlpanel?blind=' + this.checked); request.send();"><label for="blind">Hide results</label><br>
+    <input type="checkbox" id="blind"
+      onchange="request.open('GET', '/controlpanel?blind=' + this.checked); request.send();"><label for="blind">Hide
+      results</label><br>
 
     <h2>Show missing votes</h2>
     When votes are missing, there will be empty spaces on the bar.<br>
-    <input type="checkbox" id="showMissing" checked onchange="request.open('GET', '/controlpanel?showinc=' + this.checked); request.send();"><label for="showMissing">Show</label><br>
+    <input type="checkbox" id="showMissing" checked
+      onchange="request.open('GET', '/controlpanel?showinc=' + this.checked); request.send();"><label
+      for="showMissing">Show</label><br>
 
     <h2>Clear data</h2>
     <b>Warning: These buttons will permanently delete data.</b><br>
-    <button class="inline popOut" style="margin-top: 12px;" onclick="clearTable('messages');">Clear all chat messages</button><br>
-    <button class="inline popOut" style="margin-top: 12px;" onclick="clearTable('scores');">Clear all game scores</button><br>
-    <button class="inline popOut" style="margin-top: 12px;" onclick="clearTable('users');">Clear all user accounts</button>
+    <button class="inline popOut" style="margin-top: 12px;" onclick="clearTable('messages');">Clear all chat
+      messages</button><br>
+    <button class="inline popOut" style="margin-top: 12px;" onclick="clearTable('scores');">Clear all game
+      scores</button><br>
+    <button class="inline popOut" style="margin-top: 12px;" onclick="clearTable('users');">Clear all user
+      accounts</button>
   </div>
 </div>
 {% endblock %}
@@ -335,12 +372,24 @@
 
   sendStudents();
 
+  function packMSG(rx, tx, content) {
+    let msgOUT = {
+      to: rx,
+      from: tx,
+      content: content
+    }
+    return JSON.stringify(msgOUT);
+  }
+
   function updatePerm(el) {
     request.open("GET", el.value);
-    request.onload = function() {
+    console.log(el.value);
+    request.onload = function () {
       // console.log(request.response);
     };
     request.send();
+    
+    chatSocket.emit('reload', packMSG('all', 'server', ''))
   }
 
   async function updateStudents() {
@@ -366,14 +415,18 @@
       request.send();
     }
     if (document.getElementById("countdown").checked) {
-      alert("This feature is not available yet.");
       document.getElementById("playtime").checked = true;
-      ////document.getElementById("countdownTime").classList.remove("hidden");
+      alert("This feature is not available yet.");
+      //document.getElementById("countdownTime").classList.remove("hidden");
     } else {
       document.getElementById("countdownTime").classList.add("hidden");
     }
     if (document.getElementById("playtime").checked) {
       request.open('GET', '/controlpanel?barmode=playtime');
+      request.send();
+    }
+    if (document.getElementById("sendblock").checked) {
+      request.open('GET', '/controlpanel?barmode=sendblock');
       request.send();
     }
   }
@@ -496,7 +549,7 @@
   sortButtons.forEach(button => button.onclick = () => changeSort(button));
   changeSort(document.getElementById("logIn"));
 
-  collapseButton.onclick = function() {
+  collapseButton.onclick = function () {
     collapsed = !collapsed;
     let userDetails = Array.from(document.getElementsByClassName("user"));
     if (collapsed) {
@@ -511,7 +564,7 @@
   function checkUpdates(url) {
     let newRequest = new XMLHttpRequest();
     newRequest.open('GET', url);
-    newRequest.onload = function() {
+    newRequest.onload = function () {
       studentData = newRequest.response;
     };
     newRequest.send();
@@ -572,7 +625,7 @@
     }
   }
 
-  setInterval(function() {
+  setInterval(function () {
     checkUpdates('/api/students');
     let studentBox = document.getElementById('students');
     if (studentData === undefined) {
@@ -645,6 +698,17 @@
           for (student of studentList) {
             let newStudent = document.createElement('h3');
             let icons = "";
+            let pictureIcon = ""
+
+            //change image based upon persons permissions
+            let perms = student['perms']
+            if (perms) var permsIcons = document.createElement("img");
+            if (perms == 0) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/teacher.png') }}" class="permsIcon" title="teacher">`
+            if (perms == 1) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/mod.png') }}" class="permsIcon" title="mod">`
+            if (perms == 2) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/student.png') }}" class="permsIcon" title="student">`
+            if (perms == 3) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/anyone.png') }}" class="permsIcon" title="anyone">`
+            if (perms == 4) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/banned.png') }}" class="permsIcon" title="banned">`
+
 
             //Change student color according to thumb response
             let thumb = student['thumb'];
@@ -667,11 +731,13 @@
 
             if (student['complete']) icons += `<img src="{{ url_for('static', filename='img/controlpanel/complete.png') }}" class="icon" title="Complete">`;
 
-            newStudent.innerHTML = icons + student.name;
+            newStudent.innerHTML = pictureIcon + icons + student.name;
+            
             let newDetails = document.createElement('span');
             newDetails.classList.add('user');
+            cleanText = student.essay.replace(/<|>/gi, "")
             if (collapsed) newDetails.classList.add("hidden");
-            if (student.essay) newDetails.innerHTML += "<div style='margin-bottom: 8px;'><b>Essay: </b>" + student.essay + "</div>";
+            if (student.essay) newDetails.innerHTML += "<div style='margin-bottom: 8px;'><pre> Essay: <br> " + cleanText + "</pre>" + "</div>";
             if (student.help.type) {
               let helpTicket = document.createElement("div");
               let ticketTime = new Date(student.help.time * 1000);
@@ -703,7 +769,11 @@
                 helpTicket.appendChild(acceptButton);
                 helpTicket.appendChild(rejectButton);
               } else {
-                helpTicket.innerHTML += help.message || "<i>Sent a help ticket</i>";
+                console.log(student.help.message)
+                if (student.help.message)
+                  helpTicket.innerHTML += student.help.message
+                else
+                  "<i>Sent a help ticket</i>";
                 let removeButton = document.createElement("button");
                 removeButton.id = "e"
                 removeButton.classList.add("inline", "popOut");
@@ -732,7 +802,7 @@
             }
             let studentPerms = student['perms'];
             newDetails.innerHTML += `
-              <select onchange="userPerm(this, '${student}')" id="userpermsDrop" name="userpermsDrop">
+              <select onchange="userPerm(this, '${student['name']}')" id="userpermsDrop" name="userpermsDrop">
                 <option value="/users?name=${student['name']}&action=perm&perm=0" ${studentPerms === 0 ? "selected" : ""}>${permNames[0]}</option>
                 <option value="/users?name=${student['name']}&action=perm&perm=1" ${studentPerms === 1 ? "selected" : ""}>${permNames[1]}</option>
                 <option value="/users?name=${student['name']}&action=perm&perm=2" ${studentPerms === 2 ? "selected" : ""}>${permNames[2]}</option>
@@ -846,16 +916,20 @@
   async function userPerm(el, student) {
     let meRes = await getResponse("/api/me");
     let permsRes = await getResponse("/api/permissions");
+
     if (
-      student.name != meRes.name ||
+      student != meRes.name ||
       meRes.perms > el.value[el.value.length - 1] ||
       confirm("If you lower your own permissions, you may not be able to change them back. If no users have teacher permissions, the next person to log in will become the teacher.")
     ) {
       request.open("GET", el.value);
-      request.onload = function() {
+      request.onload = function () {
         console.log(request.response);
       };
       request.send();
+
+      chatSocket.emit('reload', packMSG(student, 'server', ''))
+
     } else {
       el.value = el.options[meRes.perms].value; //If perms are not updated, give el the correct value
     }
@@ -943,9 +1017,9 @@
 <script src="../static/jquery/external/jquery/jquery.js" charset="utf-8"></script>
 <script src="../static/jquery/jquery-ui.min.js" charset="utf-8"></script>
 <script>
-  $(function() {
+  $(function () {
     $("#tabs").tabs({
-      activate: function(event, ui) {
+      activate: function (event, ui) {
         let activeTab = $("#tabs").tabs("option", "active");
         $("#tabs .ui-tabs-nav a").each((i, el) => {
           if (i == activeTab) el.classList.add("pressed");

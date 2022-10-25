@@ -3322,7 +3322,15 @@ def message(message):
 @socket_.on('reload', namespace=chatnamespace)
 def message(message):
     try:
-        emit('reload', message, broadcast=True)
+        message = json.loads(message)
+        if message['to'] == 'all':
+            emit('reload', message, broadcast=True)
+            
+        else:
+            for student in sD.studentDict:
+                if sD.studentDict[student]['name'] == message['to']:
+                    emit('reload', message, to=sD.studentDict[student]['sid'])
+                    
     except Exception as e:
         print("[error] " + 'Error: ' + str(e))
 

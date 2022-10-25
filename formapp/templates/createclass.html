@@ -1,0 +1,72 @@
+{% extends 'header_content.html' %}
+
+{% block title %}Create Class{% endblock %}
+{% block style %}
+<style>
+    #content {
+    text-align: center;
+    }
+    input {
+    display: block;
+    margin: auto;
+    font-size: 20px !important;
+    width: 256px;
+    height: 36px !important;
+    box-sizing: border-box;
+    margin-top: 16px;
+  }
+</style>
+{% endblock %}
+{% block color %}purple{% endblock %}
+
+{% block main %}
+        <form action="createclass" method="post">
+            <input type="text" id="classBox" name="className" class="box" placeholder="Create Class Name" required>
+            <input type="hidden" id="userTypeBox" name="submittionType" value="createClass">
+            <input type="hidden" id="forwardBox" name="forward">
+            <input type="submit" id="submitButton" class="button unselectable" value="Submit">
+        </form>
+        <form action="createclass" method="post">
+            <input type="text" id="previousBox" name="previousName" class="box" placeholder="Select Previous Class Name" required>
+            <input type="hidden" id="userTypeBox" name="submittionType" value="previousClass">
+            <input type="hidden" id="forwardBox2" name="forward">
+            <input type="submit" id="submitButton2" class="button unselectable" value="Submit">
+        </form>
+
+{% endblock %}
+
+{% block script %}
+<script>
+    const forward = urlParams.get('forward');
+    if (forward) {
+        document.getElementById('forwardBox').value = forward
+        document.getElementById('forwardBox2').value = forward
+    }
+    else {
+        document.getElementById('forwardBox').value = null
+        document.getElementById('forwardBox2').value = null
+    }
+
+    document.getElementById("quickmenu").classList.add("hidden")
+    let ub = document.getElementById("classBox");
+    let pb = document.getElementById("previousBox");
+    let sb = document.getElementById("submitButton");
+    let sb2 = document.getElementById("submitButton2");
+    
+    function checkIfBlank() {
+      if (ub.value) {
+        sb.classList.remove("unselectable");
+        sb.onsubmit = () => true;
+      } else if (pb.value) {
+        sb2.classList.remove("unselectable");
+        sb2.onsubmit = () => true;
+      } else {
+        sb.classList.add("unselectable");
+        sb.onsubmit = () => false;
+      }
+    }
+
+    ub.oninput = checkIfBlank;
+    pb.oninput = checkIfBlank;
+</script>
+{% endblock %}

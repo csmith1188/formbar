@@ -1,0 +1,20 @@
+{% extends 'header_content.html' %}
+
+{% block title %}Select Class{% endblock %}
+{% block style %}
+
+{% endblock %}
+{% block color %}purple{% endblock %}
+
+{% block main %}
+<html>
+    <body>
+        <form action="selectclass" method="post">
+            <input type="text" name="className" placeholder="Select Class Name">
+            <input type="submit" id="submitButton" class="button unselectable" value="Submit">
+        </form>
+    </body>
+</html>
+{% endblock %}
+
+{% block script %}{% endblock %}

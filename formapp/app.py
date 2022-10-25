@@ -1462,7 +1462,7 @@ def endpoint_createaccount():
             passwordCrypt = cipher.encrypt(password.encode())
             db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
             dbcmd = db.cursor()
-            dbcmd.execute("INSERT INTO users (username, password, permissions, bot, tags) VALUES (?, ?, ?, ?, ?)", (name, passwordCrypt, sD.settings['perms']['anyone'], "False", "[ e ]"))
+            dbcmd.execute("INSERT INTO users (username, password, permissions, bot, tags) VALUES (?, ?, ?, ?, ?)", (name, passwordCrypt, sD.settings['perms']['anyone'], "False", "[]"))
             db.commit()
             db.close()
             return render_template("message.html", message = 'Account created.')

@@ -2968,10 +2968,8 @@ def endpoint_updateuser():
         except Exception as e:
             print("[error] " + "Error: " + str(e))
 
-# This endpoint allows us to see which user(Student) is logged in.
-
-
-@app.route('/users')
+#This endpoint allows us to see which user(Student) is logged in.
+@app.route('/users', methods = ['POST', 'GET'])
 def endpoint_users():
     loginResult = loginCheck(request.remote_addr, 'users')
     if loginResult:

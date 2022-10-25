@@ -56,7 +56,8 @@
 }
 
 /*Dark mode is default*/
-.dark, body:where(:not(.light):not(.classic)) {
+.dark,
+body:where(:not(.light):not(.classic)) {
   --bg-color: var(--bg-dark);
   --main-color: white;
   --gray-color: var(--light-gray);
@@ -97,7 +98,9 @@ body {
   padding: 8px;
 }
 
-body, .light, .dark {
+body,
+.light,
+.dark {
   background: var(--bg-color);
   color: var(--main-color);
 }
@@ -115,7 +118,8 @@ body, .light, .dark {
   padding: 8px;
 }
 
-.centered, .hCentered.vCentered {
+.centered,
+.hCentered.vCentered {
   position: absolute;
   left: 50%;
   top: 50%;
@@ -151,7 +155,7 @@ body, .light, .dark {
   border: solid 5px transparent;
 }
 
-.light::-webkit-scrollbar-thumb {
+:where(.light, .classic #content)::-webkit-scrollbar-thumb {
   box-shadow: inset 0 0 5px 5px var(--dark-gray);
   border: solid 5px transparent;
 }
@@ -160,7 +164,7 @@ body, .light, .dark {
   box-shadow: inset 0 0 5px 5px var(--main-color);
 }
 
-.light::-webkit-scrollbar-thumb:hover {
+:where(.light, .classic #content)::-webkit-scrollbar-thumb:hover {
   box-shadow: inset 0 0 5px 5px var(--bg-darker);
 }
 
@@ -169,7 +173,7 @@ body, .light, .dark {
   border: solid 2px transparent;
 }
 
-.light::-webkit-scrollbar-thumb:active {
+:where(.light, .classic #content)::-webkit-scrollbar-thumb:active {
   box-shadow: inset 0 0 13px 13px var(--bg-darker);
   border: solid 2px transparent;
 }
@@ -185,7 +189,10 @@ body, .light, .dark {
   accent-color: var(--theme-color);
 }
 
-input, button, textarea, select {
+input,
+button,
+textarea,
+select {
   font-size: inherit;
 }
 
@@ -205,25 +212,29 @@ input, button, textarea, select {
   background: var(--highlight-color);
 }
 
-textarea, .box {
+textarea,
+.box {
   background: var(--emphasis-color);
   color: var(--main-color);
   border: 1px solid;
 }
 
-textarea:focus, .box:focus {
+textarea:focus,
+.box:focus {
   border: 1px solid;
   outline: 1px solid;
 }
 
-button, .button {
+button,
+.button {
   cursor: pointer;
   user-select: none;
 }
 
 /*Use class "button" for button-like inputs, such as submit and file*/
 
-button:not(.inline), .button:not(.inline) {
+button:not(.inline),
+.button:not(.inline) {
   padding: 3px 9px;
   border-radius: 9999px;
   background: var(--emphasis-color);
@@ -239,7 +250,8 @@ button:where(:not(.popOut):where(:not(.unselectable):not(.pressed))):hover,
 
 /*Use class "inline" for buttons that are within the flow of text. "inline" should always be used with "popOut" (but not vice versa)*/
 
-button.inline, .button.inline {
+button.inline,
+.button.inline {
   background: var(--emphasis-color);
   border: 1px solid;
   border-radius: 6px;
@@ -316,7 +328,9 @@ a {
   cursor: pointer;
 }
 
-table, th, td {
+table,
+th,
+td {
   border: 1px solid;
   border-collapse: collapse;
 }

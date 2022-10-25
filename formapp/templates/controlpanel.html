@@ -8,7 +8,9 @@
 <!-- Extra style declarations here -->
 {% block style %}
 <style media="screen">
-  h2, h3, form {
+  h2,
+  h3,
+  form {
     margin: 0;
   }
 
@@ -19,6 +21,7 @@
   button {
     margin-right: 4px;
   }
+
   body {
     overflow-x: hidden;
   }
@@ -43,7 +46,7 @@
     left: 21px;
   }
 
-  .user > * {
+  .user>* {
     max-width: calc(100% - 21px);
     overflow-wrap: break-word;
   }
@@ -75,7 +78,8 @@
     margin-right: 8px;
   }
 
-  #history > span, #history > b {
+  #history>span,
+  #history>b {
     display: inline-block;
     width: 100px;
     margin-top: 8px;
@@ -87,21 +91,26 @@
     justify-content: space-evenly;
     padding: 0;
   }
+
   #tabBox li {
     display: inline;
   }
+
   #tabBox a {
     text-decoration: none;
   }
+
   #permsContainer {
     display: flex;
     justify-content: space-evenly;
     flex-wrap: wrap;
   }
+
   .permBox {
     width: 50%;
     margin: 0px;
   }
+
   #resetPerms {
     display: block;
     margin: 32px auto 0;
@@ -144,7 +153,6 @@
     <button id="collapseButton" class="inline popOut hidden">Collapse all</button>
 
     <div id="students">
-      <%sD.studentDict[request.remote_addr]['help']['message'] = request.args.get('message')-%>
     </div>
 
     <h2>Restart session</h2>
@@ -152,8 +160,10 @@
   </div>
   <div id="tabs-2">
     <h2>Number of students</h2>
-    <input type="number" id="studentNum" class="line" onchange="sendStudents();" name="studentNum" min="1" max="30">&nbsp;&nbsp;
-    <input type="checkbox" id="autoStudents" checked onchange="sendStudents();"><label for="autoStudents">Auto</label><br>
+    <input type="number" id="studentNum" class="line" onchange="sendStudents();" name="studentNum" min="1"
+      max="30">&nbsp;&nbsp;
+    <input type="checkbox" id="autoStudents" checked onchange="sendStudents();"><label
+      for="autoStudents">Auto</label><br>
 
     <div onchange="changeMode();">
       <h2>Bar mode</h2>
@@ -170,7 +180,8 @@
         <input type="radio" id="letters" name="type" style="margin-left: 8px;"><label for="letters">Letters</label>
         <input type="radio" id="essay" name="type" style="margin-left: 8px;"><label for="essay">Essay</label><br>
         <span id="pollDescription">Students can choose between thumbs up, thumbs down, and wiggle</span><br>
-        <input type="button" id="pollButton" class="button inline popOut" value="Start new poll" style="margin-top: 8px;">
+        <input type="button" id="pollButton" class="button inline popOut" value="Start new poll"
+          style="margin-top: 8px;">
       </form>
       <br>
 
@@ -182,7 +193,7 @@
         </div>
       </label>
       <br>
-    
+
       <label>
         <div>
           <input type="radio" id="countdown" name="mode">
@@ -205,8 +216,8 @@
           <span style="margin-left: 25px;">Students can change the colors of the bar.</span><br>
         </div>
       </label>
-	  <br>
-	  <label>
+      <br>
+      <label>
         <div>
           <input type="radio" id="sendblock" name="mode">
           <h3 style="display: inline;">Blockchest Mode</h3><br>
@@ -304,21 +315,30 @@
   <div id="tabs-5">
     <h2>Lock Formbar</h2>
     Only whitelisted users will be able to make changes.<br>
-    <input type="checkbox" id="lock" onchange="request.open('GET', '/controlpanel?locked=' + this.checked); request.send();"><label for="lock">Lock</label><br>
+    <input type="checkbox" id="lock"
+      onchange="request.open('GET', '/controlpanel?locked=' + this.checked); request.send();"><label
+      for="lock">Lock</label><br>
 
     <h2>Blind results</h2>
     Results won't be shown until the poll is complete.<br>
-    <input type="checkbox" id="blind" onchange="request.open('GET', '/controlpanel?blind=' + this.checked); request.send();"><label for="blind">Hide results</label><br>
+    <input type="checkbox" id="blind"
+      onchange="request.open('GET', '/controlpanel?blind=' + this.checked); request.send();"><label for="blind">Hide
+      results</label><br>
 
     <h2>Show missing votes</h2>
     When votes are missing, there will be empty spaces on the bar.<br>
-    <input type="checkbox" id="showMissing" checked onchange="request.open('GET', '/controlpanel?showinc=' + this.checked); request.send();"><label for="showMissing">Show</label><br>
+    <input type="checkbox" id="showMissing" checked
+      onchange="request.open('GET', '/controlpanel?showinc=' + this.checked); request.send();"><label
+      for="showMissing">Show</label><br>
 
     <h2>Clear data</h2>
     <b>Warning: These buttons will permanently delete data.</b><br>
-    <button class="inline popOut" style="margin-top: 12px;" onclick="clearTable('messages');">Clear all chat messages</button><br>
-    <button class="inline popOut" style="margin-top: 12px;" onclick="clearTable('scores');">Clear all game scores</button><br>
-    <button class="inline popOut" style="margin-top: 12px;" onclick="clearTable('users');">Clear all user accounts</button>
+    <button class="inline popOut" style="margin-top: 12px;" onclick="clearTable('messages');">Clear all chat
+      messages</button><br>
+    <button class="inline popOut" style="margin-top: 12px;" onclick="clearTable('scores');">Clear all game
+      scores</button><br>
+    <button class="inline popOut" style="margin-top: 12px;" onclick="clearTable('users');">Clear all user
+      accounts</button>
   </div>
 </div>
 {% endblock %}
@@ -353,23 +373,23 @@
   sendStudents();
 
   function packMSG(rx, tx, content) {
-        let msgOUT = {
-            to: rx,
-            from: tx,
-            content: content
-        }
-        return JSON.stringify(msgOUT);
+    let msgOUT = {
+      to: rx,
+      from: tx,
+      content: content
     }
+    return JSON.stringify(msgOUT);
+  }
 
   function updatePerm(el) {
     request.open("GET", el.value);
     console.log(el.value);
-    request.onload = function() {
+    request.onload = function () {
       // console.log(request.response);
     };
     request.send();
     
-    chatSocket.emit('reload', JSON.stringify(packMSG('all', 'server', '')))
+    chatSocket.emit('reload', packMSG('all', 'server', ''))
   }
 
   async function updateStudents() {
@@ -405,7 +425,7 @@
       request.open('GET', '/controlpanel?barmode=playtime');
       request.send();
     }
-	if (document.getElementById("sendblock").checked) {
+    if (document.getElementById("sendblock").checked) {
       request.open('GET', '/controlpanel?barmode=sendblock');
       request.send();
     }
@@ -529,7 +549,7 @@
   sortButtons.forEach(button => button.onclick = () => changeSort(button));
   changeSort(document.getElementById("logIn"));
 
-  collapseButton.onclick = function() {
+  collapseButton.onclick = function () {
     collapsed = !collapsed;
     let userDetails = Array.from(document.getElementsByClassName("user"));
     if (collapsed) {
@@ -544,7 +564,7 @@
   function checkUpdates(url) {
     let newRequest = new XMLHttpRequest();
     newRequest.open('GET', url);
-    newRequest.onload = function() {
+    newRequest.onload = function () {
       studentData = newRequest.response;
     };
     newRequest.send();
@@ -605,7 +625,7 @@
     }
   }
 
-  setInterval(function() {
+  setInterval(function () {
     checkUpdates('/api/students');
     let studentBox = document.getElementById('students');
     if (studentData === undefined) {
@@ -622,7 +642,7 @@
       if (filters.includes("!break")) studentList = studentList.filter(student => !student.excluded);
       if (filters.includes("pollResponded")) studentList = studentList.filter(student => student.thumb || student.letter || student.essay);
       if (filters.includes("!pollResponded")) studentList = studentList.filter(student => !(student.thumb || student.letter || student.essay));
-    
+
       let thumbs, letters, helpTimes;
       switch (sort) {
         case "logIn":
@@ -712,6 +732,7 @@
             if (student['complete']) icons += `<img src="{{ url_for('static', filename='img/controlpanel/complete.png') }}" class="icon" title="Complete">`;
 
             newStudent.innerHTML = pictureIcon + icons + student.name;
+            
             let newDetails = document.createElement('span');
             newDetails.classList.add('user');
             cleanText = student.essay.replace(/<|>/gi, "")
@@ -749,7 +770,7 @@
                 helpTicket.appendChild(rejectButton);
               } else {
                 console.log(student.help.message)
-                if (student.help.message) 
+                if (student.help.message)
                   helpTicket.innerHTML += student.help.message
                 else
                   "<i>Sent a help ticket</i>";
@@ -781,7 +802,7 @@
             }
             let studentPerms = student['perms'];
             newDetails.innerHTML += `
-              <select onchange="userPerm(this, '${student}')" id="userpermsDrop" name="userpermsDrop">
+              <select onchange="userPerm(this, '${student['name']}')" id="userpermsDrop" name="userpermsDrop">
                 <option value="/users?name=${student['name']}&action=perm&perm=0" ${studentPerms === 0 ? "selected" : ""}>${permNames[0]}</option>
                 <option value="/users?name=${student['name']}&action=perm&perm=1" ${studentPerms === 1 ? "selected" : ""}>${permNames[1]}</option>
                 <option value="/users?name=${student['name']}&action=perm&perm=2" ${studentPerms === 2 ? "selected" : ""}>${permNames[2]}</option>
@@ -895,16 +916,20 @@
   async function userPerm(el, student) {
     let meRes = await getResponse("/api/me");
     let permsRes = await getResponse("/api/permissions");
+
     if (
-      student.name != meRes.name ||
+      student != meRes.name ||
       meRes.perms > el.value[el.value.length - 1] ||
       confirm("If you lower your own permissions, you may not be able to change them back. If no users have teacher permissions, the next person to log in will become the teacher.")
     ) {
       request.open("GET", el.value);
-      request.onload = function() {
+      request.onload = function () {
         console.log(request.response);
       };
       request.send();
+
+      chatSocket.emit('reload', packMSG(student, 'server', ''))
+
     } else {
       el.value = el.options[meRes.perms].value; //If perms are not updated, give el the correct value
     }
@@ -992,9 +1017,9 @@
 <script src="../static/jquery/external/jquery/jquery.js" charset="utf-8"></script>
 <script src="../static/jquery/jquery-ui.min.js" charset="utf-8"></script>
 <script>
-  $(function() {
+  $(function () {
     $("#tabs").tabs({
-      activate: function(event, ui) {
+      activate: function (event, ui) {
         let activeTab = $("#tabs").tabs("option", "active");
         $("#tabs .ui-tabs-nav a").each((i, el) => {
           if (i == activeTab) el.classList.add("pressed");

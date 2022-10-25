@@ -31,6 +31,8 @@ import math
 import time
 import random
 import pandas
+import re
+#import custom modules
 from key import key
 from modules import sessions
 from modules import lessons
@@ -67,7 +69,9 @@ if ONRPi:
     import board
     import neopixel
 
-# Importing customs modules
+
+
+
 if ONRPi:
     from modules import ir
 
@@ -206,7 +210,8 @@ def endpoint_anitest():
 def dbug(message='Checkpoint Reached'):
     global DEBUG
     if DEBUG:
-        logFile(" [DEBUG] " + str(message))
+      print("[DEBUG] " + str(message))    
+
 
 
 def newStudent(remote, username, bot=False):
@@ -234,7 +239,9 @@ def newStudent(remote, username, bot=False):
             'preferredHomepage': None,
             'sid': ''
         }
-        # Track if the teacher is logged in
+
+        #Track if the teacher is logged in
+
         teacher = False
 
         # Check each student so far to make sure that none of them have teacher perms
@@ -262,18 +269,18 @@ def newStudent(remote, username, bot=False):
         db = sqlite3.connect(os.path.dirname(
             os.path.abspath(__file__)) + '/data/database.db')
         dbcmd = db.cursor()
-        userFound = dbcmd.execute(
-            "SELECT * FROM users WHERE username=:uname", {"uname": username}).fetchall()
+
+        userFound = dbcmd.execute("SELECT * FROM users WHERE username=:uname", {"uname": username}).fetchall()
+
         db.close()
+
         for user in userFound:
             if username in user:
                 if not teacher:
                     sD.studentDict[remote]['perms'] = sD.settings['perms']['admin']
                 else:
                     sD.studentDict[remote]['perms'] = int(user[3])
-                
-                
-                    
+     
 
         socket_.emit('alert', json.dumps(packMSG(
             'all', 'server', sD.studentDict[request.remote_addr]['name'] + " logged in...")), namespace=chatnamespace)

@@ -11,7 +11,7 @@
   h2,
   h3,
   form {
-    margin: 0;
+    margin: 1;
   }
 
   h2 {
@@ -116,6 +116,20 @@
     margin: 32px auto 0;
     font-size: 18px;
   }
+
+  .tab {
+    background-color: var(--bg-dark-blue);
+    color: white;
+    border-radius: 5px;
+    margin: 5px;
+    padding: 5px;
+    cursor: pointer;
+  }
+
+  .tabcontent {
+    margin: 5px;
+    padding: 5px;
+  }
 </style>
 {% endblock %}
 
@@ -153,6 +167,7 @@
     <button id="collapseButton" class="inline popOut hidden">Collapse all</button>
 
     <div id="students">
+
     </div>
 
     <h2>Restart session</h2>
@@ -943,7 +958,23 @@
       historyLength = polls.length;
       document.getElementById("history").innerHTML = null;
       polls.reverse(); //Sort newest to oldest
+
+      let oldPollDate;
       polls.forEach((poll) => {
+        let date = new Date(poll[2]);
+        let month = date.getMonth() + 1;
+        let day = date.getDate();
+        let year = date.getFullYear().toString().slice(2);
+        let hour = date.getHours();
+        let minute = date.getMinutes().toString().padStart(2, "0");
+        let shortDate = day + "/" + month + "/" + year;
+        if (hour > 12) {
+          hour -= 12;
+          ampm = "PM";
+        } else {
+          if (hour == 0) hour = 12;
+          ampm = "AM";
+        }
         let type;
         switch (poll[1]) {
           case "tutd":
@@ -956,28 +987,20 @@
             type = "Essay"
         }
 
-        let date = new Date(poll[2]);
-        let month = date.getMonth() + 1;
-        let day = date.getDate();
-        let year = date.getFullYear().toString().slice(2);
-        let hour = date.getHours();
-        let minute = date.getMinutes().toString().padStart(2, "0");
-        if (hour > 12) {
-          hour -= 12;
-          ampm = "PM";
-        } else {
-          if (hour == 0) hour = 12;
-          ampm = "AM";
-        }
+        // shortDate is the current date, and the oldPollDate are the previous saved poll dates
 
-        document.getElementById("history").innerHTML += `
-         <b>${type}</b>
-         <span>${month}/${day}/${year}</span>
-         <span>${hour}:${minute} ${ampm}</span>
-         <button class="inline popOut" onclick="downloadResponses(${poll[0]})">Download</button>
-         <br>
-        `;
+        if (oldPollDate != shortDate) {
+          document.getElementById("history").innerHTML += `<h3 class="tab">${month}/${day}/${year}</h3><div class="tabcontent" id="pollDate${shortDate}"></div>`;
+        }
+        oldPollDate = shortDate;
+        let pollBox = document.getElementById(`pollDate${shortDate}`);
+        pollBox.innerHTML += `<span>${hour}:${minute} ${ampm}</span>
+                                <b>${type}</b>
+                                <button class="inline popOut" onclick="downloadResponses(${poll[0]})">Download</button>
+                                <br>
+                                `;
       });
+      $("#history").accordion("refresh");
     }
   }
   updateHistory();
@@ -1018,6 +1041,10 @@
 <script src="../static/jquery/jquery-ui.min.js" charset="utf-8"></script>
 <script>
   $(function () {
+    $("#history").accordion({
+      collapsible: true,
+      heightStyle: "content"
+    });
     $("#tabs").tabs({
       activate: function (event, ui) {
         let activeTab = $("#tabs").tabs("option", "active");

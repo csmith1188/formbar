@@ -1,11 +1,12 @@
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
+{% extends 'header_fullscreen.html' %}
+<!-- ^^ This means add this file into the contents of the header page -->
+<!-- This is where the title, top buttons, and stylesheet is located -->
 
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" href="../../static/img/idle/favicon.png">
-  <title>Idle Business</title>
+<!-- Change title here -->
+{% block title %}Idle{% endblock %}
+
+<!-- Extra style declarations here -->
+{% block style %}
   <style>
     body {
       background-color: #000015;
@@ -108,6 +109,10 @@
       color: black;
     }
   </style>
+  {% endblock %}
+
+  <!-- Extra javascript here -->
+  {% block script %}
   <script>
     // When the page needs to refresh, send a signal to chat which will then refresh everyone's page
     chatSocket.on("reload", message => {
@@ -335,5 +340,4 @@
       </div>
   </table>
 </body>
-
-</html>
+{% endblock %}

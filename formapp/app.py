@@ -2394,7 +2394,7 @@ def endpoint_login():
             # If the user is logged in, log them out
             if remote in sD.studentDict:
                 logFile(
-                    "Info " + sD.studentDict[request.remote_addr]['name'],  " logged out.")
+                    "Info ", sD.studentDict[request.remote_addr]['name'] + " logged out.")
                 socket_.emit('alert', json.dumps(packMSG(
                     'all', 'server', sD.studentDict[request.remote_addr]['name'] + " logged out...")), namespace=chatnamespace)
                 del sD.studentDict[request.remote_addr]

@@ -7,37 +7,7 @@
 
 <!-- Extra style declarations here -->
 {% block style %}
-<style>
-  body {
-    user-select: none;
-    background: var(--bg-dark-blue);
-  }
 
-  #virtualBar {
-    width: calc(100% - 32px);
-  }
-
-  #text {
-    width: 10ch;
-    padding: 0 4px;
-    border: 1px white;
-    border-style: solid solid none;
-    background: black;
-    font: 32px monospace;
-    text-transform: uppercase;
-    overflow: hidden;
-  }
-
-  #pixBox {
-    width: 100%;
-    height: 64px;
-    box-sizing: border-box;
-    border: 1px solid white;
-    display: flex;
-    justify-content: space-around;
-    user-select: none;
-  }
-</style>
 {% endblock %}
 
 <!-- Change theme color here -->
@@ -88,7 +58,6 @@
 
 
         }
-        pixBox.innerHTML += "<div style='display: inline; flex-grow: 1; overflow: hidden; background-color: #" + pix[i][0] + "" + pix[i][1] + "" + pix[i][2] + ";'>&nbsp;</div>";
       }
     }
   });
@@ -108,30 +77,36 @@
       var wiggle = 0
       var down = 0
 
-      
+
       for (const key of Object.keys(pixRes)) {
         console.log(pixRes[key].thumb);
-        if (pixRes[key].thumb == "up") {
-          up++
-          console.log('found up');
+        console.log(pixRes[key].perms);
+        if(pixRes[key].perms < 1){
+          console.log('Caught da mf lackin');
+        } else if (pixRes[key].perms > 0){
+
+          if (pixRes[key].thumb == "up") {
+            up++
+            console.log('found up');
+          }
+          
+          if (pixRes[key].thumb == "wiggle") {
+            wiggle++
+            console.log('found wiggle');
+          }
+          
+          if (pixRes[key].thumb == "down") {
+            down++
+            console.log('found down');
+          }
         }
-      
-        if (pixRes[key].thumb == "wiggle") {
-          wiggle++
-          console.log('found wiggle');
-        }
-        
-        if (pixRes[key].thumb == "down") {
-          down++
-          console.log('found down');
-        }
-        
+          
       }
       doughnutChart.data.datasets[0].data = [up, wiggle, down];
       doughnutChart.update();
     }
   pixRequest.send(null);
-    
+  }
 
 
     // When the page needs to refresh, send a signal to chat which will then refresh everyone's page

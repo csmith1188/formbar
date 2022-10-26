@@ -23,9 +23,8 @@
 {% block main %}
 <form action="selectclass" method="post">
     <h3>Which Class Would you like to Join</h3>
-    <input type="text" id="selectBox" name="className" class="box" placeholder="Select Class Name"><br>
-    <h3>List of All Classes</h3>
-    <select name="listClassName" id="listBox" class="box"><option value="" selected disabled hidden>All Classes</option></select>
+    <input type="text" id="selectBox" list="ice-cream-flavors" name="className" class="box" placeholder="Select Class Name"><br>
+    <datalist name="listClassName" id="listBox" class="box"></datalist>
     <input type="hidden" id="forwardBox" name="forward">
     <input type="submit" id="submitButton" class="button unselectable" value="Submit">
 </form>
@@ -44,16 +43,18 @@
     document.getElementById("quickmenu").classList.add("hidden")
     let ub = document.getElementById("selectBox");
     let lb = document.getElementById("listBox");
-    let lbopt = document.getElementById("listBox").options;
     let sb = document.getElementById("submitButton");
 
     let allClasses = "{{ allClasses }}".replaceAll("&#34;", "\"")
     allClasses = JSON.parse(allClasses)
-    allClasses.forEach(classes =>
-        lbopt.add(
-            new Option(classes, classes, false)
-        )
+    var str = '';
+    console.log(allClasses);
+    allClasses.forEach(classes => 
+        str +=  `<option value="${classes}"/>`
     );
+
+    console.log(str);
+    lb.innerHTML = str;
 
     function checkIfBlank() {
         if (ub.value || lb.value) {

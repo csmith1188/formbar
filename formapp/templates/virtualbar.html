@@ -106,7 +106,7 @@
     // When the page needs to refresh, send a signal to chat which will then refresh everyone's page
     chatSocket.on("sessionUpdate", message => {
       console.log("message");
-      location.reload();
+      location.reload('/virtualbar');
     });
 
 

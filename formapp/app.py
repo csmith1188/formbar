@@ -2807,8 +2807,6 @@ def endpoint_selectclass():
         if request.method == "POST":
             if (request.form['className']):
                 className = request.form['className']
-            elif (request.form['listClassName']):
-                className = request.form['listClassName']
             else:
                 return render_template("message.html", message="No Class Was Selected")
             db = sqlite3.connect(os.path.dirname(
@@ -2817,7 +2815,7 @@ def endpoint_selectclass():
             nameofClass = dbcmd.execute(
                 "SELECT name FROM classes WHERE name=?", [className]).fetchone()
             db.close()
-            if nameofClass[0]:
+            if nameofClass:
                 db = sqlite3.connect(os.path.dirname(
                     os.path.abspath(__file__)) + '/data/database.db')
                 dbcmd = db.cursor()
@@ -2831,7 +2829,8 @@ def endpoint_selectclass():
                 db.close()
                 sD.studentDict[request.remote_addr]['class'] = className
                 return redirect('/home')
-            return render_template("message.html", message="No class with that name")
+            else: 
+                return render_template("message.html", message="No class with that name")
         else:
             db = sqlite3.connect(os.path.dirname(
                 os.path.abspath(__file__)) + '/data/database.db')

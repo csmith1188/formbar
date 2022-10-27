@@ -307,7 +307,7 @@
     <div id="recContainer" style="font-size: 14px; margin-bottom: 5px;">To <span id="recipient">all</span><span id="removeRec" onclick="removeRec()" title="Reset recipients to all">✕</span></div>
     <form onsubmit="event.preventDefault(); onSubmit(); return false;" style="margin: 0;">
         <input id="input" class="box" placeholder="Enter a message" autocomplete="off">
-        <input type="submit" value="Send" id="sendButton" class="button">
+        <input type="submit" value="Send" id="sendButton" onclick="location.reload()" class="button">
     </form>
 </div>
 <div id="notifications">
@@ -325,6 +325,9 @@
 <!-- Extra javascript here -->
 {% block script %}
 <script type="text/javascript">
+  function reloadPage(){
+    
+  }
     var username = "{{ username }}";
     var receiver = 'all';
     //get the name use for profile sending

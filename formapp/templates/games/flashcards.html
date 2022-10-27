@@ -257,6 +257,10 @@
 <!-- Extra JavaScript here -->
 {% block script %}
   <script>
+  // When the page needs to refresh, send a signal to chat which will then refresh everyone's page
+  chatSocket.on("reload", message => {
+    location.reload();
+  });
     var cardSubmitted = true;
     var discardPile = 0;
     var mistakePile = []

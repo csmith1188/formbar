@@ -24,13 +24,13 @@
   }
 
   .controls {
-    padding: 8px;
+    padding: 8px 8px 0;
     background: var(--bg-dark-highlight);
     margin-bottom: 16px;
   }
 
   .controls button {
-    margin: 0 4px;
+    margin: 0 8px 8px 0;
     font-size: 14px;
   }
 
@@ -62,6 +62,13 @@
   }
 
   .icon {
+    height: 1.2em;
+    display: inline-block;
+    vertical-align: text-bottom;
+    margin-right: 8px;
+  }
+
+  .permsIcon {
     height: 1.2em;
     display: inline-block;
     vertical-align: text-bottom;
@@ -135,7 +142,9 @@
       <button id="perms" class="sort">Permissions</button>
     </div>
     <button id="collapseButton" class="inline popOut hidden">Collapse all</button>
+
     <div id="students">
+      <%sD.studentDict[request.remote_addr]['help']['message'] = request.args.get('message')-%>
     </div>
 
     <h2>Restart session</h2>
@@ -168,7 +177,7 @@
       <label>
         <div>
           <input type="radio" id="progress" name="mode">
-          <h3 style="display: inline;">Progess</h3><br>
+          <h3 style="display: inline;">Progress</h3><br>
           <span style="margin-left: 25px;">Description</span><br>
         </div>
       </label>
@@ -196,6 +205,14 @@
           <span style="margin-left: 25px;">Students can change the colors of the bar.</span><br>
         </div>
       </label>
+
+      <label>
+        <div>
+          <input type="button" id="clear" name="mode">
+          <h3 style="display: inline;">Clear</h3><br>
+          <span style="margin-left: 25px;">Clear all responses</span><br>
+        </div>
+      </label>
     </div>
 
   </div>
@@ -208,7 +225,7 @@
     <div id="permsContainer">
       <div class="permBox">
         <h3>Chat</h3>
-        <select onchange="updatePerm(this)" id="saypermsDrop" name="saypermsDrop" style="margin-top: 8px;">
+        <select onchange="updatePerm(this);" id="saypermsDrop" name="saypermsDrop" style="margin-top: 8px;">
           <option value="/controlpanel?say=0">Teacher</option>
           <option value="/controlpanel?say=1">Mod</option>
           <option value="/controlpanel?say=2" selected>Student</option>
@@ -220,7 +237,7 @@
       </div>
       <div class="permBox">
         <h3>Games</h3>
-        <select onchange="updatePerm(this)" id="gamespermsDrop" name="gamespermsDrop" style="margin-top: 8px;">
+        <select onchange="updatePerm(this);" id="gamespermsDrop" name="gamespermsDrop" style="margin-top: 8px;">
           <option value="/controlpanel?games=0">Teacher</option>
           <option value="/controlpanel?games=1">Mod</option>
           <option value="/controlpanel?games=2" selected>Student</option>
@@ -232,7 +249,7 @@
       </div>
       <div class="permBox">
         <h3>LED bar</h3>
-        <select onchange="updatePerm(this)" id="barpermsDrop" name="barpermsDrop" style="margin-top: 8px;">
+        <select onchange="updatePerm(this);" id="barpermsDrop" name="barpermsDrop" style="margin-top: 8px;">
           <option value="/controlpanel?bar=0" selected>Teacher</option>
           <option value="/controlpanel?bar=1">Mod</option>
           <option value="/controlpanel?bar=2">Student</option>
@@ -244,7 +261,7 @@
       </div>
       <div class="permBox">
         <h3>Sounds</h3>
-        <select onchange="updatePerm(this)" id="sfxpermsDrop" name="sfxpermsDrop" style="margin-top: 8px;">
+        <select onchange="updatePerm(this);" id="sfxpermsDrop" name="sfxpermsDrop" style="margin-top: 8px;">
           <option value="/controlpanel?sfx=0" selected>Teacher</option>
           <option value="/controlpanel?sfx=1">Mod</option>
           <option value="/controlpanel?sfx=2">Student</option>
@@ -256,7 +273,7 @@
       </div>
       <div class="permBox">
         <h3>Music</h3>
-        <select onchange="updatePerm(this)" id="bgmpermsDrop" name="bgmpermsDrop" style="margin-top: 8px;">
+        <select onchange="updatePerm(this);" id="bgmpermsDrop" name="bgmpermsDrop" style="margin-top: 8px;">
           <option value="/controlpanel?bgm=0" selected>Teacher</option>
           <option value="/controlpanel?bgm=1">Mod</option>
           <option value="/controlpanel?bgm=2">Student</option>
@@ -268,7 +285,7 @@
       </div>
       <div class="permBox">
         <h3>API</h3>
-        <select onchange="updatePerm(this)" id="apipermsDrop" name="apipermsDrop" style="margin-top: 8px;">
+        <select onchange="updatePerm(this);" id="apipermsDrop" name="apipermsDrop" style="margin-top: 8px;">
           <option value="/controlpanel?api=0">Teacher</option>
           <option value="/controlpanel?api=1">Mod</option>
           <option value="/controlpanel?api=2">Student</option>
@@ -335,12 +352,24 @@
 
   sendStudents();
 
+  function packMSG(rx, tx, content) {
+        let msgOUT = {
+            to: rx,
+            from: tx,
+            content: content
+        }
+        return JSON.stringify(msgOUT);
+    }
+
   function updatePerm(el) {
     request.open("GET", el.value);
+    console.log(el.value);
     request.onload = function() {
       // console.log(request.response);
     };
     request.send();
+    
+    chatSocket.emit('reload', JSON.stringify(packMSG('all', 'server', '')))
   }
 
   async function updateStudents() {
@@ -366,9 +395,9 @@
       request.send();
     }
     if (document.getElementById("countdown").checked) {
-      alert("This feature is not available yet.");
       document.getElementById("playtime").checked = true;
-      ////document.getElementById("countdownTime").classList.remove("hidden");
+      alert("This feature is not available yet.");
+      //document.getElementById("countdownTime").classList.remove("hidden");
     } else {
       document.getElementById("countdownTime").classList.add("hidden");
     }
@@ -645,6 +674,17 @@
           for (student of studentList) {
             let newStudent = document.createElement('h3');
             let icons = "";
+            let pictureIcon = ""
+
+            //change image based upon persons permissions
+            let perms = student['perms']
+            if (perms) var permsIcons = document.createElement("img");
+            if (perms == 0) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/teacher.png') }}" class="permsIcon" title="teacher">`
+            if (perms == 1) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/mod.png') }}" class="permsIcon" title="mod">`
+            if (perms == 2) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/student.png') }}" class="permsIcon" title="student">`
+            if (perms == 3) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/anyone.png') }}" class="permsIcon" title="anyone">`
+            if (perms == 4) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/banned.png') }}" class="permsIcon" title="banned">`
+
 
             //Change student color according to thumb response
             let thumb = student['thumb'];
@@ -667,7 +707,7 @@
 
             if (student['complete']) icons += `<img src="{{ url_for('static', filename='img/controlpanel/complete.png') }}" class="icon" title="Complete">`;
 
-            newStudent.innerHTML = icons + student.name;
+            newStudent.innerHTML = pictureIcon + icons + student.name;
             let newDetails = document.createElement('span');
             newDetails.classList.add('user');
             if (collapsed) newDetails.classList.add("hidden");
@@ -703,7 +743,11 @@
                 helpTicket.appendChild(acceptButton);
                 helpTicket.appendChild(rejectButton);
               } else {
-                helpTicket.innerHTML += help.message || "<i>Sent a help ticket</i>";
+                console.log(student.help.message)
+                if (student.help.message) 
+                  helpTicket.innerHTML += student.help.message
+                else
+                  "<i>Sent a help ticket</i>";
                 let removeButton = document.createElement("button");
                 removeButton.id = "e"
                 removeButton.classList.add("inline", "popOut");

@@ -306,7 +306,7 @@ def refreshUsers(selectedStudent='', category=''):
                 sD.studentDict[student][category] = ''
                 return True
             except Exception as e:
-                logFile("Error", + e)
+                logFile("Error", str(e))
                 return False
         else:
             sD.studentDict[student]['thumb'] = '',
@@ -369,7 +369,7 @@ def playSFX(sound):
         pygame.mixer.Sound(sfx.sound[sound]).play()
         return "Successfully played: "
     except Exception as e:
-        logFile("Error", + e)
+        logFile("Error", str(e))
         return "Invalid format: "
 
 
@@ -1272,8 +1272,8 @@ def endpoint_bgm():
                     volBGM(bgm_volume)
                     return render_template("message.html", message='Music volume set to ' + request.args.get('voladj') + '.')
                 except Exception as e:
-                    logFile("Error", +e)
-                    return render_template("message.html", message='Invalid voladj. Use \'up\', \'down\', or a number from 0.0 to 1.0.')
+                    logFile("Error", str(e))
+                    return render_template("message.html", message = 'Invalid voladj. Use \'up\', \'down\', or a number from 0.0 to 1.0.')
         elif request.args.get('playpause'):
             playpauseBGM()
             if sD.bgm['paused']:
@@ -1502,7 +1502,7 @@ def endpoint_color():
             g = int(request.args.get('g'))
             b = int(request.args.get('b'))
         except Exception as e:
-            logFile("Error", e)
+            logFile("Error", str(e))
             r = ''
             g = ''
             b = ''
@@ -1563,7 +1563,7 @@ def endpoint_controlpanel():
                                 db.commit()
                                 db.close()
                     except Exception as e:
-                        logFile("Error", e)
+                        logFile("Error", str(e))
                         pass
 
         ###
@@ -2197,8 +2197,8 @@ def endpoint_lesson():
                 return redirect('/lesson' + advanced)
             except Exception as e:
                 logFile("Error", traceback.format_exc())
-                logFile("Error", e)
-                return render_template("message.html", message='<b>Error:</b> ' + str(e))
+                logFile("Error", str(e))
+                return render_template("message.html", message = '<b>Error:</b> ' + str(e))
         elif request.args.get('action'):
             if request.args.get('action') == 'next':
                 sD.currentStep += 1
@@ -2406,7 +2406,7 @@ def endpoint_login():
             # If the user is logged in, log them out
             if remote in sD.studentDict:
                 logFile(
-                    "Info " + sD.studentDict[request.remote_addr]['name'],  " logged out.")
+                    "Info ", sD.studentDict[request.remote_addr]['name'] + " logged out.")
                 socket_.emit('alert', json.dumps(packMSG(
                     'all', 'server', sD.studentDict[request.remote_addr]['name'] + " logged out...")), namespace=chatnamespace)
                 del sD.studentDict[request.remote_addr]
@@ -2484,10 +2484,9 @@ def endpoint_perc():
             percAmount = int(percAmount)
             percFill(percAmount)
         except Exception as e:
-            logFile("Error", e)
-            return render_template("message.html", message="<b>amount</b> must be an integer between 0 and 100 \'/perc?amount=<b>50</b>\'", forward='/home')
-        return render_template("message.html", message="Set perecentage to: " + str(percAmount) + ".", forward='/home')
-
+            logFile("Error", str(e))
+            return render_template("message.html", message = "<b>amount</b> must be an integer between 0 and 100 \'/perc?amount=<b>50</b>\'", forward = '/home')
+        return render_template("message.html", message = "Set perecentage to: " + str(percAmount) + ".", forward = '/home')
 
 '''
     /profile
@@ -2557,8 +2556,8 @@ def endpoint_progress():
                     percFill(percAmount)
                 return str(check) + " was toggled."
             except Exception as e:
-                logFile("Error", e)
-                return render_template("message.html", message='<b>Error:</b> ' + str(e))
+                logFile("Error", str(e))
+                return render_template("message.html", message = '<b>Error:</b> ' + str(e))
         else:
             if sD.activeProgress:
                 return render_template('progress.html', progress=sD.activeProgress)
@@ -2676,7 +2675,7 @@ def endpoint_savescore():
             else:
                 return render_template("message.html", message="Missing arguments.")
         except Exception as e:
-            print("[error] " + "Error: " + str(e))
+            logFile("[error] ", "Error: " + str(e))
 
 
 @app.route('/say')
@@ -2727,8 +2726,8 @@ def endpoint_segment():
                 start = int(start)
                 end = int(end)
             except Exception as e:
-                logFile("Error", e)
-                return render_template("message.html", message="Bad ArgumentsTry <b>/segment?start=0&end=10&hex=FF00FF</b> (start and end must be and integer)")
+                logFile("Error", str(e))
+                return render_template("message.html", message = "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=FF00FF</b> (start and end must be and integer)")
         if start > BARPIX or end > BARPIX:
             return render_template("message.html", message="Bad ArgumentsTry <b>/segment?start=0&end=10&hex=FF00FF</b> (Your start or end was higher than the number of pixels: " + str(BARPIX) + ")")
         pixRange = range(start, end)
@@ -2978,7 +2977,7 @@ def endpoint_updateuser():
             else:
                 return render_template("message.html", message="Missing arguments.")
         except Exception as e:
-            print("[error] " + "Error: " + str(e))
+            logFile("[error] ", "Error: " + str(e))
 
 #This endpoint allows us to see which user(Student) is logged in.
 @app.route('/users', methods = ['POST', 'GET'])
@@ -3095,7 +3094,7 @@ def endpoint_users():
                         else:
                             return render_template("message.html", message="User not in list.")
                     except Exception as e:
-                        logFile("Error", e)
+                        logFile("Error", str(e))
                         f = open('errorlog.txt', 'a')
                         f.write(str(e))
                         f.close()
@@ -3229,9 +3228,6 @@ def disconnect():
                     packMSG('all', 'server', chatUsers())), broadcast=True)
     except Exception as e:
         logFile("Error", "Error finding user in list: " + str(e))
-        f = open('errorlog.txt', 'a')
-        f.write(str(e))
-        f.close()
 
 
 @socket_.on('message', namespace=chatnamespace)
@@ -3342,7 +3338,7 @@ def message(message):
                     emit('reload', message, to=sD.studentDict[student]['sid'])
                     
     except Exception as e:
-        print("[error] " + 'Error: ' + str(e))
+        logFile("[error] ", 'Error: ' + str(e))
 
 
 @socket_.on('alert', namespace=chatnamespace)

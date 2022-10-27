@@ -1629,17 +1629,21 @@ def endpoint_createclass():
             db = sqlite3.connect(os.path.dirname(
                 os.path.abspath(__file__)) + '/data/database.db')
             dbcmd = db.cursor()
-            dbcmd.execute("INSERT INTO classes (name) VALUES (?)", [className])
-            db.commit()
-            classID = dbcmd.execute("SELECT uid FROM classes WHERE name=?", [
-                                    className]).fetchone()
-            userID = dbcmd.execute("SELECT uid FROM users WHERE username=?", [
-                                   sD.studentDict[request.remote_addr]['name']]).fetchone()
-            dbcmd.execute("INSERT INTO classusers (userid, classid) VALUES (?, ?)", [
-                          userID[0], classID[0]])
-            db.commit()
-            db.close()
-            sD.studentDict[request.remote_addr]['class'] = className
+            alreadyExist = dbcmd.execute("SELECT * FROM classes WHERE name=?", [className]).fetchone()
+            if  alreadyExist:
+                return render_template("message.html", message='Class Already Exists.')
+            else:
+                dbcmd.execute("INSERT INTO classes (name) VALUES (?)", [className])
+                db.commit()
+                classID = dbcmd.execute("SELECT uid FROM classes WHERE name=?", [
+                                        className]).fetchone()
+                userID = dbcmd.execute("SELECT uid FROM users WHERE username=?", [
+                                       sD.studentDict[request.remote_addr]['name']]).fetchone()
+                dbcmd.execute("INSERT INTO classusers (userid, classid) VALUES (?, ?)", [
+                              userID[0], classID[0]])
+                db.commit()
+                db.close()
+                sD.studentDict[request.remote_addr]['class'] = className
             if forward:
                 return redirect(forward, code=302)
             else:

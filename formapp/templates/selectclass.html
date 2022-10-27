@@ -2,19 +2,69 @@
 
 {% block title %}Select Class{% endblock %}
 {% block style %}
+<style>
+    #content {
+        text-align: center;
+    }
 
+    input {
+        display: block;
+        margin: auto;
+        font-size: 20px !important;
+        width: 256px;
+        height: 36px !important;
+        box-sizing: border-box;
+        margin-top: 16px;
+    }
+</style>
 {% endblock %}
 {% block color %}purple{% endblock %}
 
 {% block main %}
-<html>
-    <body>
-        <form action="selectclass" method="post">
-            <input type="text" name="className" placeholder="Select Class Name">
-            <input type="submit" id="submitButton" class="button unselectable" value="Submit">
-        </form>
-    </body>
-</html>
+<form action="selectclass" method="post">
+    <h3>Which Class Would you like to Join</h3>
+    <input type="text" id="selectBox" list="listBox" name="className" class="box" placeholder="Select Class Name"><br>
+    <datalist name="listClassName" id="listBox" class="box"></datalist>
+    <input type="hidden" id="forwardBox" name="forward">
+    <input type="submit" id="submitButton" class="button unselectable" value="Submit">
+</form>
 {% endblock %}
 
-{% block script %}{% endblock %}
+{% block script %}
+<script>
+    const forward = urlParams.get('forward');
+    if (forward) {
+        document.getElementById('forwardBox').value = forward
+    }
+    else {
+        document.getElementById('forwardBox').value = null
+    }
+
+    document.getElementById("quickmenu").classList.add("hidden")
+    let ub = document.getElementById("selectBox");
+    let lb = document.getElementById("listBox");
+    let sb = document.getElementById("submitButton");
+
+    let allClasses = "{{ allClasses }}".replaceAll("&#34;", "\"")
+    allClasses = JSON.parse(allClasses)
+    var str = '';
+    allClasses.forEach(classes => 
+        str +=  `<option value="${classes}"/>`
+    );
+
+    lb.innerHTML = str;
+
+    function checkIfBlank() {
+        if (ub.value || lb.value) {
+            sb.classList.remove("unselectable");
+            sb.onsubmit = () => true;
+        } else {
+            sb.classList.add("unselectable");
+            sb.onsubmit = () => false;
+        }
+    }
+
+    ub.oninput = checkIfBlank;
+    lb.oninput = checkIfBlank;
+</script>
+{% endblock %}

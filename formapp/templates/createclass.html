@@ -21,13 +21,13 @@
 
 {% block main %}
         <form action="createclass" method="post">
-            <input type="text" id="classBox" name="className" class="box" placeholder="Create Class Name" required>
+            <input type="text" id="classBox" name="className" class="box" autocomplete="off" placeholder="Create Class Name" required>
             <input type="hidden" id="userTypeBox" name="submittionType" value="createClass">
             <input type="hidden" id="forwardBox" name="forward">
             <input type="submit" id="submitButton" class="button unselectable" value="Submit">
-        </form>
+        </form><br>
         <form action="createclass" method="post">
-            <input type="text" id="previousBox" name="previousName" class="box" placeholder="Select Previous Class Name" required>
+            <select name="previousName" id="previousBox" placeholder="Select Previous Class" class="box" required></select><br>
             <input type="hidden" id="userTypeBox" name="submittionType" value="previousClass">
             <input type="hidden" id="forwardBox2" name="forward">
             <input type="submit" id="submitButton2" class="button unselectable" value="Submit">
@@ -53,6 +53,18 @@
     let sb = document.getElementById("submitButton");
     let sb2 = document.getElementById("submitButton2");
     
+    let allClasses = "{{ allClasses }}".replaceAll("&#34;", "\"")
+    allClasses = JSON.parse(allClasses)
+    if (allClasses[0]) {
+      var str = '<option value="" selected>Select Class</option>';
+    } else {
+      var str = '<option value="" selected>You own no classes</option>';
+    }
+    allClasses.forEach(classes => 
+        str +=  `<option value="${classes}">${classes}</option>`
+    );
+    pb.innerHTML = str;
+    
     function checkIfBlank() {
       if (ub.value) {
         sb.classList.remove("unselectable");
@@ -65,6 +77,7 @@
         sb.onsubmit = () => false;
       }
     }
+
 
     ub.oninput = checkIfBlank;
     pb.oninput = checkIfBlank;

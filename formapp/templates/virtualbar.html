@@ -77,30 +77,36 @@
       var wiggle = 0
       var down = 0
 
-      
+
       for (const key of Object.keys(pixRes)) {
         console.log(pixRes[key].thumb);
-        if (pixRes[key].thumb == "up") {
-          up++
-          console.log('found up');
+        console.log(pixRes[key].perms);
+        if(pixRes[key].perms < 2){
+          console.log('Teacher');
+        } else if (pixRes[key].perms > 0){
+
+          if (pixRes[key].thumb == "up") {
+            up++
+            console.log('found up');
+          }
+          
+          if (pixRes[key].thumb == "wiggle") {
+            wiggle++
+            console.log('found wiggle');
+          }
+          
+          if (pixRes[key].thumb == "down") {
+            down++
+            console.log('found down');
+          }
         }
-      
-        if (pixRes[key].thumb == "wiggle") {
-          wiggle++
-          console.log('found wiggle');
-        }
-        
-        if (pixRes[key].thumb == "down") {
-          down++
-          console.log('found down');
-        }
-        
+          
       }
       doughnutChart.data.datasets[0].data = [up, wiggle, down];
       doughnutChart.update();
     }
   pixRequest.send(null);
-    }
+  }
 
 
     // When the page needs to refresh, send a signal to chat which will then refresh everyone's page

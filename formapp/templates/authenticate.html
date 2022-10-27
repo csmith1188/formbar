@@ -50,7 +50,7 @@
 <!-- Extra JavaScript here -->
 {% block script %}
 <script>
-  document.getElementById("passwordBox").oninput = function() {
+  document.getElementById("passwordBox").oninput = function () {
     let sb = document.getElementById("submitButton");
     if (this.value) {
       sb.classList.remove("unselectable");

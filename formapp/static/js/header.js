@@ -8,8 +8,8 @@ const chatSocket = io("/chat");
 chatSocket.on("disconnect", message => {
   console.log("DISCONNECTED:", message);
   //if (message == "transport error") {
-    //alert("Session ended.");
-    //window.location.reload();
+  //alert("Session ended.");
+  //window.location.reload();
   //}
 });
 

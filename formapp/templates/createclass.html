@@ -55,7 +55,6 @@
     
     let allClasses = "{{ allClasses }}".replaceAll("&#34;", "\"")
     allClasses = JSON.parse(allClasses)
-    console.log(allClasses);
     if (allClasses[0]) {
       var str = '<option value="" selected>Select Class</option>';
     } else {

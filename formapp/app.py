@@ -104,7 +104,8 @@ logFile('Info', "Running formbar on ip: " + ip)
 
 # Scan the sfx and bgm folders
 sfx.updateFiles()
-#bgm.updateFiles()
+
+bgm.updateFiles()
 # Start up pygame for sfx and bgm
 pygame.init()
 

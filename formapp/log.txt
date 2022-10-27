@@ -30,3 +30,36 @@
 [2022-10-27 08:28:54] [Info] tfloto disconnected
 [2022-10-27 08:29:06] [Info] tfloto connected and was given id "QzuyYMSryO4KLglSAAAT"
 [2022-10-27 08:29:26] [Info] tfloto disconnected
+[2022-10-27 08:33:40] [Info] tfloto connected and was given id "qA5kUaX7MDAW1LRaAAAV"
+[2022-10-27 08:33:43] [Info] tfloto connected and was given id "fpEdc0HjZScOj22SAAAX"
+[2022-10-27 08:33:44] [Info] tfloto connected and was given id "Mm-HwgxpBjtGjWbfAAAZ"
+[2022-10-27 08:33:46] [Info] tfloto connected and was given id "jyy6kY5IqtFXK9tZAAAb"
+[2022-10-27 08:33:52] [Info] tfloto connected and was given id "Liqawx-euYdn9eq6AAAd"
+[2022-10-27 08:33:56] [Info] tfloto connected and was given id "2SJ8kZzHa3eeukhbAAAf"
+[2022-10-27 08:34:00] [Info] tfloto disconnected
+[2022-10-27 08:34:51] [Info] tfloto connected and was given id "MnT8P4TSGbcXOOUlAAAh"
+[2022-10-27 08:34:51] [Info] tfloto disconnected
+[2022-10-27 08:50:35] [Info] tfloto connected and was given id "5UfhUUMMGfbBEWjNAAAj"
+[2022-10-27 08:50:49] [Info] tfloto connected and was given id "S0sZ_brFvdDH7IL3AAAl"
+[2022-10-27 08:51:11] [Info] tfloto disconnected
+[2022-10-27 10:01:56] [Info] Running formbar on ip: 127.0.0.1
+[2022-10-27 10:02:20] [Info] Running formbar on ip: 127.0.0.1
+[2022-10-27 10:02:40] [Info] Running formbar on ip: 127.0.0.1
+[2022-10-27 10:07:11] [Info] Running formbar on ip: 127.0.0.1
+[2022-10-27 10:07:27] [Info] Running formbar on ip: 127.0.0.1
+[2022-10-27 10:07:39] [Info] Running formbar on ip: 127.0.0.1
+[2022-10-27 10:07:57] [Info] ac logged in. Made them the teacher...
+[2022-10-27 10:07:57] [Info] ac connected and was given id "_xmAtSLLkoJ5TO1mAAAL"
+[2022-10-27 10:08:02] [Info] ac connected and was given id "EKB8wydkYMG-xS7hAAAN"
+[2022-10-27 10:08:07] [Info] ac connected and was given id "K5RPsB9Dc3XAyyzbAAAP"
+[2022-10-27 10:08:12] [Info] ac connected and was given id "Tw4GXq8EMQCss_2oAAAR"
+[2022-10-27 10:08:13] [Info] ac connected and was given id "NrNA-s3eXial-tyHAAAT"
+[2022-10-27 10:08:14] [Info] ac connected and was given id "ub7eSIgAwRC_Uet0AAAV"
+[2022-10-27 10:08:19] [Info] ac connected and was given id "p3gbIEmmmr1mhFPaAAAX"
+[2022-10-27 10:08:20] [Info] ac connected and was given id "2UStSs2jiySUarxfAAAZ"
+[2022-10-27 10:08:24] [Info] ac connected and was given id "0_ptKzz6pMkQprZ_AAAb"
+[2022-10-27 10:08:53] [Info] Running formbar on ip: 127.0.0.1
+[2022-10-27 10:09:50] [Info] Running formbar on ip: 127.0.0.1
+[2022-10-27 10:10:13] [Info] blap logged in. Made them the teacher...
+[2022-10-27 10:10:13] [Info] blap connected and was given id "rJo7LvRmuXhKxzfgAAAP"
+[2022-10-27 10:10:51] [Info] blap disconnected

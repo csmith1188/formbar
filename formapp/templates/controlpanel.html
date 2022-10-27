@@ -8,8 +8,10 @@
 <!-- Extra style declarations here -->
 {% block style %}
 <style media="screen">
-  h2, h3, form {
-    margin: 0;
+  h2,
+  h3,
+  form {
+    margin: 1;
   }
 
   h2 {
@@ -19,6 +21,7 @@
   button {
     margin-right: 4px;
   }
+
   body {
     overflow-x: hidden;
   }
@@ -43,7 +46,7 @@
     left: 21px;
   }
 
-  .user > * {
+  .user>* {
     max-width: calc(100% - 21px);
     overflow-wrap: break-word;
   }
@@ -75,7 +78,8 @@
     margin-right: 8px;
   }
 
-  #history > span, #history > b {
+  #history>span,
+  #history>b {
     display: inline-block;
     width: 100px;
     margin-top: 8px;
@@ -87,25 +91,44 @@
     justify-content: space-evenly;
     padding: 0;
   }
+
   #tabBox li {
     display: inline;
   }
+
   #tabBox a {
     text-decoration: none;
   }
+
   #permsContainer {
     display: flex;
     justify-content: space-evenly;
     flex-wrap: wrap;
   }
+
   .permBox {
     width: 50%;
     margin: 0px;
   }
+
   #resetPerms {
     display: block;
     margin: 32px auto 0;
     font-size: 18px;
+  }
+
+  .tab {
+    background-color: var(--bg-dark-blue);
+    color: white;
+    border-radius: 5px;
+    margin: 5px;
+    padding: 5px;
+    cursor: pointer;
+  }
+
+  .tabcontent {
+    margin: 5px;
+    padding: 5px;
   }
 </style>
 {% endblock %}
@@ -116,6 +139,16 @@
 
 <!-- Main content here -->
 {% block main %}
+<script src="../static/jquery/external/jquery/jquery.js" charset="utf-8"></script>
+<script src="../static/jquery/jquery-ui.min.js" charset="utf-8"></script>
+<script>
+$( function() {
+    $( "#students" ).accordion({
+      collapsible: true
+    });
+  } );
+
+</script>
 <div id="tabs">
   <ul id="tabBox">
     <li><a class="button pressed" href="#tabs-1">Users</a></li>
@@ -144,6 +177,7 @@
     <button id="collapseButton" class="inline popOut hidden">Collapse all</button>
 
     <div id="students">
+
     </div>
 
     <h2>Restart session</h2>
@@ -151,8 +185,10 @@
   </div>
   <div id="tabs-2">
     <h2>Number of students</h2>
-    <input type="number" id="studentNum" class="line" onchange="sendStudents();" name="studentNum" min="1" max="30">&nbsp;&nbsp;
-    <input type="checkbox" id="autoStudents" checked onchange="sendStudents();"><label for="autoStudents">Auto</label><br>
+    <input type="number" id="studentNum" class="line" onchange="sendStudents();" name="studentNum" min="1"
+      max="30">&nbsp;&nbsp;
+    <input type="checkbox" id="autoStudents" checked onchange="sendStudents();"><label
+      for="autoStudents">Auto</label><br>
 
     <div onchange="changeMode();">
       <h2>Bar mode</h2>
@@ -169,7 +205,8 @@
         <input type="radio" id="letters" name="type" style="margin-left: 8px;"><label for="letters">Letters</label>
         <input type="radio" id="essay" name="type" style="margin-left: 8px;"><label for="essay">Essay</label><br>
         <span id="pollDescription">Students can choose between thumbs up, thumbs down, and wiggle</span><br>
-        <input type="button" id="pollButton" class="button inline popOut" value="Start new poll" style="margin-top: 8px;">
+        <input type="button" id="pollButton" class="button inline popOut" value="Start new poll"
+          style="margin-top: 8px;">
       </form>
       <br>
 
@@ -181,7 +218,7 @@
         </div>
       </label>
       <br>
-    
+
       <label>
         <div>
           <input type="radio" id="countdown" name="mode">
@@ -204,8 +241,8 @@
           <span style="margin-left: 25px;">Students can change the colors of the bar.</span><br>
         </div>
       </label>
-	  <br>
-	  <label>
+      <br>
+      <label>
         <div>
           <input type="radio" id="sendblock" name="mode">
           <h3 style="display: inline;">Blockchest Mode</h3><br>
@@ -303,21 +340,30 @@
   <div id="tabs-5">
     <h2>Lock Formbar</h2>
     Only whitelisted users will be able to make changes.<br>
-    <input type="checkbox" id="lock" onchange="request.open('GET', '/controlpanel?locked=' + this.checked); request.send();"><label for="lock">Lock</label><br>
+    <input type="checkbox" id="lock"
+      onchange="request.open('GET', '/controlpanel?locked=' + this.checked); request.send();"><label
+      for="lock">Lock</label><br>
 
     <h2>Blind results</h2>
     Results won't be shown until the poll is complete.<br>
-    <input type="checkbox" id="blind" onchange="request.open('GET', '/controlpanel?blind=' + this.checked); request.send();"><label for="blind">Hide results</label><br>
+    <input type="checkbox" id="blind"
+      onchange="request.open('GET', '/controlpanel?blind=' + this.checked); request.send();"><label for="blind">Hide
+      results</label><br>
 
     <h2>Show missing votes</h2>
     When votes are missing, there will be empty spaces on the bar.<br>
-    <input type="checkbox" id="showMissing" checked onchange="request.open('GET', '/controlpanel?showinc=' + this.checked); request.send();"><label for="showMissing">Show</label><br>
+    <input type="checkbox" id="showMissing" checked
+      onchange="request.open('GET', '/controlpanel?showinc=' + this.checked); request.send();"><label
+      for="showMissing">Show</label><br>
 
     <h2>Clear data</h2>
     <b>Warning: These buttons will permanently delete data.</b><br>
-    <button class="inline popOut" style="margin-top: 12px;" onclick="clearTable('messages');">Clear all chat messages</button><br>
-    <button class="inline popOut" style="margin-top: 12px;" onclick="clearTable('scores');">Clear all game scores</button><br>
-    <button class="inline popOut" style="margin-top: 12px;" onclick="clearTable('users');">Clear all user accounts</button>
+    <button class="inline popOut" style="margin-top: 12px;" onclick="clearTable('messages');">Clear all chat
+      messages</button><br>
+    <button class="inline popOut" style="margin-top: 12px;" onclick="clearTable('scores');">Clear all game
+      scores</button><br>
+    <button class="inline popOut" style="margin-top: 12px;" onclick="clearTable('users');">Clear all user
+      accounts</button>
   </div>
 </div>
 {% endblock %}
@@ -352,23 +398,23 @@
   sendStudents();
 
   function packMSG(rx, tx, content) {
-        let msgOUT = {
-            to: rx,
-            from: tx,
-            content: content
-        }
-        return JSON.stringify(msgOUT);
+    let msgOUT = {
+      to: rx,
+      from: tx,
+      content: content
     }
+    return JSON.stringify(msgOUT);
+  }
 
   function updatePerm(el) {
     request.open("GET", el.value);
     console.log(el.value);
-    request.onload = function() {
+    request.onload = function () {
       // console.log(request.response);
     };
     request.send();
     
-    chatSocket.emit('reload', JSON.stringify(packMSG('all', 'server', '')))
+    chatSocket.emit('reload', packMSG('all', 'server', ''))
   }
 
   async function updateStudents() {
@@ -404,7 +450,7 @@
       request.open('GET', '/controlpanel?barmode=playtime');
       request.send();
     }
-	if (document.getElementById("sendblock").checked) {
+    if (document.getElementById("sendblock").checked) {
       request.open('GET', '/controlpanel?barmode=sendblock');
       request.send();
     }
@@ -520,7 +566,7 @@
   let collapsed = false;
   let filters = [];
   let sort;
-
+  let number = 0
   let filterButtons = Array.from(document.querySelectorAll(".filter"));
   filterButtons.forEach(button => button.onclick = () => toggleFilter(button));
 
@@ -528,7 +574,7 @@
   sortButtons.forEach(button => button.onclick = () => changeSort(button));
   changeSort(document.getElementById("logIn"));
 
-  collapseButton.onclick = function() {
+  collapseButton.onclick = function () {
     collapsed = !collapsed;
     let userDetails = Array.from(document.getElementsByClassName("user"));
     if (collapsed) {
@@ -543,7 +589,7 @@
   function checkUpdates(url) {
     let newRequest = new XMLHttpRequest();
     newRequest.open('GET', url);
-    newRequest.onload = function() {
+    newRequest.onload = function () {
       studentData = newRequest.response;
     };
     newRequest.send();
@@ -604,7 +650,7 @@
     }
   }
 
-  setInterval(function() {
+  setInterval(function () {
     checkUpdates('/api/students');
     let studentBox = document.getElementById('students');
     if (studentData === undefined) {
@@ -621,7 +667,7 @@
       if (filters.includes("!break")) studentList = studentList.filter(student => !student.excluded);
       if (filters.includes("pollResponded")) studentList = studentList.filter(student => student.thumb || student.letter || student.essay);
       if (filters.includes("!pollResponded")) studentList = studentList.filter(student => !(student.thumb || student.letter || student.essay));
-    
+
       let thumbs, letters, helpTimes;
       switch (sort) {
         case "logIn":
@@ -676,9 +722,11 @@
           //Loop through each student in the list
           for (student of studentList) {
             let newStudent = document.createElement('h3');
+            
             let icons = "";
             let pictureIcon = ""
-
+            
+            console.log(studentList);
             //change image based upon persons permissions
             let perms = student['perms']
             if (perms) var permsIcons = document.createElement("img");
@@ -709,8 +757,15 @@
             if (student['help'].type) icons += `<img src="{{ url_for('static', filename='img/controlpanel/help.png') }}" class="icon" title="Help ticket">`;
 
             if (student['complete']) icons += `<img src="{{ url_for('static', filename='img/controlpanel/complete.png') }}" class="icon" title="Complete">`;
+            
+            //Show tags if student has any
+              let tags = `<span style="font-weight: lighter; font-size: 13px;" >${student['tags']}</span>`
 
-            newStudent.innerHTML = pictureIcon + icons + student.name;
+
+            
+            
+            newStudent.innerHTML = pictureIcon + icons + student.name + ' ' + tags;
+
             let newDetails = document.createElement('span');
             newDetails.classList.add('user');
             cleanText = student.essay.replace(/<|>/gi, "")
@@ -748,7 +803,7 @@
                 helpTicket.appendChild(rejectButton);
               } else {
                 console.log(student.help.message)
-                if (student.help.message) 
+                if (student.help.message)
                   helpTicket.innerHTML += student.help.message
                 else
                   "<i>Sent a help ticket</i>";
@@ -780,7 +835,7 @@
             }
             let studentPerms = student['perms'];
             newDetails.innerHTML += `
-              <select onchange="userPerm(this, '${student}')" id="userpermsDrop" name="userpermsDrop">
+              <select onchange="userPerm(this, '${student['name']}')" id="userpermsDrop" name="userpermsDrop">
                 <option value="/users?name=${student['name']}&action=perm&perm=0" ${studentPerms === 0 ? "selected" : ""}>${permNames[0]}</option>
                 <option value="/users?name=${student['name']}&action=perm&perm=1" ${studentPerms === 1 ? "selected" : ""}>${permNames[1]}</option>
                 <option value="/users?name=${student['name']}&action=perm&perm=2" ${studentPerms === 2 ? "selected" : ""}>${permNames[2]}</option>
@@ -834,6 +889,7 @@
               }
               newDetails.innerHTML += ` [Quiz: ${newQuiz}/${newQuizMax}]`
             }
+            
             studentBox.appendChild(newStudent)
             studentBox.appendChild(newDetails)
             let name = student['name'];
@@ -846,8 +902,10 @@
         }
       }
     }
-  }, 1000);
 
+    
+  }, 1000);
+  
   setInterval(async () => {
     let npRequests = await getResponse("/api/newpasswords");
     let el = document.getElementById("npRequests");
@@ -894,16 +952,20 @@
   async function userPerm(el, student) {
     let meRes = await getResponse("/api/me");
     let permsRes = await getResponse("/api/permissions");
+
     if (
-      student.name != meRes.name ||
+      student != meRes.name ||
       meRes.perms > el.value[el.value.length - 1] ||
       confirm("If you lower your own permissions, you may not be able to change them back. If no users have teacher permissions, the next person to log in will become the teacher.")
     ) {
       request.open("GET", el.value);
-      request.onload = function() {
+      request.onload = function () {
         console.log(request.response);
       };
       request.send();
+
+      chatSocket.emit('reload', packMSG(student, 'server', ''))
+
     } else {
       el.value = el.options[meRes.perms].value; //If perms are not updated, give el the correct value
     }
@@ -917,7 +979,23 @@
       historyLength = polls.length;
       document.getElementById("history").innerHTML = null;
       polls.reverse(); //Sort newest to oldest
+
+      let oldPollDate;
       polls.forEach((poll) => {
+        let date = new Date(poll[2]);
+        let month = date.getMonth() + 1;
+        let day = date.getDate();
+        let year = date.getFullYear().toString().slice(2);
+        let hour = date.getHours();
+        let minute = date.getMinutes().toString().padStart(2, "0");
+        let shortDate = day + "/" + month + "/" + year;
+        if (hour > 12) {
+          hour -= 12;
+          ampm = "PM";
+        } else {
+          if (hour == 0) hour = 12;
+          ampm = "AM";
+        }
         let type;
         switch (poll[1]) {
           case "tutd":
@@ -930,28 +1008,24 @@
             type = "Essay"
         }
 
-        let date = new Date(poll[2]);
-        let month = date.getMonth() + 1;
-        let day = date.getDate();
-        let year = date.getFullYear().toString().slice(2);
-        let hour = date.getHours();
-        let minute = date.getMinutes().toString().padStart(2, "0");
-        if (hour > 12) {
-          hour -= 12;
-          ampm = "PM";
-        } else {
-          if (hour == 0) hour = 12;
-          ampm = "AM";
-        }
+        // shortDate is the current date, and the oldPollDate are the previous saved poll dates
 
-        document.getElementById("history").innerHTML += `
-         <b>${type}</b>
-         <span>${month}/${day}/${year}</span>
-         <span>${hour}:${minute} ${ampm}</span>
-         <button class="inline popOut" onclick="downloadResponses(${poll[0]})">Download</button>
-         <br>
-        `;
+        if (oldPollDate != shortDate) {
+          document.getElementById("history").innerHTML += `<h3 class="tab">${month}/${day}/${year}</h3><div class="tabcontent" id="pollDate${shortDate}"></div>`;
+        }
+        oldPollDate = shortDate;
+        let pollBox = document.getElementById(`pollDate${shortDate}`);
+        pollBox.innerHTML += `<span>${hour}:${minute} ${ampm}</span>
+                                <b>${type}</b>
+                                <button class="inline popOut" onclick="downloadResponses(${poll[0]})">Download</button>
+                                <br>
+                                `;
       });
+      $("#history").accordion("refresh");
+    }
+    if (studentList.length > number) {
+      number = studentList.length
+      $('#students').accordion("refresh")
     }
   }
   updateHistory();
@@ -991,9 +1065,13 @@
 <script src="../static/jquery/external/jquery/jquery.js" charset="utf-8"></script>
 <script src="../static/jquery/jquery-ui.min.js" charset="utf-8"></script>
 <script>
-  $(function() {
+  $(function () {
+    $("#history").accordion({
+      collapsible: true,
+      heightStyle: "content"
+    });
     $("#tabs").tabs({
-      activate: function(event, ui) {
+      activate: function (event, ui) {
         let activeTab = $("#tabs").tabs("option", "active");
         $("#tabs .ui-tabs-nav a").each((i, el) => {
           if (i == activeTab) el.classList.add("pressed");

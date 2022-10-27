@@ -1464,6 +1464,7 @@ def endpoint_cleartable():
     if loginResult:
         return loginResult
     else:
+        table = request.args.get('table')
         if table:
             db = sqlite3.connect(os.path.dirname(
                 os.path.abspath(__file__)) + '/data/database.db')

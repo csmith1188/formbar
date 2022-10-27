@@ -12,4 +12,4 @@ __pycache__
 **database.db
 **send.bat
 **log.txt
-**/vscode/*
+*/vscode/*

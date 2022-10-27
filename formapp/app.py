@@ -182,7 +182,7 @@ sD.settings['perms']['bar'] = data[2]
 sD.settings['perms']['sfx'] = data[3]
 sD.settings['perms']['bgm'] = data[4]
 sD.settings['perms']['api'] = data[5]
-sD.settings['perms']['tags'] = data[9]
+sD.settings['perms']['tags'] = data[8]
 sD.settings['locked'] = data[6]
 sD.settings['blind'] = data[7]
 sD.settings['showinc'] = data[8]
@@ -864,7 +864,7 @@ def timer(minutes, seconds):
             print("FINISHED")
             playsound(finishedSound)
             break
-timer(0,3)
+
 
 
 # ███████ ███    ██ ██████  ██████   ██████  ██ ███    ██ ████████ ███████

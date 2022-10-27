@@ -3,7 +3,7 @@
 <!-- This is where the title, top buttons, and stylesheet is located -->
 
 <!-- Change title here -->
-{% block title %}Formbar Home{% endblock %}
+{% block title %}{{ className }}{% endblock %}
 {% block color %}classic{% endblock %}
 {% block style %}
 <style>
@@ -139,7 +139,7 @@
 </script>
 {% endblock %}
 {% block main %}
-<h1>Formbar</h1>
+<h1>{{ className }}</h1>
 <div id="tabcontainer" class="dark blue">
   <h3 class="tab">Students</h3>
   <div class="entry">

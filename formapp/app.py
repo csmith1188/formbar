@@ -958,7 +958,7 @@ def endpoint_2048():
 
 @app.route('/abcd')
 def endpoint_abcd():
-    loginResult = loginCheck(request.remote_addr, request.path, 'student')
+    loginResult = loginCheck(request.remote_addr, 'student')
     if loginResult:
         return loginResult
     else:

@@ -1629,7 +1629,7 @@ def endpoint_createclass():
             db = sqlite3.connect(os.path.dirname(
                 os.path.abspath(__file__)) + '/data/database.db')
             dbcmd = db.cursor()
-            dbcmd.execute("INSERT INTO classes (name) VALUES (?)", [className])
+            dbcmd.execute("INSERT INTO classes (owner, name) VALUES (?, ?)", [sD.studentDict[request.remote_addr]['name'], className])
             db.commit()
             classID = dbcmd.execute("SELECT uid FROM classes WHERE name=?", [
                                     className]).fetchone()
@@ -1661,7 +1661,15 @@ def endpoint_createclass():
             else:
                 return render_template("message.html", message='No Class With That Name')
     else:
-        return render_template('createclass.html')
+        db = sqlite3.connect(os.path.dirname(
+            os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        allClasses = dbcmd.execute("SELECT name FROM classes WHERE owner=?", [sD.studentDict[request.remote_addr]['name']]).fetchall()
+        db.close()
+        listClasses = []
+        for classes in allClasses:
+            listClasses.append(classes[0])
+        return render_template('createclass.html', allClasses=json.dumps(listClasses))
 
 
 @app.route('/createfightermatch', methods=['POST'])
@@ -2840,7 +2848,6 @@ def endpoint_selectclass():
             listClasses = []
             for classes in allClasses:
                 listClasses.append(classes[0])
-            print(listClasses)
             return render_template('selectclass.html', allClasses=json.dumps(listClasses))
 
 

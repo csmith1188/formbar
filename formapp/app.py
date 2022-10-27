@@ -2181,7 +2181,8 @@ def endpoint_home():
     if loginResult:
         return loginResult
     else:
-        return render_template("index.html")
+        className = sD.studentDict[request.remote_addr]['class']
+        return render_template("index.html", className = className)
 
 # ██
 # ██

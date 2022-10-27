@@ -48,12 +48,10 @@
     let allClasses = "{{ allClasses }}".replaceAll("&#34;", "\"")
     allClasses = JSON.parse(allClasses)
     var str = '';
-    console.log(allClasses);
     allClasses.forEach(classes => 
         str +=  `<option value="${classes}"/>`
     );
 
-    console.log(str);
     lb.innerHTML = str;
 
     function checkIfBlank() {

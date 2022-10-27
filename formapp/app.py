@@ -23,6 +23,35 @@
 #  ██████  ██████  ██   ████ ██      ██  ██████   ██████  ██   ██ ██   ██    ██    ██  ██████  ██   ████
 
 
+import os
+import sys
+import csv
+import json
+import math
+import time
+import random
+import pandas
+import re
+#import custom modules
+from key import key
+from modules import sessions
+from modules import lessons
+from modules.colors import colors, hex2dec
+from modules import bgm
+from modules import sfx
+from modules import letters
+import sqlite3
+import traceback
+import datetime
+import logging
+import threading
+import pygame
+from cryptography.fernet import Fernet
+from websocket_server import WebsocketServer
+from werkzeug.utils import secure_filename
+from threading import Lock
+from flask_socketio import SocketIO, emit, disconnect
+from flask import Flask, redirect, url_for, request, render_template, session, copy_current_request_context
 from config import *
 
 #Permission levels are as follows:
@@ -153,6 +182,7 @@ sD.settings['perms']['bar'] = data[2]
 sD.settings['perms']['sfx'] = data[3]
 sD.settings['perms']['bgm'] = data[4]
 sD.settings['perms']['api'] = data[5]
+sD.settings['perms']['tags'] = data[9]
 sD.settings['locked'] = data[6]
 sD.settings['blind'] = data[7]
 sD.settings['showinc'] = data[8]
@@ -249,12 +279,14 @@ def newStudent(remote, username, bot=False):
         dbcmd = db.cursor()
         userFound = dbcmd.execute("SELECT * FROM users WHERE username=:uname", {"uname": username}).fetchall()
         db.close()
+
         for user in userFound:
             if username in user:
                 if not teacher:
                     sD.studentDict[remote]['perms'] = sD.settings['perms']['admin']
                 else:
                     sD.studentDict[remote]['perms'] = int(user[3])
+     
 
         socket_.emit('alert', json.dumps(packMSG('all', 'server', sD.studentDict[request.remote_addr]['name'] + " logged in...")), namespace=chatnamespace)
         playSFX("sfx_up02")
@@ -276,7 +308,7 @@ def refreshUsers(selectedStudent='', category=''):
                 sD.studentDict[student][category] = ''
                 return True
             except Exception as e:
-                logFile("Error", + e)
+                logFile("Error", str(e))
                 return False
         else:
             sD.studentDict[student]['thumb'] = '',
@@ -338,7 +370,7 @@ def playSFX(sound):
         pygame.mixer.Sound(sfx.sound[sound]).play()
         return "Successfully played: "
     except Exception as e:
-        logFile("Error", + e)
+        logFile("Error", str(e))
         return "Invalid format: "
     
 
@@ -1154,7 +1186,7 @@ def endpoint_bgm():
                         startBGM(bgm_file, bgm_volume)
                     else:
                         startBGM(bgm_file)
-                    return render_template("message.html", message = 'Playing: ' + bgm_file)
+                    return render_template("message.html", message = 'Playing: ' + bgm_file, forward='/bgm')
                 else:
                     if request.args.get('return') == 'json':
                         return '{error: "It has only been ' + str(int(time.time() - sD.bgm['lastTime'])) + ' seconds since the last song started. Please wait at least 60 seconds."}'
@@ -1379,7 +1411,7 @@ def endpoint_color():
             g = int(request.args.get('g'))
             b = int(request.args.get('b'))
         except Exception as e:
-            logFile("Error", e)
+            logFile("Error", str(e))
             r = ''
             g = ''
             b = ''
@@ -1433,7 +1465,7 @@ def endpoint_controlpanel():
                                 db.commit()
                                 db.close()
                     except Exception as e:
-                        logFile("Error", e)
+                        logFile("Error", str(e))
                         pass
 
         ###
@@ -2190,8 +2222,10 @@ def endpoint_login():
         else:
             #If the user is logged in, log them out
             if remote in sD.studentDict:
-                logFile("Info " + sD.studentDict[request.remote_addr]['name'],  " logged out.")
-                socket_.emit('alert', json.dumps(packMSG('all', 'server', sD.studentDict[request.remote_addr]['name'] + " logged out...")), namespace=chatnamespace)
+                logFile(
+                    "Info ", sD.studentDict[request.remote_addr]['name'] + " logged out.")
+                socket_.emit('alert', json.dumps(packMSG(
+                    'all', 'server', sD.studentDict[request.remote_addr]['name'] + " logged out...")), namespace=chatnamespace)
                 del sD.studentDict[request.remote_addr]
                 playSFX('sfx_laser01')
             if request.args.get('name'): ##needs update
@@ -2262,7 +2296,7 @@ def endpoint_perc():
             percAmount = int(percAmount)
             percFill(percAmount)
         except Exception as e:
-            logFile("Error", e)
+            logFile("Error", str(e))
             return render_template("message.html", message = "<b>amount</b> must be an integer between 0 and 100 \'/perc?amount=<b>50</b>\'", forward = '/home')
         return render_template("message.html", message = "Set perecentage to: " + str(percAmount) + ".", forward = '/home')
 
@@ -2324,7 +2358,7 @@ def endpoint_progress():
                     percFill(percAmount)
                 return str(check) + " was toggled."
             except Exception as e:
-                logFile("Error", e)
+                logFile("Error", str(e))
                 return render_template("message.html", message = '<b>Error:</b> ' + str(e))
         else:
             if sD.activeProgress:
@@ -2434,7 +2468,7 @@ def endpoint_savescore():
             else:
                 return render_template("message.html", message = "Missing arguments.")
         except Exception as e:
-            print("[error] " + "Error: " + str(e))
+            logFile("[error] ", "Error: " + str(e))
 
 
 @app.route('/say')
@@ -2483,7 +2517,7 @@ def endpoint_segment():
                 start = int(start)
                 end = int(end)
             except Exception as e:
-                logFile("Error", e)
+                logFile("Error", str(e))
                 return render_template("message.html", message = "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=FF00FF</b> (start and end must be and integer)")
         if start > BARPIX or end > BARPIX:
             return render_template("message.html", message = "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=FF00FF</b> (Your start or end was higher than the number of pixels: " + str(BARPIX) + ")")
@@ -2710,10 +2744,10 @@ def endpoint_updateuser():
             else:
                 return render_template("message.html", message = "Missing arguments.")
         except Exception as e:
-            print("[error] " + "Error: " + str(e))
+            logFile("[error] ", "Error: " + str(e))
 
 #This endpoint allows us to see which user(Student) is logged in.
-@app.route('/users')
+@app.route('/users', methods = ['POST', 'GET'])
 def endpoint_users():
     loginResult = loginCheck(request.remote_addr, 'users')
     if loginResult:
@@ -2818,7 +2852,7 @@ def endpoint_users():
                         else:
                             return render_template("message.html", message = "User not in list.")
                     except Exception as e:
-                        logFile("Error", e)
+                        logFile("Error", str(e))
                         f = open('errorlog.txt', 'a')
                         f.write(str(e))
                         f.close()
@@ -2942,9 +2976,6 @@ def disconnect():
                 emit('userlist', json.dumps(packMSG('all', 'server', chatUsers())), broadcast=True)
     except Exception as e:
         logFile("Error", "Error finding user in list: " + str(e))
-        f = open('errorlog.txt', 'a')
-        f.write(str(e))
-        f.close()
 
 
 @socket_.on('message', namespace=chatnamespace)
@@ -3033,7 +3064,7 @@ def message(message):
     try:
         emit('reload', message, broadcast=True)
     except Exception as e:
-        print("[error] " + 'Error: ' + str(e))
+        logFile("[error] ", 'Error: ' + str(e))
 
 @socket_.on('alert', namespace=chatnamespace)
 def message(message):

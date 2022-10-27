@@ -94,24 +94,25 @@
             if (perms == 3) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/anyone.png') }}" class="permsIcon" title="anyone">`
             if (perms == 4) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/banned.png') }}" class="permsIcon" title="banned">`
 
-
          newStudent.innerHTML = pictureIcon + user[1] ;
-
+         let name = user[1];
         let newDetails = document.createElement('span');
         newDetails.classList.add('user');
         let userPerms = user[3];
+        console.log(user[1], userPerms, permNames[0]);
         newDetails.innerHTML += `
-            Default permissions:
-            <select onchange="updatePerm(this)" id="userpermsDrop" name="userpermsDrop">
-            <option value="/updateuser?name=${user[1]}&field=permissions&value=0" ${userPerms === 0 ? "selected" : ""}>${permNames[0]}</option>
-            <option value="/updateuser?name=${user[1]}&field=permissions&value=1" ${userPerms === 1 ? "selected" : ""}>${permNames[1]}</option>
-            <option value="/updateuser?name=${user[1]}&field=permissions&value=2" ${userPerms === 2 ? "selected" : ""}>${permNames[2]}</option>
-            <option value="/updateuser?name=${user[1]}&field=permissions&value=3" ${userPerms === 3 ? "selected" : ""}>${permNames[3]}</option>
-            </select>
+            <form action="/users" method="POST">
+            <select onchange="updatePerm(this, '${name}')" id="userpermsDrop" name="userpermsDrop">
+            <option value="/users?name=${name}&action=perm&perm=0" ${userPerms === 0 ? "selected" : ""}>${permNames[0]}</option>
+            <option value="/users?name=${name}&action=perm&perm=1" ${userPerms === 1 ? "selected" : ""}>${permNames[1]}</option>
+            <option value="/users?name=${name}&action=perm&perm=2" ${userPerms === 2 ? "selected" : ""}>${permNames[2]}</option>
+            <option value="/users?name=${name}&action=perm&perm=3" ${userPerms === 3 ? "selected" : ""}>${permNames[3]}</option>
+            </select> </form>
         `;
+       
         usersBox.appendChild(newStudent)
         usersBox.appendChild(newDetails)
-        let name = user[1];
+        name = user[1];
         newDetails.innerHTML += "	&nbsp; ";
         newDetails.innerHTML += `<a onclick="changePw('${name}')">Change password</a>`;
         newDetails.innerHTML += "	&nbsp; ";
@@ -121,12 +122,11 @@
         newDetails.innerHTML += "<br><br>";
     }
 
-    function updateDP(name) {
-      let digipogs;
-      do {digipogs = prompt("DigiPog Amount:")} while (digipogs === "");
-      window.location = `/users?name=${name}&action=updateDP&digipogs=${digipogs}`;
-    }
-
+  function updateDP(name) {
+    let digipogs;
+    do { digipogs = prompt("DigiPog Amount:") } while (digipogs === "");
+    window.location = `/users?name=${name}&action=updateDP&digipogs=${digipogs}`;
+  }
 
     function changePw(name) {
       let password;
@@ -134,13 +134,16 @@
       window.location = `/users?name=${name}&action=changePw&password=${password}`;
     }
 
-    function deleteAcc(name) {
-      if (confirm(`Permanently delete ${name}'s account?`)) window.location = `/users?name=${name}&action=delete`;
-    }
 
-    function updatePerm(el) {
-      request.open("POST", el.value);
-      request.send();
+  function deleteAcc(name) {
+    if (confirm(`Permanently delete ${name}'s account?`)) window.location = `/users?name=${name}&action=delete`;
+  }
+
+    function updatePerm(el, name) {
+      let newDetails = document.createElement('span');
+        newDetails.classList.add('user');
+        console.log(el.value[el.value.length - 1]);
+         window.location = `/users?name=${name}&action=perm&perm=${el.value[el.value.length - 1]}`
     }
 
     document.getElementById("addUser").addEventListener("click", () => {

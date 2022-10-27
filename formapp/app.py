@@ -2805,19 +2805,43 @@ def endpoint_selectclass():
         return redirect('/createclass?forward=' + request.args.get('forward'))
     else:
         if request.method == "POST":
-            className = request.form['className']
+            if (request.form['className']):
+                className = request.form['className']
+            else:
+                return render_template("message.html", message="No Class Was Selected")
             db = sqlite3.connect(os.path.dirname(
                 os.path.abspath(__file__)) + '/data/database.db')
             dbcmd = db.cursor()
             nameofClass = dbcmd.execute(
                 "SELECT name FROM classes WHERE name=?", [className]).fetchone()
             db.close()
-            if nameofClass[0]:
+            if nameofClass:
+                db = sqlite3.connect(os.path.dirname(
+                    os.path.abspath(__file__)) + '/data/database.db')
+                dbcmd = db.cursor()
+                classID = dbcmd.execute("SELECT uid FROM classes WHERE name=?", [
+                                        className]).fetchone()
+                userID = dbcmd.execute("SELECT uid FROM users WHERE username=?", [
+                    sD.studentDict[request.remote_addr]['name']]).fetchone()
+                dbcmd.execute("INSERT INTO classusers (userid, classid) VALUES (?, ?)", [
+                    userID[0], classID[0]])
+                db.commit()
+                db.close()
                 sD.studentDict[request.remote_addr]['class'] = className
                 return redirect('/home')
-            return render_template("message.html", message="No class with that name")
+            else: 
+                return render_template("message.html", message="No class with that name")
         else:
-            return render_template('selectclass.html')
+            db = sqlite3.connect(os.path.dirname(
+                os.path.abspath(__file__)) + '/data/database.db')
+            dbcmd = db.cursor()
+            allClasses = dbcmd.execute("SELECT name FROM classes").fetchall()
+            db.close()
+            listClasses = []
+            for classes in allClasses:
+                listClasses.append(classes[0])
+            print(listClasses)
+            return render_template('selectclass.html', allClasses=json.dumps(listClasses))
 
 
 @app.route('/sendblock')

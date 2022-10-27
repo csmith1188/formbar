@@ -69,9 +69,6 @@ if ONRPi:
     import board
     import neopixel
 
-
-
-
 if ONRPi:
     from modules import ir
 
@@ -80,8 +77,6 @@ flasklog = logging.getLogger('werkzeug')
 flasklog.setLevel(logging.ERROR)
 
 # Use this to log information/errors
-
-
 def logFile(type, message):
     #logFile("Info", "Bot successful login. Made them a guest: " + username)
     now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -141,11 +136,12 @@ banList = []
 newPasswords = {}
 blockList = []
 colorDict = {
-    '14': (255, 255, 0),
-    '15': (196, 150, 128),
-    '16': (255, 96, 0),
-    '56': (0, 192, 192),
-}
+        '14': (255, 255, 0),
+        '15': (196, 150, 128),
+        '16': (255, 96, 0),
+        '56': (0, 192, 192),
+        }
+
 
 # Set pollID based on the number of polls in the database
 db = sqlite3.connect(os.path.dirname(
@@ -182,7 +178,7 @@ sD.settings['showinc'] = data[8]
 
 
 '''
-#For testing potential animation features
+# For testing potential animation features
 def aniTest():
     if not ONRPi:
         global pixels
@@ -214,6 +210,7 @@ def dbug(message='Checkpoint Reached'):
 
 
 
+
 def newStudent(remote, username, bot=False):
     global NEWACCOUNTPERMISSIONS
     if not remote in sD.studentDict:
@@ -241,7 +238,6 @@ def newStudent(remote, username, bot=False):
         }
 
         #Track if the teacher is logged in
-
         teacher = False
 
         # Check each student so far to make sure that none of them have teacher perms
@@ -269,9 +265,7 @@ def newStudent(remote, username, bot=False):
         db = sqlite3.connect(os.path.dirname(
             os.path.abspath(__file__)) + '/data/database.db')
         dbcmd = db.cursor()
-
         userFound = dbcmd.execute("SELECT * FROM users WHERE username=:uname", {"uname": username}).fetchall()
-
         db.close()
 
         for user in userFound:
@@ -306,7 +300,7 @@ def refreshUsers(selectedStudent='', category=''):
                 sD.studentDict[student][category] = ''
                 return True
             except Exception as e:
-                logFile("Error", + e)
+                logFile("Error", str(e))
                 return False
         else:
             sD.studentDict[student]['thumb'] = '',
@@ -320,7 +314,8 @@ def refreshUsers(selectedStudent='', category=''):
 
 def changeMode(newMode='', direction='next'):
     clearString()
-    sD.pollType = None
+    sD.pollType = ''
+    sD.pollPrompt = ''
     # Clear answers
     for student in sD.studentDict:
         sD.studentDict[student]['thumb'] = ''
@@ -369,7 +364,7 @@ def playSFX(sound):
         pygame.mixer.Sound(sfx.sound[sound]).play()
         return "Successfully played: "
     except Exception as e:
-        logFile("Error", + e)
+        logFile("Error", str(e))
         return "Invalid format: "
 
 
@@ -727,6 +722,7 @@ def tutdBar():
         for i, pix in enumerate(range(0, BARPIX)):
             pixels[pix] = blend(range(0, BARPIX), i,
                                 colors['blue'], colors['red'])
+
         if sD.settings['captions']:
             clearString()
             showString("MAX GAMER!", 0, colors['purple'])
@@ -861,13 +857,11 @@ def updateStep():
         sD.wawdLink = sD.lesson.links[int(step['Prompt'])]['URL']
     elif step['Type'] == 'TUTD':
         sD.settings['barmode'] = 'tutd'
-        sD.activePrompt = step['Prompt']
     elif step['Type'] == 'Essay':
         sD.settings['barmode'] = 'essay'
-        sD.activePrompt = step['Prompt']
     elif step['Type'] == 'poll':
         sD.settings['barmode'] = 'poll'
-        sD.activeQuiz = sD.lesson.quizList[step['Prompt']]
+        sD.activeQuiz = sD.lesson.quizList[sD.pollPrompt]
         pollIndex = int(sD.activeQuiz['name'].split(' ', 1))
         sD.activePrompt = sD.activeQuiz['questions'][pollIndex]
     elif step['Type'] == 'Quiz':
@@ -958,7 +952,7 @@ def endpoint_2048():
 
 @app.route('/abcd')
 def endpoint_abcd():
-    loginResult = loginCheck(request.remote_addr, request.path, 'student')
+    loginResult = loginCheck(request.remote_addr, 'student')
     if loginResult:
         return loginResult
     else:
@@ -1252,7 +1246,7 @@ def endpoint_bgm():
                         startBGM(bgm_file, bgm_volume)
                     else:
                         startBGM(bgm_file)
-                    return render_template("message.html", message='Playing: ' + bgm_file)
+                    return render_template("message.html", message = 'Playing: ' + bgm_file, forward='/bgm')
                 else:
                     if request.args.get('return') == 'json':
                         return '{error: "It has only been ' + str(int(time.time() - sD.bgm['lastTime'])) + ' seconds since the last song started. Please wait at least 60 seconds."}'
@@ -1272,8 +1266,8 @@ def endpoint_bgm():
                     volBGM(bgm_volume)
                     return render_template("message.html", message='Music volume set to ' + request.args.get('voladj') + '.')
                 except Exception as e:
-                    logFile("Error", +e)
-                    return render_template("message.html", message='Invalid voladj. Use \'up\', \'down\', or a number from 0.0 to 1.0.')
+                    logFile("Error", str(e))
+                    return render_template("message.html", message = 'Invalid voladj. Use \'up\', \'down\', or a number from 0.0 to 1.0.')
         elif request.args.get('playpause'):
             playpauseBGM()
             if sD.bgm['paused']:
@@ -1354,6 +1348,7 @@ def endpoint_break():
                         sD.studentDict[student]['perms'] = sD.studentDict[student]['oldPerms']
                         # Disabled until chat works
                         #server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', student, 'server', 'Your break was ended.')))
+                        
                         return render_template("break.html", excluded=sD.studentDict[request.remote_addr]['excluded'], ticket=json.dumps(sD.studentDict[request.remote_addr]['help']))
                     else:
                         return render_template("message.html", message="This student is not currently taking a bathroom break.")
@@ -1469,6 +1464,7 @@ def endpoint_cleartable():
     if loginResult:
         return loginResult
     else:
+        table = request.args.get('table')
         if table:
             db = sqlite3.connect(os.path.dirname(
                 os.path.abspath(__file__)) + '/data/database.db')
@@ -1502,7 +1498,7 @@ def endpoint_color():
             g = int(request.args.get('g'))
             b = int(request.args.get('b'))
         except Exception as e:
-            logFile("Error", e)
+            logFile("Error", str(e))
             r = ''
             g = ''
             b = ''
@@ -1518,8 +1514,6 @@ def endpoint_color():
         return render_template("message.html", message="Color sent!", forward='/home')
 
 # This endpoint is exclusive only to the teacher.
-
-
 @app.route('/controlpanel', methods=['POST', 'GET'])
 def endpoint_controlpanel():
     loginResult = loginCheck(request.remote_addr, 'admin')
@@ -1563,7 +1557,7 @@ def endpoint_controlpanel():
                                 db.commit()
                                 db.close()
                     except Exception as e:
-                        logFile("Error", e)
+                        logFile("Error", str(e))
                         pass
 
         ###
@@ -1579,12 +1573,14 @@ def endpoint_controlpanel():
                 sD.settings['autocount'] = False
                 resString += 'Set <i>numStudents</i> to: ' + \
                     str(sD.settings['numStudents'])
-        if request.args.get('barmode'):
-            if request.args.get('barmode') in sD.settings['modes']:
-                sD.settings['barmode'] = request.args.get('barmode')
-                resString += 'Set <i>mode</i> to: ' + sD.settings['barmode']
-            else:
-                resString += 'No setting called ' + sD.settings['barmode']
+                    
+        if request.method == 'POST':
+                 if request.form['barmode']:
+                    if request.form['barmode'] in sD.settings['modes']:
+                        sD.settings['barmode'] = request.form['barmode']
+                        resString += 'Set <i>mode</i> to: ' + sD.settings['barmode']
+                    else:
+                        resString += 'No setting called ' + sD.settings['barmode']
         if resString == '':
             return render_template("controlpanel.html", data=json.dumps(sD.settings))
         else:
@@ -1676,8 +1672,6 @@ def endpoint_emptyblocks():
 '''
 
 # Start a poll
-
-
 @app.route('/endpoll')
 def endpoll():
     loginResult = loginCheck(request.remote_addr, 'mod')
@@ -1894,8 +1888,6 @@ def endpoint_games_flashcards():
         return render_template('games/flashcards.html')
 
 # This endpoint takes you to the hangman game
-
-
 @app.route('/games/hangman')
 def endpoint_games_hangman():
     loginResult = loginCheck(request.remote_addr, 'games')
@@ -2006,8 +1998,6 @@ def endpoint_games_towerdefense():
         return render_template('games/towerdefense.html', progress=progress, achievements=achievements)
 
 # Tic Tac Toe
-
-
 @app.route('/games/ttt')
 def endpoint_games_ttt():
     loginResult = loginCheck(request.remote_addr, 'games')
@@ -2036,6 +2026,7 @@ def endpoint_games_ttt():
             if sD.studentDict[request.remote_addr]['name'] in game.players and opponent in game.players:
                 # Then you have found the right game and can edit it here
                 return render_template("games/ttt.html", game=json.dumps(game.__dict__), username=sD.studentDict[request.remote_addr]['name'], wins=wins)
+
                 # return the response here
 
         # Creating a new game
@@ -2197,8 +2188,8 @@ def endpoint_lesson():
                 return redirect('/lesson' + advanced)
             except Exception as e:
                 logFile("Error", traceback.format_exc())
-                logFile("Error", e)
-                return render_template("message.html", message='<b>Error:</b> ' + str(e))
+                logFile("Error", str(e))
+                return render_template("message.html", message = '<b>Error:</b> ' + str(e))
         elif request.args.get('action'):
             if request.args.get('action') == 'next':
                 sD.currentStep += 1
@@ -2325,8 +2316,8 @@ def endpoint_login():
             if userType == "login":
                 if username and password:
                     # Open and connect to database
-                    db = sqlite3.connect(os.path.dirname(
-                        os.path.abspath(__file__)) + '/data/database.db')
+                    db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+
                     dbcmd = db.cursor()
                     userFound = dbcmd.execute(
                         "SELECT * FROM users WHERE username=:uname", {"uname": username}).fetchall()
@@ -2355,8 +2346,8 @@ def endpoint_login():
 
             elif userType == "new":
                 # Open and connect to database
-                db = sqlite3.connect(os.path.dirname(
-                    os.path.abspath(__file__)) + '/data/database.db')
+                db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+
                 dbcmd = db.cursor()
                 userFound = dbcmd.execute(
                     "SELECT * FROM users WHERE username=:uname", {"uname": username}).fetchall()
@@ -2372,8 +2363,7 @@ def endpoint_login():
                         os.path.abspath(__file__)) + '/data/database.db')
                     dbcmd = db.cursor()
                     # Add user to database
-                    userFound = dbcmd.execute("INSERT INTO users (username, password, permissions, bot) VALUES (?, ?, ?, ?)", (
-                        username, passwordCrypt, sD.settings['perms']['anyone'], str(bot)))
+                    userFound = dbcmd.execute("INSERT INTO users (username, password, permissions, bot) VALUES (?, ?, ?, ?)", (username, passwordCrypt, sD.settings['perms']['anyone'], str(bot)))
                     db.commit()
                     db.close()
                     newStudent(remote, username, bot=bot)
@@ -2384,8 +2374,8 @@ def endpoint_login():
 
             elif userType == "guest":
                 # Open and connect to database
-                db = sqlite3.connect(os.path.dirname(
-                    os.path.abspath(__file__)) + '/data/database.db')
+                db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+
                 dbcmd = db.cursor()
                 userFound = dbcmd.execute(
                     "SELECT * FROM users WHERE username=:uname", {"uname": username}).fetchall()
@@ -2406,7 +2396,7 @@ def endpoint_login():
             # If the user is logged in, log them out
             if remote in sD.studentDict:
                 logFile(
-                    "Info " + sD.studentDict[request.remote_addr]['name'],  " logged out.")
+                    "Info ", sD.studentDict[request.remote_addr]['name'] + " logged out.")
                 socket_.emit('alert', json.dumps(packMSG(
                     'all', 'server', sD.studentDict[request.remote_addr]['name'] + " logged out...")), namespace=chatnamespace)
                 del sD.studentDict[request.remote_addr]
@@ -2484,10 +2474,9 @@ def endpoint_perc():
             percAmount = int(percAmount)
             percFill(percAmount)
         except Exception as e:
-            logFile("Error", e)
-            return render_template("message.html", message="<b>amount</b> must be an integer between 0 and 100 \'/perc?amount=<b>50</b>\'", forward='/home')
-        return render_template("message.html", message="Set perecentage to: " + str(percAmount) + ".", forward='/home')
-
+            logFile("Error", str(e))
+            return render_template("message.html", message = "<b>amount</b> must be an integer between 0 and 100 \'/perc?amount=<b>50</b>\'", forward = '/home')
+        return render_template("message.html", message = "Set perecentage to: " + str(percAmount) + ".", forward = '/home')
 
 '''
     /profile
@@ -2532,9 +2521,9 @@ def endpoint_profile():
                 "wordle": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='wordle' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
             }
             db.close()
-            return render_template("profile.html", username=user['name'], perms=sD.settings['permname'][user['perms']], bot=user['bot'], highScores=json.dumps(highScores), digipogs=digipogs[0])
+            return render_template("profile.html", username = user['name'], perms = sD.settings['permname'][user['perms']], bot = user['bot'], highScores = json.dumps(highScores), digipogs = digipogs[0])
         # If there are no matches
-        return render_template("message.html", message="There are no users with that name.")
+        return render_template("message.html", message = "There are no users with that name.")
 
 
 '''
@@ -2557,8 +2546,8 @@ def endpoint_progress():
                     percFill(percAmount)
                 return str(check) + " was toggled."
             except Exception as e:
-                logFile("Error", e)
-                return render_template("message.html", message='<b>Error:</b> ' + str(e))
+                logFile("Error", str(e))
+                return render_template("message.html", message = '<b>Error:</b> ' + str(e))
         else:
             if sD.activeProgress:
                 return render_template('progress.html', progress=sD.activeProgress)
@@ -2595,7 +2584,7 @@ def endpoint_quickpanel():
 
 
 # takes you to a quiz(literally)
-@app.route('/quiz', methods=['POST', 'GET'])
+@app.route('/quiz', methods = ['POST', 'GET'])
 def endpoint_quiz():
     loginResult = loginCheck(request.remote_addr, 'student')
     if loginResult:
@@ -2676,7 +2665,7 @@ def endpoint_savescore():
             else:
                 return render_template("message.html", message="Missing arguments.")
         except Exception as e:
-            print("[error] " + "Error: " + str(e))
+            logFile("[error] ", "Error: " + str(e))
 
 
 @app.route('/say')
@@ -2727,8 +2716,8 @@ def endpoint_segment():
                 start = int(start)
                 end = int(end)
             except Exception as e:
-                logFile("Error", e)
-                return render_template("message.html", message="Bad ArgumentsTry <b>/segment?start=0&end=10&hex=FF00FF</b> (start and end must be and integer)")
+                logFile("Error", str(e))
+                return render_template("message.html", message = "Bad ArgumentsTry <b>/segment?start=0&end=10&hex=FF00FF</b> (start and end must be and integer)")
         if start > BARPIX or end > BARPIX:
             return render_template("message.html", message="Bad ArgumentsTry <b>/segment?start=0&end=10&hex=FF00FF</b> (Your start or end was higher than the number of pixels: " + str(BARPIX) + ")")
         pixRange = range(start, end)
@@ -2771,7 +2760,7 @@ def endpoint_sendblock():
             blockList.append([blockId, blockData])
             addBlock()
             # fillBlocks()
-            return render_template("message.html", message="Got Block: " + blockId + ", " + blockData)
+            return render_template("message.html", message = "Got Block: " + blockId + ", " + blockData)
         else:
             return render_template("message.html", message="Bad block Id")
     else:
@@ -2780,7 +2769,8 @@ def endpoint_sendblock():
 # Choose the user's default homepage
 
 
-@app.route('/setdefault', methods=['POST', 'GET'])
+# Choose the user's default homepage
+@app.route('/setdefault', methods = ['POST', 'GET'])
 def endpoint_setdefault():
     loginResult = loginCheck(request.remote_addr)
     if loginResult:
@@ -2812,8 +2802,6 @@ def endpoint_settings():
     return redirect('/controlpanel' + advanced)
 
 # This endpoint leads to the Sound Effect page
-
-
 @app.route('/sfx')
 def endpoint_sfx():
     loginResult = loginCheck(request.remote_addr, 'sfx')
@@ -2852,23 +2840,18 @@ def endpoint_standard():
     return redirect('/home')
 
 # Start a poll
-
-
-@app.route('/startpoll')
+@app.route('/startpoll', methods = ['POST', 'GET'])
 def endpoint_startpoll():
     loginResult = loginCheck(request.remote_addr, 'mod')
     if loginResult:
         return loginResult
-    else:
-        if not request.args.get('type'):
-            return render_template("message.html", message="You need a poll type.")
-        type = request.args.get('type')
-        if not (type == 'tutd' or type == 'abcd' or type == 'text'):
-            return render_template("message.html", message="Invalid poll type.")
-        changeMode(type)
-        repeatMode()
-        sD.pollType = type
-        return render_template("message.html", message='Started a new ' + type + ' poll.')
+    changeMode(request.form['type'])
+    repeatMode()
+    sD.pollPrompt = request.form['prompt']
+    sD.pollType = request.form['type']
+    sD.settings['barmode'] = request.form['type']
+    return render_template("message.html", message = 'Started a new ' + sD.pollType + ' poll.')
+
 
 # ████████
 #    ██
@@ -2909,19 +2892,19 @@ def endpoint_ttt():
     Thumbs-Up-Thumbs-Down page (Thumbspanel)
 '''
 
-
-@app.route('/tutd')
+@app.route('/tutd', methods = ['POST', 'GET'])
 def endpoint_tutd():
     loginResult = loginCheck(request.remote_addr)
     if loginResult:
         return loginResult
     else:
+        pollPrompt = sD.pollPrompt
         ip = request.remote_addr
         thumb = request.args.get('thumb')
         if thumb:
             if sD.settings['barmode'] == 'tutd':
-                # This commented lines if made un-commented will allow for the host of the server to see who sent what reaction, along with their ip address.
-                #logFile("Info",  "Recieved " + thumb + " from " + name + " at ip: " + ip)
+                # This commented lines if made un-commented will allow for the host of the server to see who sent what reaction, along with their ip address. 
+                # logFile("Info",  "Recieved " + thumb + " from " + name + " at ip: " + ip)
                 if thumb in ['up', 'down', 'wiggle']:
                     if sD.studentDict[request.remote_addr]['thumb'] != thumb:
                         sD.studentDict[request.remote_addr]['thumb'] = thumb
@@ -2946,7 +2929,7 @@ def endpoint_tutd():
             else:
                 return render_template("message.html", message="Not in TUTD mode.")
         else:
-            return render_template("thumbsrental.html")
+            return render_template("thumbsrental.html", prompt = pollPrompt)
 
 # ██    ██
 # ██    ██
@@ -2978,10 +2961,11 @@ def endpoint_updateuser():
             else:
                 return render_template("message.html", message="Missing arguments.")
         except Exception as e:
-            print("[error] " + "Error: " + str(e))
+            logFile("[error] ", "Error: " + str(e))
 
-#This endpoint allows us to see which user(Student) is logged in.
-@app.route('/users', methods = ['POST', 'GET'])
+
+# This endpoint allows us to see which user(Student) is logged in.
+@app.route('/users')
 def endpoint_users():
     loginResult = loginCheck(request.remote_addr, 'users')
     if loginResult:
@@ -3052,9 +3036,9 @@ def endpoint_users():
                     sD.studentDict[student]['oldPerms'] = sD.studentDict[student]['perms']
                     sD.studentDict[student]['perms'] = sD.settings['perms']['anyone']
                 # Disabled until chat works
-                    #server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', name, 'server', 'The teacher accepted your break request.')))
+                    # server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', name, 'server', 'The teacher accepted your break request.')))
                 # elif sD.studentDict[student]['help']['type'] == 'break':
-                    #server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', name, 'server', 'The teacher rejected your break request.')))
+                    # server.send_message(sD.studentDict[student], json.dumps(packMSG('alert', name, 'server', 'The teacher rejected your break request.')))
             if action == 'kick':
                 if user in sD.studentDict:
                     logFile(
@@ -3083,8 +3067,7 @@ def endpoint_users():
                             else:
                                 sD.studentDict[user]['perms'] = perm
                                 # Open and connect to database
-                                db = sqlite3.connect(os.path.dirname(
-                                    os.path.abspath(__file__)) + '/data/database.db')
+                                db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
                                 dbcmd = db.cursor()
                                 dbcmd.execute("UPDATE users SET permissions=:perms WHERE username=:uname", {
                                               "uname": sD.studentDict[user]['name'], "perms": sD.studentDict[user]['perms']})
@@ -3095,7 +3078,7 @@ def endpoint_users():
                         else:
                             return render_template("message.html", message="User not in list.")
                     except Exception as e:
-                        logFile("Error", e)
+                        logFile("Error", str(e))
                         f = open('errorlog.txt', 'a')
                         f.write(str(e))
                         f.close()
@@ -3229,9 +3212,6 @@ def disconnect():
                     packMSG('all', 'server', chatUsers())), broadcast=True)
     except Exception as e:
         logFile("Error", "Error finding user in list: " + str(e))
-        f = open('errorlog.txt', 'a')
-        f.write(str(e))
-        f.close()
 
 
 @socket_.on('message', namespace=chatnamespace)
@@ -3249,8 +3229,7 @@ def message(message):
             if len(message['content']) > 252:
                 message['content'] = message['content'][:252]+'...'
             # Save the message to the database
-            db = sqlite3.connect(os.path.dirname(
-                os.path.abspath(__file__)) + '/data/database.db')
+            db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
             dbcmd = db.cursor()
             content = message['content'].replace('"', '\\"')
             contentCrypt = cipher.encrypt(content.encode())
@@ -3342,7 +3321,7 @@ def message(message):
                     emit('reload', message, to=sD.studentDict[student]['sid'])
                     
     except Exception as e:
-        print("[error] " + 'Error: ' + str(e))
+        logFile("[error] ", 'Error: ' + str(e))
 
 
 @socket_.on('alert', namespace=chatnamespace)
@@ -3355,37 +3334,43 @@ def message(message):
   
 @socket_.on('tutd')
 def message(message):
-    message = json.loads(thumb)
-    print(message['thumb'])
-    userip = request.remote_addr
-    if thumb:
-        if sD.settings['barmode'] == 'tutd':
-            # print("[info] " + "Recieved " + thumb + " from " + name + " at ip: " + ip)
+    try:
+        thumb = request.args.get('thumb')
+        message = json.loads(thumb)
+        print(message['thumb'])
+        userip = request.remote_addr
+        if thumb:
+            if sD.settings['barmode'] == 'tutd':
+                # print("[info] " + "Recieved " + thumb + "+ from " + name + " at ip: " + ip)
                 if sD.studentDict[request.remote_addr]['thumb'] != message['thumb']:
                     sD.studentDict[request.remote_addr]['thumb'] = message['thumb']
                     tutdBar()
                     socket_.emit('sessionUpdate', json.dumps(packMSG('all', 'server', sD.studentDict)))     
+    except Exception as e:
+        logFile("Error", str(e))
 
 @socket_.on('permsReload')
 def message(message):
-    message = json.loads(perms)
-    print(message['thumb'])
-    userip = request.remote_addr
-    if sD.studentDict[request.remote_addr]['perms'] <= sD.settings['perms']['admin']:
-        socket_.emit('sessionUpdate', json.dumps(packMSG('all', 'server', sD.studentDict)))
+    try:
+        userip = request.remote_addr
+        if sD.studentDict[request.remote_addr]['perms'] <= sD.settings['perms']['admin']:
+            socket_.emit('sessionUpdate', json.dumps(packMSG('all', 'server', sD.studentDict)))
+    except Exception as e:
+        logFile("Error", str(e))
 
 @socket_.on('loginReload')
 def message(message):
-    message = json.loads(perms)
-    print(message['thumb'])
-    loginResult = loginCheck(request.remote_addr, 'users')
-    if loginResult:
-        socket_.emit('sessionUpdate', json.dumps(packMSG('all', 'server', sD.studentDict)))
+    try:
+        loginResult = loginCheck(request.remote_addr, 'users')
+        if loginResult:
+            socket_.emit('sessionUpdate', json.dumps(packMSG('all', 'server', sD.studentDict)))
+    except Exception as e:
+        logFile("Error", str(e))
         
 @socket_.on('help', namespace=chatnamespace)
 def message(message):
     try:
-        #Update or remove
+        # Update or remove
         pass
         #message = json.loads(message)
         #name = sD.studentDict[request.remote_addr]['name']

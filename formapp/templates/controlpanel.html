@@ -12,6 +12,7 @@
   h3,
   form {
     margin: 1;
+
   }
 
   h2 {
@@ -139,6 +140,16 @@
 
 <!-- Main content here -->
 {% block main %}
+<script src="../static/jquery/external/jquery/jquery.js" charset="utf-8"></script>
+<script src="../static/jquery/jquery-ui.min.js" charset="utf-8"></script>
+<script>
+$( function() {
+    $( "#students" ).accordion({
+      collapsible: true
+    });
+  } );
+
+</script>
 <div id="tabs">
   <ul id="tabBox">
     <li><a class="button pressed" href="#tabs-1">Users</a></li>
@@ -189,12 +200,13 @@
           <span style="margin-left: 25px;">Students' votes are displayed on the bar.</span><br>
         </div>
       </label>
-      <form id="pollType" class="hidden" style="margin: 8px 0 0 25px;" onchange="changePollType();">
+      <form id="pollType" method="post" class="hidden" style="margin: 8px 0 0 25px;" onchange="changePollType();">
         Type:
         <input type="radio" id="thumbs" name="type" checked style="margin-left: 8px;"><label for="thumbs">Thumbs</label>
         <input type="radio" id="letters" name="type" style="margin-left: 8px;"><label for="letters">Letters</label>
         <input type="radio" id="essay" name="type" style="margin-left: 8px;"><label for="essay">Essay</label><br>
         <span id="pollDescription">Students can choose between thumbs up, thumbs down, and wiggle</span><br>
+        <input type="text" id="pollPrompt" name="prompt" placeholder="Prompt" style="color: black;">
         <input type="button" id="pollButton" class="button inline popOut" value="Start new poll"
           style="margin-top: 8px;">
       </form>
@@ -403,7 +415,7 @@
       // console.log(request.response);
     };
     request.send();
-    
+   
     chatSocket.emit('reload', packMSG('all', 'server', ''))
   }
 
@@ -413,21 +425,25 @@
       document.getElementById("studentNum").value = Object.keys(res).length;
     }
   }
-
+  
   updateStudents();
   setInterval(updateStudents, 1000);
-
-  function changeMode() {
+  
+  function changeMode(type) {
     if (document.getElementById("poll").checked) {
-      request.open('GET', '/controlpanel?barmode=poll');
-      request.send();
+      let xhr = new XMLHttpRequest();
+      xhr.open("POST", "/controlpanel", true);
+      xhr.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
+      xhr.send(`barmode=${type}`);
       document.getElementById("pollType").classList.remove("hidden");
     } else {
       document.getElementById("pollType").classList.add("hidden");
     }
     if (document.getElementById("progress").checked) {
-      request.open('GET', '/controlpanel?barmode=progress');
-      request.send();
+      let xhr = new XMLHttpRequest();
+      xhr.open("POST", "/controlpanel", true);
+      xhr.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
+      xhr.send(`barmode=progress`);
     }
     if (document.getElementById("countdown").checked) {
       document.getElementById("playtime").checked = true;
@@ -437,38 +453,50 @@
       document.getElementById("countdownTime").classList.add("hidden");
     }
     if (document.getElementById("playtime").checked) {
-      request.open('GET', '/controlpanel?barmode=playtime');
-      request.send();
+      let xhr = new XMLHttpRequest();
+      xhr.open("POST", "/controlpanel", true);
+      xhr.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
+      xhr.send(`barmode=playtime`);
     }
     if (document.getElementById("sendblock").checked) {
-      request.open('GET', '/controlpanel?barmode=sendblock');
-      request.send();
+      let xhr = new XMLHttpRequest();
+      xhr.open("POST", "/controlpanel", true);
+      xhr.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
+      xhr.send(`barmode=sendBlock`);
     }
   }
-
+  
   function changePollType() {
-    if (document.getElementById("thumbs").checked) document.getElementById("pollDescription").innerText = "Students can choose between thumbs up, thumbs down, and wiggle.";
-    else if (document.getElementById("letters").checked) document.getElementById("pollDescription").innerText = "Students can choose between A, B, C, and D.";
-    else if (document.getElementById("essay").checked) document.getElementById("pollDescription").innerHTML = "Students will type out short answers. View essays in the \"Users\" section.";
+    if (document.getElementById("thumbs").checked) document.getElementById("pollDescription").innerText =
+    "Students can choose between thumbs up, thumbs down, and wiggle.";
+    else if (document.getElementById("letters").checked) document.getElementById("pollDescription").innerText =
+    "Students can choose between A, B, C, and D.";
+    else if (document.getElementById("essay").checked) document.getElementById("pollDescription").innerHTML =
+    "Students will type out short answers. View essays in the \"Users\" section.";
   }
-
+  
   function startPoll() {
     if (document.getElementById("thumbs").checked) {
-      request.open('GET', '/startpoll?type=tutd');
-      request.send();
+      let xhr = new XMLHttpRequest();
+      xhr.open("POST", "/startpoll", true);
+      xhr.setRequestHeader("Content-Type", 'application/x-www-form-urlencoded');
+      xhr.send(`type=tutd&prompt=${document.getElementById('pollPrompt').value}`);
     } else if (document.getElementById("letters").checked) {
-      request.open('GET', '/startpoll?type=abcd');
-      request.send();
+      let xhr = new XMLHttpRequest();
+      xhr.open("POST", "/startpoll");
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhr.send(`type=abcd&prompt=${document.getElementById('pollPrompt').value}`);
     } else if (document.getElementById("essay").checked) {
-      request.open('GET', '/startpoll?type=text');
-      request.send();
+      let xhr = new XMLHttpRequest();
+      xhr.open("POST", "/startpoll");
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhr.send(`type=text&prompt=${document.getElementById('pollPrompt').value}`);
     }
-
     let pollButton = document.getElementById("pollButton");
     pollButton.value = "End poll";
     pollButton.onclick = endPoll;
   }
-
+  
   function endPoll() {
     request.open('GET', '/endpoll');
     request.send();
@@ -477,7 +505,7 @@
     pollButton.value = "Start new poll";
     pollButton.onclick = startPoll;
   }
-
+  
   function resetPerms() {
     document.getElementById("saypermsDrop").value = "/controlpanel?say=2";
     document.getElementById("gamespermsDrop").value = "/controlpanel?games=2";
@@ -498,10 +526,9 @@
       case "poll":
         document.getElementById("poll").checked = true;
         document.getElementById("pollType").classList.remove("hidden");
-        document.getElementById("thumbs").checked = true;
         document.getElementById("pollButton").onclick = startPoll;
         break;
-      case "tutd":
+      case "thumb":
         document.getElementById("poll").checked = true;
         document.getElementById("pollType").classList.remove("hidden");
         document.getElementById("thumbs").checked = true;
@@ -509,7 +536,7 @@
         document.getElementById("pollButton").onclick = endPoll;
         changePollType();
         break;
-      case "abcd":
+      case "letters":
         document.getElementById("poll").checked = true;
         document.getElementById("pollType").classList.remove("hidden");
         document.getElementById("letters").checked = true;
@@ -517,7 +544,7 @@
         document.getElementById("pollButton").onclick = endPoll;
         changePollType();
         break;
-      case "text":
+      case "essay":
         document.getElementById("poll").checked = true;
         document.getElementById("pollType").classList.remove("hidden");
         document.getElementById("essay").checked = true;
@@ -556,7 +583,7 @@
   let collapsed = false;
   let filters = [];
   let sort;
-
+  let number = 0
   let filterButtons = Array.from(document.querySelectorAll(".filter"));
   filterButtons.forEach(button => button.onclick = () => toggleFilter(button));
 
@@ -623,7 +650,8 @@
   function changeSort(el) {
     let newSort = el.id;
     sortButtons.forEach(button => {
-      if (button.innerText.endsWith("🡇") || button.innerText.endsWith("🡅")) button.innerText = button.innerText.slice(0, -2);
+      if (button.innerText.endsWith("🡇") || button.innerText.endsWith("🡅")) button.innerText = button.innerText
+        .slice(0, -2);
       if (button == el) {
         button.classList.add("pressed");
       } else {
@@ -684,14 +712,16 @@
           thumbs = ["up", "wiggle", "down", ""];
           letters = ["a", "b", "c", "d", ""];
           studentList = studentList.sort((a, b) => thumbs.indexOf(a.thumb) - thumbs.indexOf(b.thumb)); //Thumbs poll
-          studentList = studentList.sort((a, b) => letters.indexOf(a.letter) - letters.indexOf(b.letter)); //Letters poll
+          studentList = studentList.sort((a, b) => letters.indexOf(a.letter) - letters.indexOf(b
+          .letter)); //Letters poll
           studentList = studentList.sort((a, b) => !!b.essay - !!a.essay); //Essay poll
           break;
         case "pollResRev":
           thumbs = ["down", "wiggle", "up", ""];
           letters = ["d", "c", "b", "a", ""];
           studentList = studentList.sort((a, b) => thumbs.indexOf(a.thumb) - thumbs.indexOf(b.thumb)); //Thumbs poll
-          studentList = studentList.sort((a, b) => letters.indexOf(a.letter) - letters.indexOf(b.letter)); //Letters poll
+          studentList = studentList.sort((a, b) => letters.indexOf(a.letter) - letters.indexOf(b
+          .letter)); //Letters poll
           studentList = studentList.reverse().sort((a, b) => !!b.essay - !!a.essay); //Essay poll
           break;
         case "perms":
@@ -712,37 +742,54 @@
           //Loop through each student in the list
           for (student of studentList) {
             let newStudent = document.createElement('h3');
+            
             let icons = "";
             let pictureIcon = ""
-
+            
+            console.log(studentList);
             //change image based upon persons permissions
             let perms = student['perms']
             if (perms) var permsIcons = document.createElement("img");
-            if (perms == 0) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/teacher.png') }}" class="permsIcon" title="teacher">`
-            if (perms == 1) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/mod.png') }}" class="permsIcon" title="mod">`
-            if (perms == 2) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/student.png') }}" class="permsIcon" title="student">`
-            if (perms == 3) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/anyone.png') }}" class="permsIcon" title="anyone">`
-            if (perms == 4) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/banned.png') }}" class="permsIcon" title="banned">`
+            if (perms == 0) pictureIcon +=
+              `<img src="{{ url_for('static', filename='img/controlpanel/teacher.png') }}" class="permsIcon" title="teacher">`
+            if (perms == 1) pictureIcon +=
+              `<img src="{{ url_for('static', filename='img/controlpanel/mod.png') }}" class="permsIcon" title="mod">`
+            if (perms == 2) pictureIcon +=
+              `<img src="{{ url_for('static', filename='img/controlpanel/student.png') }}" class="permsIcon" title="student">`
+            if (perms == 3) pictureIcon +=
+              `<img src="{{ url_for('static', filename='img/controlpanel/anyone.png') }}" class="permsIcon" title="anyone">`
+            if (perms == 4) pictureIcon +=
+              `<img src="{{ url_for('static', filename='img/controlpanel/banned.png') }}" class="permsIcon" title="banned">`
 
 
             //Change student color according to thumb response
             let thumb = student['thumb'];
             if (thumb) var thumbIcon = document.createElement("img");
-            if (thumb == "up") icons += `<img src="{{ url_for('static', filename='img/controlpanel/up.png') }}" class="icon" title="Up">`;
-            if (thumb == "wiggle") icons += `<img src="{{ url_for('static', filename='img/controlpanel/wiggle.png') }}" class="icon" title="Wiggle">`;
-            if (thumb == "down") icons += `<img src="{{ url_for('static', filename='img/controlpanel/down.png') }}" class="icon" title="Down">`;
+            if (thumb == "up") icons +=
+              `<img src="{{ url_for('static', filename='img/controlpanel/up.png') }}" class="icon" title="Up">`;
+            if (thumb == "wiggle") icons +=
+              `<img src="{{ url_for('static', filename='img/controlpanel/wiggle.png') }}" class="icon" title="Wiggle">`;
+            if (thumb == "down") icons +=
+              `<img src="{{ url_for('static', filename='img/controlpanel/down.png') }}" class="icon" title="Down">`;
 
             //Change student letter according to letter response
             let letter = student['letter']
-            if (letter == "a") icons += `<img src="{{ url_for('static', filename='img/controlpanel/a.png') }}" class="icon" title="A">`;
-            if (letter == "b") icons += `<img src="{{ url_for('static', filename='img/controlpanel/b.png') }}" class="icon" title="B">`;
-            if (letter == "c") icons += `<img src="{{ url_for('static', filename='img/controlpanel/c.png') }}" class="icon" title="C">`;
-            if (letter == "d") icons += `<img src="{{ url_for('static', filename='img/controlpanel/d.png') }}" class="icon" title="D">`;
+            if (letter == "a") icons +=
+              `<img src="{{ url_for('static', filename='img/controlpanel/a.png') }}" class="icon" title="A">`;
+            if (letter == "b") icons +=
+              `<img src="{{ url_for('static', filename='img/controlpanel/b.png') }}" class="icon" title="B">`;
+            if (letter == "c") icons +=
+              `<img src="{{ url_for('static', filename='img/controlpanel/c.png') }}" class="icon" title="C">`;
+            if (letter == "d") icons +=
+              `<img src="{{ url_for('static', filename='img/controlpanel/d.png') }}" class="icon" title="D">`;
 
             //Show icon if student has submitted Essay
-            if (student.essay) icons += `<img src="{{ url_for('static', filename='img/controlpanel/text.png') }}" class="icon" title="Essay submitted">`;
+            if (student.essay) icons +=
+              `<img src="{{ url_for('static', filename='img/controlpanel/text.png') }}" class="icon" title="Essay submitted">`;
 
-            if (student['help'].type) icons += `<img src="{{ url_for('static', filename='img/controlpanel/help.png') }}" class="icon" title="Help ticket">`;
+            if (student['help'].type) icons +=
+              `<img src="{{ url_for('static', filename='img/controlpanel/help.png') }}" class="icon" title="Help ticket">`;
+
 
             if (student['complete']) icons += `<img src="{{ url_for('static', filename='img/controlpanel/complete.png') }}" class="icon" title="Complete">`;
             
@@ -754,11 +801,13 @@
             
             newStudent.innerHTML = pictureIcon + icons + student.name + ' ' + tags;
 
+
             let newDetails = document.createElement('span');
             newDetails.classList.add('user');
             cleanText = student.essay.replace(/<|>/gi, "")
             if (collapsed) newDetails.classList.add("hidden");
-            if (student.essay) newDetails.innerHTML += "<div style='margin-bottom: 8px;'><pre> Essay: <br> " + cleanText + "</pre>" + "</div>";
+            if (student.essay) newDetails.innerHTML += "<div style='margin-bottom: 8px;'><pre> Essay: <br> " +
+              cleanText + "</pre>" + "</div>";
             if (student.help.type) {
               let helpTicket = document.createElement("div");
               let ticketTime = new Date(student.help.time * 1000);
@@ -877,6 +926,7 @@
               }
               newDetails.innerHTML += ` [Quiz: ${newQuiz}/${newQuizMax}]`
             }
+            
             studentBox.appendChild(newStudent)
             studentBox.appendChild(newDetails)
             let name = student['name'];
@@ -889,15 +939,18 @@
         }
       }
     }
-  }, 1000);
 
+    
+  }, 1000);
+  
   setInterval(async () => {
     let npRequests = await getResponse("/api/newpasswords");
     let el = document.getElementById("npRequests");
     el.innerHTML = "";
     for (let student in npRequests) {
       let ticket = document.createElement("div");
-      ticket.innerHTML += `<i><b>${student}</b> requested a password change from the login page. Before you accept, confirm that this request is legitimate.</i>`;
+      ticket.innerHTML +=
+        `<i><b>${student}</b> requested a password change from the login page. Before you accept, confirm that this request is legitimate.</i>`;
       let acceptButton = document.createElement("button");
       let rejectButton = document.createElement("button");
       acceptButton.classList.add("inline", "popOut");
@@ -941,7 +994,9 @@
     if (
       student != meRes.name ||
       meRes.perms > el.value[el.value.length - 1] ||
-      confirm("If you lower your own permissions, you may not be able to change them back. If no users have teacher permissions, the next person to log in will become the teacher.")
+      confirm(
+        "If you lower your own permissions, you may not be able to change them back. If no users have teacher permissions, the next person to log in will become the teacher."
+        )
     ) {
       request.open("GET", el.value);
       request.onload = function () {
@@ -1008,6 +1063,10 @@
       });
       $("#history").accordion("refresh");
     }
+    if (studentList.length > number) {
+      number = studentList.length
+      $('#students').accordion("refresh")
+    }
   }
   updateHistory();
   setInterval(updateHistory, 1000);
@@ -1015,7 +1074,8 @@
   async function downloadResponses(poll) {
     let responses = await getResponse("/api/pollresponses");
     responses = responses.filter(response => response[0] == poll);
-    responses = responses.map(response => [response[1], `"${response[2].replaceAll("\"", "\"\"")}"`]); //Escape quotes in values, then add quotes around each value
+    responses = responses.map(response => [response[1],
+    `"${response[2].replaceAll("\"", "\"\"")}"`]); //Escape quotes in values, then add quotes around each value
     let csv = "data:text/csv;charset=utf-8,";
     csv += responses.map(response => response.join(",")).join("\n");
     let link = document.createElement("a");

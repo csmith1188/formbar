@@ -4,7 +4,8 @@ class Session():
         self.ip = ip
         self.studentDict = {}
         self.mainPage = '/home'
-        self.pollType = None
+        self.pollType = ''
+        self.pollPrompt = ''
         self.pollID = 1
         self.bgm = {
             'nowplaying': '',

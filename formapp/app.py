@@ -41,6 +41,7 @@ from threading import Lock
 from werkzeug.utils import secure_filename
 from websocket_server import WebsocketServer
 from cryptography.fernet import Fernet
+from playsound import playsound
 import pandas, json, csv
 import random, sys, os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
@@ -51,6 +52,7 @@ import logging
 import datetime
 import traceback
 import sqlite3
+import asyncio
 if ONRPi:
     import board, neopixel
 
@@ -339,7 +341,7 @@ def playSFX(sound):
         logFile("Error", + e)
         return "Invalid format: "
     
-playSFX("formbar/formbar/formapp/sfx_success01.wav")    
+
 
 def stopSFX():
     pygame.mixer.Sound.stop()
@@ -816,7 +818,7 @@ def loginCheck(remAdd, perm=False):
         return False
 
 def timer(minutes, seconds):
-    finishedSound = "formapp/sfx_success01.wav"
+    finishedSound = 'sfx_success01.wav'
     while True:
         print(minutes,":", seconds)
         time.sleep(1)
@@ -828,8 +830,10 @@ def timer(minutes, seconds):
                 seconds = 59
         if minutes < 0:
             print("FINISHED")
-            #playSFX(finishedSound)
+            playsound(finishedSound)
             break
+timer(0,3)
+
 
 # ███████ ███    ██ ██████  ██████   ██████  ██ ███    ██ ████████ ███████
 # ██      ████   ██ ██   ██ ██   ██ ██    ██ ██ ████   ██    ██    ██
@@ -1465,7 +1469,8 @@ def endpoint_countdown():
     getSeconds = int(getSeconds)
     timer(getMinutes, getSeconds)
     return render_template("countdown.html")
-  
+
+    
 
 @app.route('/createaccount')
 def endpoint_createaccount():

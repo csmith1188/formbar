@@ -139,6 +139,16 @@
 
 <!-- Main content here -->
 {% block main %}
+<script src="../static/jquery/external/jquery/jquery.js" charset="utf-8"></script>
+<script src="../static/jquery/jquery-ui.min.js" charset="utf-8"></script>
+<script>
+$( function() {
+    $( "#students" ).accordion({
+      collapsible: true
+    });
+  } );
+
+</script>
 <div id="tabs">
   <ul id="tabBox">
     <li><a class="button pressed" href="#tabs-1">Users</a></li>
@@ -556,7 +566,7 @@
   let collapsed = false;
   let filters = [];
   let sort;
-
+  let number = 0
   let filterButtons = Array.from(document.querySelectorAll(".filter"));
   filterButtons.forEach(button => button.onclick = () => toggleFilter(button));
 
@@ -712,9 +722,11 @@
           //Loop through each student in the list
           for (student of studentList) {
             let newStudent = document.createElement('h3');
+            
             let icons = "";
             let pictureIcon = ""
-
+            
+            console.log(studentList);
             //change image based upon persons permissions
             let perms = student['perms']
             if (perms) var permsIcons = document.createElement("img");
@@ -877,6 +889,7 @@
               }
               newDetails.innerHTML += ` [Quiz: ${newQuiz}/${newQuizMax}]`
             }
+            
             studentBox.appendChild(newStudent)
             studentBox.appendChild(newDetails)
             let name = student['name'];
@@ -889,8 +902,10 @@
         }
       }
     }
-  }, 1000);
 
+    
+  }, 1000);
+  
   setInterval(async () => {
     let npRequests = await getResponse("/api/newpasswords");
     let el = document.getElementById("npRequests");
@@ -1007,6 +1022,10 @@
                                 `;
       });
       $("#history").accordion("refresh");
+    }
+    if (studentList.length > number) {
+      number = studentList.length
+      $('#students').accordion("refresh")
     }
   }
   updateHistory();

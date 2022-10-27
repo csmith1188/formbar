@@ -1252,7 +1252,7 @@ def endpoint_bgm():
                         startBGM(bgm_file, bgm_volume)
                     else:
                         startBGM(bgm_file)
-                    return render_template("message.html", message='Playing: ' + bgm_file)
+                    return render_template("message.html", message = 'Playing: ' + bgm_file, forward='/bgm')
                 else:
                     if request.args.get('return') == 'json':
                         return '{error: "It has only been ' + str(int(time.time() - sD.bgm['lastTime'])) + ' seconds since the last song started. Please wait at least 60 seconds."}'

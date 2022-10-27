@@ -2204,6 +2204,11 @@ def endpoint_lesson():
                 sD.currentStep += 1
                 if sD.currentStep >= len(sD.lesson.steps):
                     sD.currentStep = len(sD.lesson.steps)
+                    sD.refresh()
+                    if request.args.get('advanced'):
+                        advanced = '?advanced=true'
+                    else:
+                        advanced = ''
                     return render_template("message.html", message='End of lesson!')
                 else:
                     updateStep()
@@ -2226,7 +2231,11 @@ def endpoint_lesson():
                     return redirect('/lesson' + advanced)
             elif request.args.get('action') == 'unload':
                 sD.refresh()
-                return render_template("message.html", message='Unloaded lesson.')
+                if request.args.get('advanced'):
+                    advanced = '?advanced=true'
+                else:
+                    advanced = ''
+                return redirect('/lesson' + advanced)
             elif request.args.get('action') == 'upload':
                 return render_template('general.html', content='<form method=post enctype=multipart/form-data><input type=file name=file accept=".xlsx"><input type=submit value=Upload></form>')
             else:

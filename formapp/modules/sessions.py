@@ -18,15 +18,15 @@ class Session():
         self.ttt = []
         self.fighter = {}
         self.settings = {
-            #If you change the default values here, you'll need to update the database too
+            # If you change the default values here, you'll need to update the database too
             'perms': {
-                'admin' : 0,
-                'users' : 1,
-                'api' : 3,
-                'sfx' : 1,
-                'bgm' : 1,
-                'say' : 2,
-                'bar' : 1,
+                'admin': 0,
+                'users': 1,
+                'api': 3,
+                'sfx': 1,
+                'bgm': 1,
+                'say': 2,
+                'bar': 1,
                 'games': 2,
                 'teacher': 0,
                 'mod': 1,
@@ -35,12 +35,12 @@ class Session():
                 'banned': 4
             },
             'permname': ['Teacher', 'Mod', 'Student', 'Guest', 'Banned'],
-            'locked' : False,
-            'paused' : False,
-            'blind' : False,
-            'showinc' : True,
-            'captions' : True,
-            'autocount' : True,
+            'locked': False,
+            'paused': False,
+            'blind': False,
+            'showinc': True,
+            'captions': True,
+            'autocount': True,
             'numStudents': 8,
             'upcolor': 'green',
             'wigglecolor': 'blue',
@@ -50,7 +50,7 @@ class Session():
             'whitelist': [
                 '127.0.0.1',
                 '172.21.3.5'
-                ]
+            ]
         }
 
     def refresh(self):
@@ -65,6 +65,7 @@ class Session():
         self.activeQuiz = {}
         self.lesson = {}
         self.lessonList = {}
+
 
 class Student():
     def __init__(self, username):

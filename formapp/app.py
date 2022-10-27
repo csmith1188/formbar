@@ -3366,7 +3366,6 @@ def message(message):
 @socket_.on('permsReload')
 def message(message):
     try:
-        print('hello')
         userip = request.remote_addr
         if sD.studentDict[request.remote_addr]['perms'] <= sD.settings['perms']['admin']:
             socket_.emit('sessionUpdate', json.dumps(packMSG('all', 'server', sD.studentDict)))
@@ -3376,7 +3375,6 @@ def message(message):
 @socket_.on('loginReload')
 def message(message):
     try:
-        print('hello')
         loginResult = loginCheck(request.remote_addr, 'users')
         if loginResult:
             socket_.emit('sessionUpdate', json.dumps(packMSG('all', 'server', sD.studentDict)))

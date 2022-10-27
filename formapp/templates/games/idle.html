@@ -1,222 +1,251 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="icon" href="../../static/img/idle/favicon.png">
-        <title>Idle Business</title>
-        <style>
-        body{
-            background-color: #000015;
-            height: 100%;
-        }#content  {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          flex-direction: column;
-          user-select: none;
-        }#game{
-          display: flex;
-          justify-content: center;
-          border: 5px solid #78756f;
-          border-radius: 5px;
-          padding-top: 1%;
-          padding-left: 2%;
-          padding-right: 5%;
-          padding-bottom: 1%;
-          flex-direction: column;
-          background-color: #b3b0aa;
-          box-shadow: 2px 2px #737170;
-          font-family: OCR A;
-          font-weight: normal;
-        }#back{
-          margin-bottom: 2%;
-        }#settingsbox{
-           display: none;
-         }#settingpic {
-          display: flex;
-          justify-content: center;
-          position: sticky;
-        }h5 {
-          margin-top: 1%;
-        }.gens {
-          margin: 7% 0 7% 0;
-        }#headerbox {
-          display: flex;
-          justify-content: center;
-          margin-top: 2%;
-          color: #e3e0d8;
-          font-size: 20px;
-          text-shadow: 2px 2px #737170;
-          font-family: OCR A;
-          font-weight: bold;
-        }#inv {
-          display: flex;
-          justify-content: space-around;
-          flex-direction: row;
-          position: sticky;
-          gap: 10px;
-          min-width: 35%;
-          min-height: 25%;
-        }.invbox {
-          display: flex;
-          border: 3px solid #78756f;
-          border-radius: 5px;
-          padding: 10px;
-          background-color: #b3b0aa;
-          position: sticky;
-          box-shadow: 4px 2px #737170;
-          min-width: 35%;
-          min-height: 25%;
-        }button {
-          border-radius: 8px;
-          border: 2px solid gray;
-          transition-duration: 0.4s;
-          cursor: pointer;
-          text-align: center;
-          box-shadow: 0 4px #999;
-          font-family: OCR A;
-          font-weight: bold;
-        }button:active {
-          transform: translateY(3px);
-          box-shadow: 0 2px #737170;
-          color: black;
-        }
-        </style>
-        <script>
-        var point = 0;
-        var pointPerSecond = 0;
-        var gen1Cost = 0;
-        var gen1s = 0;
-        var gen1gain = 1;
-        var gen2Cost = 500;
-        var gen2s = 0;
-        var gen2gain = 3;
-        var gen3Cost = 3000;
-        var gen3s = 0;
-        var gen3gain = 7;
-        var prestigeLevel = 0;
-        var prestigeCost = 25000;
-        function update() {
-            document.getElementById("showPoint").innerText = point;
-            document.getElementById("prescost").innerText = prestigeCost;
-            document.getElementById("showPoint").innerText = point;
-            document.getElementById("gen1num").innerText = gen1s;
-            document.getElementById("gen1price").innerText = gen1Cost;
-            document.getElementById("gen1add").innerText = gen1gain;
-            document.getElementById("gen2num").innerText = gen2s;
-            document.getElementById("gen2price").innerText = gen2Cost;
-            document.getElementById("gen2add").innerText = gen2gain;
-            document.getElementById("gen3num").innerText = gen3s;
-            document.getElementById("gen3price").innerText = gen3Cost;
-            document.getElementById("gen3add").innerText = gen3gain;
-            document.getElementById("showpsec").innerText = pointPerSecond;
-            document.getElementById("showplvl").innerText = prestigeLevel;
-            document.getElementById("prescost").innerText = prestigeCost;
-            if (point < gen1Cost) {
-              document.getElementById('buyButton1').style.backgroundColor = '#f55b5b';
-            }else {
-              document.getElementById('buyButton1').style.backgroundColor = '#4CAF50';
-            }
-            if (point < gen2Cost) {
-              document.getElementById('buyButton2').style.backgroundColor = '#f55b5b';
-            }else {
-              document.getElementById('buyButton2').style.backgroundColor = '#4CAF50';
-            }
-            if (point < gen3Cost) {
-              document.getElementById('buyButton3').style.backgroundColor = '#f55b5b';
-            }else {
-              document.getElementById('buyButton3').style.backgroundColor = '#4CAF50';
-            }
-            if (point < prestigeCost) {
-              document.getElementById('prest').style.backgroundColor = '#f55b5b';
-            }else {
-              document.getElementById('prest').style.backgroundColor = '#4CAF50';
-            }
-        }
-        function save() {
-          var save = {
-            point: point,
-            gen1s: gen1s,
-            gen1Cost: gen1Cost,
-            gen1gain: gen1gain,
-            pointPerSecond: pointPerSecond,
-            gen2Cost: gen2Cost,
-            gen2s: gen2s,
-            gen2gain: gen2gain,
-            gen3Cost: gen3Cost,
-            gen3s: gen3s,
-            gen3gain: gen3gain,
-            prestigeLevel: prestigeLevel,
-            prestigeCost: prestigeCost,
-          }
-          localStorage.setItem("save",JSON.stringify(save));
-        }
-        function load() {
-          var savegame = JSON.parse(localStorage.getItem("save"));
-          if (typeof savegame.point !== "undefined") point = savegame.point;
-          if (typeof savegame.pointPerSecond !== "undefined") pointPerSecond = savegame.pointPerSecond;
-          if (typeof savegame.gen1s !== "undefined") gen1s = savegame.gen1s;
-          if (typeof savegame.gen1Cost !== "undefined") gen1Cost = savegame.gen1Cost;
-          if (typeof savegame.gen1gain !== "undefined") gen1gain = savegame.gen1gain;
-          if (typeof savegame.gen2s !== "undefined") gen2s = savegame.gen2s;
-          if (typeof savegame.gen2Cost !== "undefined") gen2Cost = savegame.gen2Cost;
-          if (typeof savegame.gen2gain !== "undefined") gen2gain = savegame.gen2gain;
-          if (typeof savegame.gen3s !== "undefined") gen3s = savegame.gen3s;
-          if (typeof savegame.gen3Cost !== "undefined") gen3Cost = savegame.gen3Cost;
-          if (typeof savegame.gen3gain !== "undefined") gen3gain = savegame.gen3gain;
-          if (typeof savegame.prestigeLevel !== "undefined") prestigeLevel = savegame.prestigeLevel;
-          if (typeof savegame.prestigeCost !== "undefined") prestigeCost = savegame.prestigeCost;
-        }
-        function delSave() {
-          localStorage.removeItem("save")
-          location.reload()
-        }
-        setInterval(function() {
-          update();
-            if (gen1s >= 1){
-            point += pointPerSecond * .25;
-            }
-        }, 250)
-        setInterval(function() {
-            save();
-        }, 1000)
-        function buygen1() {
-          if (point >= gen1Cost) {
-            point -= gen1Cost;
-            gen1s++;
-            gen1Cost += 1;
-            gen1Cost *= 1.1;
-            gen1Cost = Math.round(gen1Cost)
-            pointPerSecond += gen1gain;
-            update();
-          }else {
-          }
-        }
-        function buygen2() {
-          if (point >= gen2Cost) {
-            point -= gen2Cost;
-            gen2s++;
-            gen2Cost *= 1.1;
-            gen2Cost = Math.round(gen2Cost)
-            pointPerSecond += gen2gain;
-            update();
-          }else {
-        }
-        }
-        function buygen3() {
-          if (point >= gen3Cost) {
-            point -= gen3Cost;
-            gen3s++;
-            gen3Cost *= 1.1;
-            gen3Cost = Math.round(gen3Cost)
-            pointPerSecond += gen3gain;
-            update();
-          }else {
-          }
-        }
-        function prestige() {
-          if (confirm("Are you sure?") == true){
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="../../static/img/idle/favicon.png">
+  <title>Idle Business</title>
+  <style>
+    body {
+      background-color: #000015;
+      height: 100%;
+    }
+
+    #content {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      user-select: none;
+    }
+
+    #game {
+      display: flex;
+      justify-content: center;
+      border: 5px solid #78756f;
+      border-radius: 5px;
+      padding-top: 1%;
+      padding-left: 2%;
+      padding-right: 5%;
+      padding-bottom: 1%;
+      flex-direction: column;
+      background-color: #b3b0aa;
+      box-shadow: 2px 2px #737170;
+      font-family: OCR A;
+      font-weight: normal;
+    }
+
+    #back {
+      margin-bottom: 2%;
+    }
+
+    #settingsbox {
+      display: none;
+    }
+
+    #settingpic {
+      display: flex;
+      justify-content: center;
+      position: sticky;
+    }
+
+    h5 {
+      margin-top: 1%;
+    }
+
+    .gens {
+      margin: 7% 0 7% 0;
+    }
+
+    #headerbox {
+      display: flex;
+      justify-content: center;
+      margin-top: 2%;
+      color: #e3e0d8;
+      font-size: 20px;
+      text-shadow: 2px 2px #737170;
+      font-family: OCR A;
+      font-weight: bold;
+    }
+
+    #inv {
+      display: flex;
+      justify-content: space-around;
+      flex-direction: row;
+      position: sticky;
+      gap: 10px;
+      min-width: 35%;
+      min-height: 25%;
+    }
+
+    .invbox {
+      display: flex;
+      border: 3px solid #78756f;
+      border-radius: 5px;
+      padding: 10px;
+      background-color: #b3b0aa;
+      position: sticky;
+      box-shadow: 4px 2px #737170;
+      min-width: 35%;
+      min-height: 25%;
+    }
+
+    button {
+      border-radius: 8px;
+      border: 2px solid gray;
+      transition-duration: 0.4s;
+      cursor: pointer;
+      text-align: center;
+      box-shadow: 0 4px #999;
+      font-family: OCR A;
+      font-weight: bold;
+    }
+
+    button:active {
+      transform: translateY(3px);
+      box-shadow: 0 2px #737170;
+      color: black;
+    }
+  </style>
+  <script>
+    // When the page needs to refresh, send a signal to chat which will then refresh everyone's page
+    chatSocket.on("reload", message => {
+      location.reload();
+    });
+    var point = 0;
+    var pointPerSecond = 0;
+    var gen1Cost = 0;
+    var gen1s = 0;
+    var gen1gain = 1;
+    var gen2Cost = 500;
+    var gen2s = 0;
+    var gen2gain = 3;
+    var gen3Cost = 3000;
+    var gen3s = 0;
+    var gen3gain = 7;
+    var prestigeLevel = 0;
+    var prestigeCost = 25000;
+    function update() {
+      document.getElementById("showPoint").innerText = point;
+      document.getElementById("prescost").innerText = prestigeCost;
+      document.getElementById("showPoint").innerText = point;
+      document.getElementById("gen1num").innerText = gen1s;
+      document.getElementById("gen1price").innerText = gen1Cost;
+      document.getElementById("gen1add").innerText = gen1gain;
+      document.getElementById("gen2num").innerText = gen2s;
+      document.getElementById("gen2price").innerText = gen2Cost;
+      document.getElementById("gen2add").innerText = gen2gain;
+      document.getElementById("gen3num").innerText = gen3s;
+      document.getElementById("gen3price").innerText = gen3Cost;
+      document.getElementById("gen3add").innerText = gen3gain;
+      document.getElementById("showpsec").innerText = pointPerSecond;
+      document.getElementById("showplvl").innerText = prestigeLevel;
+      document.getElementById("prescost").innerText = prestigeCost;
+      if (point < gen1Cost) {
+        document.getElementById('buyButton1').style.backgroundColor = '#f55b5b';
+      } else {
+        document.getElementById('buyButton1').style.backgroundColor = '#4CAF50';
+      }
+      if (point < gen2Cost) {
+        document.getElementById('buyButton2').style.backgroundColor = '#f55b5b';
+      } else {
+        document.getElementById('buyButton2').style.backgroundColor = '#4CAF50';
+      }
+      if (point < gen3Cost) {
+        document.getElementById('buyButton3').style.backgroundColor = '#f55b5b';
+      } else {
+        document.getElementById('buyButton3').style.backgroundColor = '#4CAF50';
+      }
+      if (point < prestigeCost) {
+        document.getElementById('prest').style.backgroundColor = '#f55b5b';
+      } else {
+        document.getElementById('prest').style.backgroundColor = '#4CAF50';
+      }
+    }
+    function save() {
+      var save = {
+        point: point,
+        gen1s: gen1s,
+        gen1Cost: gen1Cost,
+        gen1gain: gen1gain,
+        pointPerSecond: pointPerSecond,
+        gen2Cost: gen2Cost,
+        gen2s: gen2s,
+        gen2gain: gen2gain,
+        gen3Cost: gen3Cost,
+        gen3s: gen3s,
+        gen3gain: gen3gain,
+        prestigeLevel: prestigeLevel,
+        prestigeCost: prestigeCost,
+      }
+      localStorage.setItem("save", JSON.stringify(save));
+    }
+    function load() {
+      var savegame = JSON.parse(localStorage.getItem("save"));
+      if (typeof savegame.point !== "undefined") point = savegame.point;
+      if (typeof savegame.pointPerSecond !== "undefined") pointPerSecond = savegame.pointPerSecond;
+      if (typeof savegame.gen1s !== "undefined") gen1s = savegame.gen1s;
+      if (typeof savegame.gen1Cost !== "undefined") gen1Cost = savegame.gen1Cost;
+      if (typeof savegame.gen1gain !== "undefined") gen1gain = savegame.gen1gain;
+      if (typeof savegame.gen2s !== "undefined") gen2s = savegame.gen2s;
+      if (typeof savegame.gen2Cost !== "undefined") gen2Cost = savegame.gen2Cost;
+      if (typeof savegame.gen2gain !== "undefined") gen2gain = savegame.gen2gain;
+      if (typeof savegame.gen3s !== "undefined") gen3s = savegame.gen3s;
+      if (typeof savegame.gen3Cost !== "undefined") gen3Cost = savegame.gen3Cost;
+      if (typeof savegame.gen3gain !== "undefined") gen3gain = savegame.gen3gain;
+      if (typeof savegame.prestigeLevel !== "undefined") prestigeLevel = savegame.prestigeLevel;
+      if (typeof savegame.prestigeCost !== "undefined") prestigeCost = savegame.prestigeCost;
+    }
+    function delSave() {
+      localStorage.removeItem("save")
+      location.reload()
+    }
+    setInterval(function () {
+      update();
+      if (gen1s >= 1) {
+        point += pointPerSecond * .25;
+      }
+    }, 250)
+    setInterval(function () {
+      save();
+    }, 1000)
+    function buygen1() {
+      if (point >= gen1Cost) {
+        point -= gen1Cost;
+        gen1s++;
+        gen1Cost += 1;
+        gen1Cost *= 1.1;
+        gen1Cost = Math.round(gen1Cost)
+        pointPerSecond += gen1gain;
+        update();
+      } else {
+      }
+    }
+    function buygen2() {
+      if (point >= gen2Cost) {
+        point -= gen2Cost;
+        gen2s++;
+        gen2Cost *= 1.1;
+        gen2Cost = Math.round(gen2Cost)
+        pointPerSecond += gen2gain;
+        update();
+      } else {
+      }
+    }
+    function buygen3() {
+      if (point >= gen3Cost) {
+        point -= gen3Cost;
+        gen3s++;
+        gen3Cost *= 1.1;
+        gen3Cost = Math.round(gen3Cost)
+        pointPerSecond += gen3gain;
+        update();
+      } else {
+      }
+    }
+    function prestige() {
+      if (confirm("Are you sure?") == true) {
         if (point >= prestigeCost) {
           point -= point;
           pointPerSecond -= pointPerSecond;
@@ -240,61 +269,71 @@
         }
       }
     }
-        function setting() {
-          document.getElementById("settingsbox").style.display = "block";
-            document.getElementById("gam2").style.display = "none";
-          }
-          function back() {
-              document.getElementById("settingsbox").style.display = "none";
-              document.getElementById("gam2").style.display = "block";
-            }
-</script>
-    </head>
-    <body onload="load()">
-      <table>
-        <div id="content">
-          <div id="headerbox">
-              <h1>Idle Business</h1>
+    function setting() {
+      document.getElementById("settingsbox").style.display = "block";
+      document.getElementById("gam2").style.display = "none";
+    }
+    function back() {
+      document.getElementById("settingsbox").style.display = "none";
+      document.getElementById("gam2").style.display = "block";
+    }
+  </script>
+</head>
+
+<body onload="load()">
+  <table>
+    <div id="content">
+      <div id="headerbox">
+        <h1>Idle Business</h1>
+      </div>
+      <div id="inv">
+        <p class="invbox">Money :&nbsp<span id="showPoint">0</span></p>
+        <p class="invbox">Per Second :&nbsp<span id="showpsec">0</span></p>
+        <p class="invbox">Business :&nbsp#<span id="showplvl">0</span></p>
+      </div>
+      <div id="game">
+        <img id='settingpic' src="../../static/img/idle/gear.png" alt="Settings" width="50px" length="50px"
+          onclick='setting()'>
+        <div id="settingsbox">
+          <button id='back' onclick='back()'> &lt-- </button>
+          <div id="savebox">
+            <h2>Game Explanation</h2>You just bought your first business!<br>Hire workers to get more money. Once you
+            get enough money, you can <br>start a new business and get a boost in earnings.<br>Can you come out on
+            top?<br><br><br><br><br><br>
+            <p>Made by: Tommy Blount</p>Discord: parsifaal#8008<br>Dm me with any suggestions<br><br>
+            <button onclick="delSave()">Delete Save</button>
           </div>
-          <div id="inv">
-              <p class="invbox">Money :&nbsp<span id="showPoint">0</span></p>
-              <p class="invbox">Per Second :&nbsp<span id="showpsec">0</span></p>
-              <p class="invbox">Business :&nbsp#<span id="showplvl">0</span></p>
-          </div>
-            <div id="game">
-              <img id='settingpic' src="../../static/img/idle/gear.png" alt="Settings" width="50px" length="50px" onclick='setting()'>
-    <div id="settingsbox">
-        <button id='back' onclick='back()'> &lt-- </button>
-        <div id="savebox">
-        <h2>Game Explanation</h2>You just bought your first business!<br>Hire workers to get more money. Once you get enough money, you can <br>start a new business and get a boost in earnings.<br>Can you come out on top?<br><br><br><br><br><br><p>Made by: Tommy Blount</p>Discord: parsifaal#8008<br>Dm me with any suggestions<br><br>
-        <button onclick="delSave()">Delete Save</button>
-    </div>
-    </div>
-    <div id='gam2'>
-                <div id="idleshop">
-                    <div class="gens">
-                      <!-- <img src="generator.png" alt="generator" style="width:100px;height:75px;"> -->
-                    <button onclick="buygen1()" id="buyButton1">Hire Worker</button>
-                        <h5>+<span id="gen1add">1</span> Money Per Second | Cost: <span id="gen1price">0</span> | Owned: <span id="gen1num">0</span></h5>
-                    </div>
-                    <div class="gens">
-                      <!-- <img src="generator.png" alt="generator" style="width:100px;height:75px;"> -->
-                        <button onclick="buygen2()" id="buyButton2">Hire Secretary </button>
-                        <h5>+<span id="gen2add">3</span> Money Per Second | Cost: <span id="gen2price">500</span> | Owned: <span id="gen2num">0</span></h5>
-                    </div>
-                    <div class="gens">
-                      <!-- <img src="generator.png" alt="generator" style="width:100px;height:75px;"> -->
-                        <button onclick="buygen3()" id="buyButton3">Hire Manager</button>
-                        <h5>+<span id="gen3add">7</span> Money Per Second | Cost: <span id="gen3price">3000</span> | Owned: <span id="gen3num">0</span></h5>
-                    </div>
-                  </div>
-                  <div id="prestigebox">
-                      <button onclick="prestige()" id="prest">Start New Business</button>
-                      <h5>Costs <span id="prescost">25000</span> money and resets your progress, but boosts your earnings by 1.5x</h5>
-                      <br>
-                  </div>
-</div>
         </div>
-      </table>
-    </body>
+        <div id='gam2'>
+          <div id="idleshop">
+            <div class="gens">
+              <!-- <img src="generator.png" alt="generator" style="width:100px;height:75px;"> -->
+              <button onclick="buygen1()" id="buyButton1">Hire Worker</button>
+              <h5>+<span id="gen1add">1</span> Money Per Second | Cost: <span id="gen1price">0</span> | Owned: <span
+                  id="gen1num">0</span></h5>
+            </div>
+            <div class="gens">
+              <!-- <img src="generator.png" alt="generator" style="width:100px;height:75px;"> -->
+              <button onclick="buygen2()" id="buyButton2">Hire Secretary </button>
+              <h5>+<span id="gen2add">3</span> Money Per Second | Cost: <span id="gen2price">500</span> | Owned: <span
+                  id="gen2num">0</span></h5>
+            </div>
+            <div class="gens">
+              <!-- <img src="generator.png" alt="generator" style="width:100px;height:75px;"> -->
+              <button onclick="buygen3()" id="buyButton3">Hire Manager</button>
+              <h5>+<span id="gen3add">7</span> Money Per Second | Cost: <span id="gen3price">3000</span> | Owned: <span
+                  id="gen3num">0</span></h5>
+            </div>
+          </div>
+          <div id="prestigebox">
+            <button onclick="prestige()" id="prest">Start New Business</button>
+            <h5>Costs <span id="prescost">25000</span> money and resets your progress, but boosts your earnings by 1.5x
+            </h5>
+            <br>
+          </div>
+        </div>
+      </div>
+  </table>
+</body>
+
 </html>

@@ -7,37 +7,7 @@
 
 <!-- Extra style declarations here -->
 {% block style %}
-<style>
-  body {
-    user-select: none;
-    background: var(--bg-dark-blue);
-  }
 
-  #virtualBar {
-    width: calc(100% - 32px);
-  }
-
-  #text {
-    width: 10ch;
-    padding: 0 4px;
-    border: 1px white;
-    border-style: solid solid none;
-    background: black;
-    font: 32px monospace;
-    text-transform: uppercase;
-    overflow: hidden;
-  }
-
-  #pixBox {
-    width: 100%;
-    height: 64px;
-    box-sizing: border-box;
-    border: 1px solid white;
-    display: flex;
-    justify-content: space-around;
-    user-select: none;
-  }
-</style>
 {% endblock %}
 
 <!-- Change theme color here -->
@@ -45,7 +15,6 @@
 
 <!-- Main content here -->
 {% block main %}
-
 
 <div class="container"></div>
 <canvas id='virtualbar' style="height:900px; width:969px"></canvas>
@@ -61,17 +30,13 @@
 <script>
   
   var mychart = document.getElementById('virtualbar').getContext("2d");
- 
   var doughnutChart = new Chart(mychart, {
     type: 'doughnut',
     data: {
-      labels: ["Up", "Wiggle", "Down"],
+      labels: [],
       datasets: [{
-        backgroundColor: [
-          "#00ff00",
-          "#00ffff",
-          "#ff0000"],
-        data: [0, 0, 0]
+        backgroundColor: [],
+        data: [0, 0, 0, 0]
       }]
     },
     options: {
@@ -88,58 +53,96 @@
 
 
         }
-        pixBox.innerHTML += "<div style='display: inline; flex-grow: 1; overflow: hidden; background-color: #" + pix[i][0] + "" + pix[i][1] + "" + pix[i][2] + ";'>&nbsp;</div>";
       }
     }
   });
   
-  
-  
   let pixRes;
-
+  let type = "{{ type }}"
+  
   function update() {
     // Update the virtual bar
     let pixRequest = new XMLHttpRequest();
     pixRequest.open("GET", '/api/students');
     pixRequest.onload = () => {
-      pixRes = JSON.parse(pixRequest.responseText);
-
-      var up = 0
-      var wiggle = 0
-      var down = 0
-
+    pixRes = JSON.parse(pixRequest.responseText);
       
-      for (const key of Object.keys(pixRes)) {
-        console.log(pixRes[key].thumb);
-        if (pixRes[key].thumb == "up") {
-          up++
-          console.log('found up');
-        }
-      
-        if (pixRes[key].thumb == "wiggle") {
-          wiggle++
-          console.log('found wiggle');
-        }
+      if (type == 'tutd'){
+        var up = 0
+        var wiggle = 0
+        var down = 0
+        var none = 0
+  
         
-        if (pixRes[key].thumb == "down") {
-          down++
-          console.log('found down');
-        }
+        for (const key of Object.keys(pixRes)) {
+          console.log(pixRes[key].thumb);
+          if (pixRes[key].thumb == "up") {
+            up++
+          }
         
-      }
-      doughnutChart.data.datasets[0].data = [up, wiggle, down];
+          if (pixRes[key].thumb == "wiggle") {
+            wiggle++
+          }
+          
+          if (pixRes[key].thumb == "down") {
+            down++
+          }
+          if (pixRes[key].thumb == "") {
+            none++
+          }
+          if (up >= 1 && down == 0 && wiggle == 0 && none == 0){
+          doughnutChart.data.labels = ['MAX GAMER']
+          doughnutChart.data.datasets[0].backgroundColor = ['#BF40BF']
+          doughnutChart.data.datasets[0].data = [up];
+        } else {
+          doughnutChart.data.labels = ["Up", "Wiggle", "Down", "Not Submitted"]
+          doughnutChart.data.datasets[0].backgroundColor = ["#00ff00","#00ffff","#ff0000", "#FFFFFF"]
+          doughnutChart.data.datasets[0].data = [up, wiggle, down, none];
+        }
+        }
+          } else if (type == 'abcd'){
+            var a = 0
+            var b = 0
+            var c = 0
+            var d = 0
+          
+
+            for (const key of Object.keys(pixRes)) {
+              console.log(pixRes[key].letter);
+              if (pixRes[key].letter == "a") {
+                a++
+              }
+            
+              if (pixRes[key].letter == "b") {
+                b++
+              }
+
+              if (pixRes[key].letter == "c") {
+                c++
+              }
+
+              if (pixRes[key].letter == "d") {
+                d++
+              }
+              doughnutChart.data.datasets[0].data = [a, b, c, d];
+              doughnutChart.data.labels = ['A', 'B', 'C', 'D'];
+              doughnutChart.data.datasets[0].backgroundColor = ["#00ff00","#00ffff","#ff0000", "#ffdf40"]
+         }
+        } else {
+          doughnutChart.data.labels = ['No Active Poll'];
+        } 
+        
+        }
+
       doughnutChart.update();
+      pixRequest.send(null);
     }
-  pixRequest.send(null);
-    
-
-
+  
     // When the page needs to refresh, send a signal to chat which will then refresh everyone's page
     chatSocket.on("sessionUpdate", message => {
       console.log(message);
       location.reload();
     });
-
 
   update();
   setInterval(update, 1000);

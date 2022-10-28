@@ -168,7 +168,6 @@ sD.settings['perms']['bar'] = data[2]
 sD.settings['perms']['sfx'] = data[3]
 sD.settings['perms']['bgm'] = data[4]
 sD.settings['perms']['api'] = data[5]
-sD.settings['perms']['tags'] = data[9]
 sD.settings['locked'] = data[6]
 sD.settings['blind'] = data[7]
 sD.settings['showinc'] = data[8]
@@ -958,7 +957,7 @@ def endpoint_2048():
 
 @app.route('/abcd')
 def endpoint_abcd():
-    loginResult = loginCheck(request.remote_addr, request.path, 'student')
+    loginResult = loginCheck(request.remote_addr)
     if loginResult:
         return loginResult
     else:
@@ -3138,7 +3137,9 @@ def endpoint_usermanual():
 # This endpoint allows you to see the formbars IP with style and shows different colors.
 @app.route('/virtualbar')
 def endpoint_virtualbar():
-    return render_template("virtualbar.html")
+    type = sD.pollType
+    print(type)
+    return render_template("virtualbar.html", type = type)
 
 # ██     ██
 # ██     ██

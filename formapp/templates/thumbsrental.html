@@ -83,7 +83,9 @@
 
 <!-- Main content here -->
 {% block main %}
-{{ prompt|safe }}
+<h2>Prompt</h2>
+<h3>{{ prompt }}</h3>
+<span id="prompt"></span>
 <h2 style="margin-top: 0;">Thumbs</h2>
 <div class="container1-flex">
     <div class="bigbutton bb-green" onclick="window.location = '/tutd?thumb=up';">

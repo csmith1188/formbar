@@ -307,7 +307,7 @@
     <div id="recContainer" style="font-size: 14px; margin-bottom: 5px;">To <span id="recipient">all</span><span id="removeRec" onclick="removeRec()" title="Reset recipients to all">✕</span></div>
     <form onsubmit="event.preventDefault(); onSubmit(); return false;" style="margin: 0;">
         <input id="input" class="box" placeholder="Enter a message" autocomplete="off">
-        <input type="submit" value="Send" id="sendButton" onclick="location.reload()" class="button">
+        <input type="submit" value="Send" id="sendButton"  class="button">
     </form>
 </div>
 <div id="notifications">
@@ -540,10 +540,16 @@ return false ;
         output(message);
     });
 
+
+
+    
     // When the page needs to refresh, send a signal to chat which will then refresh everyone's page
     chatSocket.on("reload", message => {
       location.reload();
     });
+
+
+
       //check message.content for permission level, and see if it matches this user's permission to see if they need to change
     chatSocket.on("userlist", message => {
         message = JSON.parse(message);

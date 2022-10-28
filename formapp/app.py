@@ -1408,7 +1408,6 @@ def endpoint_controlpanel():
                                 db.close()
                     except Exception as e:
                         logFile("Error", e)
-                        pass
 
         ###
         ### Everything past this point uses the old method of changing settings. Needs updated
@@ -2492,7 +2491,7 @@ def endpoint_sendblock():
         if blockId in colorDict:
             blockList.append([blockId, blockData])
             addBlock()
-            #fillBlocks()
+            fillBlocks()
             return render_template("message.html", message = "Got Block: " + blockId + ", " + blockData)
         else:
             return render_template("message.html", message = "Bad block Id")

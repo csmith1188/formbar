@@ -82,10 +82,7 @@ import datetime
 import traceback
 import sqlite3
 import asyncio
-if ONRPi:
-<<<<<<< HEAD
-    import board, neopixel
-
+if ONRPi: import board, neopixel
 #Importing customs modules
 from modules import letters
 from modules import sfx
@@ -94,10 +91,6 @@ from modules.colors import colors, hex2dec
 from modules import lessons
 from modules import sessions
 from key import key
-=======
-    import board
-    import neopixel
-
 #Importing customs modules
 from modules import letters
 from modules import sfx

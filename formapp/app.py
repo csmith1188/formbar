@@ -1991,10 +1991,16 @@ def endpoint_games_towerdefense():
         db = sqlite3.connect(os.path.dirname(
             os.path.abspath(__file__)) + '/data/database.db')
         dbcmd = db.cursor()
-        progress = dbcmd.execute("SELECT tdProgress FROM users WHERE username=:uname", {
-                                 "uname": username}).fetchone()[0] or ''
-        achievements = dbcmd.execute("SELECT tdAchievements FROM users WHERE username=:uname", {
-                                     "uname": username}).fetchone()[0] or ''
+        progress = dbcmd.execute("SELECT tdProgress FROM users WHERE username=:uname", {"uname": username}).fetchone()
+        if progress:
+            progress = progress[0]
+        else:
+            progress = ''
+        achievements = dbcmd.execute("SELECT tdAchievements FROM users WHERE username=:uname", {"uname": username}).fetchone()
+        if achievements:
+            achievements = achievements[0]
+        else:
+            achievements = ''
         db.close()
         return render_template('games/towerdefense.html', progress=progress, achievements=achievements)
 
@@ -2364,7 +2370,7 @@ def endpoint_login():
                         os.path.abspath(__file__)) + '/data/database.db')
                     dbcmd = db.cursor()
                     # Add user to database
-                    userFound = dbcmd.execute("INSERT INTO users (username, password, permissions, bot) VALUES (?, ?, ?, ?)", (username, passwordCrypt, sD.settings['perms']['anyone'], str(bot)))
+                    userFound = dbcmd.execute("INSERT INTO users (username, password, permissions, bot, digipogs) VALUES (?, ?, ?, ?, ?)", (username, passwordCrypt, sD.settings['perms']['anyone'], str(bot), 0))
                     db.commit()
                     db.close()
                     newStudent(remote, username, bot=bot)
@@ -2832,7 +2838,7 @@ def endpoint_socket():
     return render_template('socket.html', async_mode=socket_.async_mode)
 
 #Spend digipogs to unlock things or start games
-@app.route('/spenddp', methods = ['POST'])
+@app.route('/spenddp')
 def endpoint_spenddp():
     loginResult = loginCheck(request.remote_addr)
     if loginResult:
@@ -2840,13 +2846,19 @@ def endpoint_spenddp():
     amount = request.args.get('amount')
     if amount == None:
         return '{"result": "failure", "reason": "no amount given"}'
+    try:
+        amount = int(amount)
+    except:
+        return '{"result": "failure", "reason": "amount is not an integer"}'
     db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
     dbcmd = db.cursor()
-    digipogs = dbcmd.execute("SELECT digipogs FROM users WHERE username=:uname AND digipogs",  {"uname": sD.studentDict[request.remote_addr]['name']}).fetchone()
-    print(digipogs)
+    try:
+        digipogs = dbcmd.execute("SELECT digipogs FROM users WHERE username=:uname",  {"uname": sD.studentDict[request.remote_addr]['name']}).fetchone()[0]
+    except:
+        return '{"result": "failure", "reason": "database error", "note": "guests can\'t spend digipogs"}'
     if digipogs < amount:
         return '{"result": "failure", "reason": "not enough digipogs"}'
-    newAmount =  int(''.join(map(str, digipogs))) - int(amount)
+    newAmount =  digipogs - amount
     dbcmd.execute("UPDATE users SET digipogs=:digipogs WHERE username=:uname", {"uname": sD.studentDict[request.remote_addr]['name'], "digipogs": newAmount})
     db.commit()
     db.close()

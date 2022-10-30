@@ -1994,12 +1994,12 @@ def endpoint_games_towerdefense():
         progress = dbcmd.execute("SELECT tdProgress FROM users WHERE username=:uname", {"uname": username}).fetchone()
         if progress:
             progress = progress[0]
-        else:
+        if not progress:
             progress = ''
         achievements = dbcmd.execute("SELECT tdAchievements FROM users WHERE username=:uname", {"uname": username}).fetchone()
         if achievements:
             achievements = achievements[0]
-        else:
+        if not achievements:
             achievements = ''
         db.close()
         return render_template('games/towerdefense.html', progress=progress, achievements=achievements)

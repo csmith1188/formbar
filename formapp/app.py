@@ -2558,6 +2558,27 @@ def endpoint_sfx():
 def endpoint_socket():
     return render_template('socket.html', async_mode=socket_.async_mode)
 
+#Spend digipogs to unlock things or start games
+@app.route('/spenddp', methods = ['POST'])
+def endpoint_spenddp():
+    loginResult = loginCheck(request.remote_addr)
+    if loginResult:
+        return loginResult
+    amount = request.args.get('amount')
+    if amount == None:
+        return '{"result": "failure", "reason": "no amount given"}'
+    db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+    dbcmd = db.cursor()
+    digipogs = dbcmd.execute("SELECT digipogs FROM users WHERE username=:uname AND digipogs",  {"uname": sD.studentDict[request.remote_addr]['name']}).fetchone()
+    print(digipogs)
+    if digipogs < amount:
+        return '{"result": "failure", "reason": "not enough digipogs"}'
+    newAmount =  int(''.join(map(str, digipogs))) - int(amount)
+    dbcmd.execute("UPDATE users SET digipogs=:digipogs WHERE username=:uname", {"uname": sD.studentDict[request.remote_addr]['name'], "digipogs": newAmount})
+    db.commit()
+    db.close()
+    return '{"result": "success"}'
+
 @app.route('/speedtype')
 def endpoint_speedtype():
     if request.args.get('advanced'):

@@ -2312,7 +2312,7 @@ def endpoint_login():
             userType = request.form['userType']
             forward = request.form['forward']
             bot = request.form['bot']
-            bot = bot.lower() == "true" 
+            bot = bot.lower() == "true"
 
             if userType == "login":
                 if username and password:

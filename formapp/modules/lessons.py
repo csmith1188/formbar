@@ -1,8 +1,9 @@
-import pandas#Imports pandas.
-import os#Imports operating system.
+import pandas  # Imports pandas.
+import os  # Imports operating system.
 import pprint
 import math
 import html
+
 
 class Lesson():
     def __init__(self):
@@ -14,8 +15,9 @@ class Lesson():
         self.progList = {}
         self.results = {}
         self.vocab = {}
+
     def checkProg(self, studentList):
-        complete = [0,0,0]
+        complete = [0, 0, 0]
         for student in studentList:
             for task in studentList[student]['progress']:
                 complete[int(task)] += 1
@@ -27,21 +29,25 @@ class Lesson():
             percAmount = 0
         return int(percAmount)
 
+
 lessons = {}
+
 
 def updateFiles():
     global lessons
-    #Empty lessons file list
+    # Empty lessons file list
     lessons = {}
-    #Scan folder for all filenames
+    # Scan folder for all filenames
     availableFiles = os.listdir("./lessondata")
-    #Loop through each file
+    # Loop through each file
     for file in sorted(availableFiles):
-        #Check last five letters are the correct file extension
+        # Check last five letters are the correct file extension
         if file[-5:] == '.xlsx':
-            #Add them to the lessonsFiles list if so
-            lessons[file[:-5]] = os.path.dirname(os.path.abspath(__file__)) + "/../lessondata/" + file
+            # Add them to the lessonsFiles list if so
+            lessons[file[:-5]] = os.path.dirname(
+                os.path.abspath(__file__)) + "/../lessondata/" + file
     return lessons
+
 
 def readBook(incBook):
     newBook = 'lessondata/' + incBook + '.xlsx'
@@ -70,7 +76,8 @@ def readBook(incBook):
                 lD.vocab[data[col]['Word']] = data[col]['Definition']
         elif sheet[0:5] == 'Quiz_':
             data = book.parse(sheet).to_dict()
-            quiz = {'name': sheet[5:], 'questions':[], 'keys': [], 'answers': []}
+            quiz = {'name': sheet[5:], 'questions': [],
+                    'keys': [], 'answers': []}
             for row in range(0, len(data['Question'])):
                 answers = []
                 for i, col in enumerate(data):
@@ -85,7 +92,7 @@ def readBook(incBook):
 
         elif sheet[0:9] == 'Progress_':
             data = book.parse(sheet).to_dict()
-            progress = {'name': sheet[9:], 'task':[], 'desc': []}
+            progress = {'name': sheet[9:], 'task': [], 'desc': []}
             for task in data['Task']:
                 if str(data['Task'][task]) == 'nan':
                     progress['task'].append('N/A')
@@ -95,7 +102,8 @@ def readBook(incBook):
                 if str(data['Description'][desc]) == 'nan':
                     progress['desc'].append('N/A')
                 else:
-                    progress['desc'].append(html.escape(data['Description'][desc]))
+                    progress['desc'].append(
+                        html.escape(data['Description'][desc]))
             lD.progList[sheet] = progress
     pprint.pprint(vars(lD))
     return lD

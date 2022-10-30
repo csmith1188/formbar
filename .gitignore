@@ -11,3 +11,5 @@ __pycache__
 **config.py
 **database.db
 **send.bat
+**log.txt
+*/vscode/*

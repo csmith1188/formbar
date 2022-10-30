@@ -2106,7 +2106,7 @@ def endpoint_help():
         if sD.studentDict[request.remote_addr]['help']['type']:
             return render_template("message.html", message="You already have a help ticket or break request in. If your problem is time-sensitive, or your last ticket was not cleared, please get the teacher's attention manually.")
         elif request.method == 'POST':
-            sD.studentDict[request.remote_addr]['help']['type'] = 'help';
+            sD.studentDict[request.remote_addr]['help']['type'] = 'help'
             sD.studentDict[request.remote_addr]['help']['time'] = time.time()
             sD.studentDict[request.remote_addr]['help']['message'] = request.form.get(
                 'message')

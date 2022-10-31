@@ -2129,6 +2129,21 @@ def endpoint_home():
 # ██
 # ██
 # ██
+# ██
+
+
+@app.route('/idle')
+def endpoint_idle():
+    if request.args.get('advanced'):
+        advanced = '?advanced=true'
+    else:
+        advanced = ''
+    return redirect('/games/idle' + advanced)
+
+# ██
+# ██
+# ██
+# ██
 # ███████
 
 

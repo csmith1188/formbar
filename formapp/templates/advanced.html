@@ -498,7 +498,7 @@
   try {
     openPage("{{ page }}" || defaultPage); //If there is no "page" param, go to the main page
   } catch {
-    alert("Page does not exist");
+    formbarAlert("Page does not exist");
     openPage("chat");
   }
 
@@ -561,11 +561,13 @@
 
   function logOut() {
     //If the user is the only teacher logged in, confirm before logging out
-    if (
-      meRes.perms != permsRes.teacher ||
-      Object.values(studentsRes).filter(user => user.perms == permsRes.teacher).length > 1 ||
-      confirm("If you log out, the next person to log in will become the teacher. Log out anyway?")
+    if (meRes.perms == permsRes.teacher &&
+      Object.values(studentsRes).filter(user => user.perms == permsRes.teacher).length == 1
     ) {
+      formbarAlert("If you log out, the next person to log in will become the teacher. Log out anyway?", "confirm", result => {
+        if (result) window.location = "/login"
+      });
+    } else {
       window.location = "/login";
     }
   }

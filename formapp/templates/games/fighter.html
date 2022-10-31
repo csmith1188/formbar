@@ -1301,11 +1301,11 @@
     let res = JSON.parse(request.responseText);
     match = res[code];
     if (!match) {
-      alert("Match does not exist.");
+      formbarAlert("Match does not exist.");
     } else if (match.opponent) {
-      alert("Match is already full.");
+      formbarAlert("Match is already full.");
     } else if (match.creator == me.name) {
-      alert("You can't join your own match.");
+      formbarAlert("You can't join your own match.");
     } else {
       me.team = 2;
       me.fighters = [fighter2a, fighter2b];
@@ -2588,7 +2588,7 @@
   }
 
   function rematchButton() {
-    alert("This feature is not available yet.");
+    formbarAlert("This feature is not available yet.");
     return;
     //TO DO: If both players press this button, start a new match
     let el = document.getElementById("rematchButton");

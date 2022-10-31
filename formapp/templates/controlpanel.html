@@ -447,7 +447,7 @@ $( function() {
     }
     if (document.getElementById("countdown").checked) {
       document.getElementById("playtime").checked = true;
-      alert("This feature is not available yet.");
+      formbarAlert("This feature is not available yet.");
       //document.getElementById("countdownTime").classList.remove("hidden");
     } else {
       document.getElementById("countdownTime").classList.add("hidden");
@@ -564,17 +564,21 @@ $( function() {
   })();
 
   function restart() {
-    if (confirm("Are you sure you want to restart the Formbar?")) {
-      request.open("GET", "/flush");
-      request.send();
-    }
+    formbarAlert("Are you sure you want to restart the Formbar?", "confirm", result => {
+      if (result) {
+        request.open("GET", "/flush");
+        request.send();
+      }
+    });
   }
 
   function clearTable(table) {
-    if (confirm(`Are you sure you want to remove all data in the table "${table}"?`)) {
-      request.open("GET", `/cleartable?table=${table}`);
-      request.send();
-    }
+    formbarAlert(`Are you sure you want to remove all data in the table "${table}"?`, "confirm", result => {
+      if (result) {
+        request.open("GET", `/cleartable?table=${table}`);
+        request.send();
+      }
+    });
   }
   let studentData = null;
   let oldStudentList;
@@ -613,17 +617,21 @@ $( function() {
   }
 
   function remove(name) {
-    if (confirm(`Remove ${name}? They will still be able to log in.`)) {
+    formbarAlert(`Remove ${name}? They will still be able to log in.`, "confirm", result => {
+      if (result) {
       request.open("GET", "users?name=" + name + "&action=kick");
       request.send();
-    }
+      }
+    });
   }
 
   function banip(name) {
-    if (confirm("Are you sure you want to ban this user's DEVICE?")) {
-      request.open("GET", "/users?name=" + name + "&action=ban");
-      request.send();
-    }
+    formbarAlert("Are you sure you want to ban this user's DEVICE?", "confirm", result => {
+      if (result) {
+        request.open("GET", "/users?name=" + name + "&action=ban");
+        request.send();
+      }
+    });
   }
 
   function toggleFilter(el) {
@@ -990,14 +998,22 @@ $( function() {
   async function userPerm(el, student) {
     let meRes = await getResponse("/api/me");
     let permsRes = await getResponse("/api/permissions");
+    
+    if (student == meRes.name && meRes.perms < el.value[el.value.length - 1]) {
+      formbarAlert("If you lower your own permissions, you may not be able to change them back. If no users have teacher permissions, the next person to log in will become the teacher.<br>Change anyway?", "confirm", result => {
+        if (result) {
+          request.open("GET", el.value);
+          request.onload = function () {
+            console.log(request.response);
+          };
+          request.send();
 
-    if (
-      student != meRes.name ||
-      meRes.perms > el.value[el.value.length - 1] ||
-      confirm(
-        "If you lower your own permissions, you may not be able to change them back. If no users have teacher permissions, the next person to log in will become the teacher."
-        )
-    ) {
+          chatSocket.emit('reload', packMSG(student, 'server', ''))
+        } else {
+          el.value = el.options[meRes.perms].value; //If perms are not updated, give el the correct value
+        }
+      });
+    } else {
       request.open("GET", el.value);
       request.onload = function () {
         console.log(request.response);
@@ -1005,9 +1021,6 @@ $( function() {
       request.send();
 
       chatSocket.emit('reload', packMSG(student, 'server', ''))
-
-    } else {
-      el.value = el.options[meRes.perms].value; //If perms are not updated, give el the correct value
     }
   }
 

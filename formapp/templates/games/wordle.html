@@ -86,8 +86,7 @@
     let guess = "";
     let guessed = 0;
     let score = 0;
-    let highScore = {{ highScore }
-  };
+    let highScore = {{ highScore }};
 
   document.getElementById("highScore").innerHTML = highScore;
 
@@ -160,18 +159,18 @@
     }
   }
 
-  document.addEventListener("keydown", e => {
+  document.addEventListener("keypress", e => {
     if (/^[a-z]{1}$/.test(e.key)) addLetter(e.key); //If a letter key is pressed, guess that letter
     if (e.key == "Backspace") backspace();
-    if (e.key == "Enter") guessWord();
+    if (e.key == "Enter" && !document.getElementById("alertBox")) guessWord();
   });
 
   function guessWord() {
     if (guess.length == 5) {
       if (!wordList.includes(guess)) {
-        alert("Not in word list");
+        formbarAlert("Not in word list");
       } else if (!word) {
-        alert("Still getting a word. Try again in a few seconds.");
+        formbarAlert("Still getting a word. Try again in a few seconds.");
       } else {
         let greenList = guess.split("").filter((letter, i) => letter == word[i]);
 
@@ -202,19 +201,17 @@
         guessed++;
         setTimeout(() => {
           if (guess == word) {
-            alert("Correct!");
             score += 7 - guessed;
             if (score > highScore) {
               highScore = score;
               document.getElementById("highScore").style.color = "var(--light-purple)";
             }
-            newWord();
+            formbarAlert("Correct!", "alert", newWord);
           } else if (guessed == 6) {
-            alert("Game over\nCorrect word: " + word);
             request.open("POST", "/savescore?game=wordle&score=" + score);
             request.send();
             score = 0;
-            newWord();
+            formbarAlert("Game over<br>Correct word: " + word, "alert", newWord);
           }
           document.getElementById("score").innerText = score;
           document.getElementById("highScore").innerText = highScore;
@@ -222,7 +219,7 @@
         }, 0);
       }
     } else {
-      alert("Not enough letters");
+      formbarAlert("Not enough letters");
     }
   }
   }

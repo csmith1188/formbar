@@ -750,12 +750,15 @@
   }
 
   function edit(time, original) {
-    let newContent = prompt("Edit your message", original);
-    if (newContent && newContent != original) chatSocket.emit("edit", time, newContent);
+    formbarAlert("Edit your message", "prompt", newContent => {
+      if (newContent && newContent != original) chatSocket.emit("edit", time, newContent);
+    }, "text", original);
   }
 
   function del(time) {
-    if (confirm("Delete this message?")) chatSocket.emit("delete", time);
+    formbarAlert("Delete this message?", "confirm", result => {
+      if (result) chatSocket.emit("delete", time);
+    });
   }
 
   function enterCommand(command) {
@@ -773,7 +776,7 @@
     } else {
       this.checked = false;
       localStorage.setItem("chatNotifications", "");
-      if (Notification.permission == "denied") alert("You need to reset this sites's permissions to allow notifications.");
+      if (Notification.permission == "denied") formbarAlert("You need to reset this sites's permissions to allow notifications.");
     }
   };
 </script>

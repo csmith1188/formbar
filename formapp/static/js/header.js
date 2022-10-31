@@ -43,6 +43,7 @@ function formbarAlert(message, type = "alert", callback, inputType = "text", pro
   document.getElementById("cover")?.remove();
   let cover = document.createElement("div");
   cover.id = "cover";
+  cover.classList.add("fullScreen");
   document.body.append(cover);
   let alertBox = document.createElement("div");
   alertBox.id = "alertBox";

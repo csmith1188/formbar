@@ -2132,7 +2132,7 @@
     let dragOver;
     let animate;
 
-    for (let i = progress.length; progress.length < maps.length; i++) progress += maps[i].digipogs ? "L" : "0";
+    for (let i = progress.length; progress.length < maps.length; i++) progress += +maps[i].digipogs ? "L" : "0";
     if (progress.length > maps.length) progress = progress.slice(0, maps.length - progress.length); //Remove numbers from the end if maps are deleted
     request.open("POST", "/updateuser?field=tdProgress&value=" + progress);
     request.send();

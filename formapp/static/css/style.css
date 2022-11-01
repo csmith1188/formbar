@@ -371,6 +371,7 @@ td {
   border: 2px solid var(--dark-gray);
   border-radius: 8px;
   filter: drop-shadow(10px 10px 5px black);
+  z-index: 9999;
 }
 
 #alertText {
@@ -417,4 +418,5 @@ td {
 
 #cover {
   backdrop-filter: blur(2px);
+  z-index: 9999;
 }

@@ -1924,7 +1924,7 @@ def endpoint_games_hangman():
 
 @app.route('/games/idle')
 def endpoint_games_idle():
-    loginResult = loginCheck(request.remote_addr)
+    loginResult = loginCheck(request.remote_addr, 'games')
     if loginResult:
         return loginResult
     else:

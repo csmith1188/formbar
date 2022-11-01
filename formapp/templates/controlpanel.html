@@ -528,7 +528,7 @@ $( function() {
         document.getElementById("pollType").classList.remove("hidden");
         document.getElementById("pollButton").onclick = startPoll;
         break;
-      case "thumb":
+      case "tutd":
         document.getElementById("poll").checked = true;
         document.getElementById("pollType").classList.remove("hidden");
         document.getElementById("thumbs").checked = true;
@@ -536,7 +536,7 @@ $( function() {
         document.getElementById("pollButton").onclick = endPoll;
         changePollType();
         break;
-      case "letters":
+      case "abcd":
         document.getElementById("poll").checked = true;
         document.getElementById("pollType").classList.remove("hidden");
         document.getElementById("letters").checked = true;
@@ -544,7 +544,7 @@ $( function() {
         document.getElementById("pollButton").onclick = endPoll;
         changePollType();
         break;
-      case "essay":
+      case "text":
         document.getElementById("poll").checked = true;
         document.getElementById("pollType").classList.remove("hidden");
         document.getElementById("essay").checked = true;

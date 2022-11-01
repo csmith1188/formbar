@@ -44,8 +44,11 @@
   function finish() {
     let forward = "{{ forward }}";
     let lastPage = document.referrer && new URL(document.referrer);
+    console.log(lastPage.pathname);
+    console.log(window.location.search);
     if (forward) location.href = forward;
     else if (!lastPage || (lastPage.pathname == "/login" && window.location.pathname != "/login")) location.href = "/";
+    else if (!lastPage || (lastPage.pathname == "/lesson" && window.location.search == "?action=next")) location.href = "/lesson";
     else window.history.back();
   }
 </script>

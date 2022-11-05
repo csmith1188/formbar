@@ -42,6 +42,10 @@
     cursor: pointer;
   }
 
+  #collapseButton {
+    margin-bottom: 16px;
+  }
+
   .user {
     position: relative;
     left: 21px;
@@ -52,9 +56,21 @@
     overflow-wrap: break-word;
   }
 
-  #students h3 {
+  .student {
+    border: 1px solid var(--light-gray);
+    border-radius: 5px;
+    margin-bottom: 8px;
+    padding: 4px 6px 8px !important;
+  }
+
+  .student h3 {
     margin: 0 0 8px 0;
     padding: 4px;
+    cursor: pointer;
+  }
+
+  .student .ui-accordion-header-collapsed {
+    margin: 0;
   }
 
   button.inline {
@@ -65,22 +81,23 @@
     margin-bottom: 8px;
   }
 
-  .icon {
+  .icon, .permsIcon {
     height: 1.2em;
     display: inline-block;
     vertical-align: text-bottom;
     margin-right: 8px;
   }
 
-  .permsIcon {
-    height: 1.2em;
-    display: inline-block;
-    vertical-align: text-bottom;
-    margin-right: 8px;
+  .ui-state-active .permsIcon {
+    display: none; /*Only show perms icon if the panel is collapsed*/
   }
 
-  #history>span,
-  #history>b {
+  #history h3 {
+    cursor: pointer;
+  }
+
+  #history .tabcontent>span,
+  #history .tabcontent>b {
     display: inline-block;
     width: 100px;
     margin-top: 8px;
@@ -118,15 +135,6 @@
     font-size: 18px;
   }
 
-  .tab {
-    background-color: var(--bg-dark-blue);
-    color: white;
-    border-radius: 5px;
-    margin: 5px;
-    padding: 5px;
-    cursor: pointer;
-  }
-
   .tabcontent {
     margin: 5px;
     padding: 5px;
@@ -142,14 +150,6 @@
 {% block main %}
 <script src="../static/jquery/external/jquery/jquery.js" charset="utf-8"></script>
 <script src="../static/jquery/jquery-ui.min.js" charset="utf-8"></script>
-<script>
-$( function() {
-    $( "#students" ).accordion({
-      collapsible: true
-    });
-  } );
-
-</script>
 <div id="tabs">
   <ul id="tabBox">
     <li><a class="button pressed" href="#tabs-1">Users</a></li>
@@ -597,12 +597,11 @@ $( function() {
 
   collapseButton.onclick = function () {
     collapsed = !collapsed;
-    let userDetails = Array.from(document.getElementsByClassName("user"));
     if (collapsed) {
-      userDetails.forEach(user => user.classList.add("hidden"));
+      $( ".student" ).accordion( "option", "active", false );
       this.innerText = "Expand all";
     } else {
-      userDetails.forEach(user => user.classList.remove("hidden"));
+      $( ".student" ).accordion( "option", "active", 0 );
       this.innerText = "Collapse all";
     }
   }
@@ -749,6 +748,9 @@ $( function() {
           studentBox.innerHTML = '';
           //Loop through each student in the list
           for (student of studentList) {
+            let container = document.createElement('div');
+            container.classList.add('student');
+
             let newStudent = document.createElement('h3');
             
             let icons = "";
@@ -802,7 +804,7 @@ $( function() {
             if (student['complete']) icons += `<img src="{{ url_for('static', filename='img/controlpanel/complete.png') }}" class="icon" title="Complete">`;
             
             //Show tags if student has any
-              let tags = `<span style="font-weight: lighter; font-size: 13px;" >${student['tags']}</span>`
+              let tags = `<span style="font-weight: lighter; font-size: 13px;" >${student['tags'] || ""}</span>`
 
 
             
@@ -864,6 +866,7 @@ $( function() {
             }
             if (student.excluded) {
               let excluded = document.createElement("div");
+              container.style.borderStyle = "dashed";
               newStudent.style.color = "#aaa";
               excluded.innerHTML += "Taking a bathroom break";
               let endButton = document.createElement("button");
@@ -935,15 +938,21 @@ $( function() {
               newDetails.innerHTML += ` [Quiz: ${newQuiz}/${newQuizMax}]`
             }
             
-            studentBox.appendChild(newStudent)
-            studentBox.appendChild(newDetails)
+            container.appendChild(newStudent)
+            container.appendChild(newDetails)
+            studentBox.appendChild(container)
             let name = student['name'];
             newDetails.innerHTML += "	&nbsp; ";
             newDetails.innerHTML += `<a onclick="remove('${name}')">Remove</a>`;
             newDetails.innerHTML += "	&nbsp; ";
             newDetails.innerHTML += `<a onclick="banip('${name}')">Ban Device</a>`;
-            newDetails.innerHTML += "<br><br>";
           }
+          
+          $( function() {
+              $( ".student" ).accordion({
+                collapsible: true
+              });
+            } );
         }
       }
     }
@@ -1076,15 +1085,16 @@ $( function() {
       });
       $("#history").accordion("refresh");
     }
-    if (studentList.length > number) {
+    if (studentList?.length > number) {
       number = studentList.length
-      $('#students').accordion("refresh")
+      $('.student').accordion("refresh")
     }
   }
   updateHistory();
   setInterval(updateHistory, 1000);
 
   async function downloadResponses(poll) {
+    let polls = await getResponse("/api/polls");
     let responses = await getResponse("/api/pollresponses");
     responses = responses.filter(response => response[0] == poll);
     responses = responses.map(response => [response[1],
@@ -1094,7 +1104,7 @@ $( function() {
     let link = document.createElement("a");
     link.href = encodeURI(csv);
 
-    let date = new Date();
+    let date = new Date(polls[poll - 1][2]);
     let y = date.getFullYear();
     let mo = (date.getMonth() + 1).toString().padStart(2, "0");
     let d = date.getDate().toString().padStart(2, "0");

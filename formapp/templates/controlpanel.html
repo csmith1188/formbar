@@ -495,6 +495,7 @@
     let pollButton = document.getElementById("pollButton");
     pollButton.value = "End poll";
     pollButton.onclick = endPoll;
+    document.getElementById("pollPrompt").classList.add("hidden");
   }
   
   function endPoll() {
@@ -504,6 +505,7 @@
     let pollButton = document.getElementById("pollButton");
     pollButton.value = "Start new poll";
     pollButton.onclick = startPoll;
+    document.getElementById("pollPrompt").classList.remove("hidden");
   }
   
   function resetPerms() {
@@ -534,6 +536,7 @@
         document.getElementById("thumbs").checked = true;
         document.getElementById("pollButton").value = "End poll";
         document.getElementById("pollButton").onclick = endPoll;
+        document.getElementById("pollPrompt").classList.add("hidden");
         changePollType();
         break;
       case "abcd":
@@ -542,6 +545,7 @@
         document.getElementById("letters").checked = true;
         document.getElementById("pollButton").value = "End poll";
         document.getElementById("pollButton").onclick = endPoll;
+        document.getElementById("pollPrompt").classList.add("hidden");
         changePollType();
         break;
       case "text":
@@ -550,6 +554,7 @@
         document.getElementById("essay").checked = true;
         document.getElementById("pollButton").value = "End poll";
         document.getElementById("pollButton").onclick = endPoll;
+        document.getElementById("pollPrompt").classList.add("hidden");
         changePollType();
         break;
       case "progress":

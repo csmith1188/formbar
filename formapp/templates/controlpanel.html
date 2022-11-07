@@ -495,7 +495,9 @@
     let pollButton = document.getElementById("pollButton");
     pollButton.value = "End poll";
     pollButton.onclick = endPoll;
-    document.getElementById("pollPrompt").classList.add("hidden");
+    let pollPrompt = document.getElementById("pollPrompt");
+    pollPrompt.classList.add("hidden");
+    pollPrompt.value = "";
   }
   
   function endPoll() {

@@ -2605,7 +2605,8 @@ def endpoint_quiz():
             socket_.emit('message', json.dumps(messageOut))
             resString = '<ul>'
             for i, answer in enumerate(request.form):
-                resString += '<li>' + str(i) + ': '
+                index = i + 1
+                resString += '<li>' + str(index)  + ': '
                 if sD.activeQuiz['keys'][i] == int(request.form[answer]):
                     sD.studentDict[request.remote_addr]['quizRes'].append(True)
                     resString += '<b>Correct!</b></li>'
@@ -2614,7 +2615,9 @@ def endpoint_quiz():
                         False)
                     resString += 'Incorrect</li>'
                     sD.studentDict[request.remote_addr]['complete'] = True
-                    return render_template('general.html', content=resString)
+            return render_template('general.html', content=resString)
+        elif sD.studentDict[request.remote_addr]['quizRes']:
+            return render_template("message.html", message="You already complete the Quiz.")
         elif sD.activeQuiz:
             return render_template('quiz.html', quiz=sD.activeQuiz)
         else:

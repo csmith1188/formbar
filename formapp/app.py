@@ -1539,6 +1539,7 @@ def endpoint_controlpanel():
                                       arg + "=:value", {"value": argVal})
                         db.commit()
                         db.close()
+
                     else:
                         resString += 'There is no setting that takes \'true\' or \'false\' named: <i>' + arg + "</i>"
                 else:
@@ -1671,7 +1672,7 @@ def endpoint_emptyblocks():
     return render_template("message.html", message = "Emptied blocks")
 '''
 
-# Start a poll
+#End a poll
 @app.route('/endpoll')
 def endpoll():
     loginResult = loginCheck(request.remote_addr, 'mod')
@@ -1693,10 +1694,10 @@ def endpoll():
                               (sD.pollID, sD.studentDict[user]['name'], response))
         db.commit()
         db.close()
+        sD.pollID += 1
         changeMode('poll')
-        repeatMode()
-        return render_template("message.html", message='Poll ended. Results saved.')
-
+        endMode()
+        return render_template("message.html", message = 'Poll ended. Results saved.')
 
 '''
 /essay
@@ -1990,10 +1991,16 @@ def endpoint_games_towerdefense():
         db = sqlite3.connect(os.path.dirname(
             os.path.abspath(__file__)) + '/data/database.db')
         dbcmd = db.cursor()
-        progress = dbcmd.execute("SELECT tdProgress FROM users WHERE username=:uname", {
-                                 "uname": username}).fetchone()[0] or ''
-        achievements = dbcmd.execute("SELECT tdAchievements FROM users WHERE username=:uname", {
-                                     "uname": username}).fetchone()[0] or ''
+        progress = dbcmd.execute("SELECT tdProgress FROM users WHERE username=:uname", {"uname": username}).fetchone()
+        if progress:
+            progress = progress[0]
+        if not progress:
+            progress = ''
+        achievements = dbcmd.execute("SELECT tdAchievements FROM users WHERE username=:uname", {"uname": username}).fetchone()
+        if achievements:
+            achievements = achievements[0]
+        if not achievements:
+            achievements = ''
         db.close()
         return render_template('games/towerdefense.html', progress=progress, achievements=achievements)
 
@@ -2372,7 +2379,7 @@ def endpoint_login():
                         os.path.abspath(__file__)) + '/data/database.db')
                     dbcmd = db.cursor()
                     # Add user to database
-                    userFound = dbcmd.execute("INSERT INTO users (username, password, permissions, bot) VALUES (?, ?, ?, ?)", (username, passwordCrypt, sD.settings['perms']['anyone'], str(bot)))
+                    userFound = dbcmd.execute("INSERT INTO users (username, password, permissions, bot, digipogs) VALUES (?, ?, ?, ?, ?)", (username, passwordCrypt, sD.settings['perms']['anyone'], str(bot), 0))
                     db.commit()
                     db.close()
                     newStudent(remote, username, bot=bot)
@@ -2505,6 +2512,8 @@ def endpoint_profile():
             user = sD.studentDict[x]
             if user['name'].strip() == name:
                 userFound = True
+                perms = user['perms']
+                bot = user['bot']
         if not userFound:
             db = sqlite3.connect(os.path.dirname(
                 os.path.abspath(__file__)) + '/data/database.db')
@@ -2512,6 +2521,9 @@ def endpoint_profile():
             userFound = dbcmd.execute(
                 "SELECT * FROM users WHERE username=:uname", {"uname": name}).fetchall()
             db.close()
+            if userFound:
+                perms = userFound[0][3]
+                bot = userFound[0][4]
         if userFound:
             db = sqlite3.connect(os.path.dirname(
                 os.path.abspath(__file__)) + '/data/database.db')
@@ -2519,19 +2531,19 @@ def endpoint_profile():
             digipogs = dbcmd.execute("SELECT digipogs FROM users WHERE username=:uname AND digipogs",  {
                                      "uname": user['name']}).fetchone()
             highScores = {
-                "2048": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='2048' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
-                "bitshifter": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='bitshifter' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
-                "hangman": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='hangman' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
-                "minesweeper": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='minesweeper' ORDER BY score ASC", {"uname": user['name']}).fetchone(),
-                "speedtype": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='speedtype' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
-                "towerdefense": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='towerdefense' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
-                "ttt": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='ttt' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
-                "fighter": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='fighter' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
-                "wordle": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='wordle' ORDER BY score DESC", {"uname": user['name']}).fetchone(),
+                "2048": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='2048' ORDER BY score DESC", {"uname": name}).fetchone(),
+                "bitshifter": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='bitshifter' ORDER BY score DESC", {"uname": name}).fetchone(),
+                "hangman": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='hangman' ORDER BY score DESC", {"uname": name}).fetchone(),
+                "minesweeper": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='minesweeper' ORDER BY score ASC", {"uname": name}).fetchone(),
+                "speedtype": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='speedtype' ORDER BY score DESC", {"uname": name}).fetchone(),
+                "towerdefense": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='towerdefense' ORDER BY score DESC", {"uname": name}).fetchone(),
+                "ttt": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='ttt' ORDER BY score DESC", {"uname": name}).fetchone(),
+                "fighter": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='fighter' ORDER BY score DESC", {"uname": name}).fetchone(),
+                "wordle": dbcmd.execute("SELECT * FROM scores WHERE username=:uname AND game='wordle' ORDER BY score DESC", {"uname": name}).fetchone(),
             }
             db.close()
-            return render_template("profile.html", username = user['name'], perms = sD.settings['permname'][user['perms']], bot = user['bot'], highScores = json.dumps(highScores), digipogs = digipogs[0])
-        # If there are no matches
+            return render_template("profile.html", username = name, perms = sD.settings['permname'][perms], bot = bot, highScores = json.dumps(highScores), digipogs = digipogs[0])
+        #If there are no matches
         return render_template("message.html", message = "There are no users with that name.")
 
 
@@ -2837,6 +2849,32 @@ def endpoint_sfx():
 def endpoint_socket():
     return render_template('socket.html', async_mode=socket_.async_mode)
 
+#Spend digipogs to unlock things or start games
+@app.route('/spenddp')
+def endpoint_spenddp():
+    loginResult = loginCheck(request.remote_addr)
+    if loginResult:
+        return loginResult
+    amount = request.args.get('amount')
+    if amount == None:
+        return '{"result": "failure", "reason": "no amount given"}'
+    try:
+        amount = int(amount)
+    except:
+        return '{"result": "failure", "reason": "amount is not an integer"}'
+    db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+    dbcmd = db.cursor()
+    try:
+        digipogs = dbcmd.execute("SELECT digipogs FROM users WHERE username=:uname",  {"uname": sD.studentDict[request.remote_addr]['name']}).fetchone()[0]
+    except:
+        return '{"result": "failure", "reason": "database error", "note": "guests can\'t spend digipogs"}'
+    if digipogs < amount:
+        return '{"result": "failure", "reason": "not enough digipogs"}'
+    newAmount =  digipogs - amount
+    dbcmd.execute("UPDATE users SET digipogs=:digipogs WHERE username=:uname", {"uname": sD.studentDict[request.remote_addr]['name'], "digipogs": newAmount})
+    db.commit()
+    db.close()
+    return '{"result": "success"}'
 
 @app.route('/speedtype')
 def endpoint_speedtype():
@@ -2990,6 +3028,19 @@ def endpoint_users():
                 if request.args.get('name') == sD.studentDict[key]['name']:
                     user = key
                     break
+            if action == 'updateDP':
+                if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['users']:
+                    return render_template("message.html", message = "You do not have high enough permissions to do this right now.")
+                else:
+                    db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+                    dbcmd = db.cursor()
+                    digipogs = dbcmd.execute("SELECT digipogs FROM users WHERE username=:uname AND digipogs",  {"uname": request.args.get('name')}).fetchone()
+                    addDigi = request.args.get('digipogs')
+                    digiAmount =  int(''.join(map(str, digipogs))) + int(addDigi)
+                    dbcmd.execute("UPDATE users SET digipogs=:digipogs WHERE username=:uname", {"uname": request.args.get('name'), "digipogs": digiAmount})
+                    db.commit()
+                    db.close()
+                    return render_template("message.html", message = "Added Digipogs")
             if action == 'delete':
                 db = sqlite3.connect(os.path.dirname(
                     os.path.abspath(__file__)) + '/data/database.db')

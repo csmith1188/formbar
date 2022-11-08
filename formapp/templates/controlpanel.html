@@ -176,7 +176,6 @@ $( function() {
       <button id="perms" class="sort">Permissions</button>
     </div>
     <button id="collapseButton" class="inline popOut hidden">Collapse all</button>
-
     <div id="students">
 
     </div>
@@ -839,11 +838,7 @@ $( function() {
                 helpTicket.appendChild(acceptButton);
                 helpTicket.appendChild(rejectButton);
               } else {
-                console.log(student.help.message)
-                if (student.help.message)
-                  helpTicket.innerHTML += student.help.message
-                else
-                  "<i>Sent a help ticket</i>";
+                helpTicket.innerHTML += student.help.message || "<i>Sent a help ticket</i>";
                 let removeButton = document.createElement("button");
                 removeButton.id = "e"
                 removeButton.classList.add("inline", "popOut");

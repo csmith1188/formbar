@@ -192,8 +192,7 @@
       if (checkWin()) {
         console.log(player.name + ' has won with ' + player.shape + ' on board ' + gameboard);
         setTimeout(function () {
-          alert(player.name + " (" + player.shape + ")" + " has won");
-          window.location.reload();
+          formbarAlert(player.name + " (" + player.shape + ")" + " has won", "alert", () => window.location.reload());
         }, 10)
         if (eval(me) == player) {
           request.open("POST", "/savescore?game=ttt&score=" + ({{ wins }} + 1));
@@ -207,8 +206,7 @@
     } else if (!gameboard.find(row => row.includes(null))) {
       console.log('The game has ended with a draw.');
       setTimeout(function () {
-        alert("Draw");
-        window.location.reload();
+        formbarAlert("Draw", "alert", () => window.location.reload());
       }, 10)
       if (me == "player1") {
         let newRequest = new XMLHttpRequest();

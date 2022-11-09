@@ -266,6 +266,7 @@
 
     <div id="tutdDiv" class="hidden">
       <h2>Thumbs</h2>
+      <h3 id="tutdPrompt"></h3>
       <img src="{{ url_for('static', filename='img/advanced/thumbButton0.png') }}" id="thumbButton0"
         class="thumbButton button inline popOut moreDepth greenColor" title="Up" onclick="thumbsVote(0);" tabindex="0">
       <br>
@@ -279,6 +280,7 @@
 
     <div id="abcdDiv" class="hidden">
       <h2>Letters</h2>
+      <h3 id="abcdPrompt"></h3>
       <img src="{{ url_for('static', filename='img/advanced/letterButton0.png') }}" id="letterButton0"
         class="letterButton button inline popOut moreDepth redColor" title="Vote A" onclick="letterVote(0);"
         tabindex="0">
@@ -298,6 +300,7 @@
 
     <div id="essayDiv" class="hidden">
       <h2>Essay</h2>
+      <h3 id="essayPrompt"></h3>
       <textarea id="essay" rows="6" cols="25" placeholder="Type your essay here" oninput="checkEssay();"></textarea><br>
       <button id="submitEssay" class="inline popOut unselectable">Submit</button>
     </div>
@@ -385,6 +388,7 @@
     <a href="/quickpanel">Go to the quick panel</a><br>
     <a href="/home">Go to the standard homepage</a><br>
     <a href="/setdefault">Set default homepage</a><br>
+    <a href="javascript:openPage('usermanual');">Read the user manual</a><br>
     <a href="https://github.com/csmith1188/formbar/issues/new" target="_blank">Send feedback 🡆</a>
   </div>
 </div>
@@ -408,6 +412,7 @@
       <div id="bitshifterTab" class="tab" onclick="openPage('games/bitshifter');">Bitshifter</div>
       <div id="flashcardsTab" class="tab" onclick="openPage('games/flashcards');">Flashcards</div>
       <div id="hangmanTab" class="tab" onclick="openPage('games/hangman');">Hangman</div>
+      <div id="idleTab" class="tab" onclick="openPage('games/idle');">Idle Business</div>
       <div id="minesweeperTab" class="tab" onclick="openPage('games/minesweeper');">Minesweeper</div>
       <div id="speedtypeTab" class="tab" onclick="openPage('games/speedtype');">Speed Typer</div>
       <div id="tttTab" class="tab" onclick="openPage('games/ttt');">Tic-tac-toe</div>
@@ -493,7 +498,7 @@
   try {
     openPage("{{ page }}" || defaultPage); //If there is no "page" param, go to the main page
   } catch {
-    alert("Page does not exist");
+    formbarAlert("Page does not exist");
     openPage("chat");
   }
 
@@ -556,11 +561,13 @@
 
   function logOut() {
     //If the user is the only teacher logged in, confirm before logging out
-    if (
-      meRes.perms != permsRes.teacher ||
-      Object.values(studentsRes).filter(user => user.perms == permsRes.teacher).length > 1 ||
-      confirm("If you log out, the next person to log in will become the teacher. Log out anyway?")
+    if (meRes.perms == permsRes.teacher &&
+      Object.values(studentsRes).filter(user => user.perms == permsRes.teacher).length == 1
     ) {
+      formbarAlert("If you log out, the next person to log in will become the teacher. Log out anyway?", "confirm", result => {
+        if (result) window.location = "/login"
+      });
+    } else {
       window.location = "/login";
     }
   }
@@ -570,7 +577,7 @@
       let cl = document.getElementById(tab + "Tab").classList;
       meRes.perms === permsRes.teacher ? cl.add("unselectable") : cl.remove("unselectable");
     });
-    ["2048", "bitshifter", "hangman", "minesweeper", "speedtype", "ttt", "towerdefense", "fighter", "wordle"].forEach(tab => {
+    ["2048", "bitshifter", "hangman", "idle", "minesweeper", "speedtype", "ttt", "towerdefense", "fighter", "wordle"].forEach(tab => {
       let cl = document.getElementById(tab + "Tab").classList;
       meRes.perms > permsRes.games ? cl.add("unselectable") : cl.remove("unselectable");
     });

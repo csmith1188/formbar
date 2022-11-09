@@ -7,13 +7,6 @@
 
 <!-- Extra style declarations here -->
 {% block style %}
-<link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
-<link rel="stylesheet" href="/resources/demos/style.css">
-<style>
-  .ui-button.ui-corner-all.ui-widget.ui-button-icon-only.ui-dialog-titlebar-close {
-    display: none;
-  }
-</style>
 {{ style|safe }}{% endblock %}
 
 <!-- Change theme color here -->
@@ -21,27 +14,13 @@
 
 <!-- Main content here -->
 {% block main %}
-<div id="dialog" title="Alert">
-  <p>
-    {{ message }}
-  </p>
-  <button onclick="finish()">Go Back</button>
-</div>
 {{ content|safe }}
 {% endblock %}
 
 <!-- Extra JavaScript here -->
 {% block script %}
-<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
-<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
 <script>
-  $(function () {
-    $("#dialog").dialog({
-      autoOpen: true
-    });
-    $(".selector").on("dialogclose", function (event, ui) { });
-  });
-  function finish() {
+  formbarAlert("{{ message }}", "alert", () => {
     let forward = "{{ forward }}";
     let lastPage = document.referrer && new URL(document.referrer);
     console.log(lastPage.pathname);
@@ -50,8 +29,7 @@
     else if (!lastPage || (lastPage.pathname == "/login" && window.location.pathname != "/login")) location.href = "/";
     else if (!lastPage || (lastPage.pathname == "/lesson" && window.location.search == "?action=next")) location.href = "/lesson";
     else window.history.back();
-  }
-</script>
+  });
 </script>
 <!-- <script>
     let message = "{{ message }}";

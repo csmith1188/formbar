@@ -819,10 +819,13 @@
 
             let newDetails = document.createElement('span');
             newDetails.classList.add('user');
-            cleanText = student.essay.replace(/<|>/gi, "")
+            cleanText = student.essay.replace(/<|>/gi, "").replaceAll("\\n", "\n").replaceAll("\\t", "\t");
             if (collapsed) newDetails.classList.add("hidden");
-            if (student.essay) newDetails.innerHTML += "<div style='margin-bottom: 8px;'><pre> Essay: <br> " +
-              cleanText + "</pre>" + "</div>";
+            if (student.essay) newDetails.innerHTML += `
+              <div style='margin-bottom: 8px;'>
+                <pre><b>Essay:</b><br>${cleanText}</pre>
+              </div>
+            `;
             if (student.help.type) {
               let helpTicket = document.createElement("div");
               let ticketTime = new Date(student.help.time * 1000);
@@ -1089,6 +1092,7 @@
                                 `;
       });
       $("#history").accordion("refresh");
+      $("#history").accordion("option", "active", 0);
     }
     if (studentList?.length > number) {
       number = studentList.length
@@ -1101,9 +1105,11 @@
   async function downloadResponses(poll) {
     let polls = await getResponse("/api/polls");
     let responses = await getResponse("/api/pollresponses");
+    responses.push([poll, "Oley", studentList[0].essay]);
     responses = responses.filter(response => response[0] == poll);
     responses = responses.map(response => [response[1],
-    `"${response[2].replaceAll("\"", "\"\"")}"`]); //Escape quotes in values, then add quotes around each value
+    `"${response[2].replaceAll("\"", "\"\"").replaceAll("\\n", "\n").replaceAll("\\t", "\t")}"`]); //Escape quotes in values, then add quotes around each value
+    console.log(responses)
     let csv = "data:text/csv;charset=utf-8,";
     csv += responses.map(response => response.join(",")).join("\n");
     let link = document.createElement("a");

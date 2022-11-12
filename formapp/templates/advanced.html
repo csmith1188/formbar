@@ -301,7 +301,7 @@
     <div id="essayDiv" class="hidden">
       <h2>Essay</h2>
       <h3 id="essayPrompt"></h3>
-      <textarea id="essay" rows="6" cols="25" placeholder="Type your essay here" oninput="checkEssay();"></textarea><br>
+      <textarea id="essay" rows="6" cols="25" placeholder="Type your response here" oninput="checkEssay();"></textarea><br>
       <button id="submitEssay" class="inline popOut unselectable">Submit</button>
     </div>
 
@@ -385,7 +385,6 @@
     <h2>More</h2>
     <a href="javascript:logOut();">Log out</a><br>
     <a href="javascript:openPage('changepassword');">Change your password</a><br>
-    <a href="/quickpanel">Go to the quick panel</a><br>
     <a href="/home">Go to the standard homepage</a><br>
     <a href="/setdefault">Set default homepage</a><br>
     <a href="javascript:openPage('usermanual');">Read the user manual</a><br>
@@ -659,7 +658,8 @@
     if (path.startsWith("/games") || path == "/leaderboards") document.getElementById("gamesTab").classList.add("open");
     if (["/controlpanel", "/users", "/lesson", "/virtualbar"].includes(path)) document.getElementById("teacherTab").classList.add("open");
     if (tabEl) tabEl.classList.add("open");
-    if (["/abcd", "/advanced", "/home", "/mobile", "/quickpanel", "/essay", "/tutd"].includes(path)) openPage(defaultPage);
+    if (["/advanced", "/home", "/mobile", "/polls"].includes(path)) openPage(defaultPage);
+    if (path == "/login") window.location.reload();
     if (path == "/chat") {
       newMessages = 0;
       document.getElementById("newMessages").innerText = null;

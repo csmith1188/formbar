@@ -75,7 +75,7 @@
 <!-- Extra JavaScript here -->
 {% block script %}
 <script>
-  let checked = ("{{ pm }}" == "None") ? "standard" : "{{ pm }}";
+  let checked = ("{{ pm }}" == "advanced") ? "advanced" : "standard";
   document.getElementById(checked).checked = true;
 </script>
 {% endblock %}

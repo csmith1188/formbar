@@ -177,7 +177,6 @@ function submitEssay() {
   let box = document.getElementById("essay");
   let essay = box.value.replaceAll("\n", "\\n").replaceAll("\t", "\\t");
   request.open("POST", "/essay?essay=" + essay);
-  console.log("/essay?essay=" + essay)
   request.send();
   essaySubmitted();
 }

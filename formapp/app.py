@@ -1680,7 +1680,7 @@ def endpoll():
         dbcmd.execute("INSERT INTO polls ('type', 'time') VALUES (?, ?)",
                       (sD.pollType, int(time.time() * 1000)))
         for user in sD.studentDict:
-            if sD.studentDict[user]['perms'] == sD.settings['perms']['student'] or True:
+            if sD.studentDict[user]['perms'] == sD.settings['perms']['student']:
                 response = sD.studentDict[user]['thumb'] or sD.studentDict[user]['letter'] or sD.studentDict[user]['essay']
                 response = response.replace('"', '\\"')  # Escape quotes
                 dbcmd.execute("INSERT INTO responses ('poll', 'name', 'response') VALUES (?, ?, ?)",

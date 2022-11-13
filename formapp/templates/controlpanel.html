@@ -1102,11 +1102,9 @@
   async function downloadResponses(poll) {
     let polls = await getResponse("/api/polls");
     let responses = await getResponse("/api/pollresponses");
-    responses.push([poll, "Oley", studentList[0].essay]);
     responses = responses.filter(response => response[0] == poll);
     responses = responses.map(response => [response[1],
     `"${response[2].replaceAll("\"", "\"\"").replaceAll("\\n", "\n").replaceAll("\\t", "\t")}"`]); //Escape quotes in values, then add quotes around each value
-    console.log(responses)
     let csv = "data:text/csv;charset=utf-8,";
     csv += responses.map(response => response.join(",")).join("\n");
     let link = document.createElement("a");

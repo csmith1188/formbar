@@ -43,6 +43,7 @@
 
   button:not(.inline) {
     background: transparent;
+    border-width: 2px;
   }
 
   button:not(.inline):not(.unselectable):hover {
@@ -69,6 +70,7 @@
   #achvButton {
     margin-left: 0.75%;
     font-size: 75%;
+    color: inherit;
   }
 
   .complete {
@@ -78,6 +80,20 @@
   .complete span,
   .complete button:not(:hover) {
     filter: drop-shadow(0 0 5px #fffa);
+  }
+
+  #playButton {
+    top: 50%;
+    width: 15%;
+    font-size: 300%;
+    color: white;
+  }
+
+  #editorButton {
+    top: 60%;
+    width: 12%;
+    font-size: 200%;
+    color: white;
   }
 
   #back {
@@ -140,8 +156,6 @@
   #hard {
     padding: 0.25% 1%;
     margin: 0 0.5%;
-    border: 1px solid;
-    border-radius: 9999px;
     font-size: calc(inherit x 0.75);
     font-weight: 500;
   }
@@ -171,8 +185,6 @@
     bottom: 5%;
     padding: 0.25% 1%;
     color: var(--light-cyan);
-    border: 1px solid;
-    border-radius: 9999px;
     font-size: 200%;
     font-weight: 500;
   }
@@ -305,8 +317,6 @@
     height: 20%;
     padding: 0.25% 1%;
     background: white;
-    border: 1px solid;
-    border-radius: 9999px;
     font-size: calc(400% / 3);
     font-weight: 500;
     filter: drop-shadow(2px 2px 1px #000c);
@@ -495,8 +505,124 @@
       transform: rotate(-1deg);
     }
   }
+
+  #newMap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 20%;
+    aspect-ratio: 4 / 3;
+    background: white;
+    cursor: pointer;
+  }
+
+  #mapOptions {
+    position: absolute;
+    width: 40%;
+    height: 60%;
+    padding: 1.5%;
+    box-sizing: border-box;
+    background: #cccc;
+    color: var(--bg-darker);
+    font-weight: 600;
+    font-size: 200%;
+    text-align: left;
+    filter: drop-shadow(10px 10px 5px black);
+  }
+
+  #mapOptions h2 {
+    margin-top: 0;
+    text-align: center;
+  }
+
+  #mapOptions button {
+    position: absolute;
+    bottom: 5%;
+    width: 20%;
+    height: 10%;
+    padding: 0.25% 1%;
+    background: white;
+    font-size: calc(400% / 3);
+    filter: drop-shadow(2px 2px 1px #000c);
+    color: var(--color-blue);
+    left: 40%;
+  }
+
+  #mapOptions button:hover {
+    background: white !important;
+    filter: brightness(90%) drop-shadow(2px 2px 1px #000a);
+  }
+
+  #lightBackground {
+    width: 100%;
+    height: 100%;
+    background: var(--light-gray);
+  }
+
+  #newMapCanvas {
+    width: 75%;
+    aspect-ratio: 17 / 10;
+    background: linear-gradient(to bottom right, #040, #400, #004);
+  }
+
+  #newMapGrid {
+    width: 75%;
+    aspect-ratio: 17 / 10;
+    border-collapse: collapse;
+  }
+
+  #newMapGrid td {
+    width: calc(100% / 34);
+    height: 5%;
+    border-color: gray;
+  }
+
+  #newMapGrid td:nth-child(1) {
+    border-left: none;
+    background: #ccc5;
+  }
+
+  #newMapGrid td:nth-child(34) {
+    border-right: none;
+    background: #ccc5;
+  }
+
+  #newMapGrid tr:nth-child(1) td {
+    border-top: none;
+    background: #ccc5;
+  }
+
+  #newMapGrid tr:nth-child(20) td {
+    border-bottom: none;
+    background: #ccc5;
+  }
+
+  #pathText {
+    width: 25%;
+    aspect-ratio: 17 / 30;
+    box-sizing: border-box;
+    padding: 1%;
+    font-size: 200%;
+    text-align: left;
+  }
+
+  #lightBackground button {
+    position: absolute;
+    bottom: 0;
+    width: 20%;
+    height: 10%;
+    padding: 0.25% 1%;
+    background: white;
+    font-size: calc(400% / 3);
+    filter: drop-shadow(2px 2px 1px #000c);
+    color: var(--color-blue);
+    left: 40%;
+  }
 </style>
 {% endblock %}
+
+<!-- Change theme color here -->
+{% block color %}green{% endblock %}
 
 <!-- Main content here -->
 {% block main %}
@@ -2227,8 +2353,18 @@
     });
     ctx.fillStyle = "white";
     ctx.textAlign = "center";
-    ctx.font = "48px Segoe UI";
-    ctx.fillText("Click to continue", 960, 600);
+    let playButton = document.createElement("button");
+    playButton.id = "playButton";
+    playButton.classList.add("hCentered");
+    playButton.innerText = "Play";
+    playButton.onclick = showMaps;
+    document.getElementById("container").append(playButton);
+    let editorButton = document.createElement("button");
+    editorButton.id = "editorButton";
+    editorButton.classList.add("hCentered");
+    editorButton.innerText = "Map editor";
+    editorButton.onclick = openEditor;
+    document.getElementById("container").append(editorButton);
     ctx.font = "32px Segoe UI";
     ctx.fillText("Created by Oley Birkeland", 960, 1000);
     let completeMaps = progress.filter(char => char != "L").reduce((a, b) => +a + +b); //Convert every character to a number and add
@@ -2261,7 +2397,9 @@
     progressEl.append(achvText);
 
     function showMaps() {
-      document.getElementById("progress").classList.add("hidden");
+      document.getElementById("progress").remove();
+      document.getElementById("playButton").remove();
+      document.getElementById("editorButton").remove();
       if (document.getElementById("alert")) resumeGame();
       ctx.clearRect(0, 0, 1920, 1080); //Clear the canvas
 
@@ -2318,10 +2456,7 @@
       container.append(startButton);
 
       switchMap();
-
-      document.getElementById("game").onclick = null;
     }
-    document.getElementById("game").onclick = showMaps;
 
     function switchMap() {
       map = maps[mapIndex];
@@ -2648,6 +2783,152 @@
       ctx.fillStyle = "white";
       ctx.fillText("Click to return to the home screen", 960, 800);
       document.getElementById("game").onclick = () => window.location.reload();
+    }
+
+    function openEditor() {
+      if (false) return createMap();
+
+      ctx.clearRect(0, 0, 1920, 1080); //Clear the canvas
+      document.getElementById("progress").remove();
+
+      let myMaps = document.createElement("div");
+      myMaps.id = "myMaps";
+      let newMap = document.createElement("div");
+      newMap.id = "newMap";
+      newMap.onclick = createMap;
+      myMaps.append(newMap);
+      document.getElementById("container").append(myMaps);
+    }
+
+    function createMap() {
+      let mapOptions = document.createElement("div");
+      mapOptions.id = "mapOptions";
+      mapOptions.classList.add("centered");
+      mapOptions.innerHTML = `
+        <h2>Create new map</h2><br>
+        Map name: <input id="name" class="box" type="text"><br><br>
+        Your name: <input id="author" class="box" type="text"><br><br>
+        Digipogs to unlock: <input id="digipogs" class="box" type="number" value="0" min="0">
+      `;
+      let next = document.createElement("button");
+      next.innerText = "Next";
+      next.onclick = createPath;
+      mapOptions.append(next);
+      document.getElementById("container").append(mapOptions);
+    }
+
+    function createPath() {
+      document.getElementById("myMaps").remove();
+      document.getElementById("mapOptions").remove();
+
+      let lightBg = document.createElement("div");
+      lightBg.id = "lightBackground";
+      lightBg.classList.add("centered");
+      let next = document.createElement("button");
+      next.innerText = "Next";
+      next.onclick = null;
+      lightBg.append(next);
+      document.getElementById("container").append(lightBg);
+
+      let pathText = document.createElement("textarea");
+      pathText.id = "pathText";
+      pathText.classList.add("centered", "hidden");
+      document.getElementById("container").append(pathText);
+
+      let nmc = document.createElement("canvas");
+      nmc.id = "newMapCanvas";
+      nmc.classList.add("centered");
+      nmc.width = 2040;
+      nmc.height = 1200;
+      document.getElementById("container").append(nmc);
+
+      let nmg = document.createElement("table");
+      nmg.id = "newMapGrid";
+      nmg.classList.add("centered", "visibleLines");
+      let gridHTML = "";
+      for (let i = 0; i < 20; i++) {
+        gridHTML += "<tr>";
+        for (let j = 0; j < 34; j++) gridHTML += `<td id=r${i}c${j} onmousedown="startPath(${i}, ${j});" onmouseover="dragLine(${i}, ${j});" onmouseup="endPath(${i}, ${j})"></td>`;
+        gridHTML += "</tr>";
+      }
+      nmg.innerHTML = gridHTML;
+      document.getElementById("container").append(nmg);
+    }
+
+    let newPathSquares = [];
+    let newPathText = "";
+    let newPathStart;
+    let segmentStart;
+    let segmentDirection;
+    let nmctx;
+
+    function startPath(row, col) {
+      newPathText = "";
+      newPathStart = [row, col];
+      segmentStart = newPathStart;
+      newPathSquares.push(newPathStart);
+      let nmc = document.getElementById("newMapCanvas");
+      nmctx = nmc.getContext("2d");
+
+      nmctx.clearRect(0, 0, 2040, 1200);
+
+      nmctx.lineWidth = 1.5;
+      nmctx.strokeStyle = "#80ffff";
+      nmctx.fillStyle = "#80ffff";
+      
+      nmctx.beginPath();
+      nmctx.arc(col * 60 + 30, row * 60 + 30, 15, 0, 2 * Math.PI);
+      nmctx.stroke();
+      nmctx.fill();
+
+      nmctx.beginPath();
+      nmctx.moveTo(col * 60 + 30, row * 60 + 30);
+    }
+
+    function dragLine(row, col) {
+      if (!newPathStart) return;
+
+      let lastSquare = newPathSquares.at(-1);
+      newPathSquares.push([row, col]);
+      let lastDirection = segmentDirection;
+      if (row == lastSquare[0] && col == lastSquare[1]) {
+        //If the square is the same, don't change the direction
+      } else if (row == lastSquare[0]) {
+        if (col > lastSquare[1]) segmentDirection = "right";
+        else segmentDirection = "left";
+      } else if (col == lastSquare[1]) {
+        if (row > lastSquare[0]) segmentDirection = "down";
+        else segmentDirection = "up";
+      } else {
+        newPathSquares.pop();
+        return endPath(...lastSquare);
+      }
+      if (lastDirection && segmentDirection != lastDirection) newSegment(...lastSquare, lastDirection);
+      nmctx.lineTo(col * 60 + 30, row * 60 + 30);
+      nmctx.stroke();
+    }
+
+    function newSegment(row, col, direction) {
+      let length;
+      switch (direction) {
+        case "right":
+        case "left":
+          length = Math.abs(col - segmentStart[1]);
+          break;
+        case "up":
+        case "down":
+          length = Math.abs(row - segmentStart[0]);
+      }
+      newPathText += `["${direction}", ${length}],\n`;
+      segmentStart = [row, col];
+    }
+
+    function endPath(row, col) {
+      newSegment(row, col, segmentDirection);
+      newPathStart = null;
+      segmentStart = null;
+      segmentDirection = null;
+      document.getElementById("pathText").value = newPathText;
     }
   }
 </script>

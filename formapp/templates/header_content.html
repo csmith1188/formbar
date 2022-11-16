@@ -30,6 +30,10 @@
       overflow: hidden;
     }
 
+    body.light {
+      background-color: var(--light-blue);
+    }
+
     h1 {
       text-align: center;
       margin-top: 12px;
@@ -84,7 +88,7 @@
   <div id="quickmenu" class="hidden">
     <a href="/home" class="quickButton">Home</a>
     <a href="/chat" class="quickButton">Chat</a>
-    <a href="/tutd" class="quickButton">Polls</a>
+    <a href="/polls" class="quickButton">Polls</a>
   </div>
   <div id="content">
     {% block main %}{% endblock %}

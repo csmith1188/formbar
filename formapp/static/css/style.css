@@ -4,7 +4,7 @@
   --color-red: #bf0000;
   --color-brown: #802000;
   --color-orange: #ff4000;
-  --color-gold: #fa0;
+  --color-gold: #e90;
   --color-yellow: #ffbf00;
   --color-green: #00bf00;
   --color-cyan: #009fbf;
@@ -19,7 +19,7 @@
   --light-yellow: #ffdf40;
   --light-green: #80ff80;
   --light-cyan: #80ffff;
-  --light-blue: #bfcfff;
+  --light-blue: #afbfff;
   --light-purple: #df80ff;
   --light-pink: #ff80bfff;
   --light-gray: #ccc;
@@ -283,16 +283,16 @@ img.button.inline {
   background: var(--highlight-color);
 }
 
-.unselectable {
-  opacity: 50%;
-  cursor: not-allowed;
-}
-
 .pressed.pressed {
   background: var(--theme-color);
   border-color: var(--theme-color);
   color: var(--bg-color);
   cursor: default;
+}
+
+.unselectable.unselectable {
+  opacity: 50%;
+  cursor: not-allowed;
 }
 
 input[type="number"] {

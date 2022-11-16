@@ -169,6 +169,13 @@ sD.settings['locked'] = data[6]
 sD.settings['blind'] = data[7]
 sD.settings['showinc'] = data[8]
 
+db = sqlite3.connect(os.path.dirname(
+    os.path.abspath(__file__)) + '/data/database.db')
+dbcmd = db.cursor()
+names = dbcmd.execute("SELECT username FROM users").fetchall()
+db.close()
+names=[i[0] for i in names]
+# Create a whole list of names from user account for future refences
 
 # ███████ ██    ██ ███    ██  ██████ ████████ ██  ██████  ███    ██ ███████
 # ██      ██    ██ ████   ██ ██         ██    ██ ██    ██ ████   ██ ██
@@ -925,8 +932,6 @@ def endpoint_root():
         return redirect('/home')
     if sD.studentDict[request.remote_addr]['preferredHomepage'] == 'advanced':
         return redirect('/advanced')
-    if sD.studentDict[request.remote_addr]['preferredHomepage'] == 'quickpanel':
-        return redirect('/quickpanel')
     return redirect('/setdefault')
 
 
@@ -985,7 +990,7 @@ def endpoint_abcd():
             else:
                 return render_template("message.html", message="Not in ABCD mode.")
         else:
-            return render_template("thumbsrental.html")
+            return redirect('/polls')
 
 
 '''
@@ -1206,11 +1211,6 @@ def endpoint_api_students():
 # ██████
 # ██   ██
 # ██████
-
-
-@app.route('/basic')
-def endpoint_basic():
-    return redirect('/quickpanel')
 
 
 '''
@@ -1727,7 +1727,7 @@ def endpoint_essay():
             else:
                 return render_template("message.html", message="Not in Essay mode.")
         else:
-            return render_template('thumbsrental.html')
+            return redirect('/polls')
 
 
 @app.route('/expert')
@@ -2509,6 +2509,18 @@ def endpoint_perc():
             return render_template("message.html", message = "<b>amount</b> must be an integer between 0 and 100 \'/perc?amount=<b>50</b>\'", forward = '/home')
         return render_template("message.html", message = "Set perecentage to: " + str(percAmount) + ".", forward = '/home')
 
+
+@app.route('/polls')
+def endpoint_polls():
+    loginResult = loginCheck(request.remote_addr, 'student')
+    if loginResult:
+        return loginResult
+    else:
+        if sD.studentDict[request.remote_addr]['perms'] != sD.settings['perms']['student']:
+            return render_template("message.html", message = 'Only students can vote in polls.')
+        pollPrompt = sD.pollPrompt
+        return render_template("polls.html", prompt = pollPrompt)
+
 '''
     /profile
 '''
@@ -2596,27 +2608,6 @@ def endpoint_progress():
 # ██ ▄▄ ██
 #  ██████
 #     ▀▀
-
-
-'''
-    /quickpanel
-    Only the most-used features
-'''
-
-
-@app.route('/quickpanel')
-def endpoint_quickpanel():
-    loginResult = loginCheck(request.remote_addr)
-    if loginResult:
-        return loginResult
-    else:
-        sounds = []
-        music = []
-        for key, value in sfx.sound.items():
-            sounds.append(key)
-        for key, value in bgm.bgm.items():
-            music.append(key)
-        return render_template("quickpanel.html", sfx=sounds, bgm=music)
 
 
 # takes you to a quiz(literally)
@@ -2805,8 +2796,6 @@ def endpoint_sendblock():
     else:
         return render_template("message.html", message="Bad Arguments. Requires 'id' and 'data'")
 
-# Choose the user's default homepage
-
 
 # Choose the user's default homepage
 @app.route('/setdefault', methods = ['POST', 'GET'])
@@ -2816,7 +2805,7 @@ def endpoint_setdefault():
         return loginResult
     else:
         if request.method == 'POST':
-            if request.form['page'] == 'standard' or request.form['page'] == 'advanced' or request.form['page'] == 'quickpanel':
+            if request.form['page'] == 'standard' or request.form['page'] == 'advanced':
                 sD.studentDict[request.remote_addr]['preferredHomepage'] = request.form['page']
                 db = sqlite3.connect(os.path.dirname(
                     os.path.abspath(__file__)) + '/data/database.db')
@@ -2963,7 +2952,6 @@ def endpoint_tutd():
     if loginResult:
         return loginResult
     else:
-        pollPrompt = sD.pollPrompt
         ip = request.remote_addr
         thumb = request.args.get('thumb')
         if thumb:
@@ -2994,7 +2982,7 @@ def endpoint_tutd():
             else:
                 return render_template("message.html", message="Not in TUTD mode.")
         else:
-            return render_template("thumbsrental.html", prompt = pollPrompt)
+            return redirect('/polls')
 
 # ██    ██
 # ██    ██
@@ -3039,9 +3027,11 @@ def endpoint_users():
         action = request.args.get('action')
         user = ''
         if request.args.get('name'):
-            for key, value in sD.studentDict.items():
-                if request.args.get('name') == sD.studentDict[key]['name']:
-                    user = key
+            for key in names:
+                # Check the request name to all the names in the user list.
+                if request.args.get('name') == key:
+                    user = key 
+                    # the name is user for all the future uses and if statements.
                     break
             if action == 'updateDP':
                 if sD.studentDict[request.remote_addr]['perms'] > sD.settings['perms']['users']:
@@ -3129,9 +3119,10 @@ def endpoint_users():
                 else:
                     return render_template("message.html", message="User not in list.")
             if action == 'ban':
-                if user in sD.studentDict:
+                if user in names:
                     banList.append(user)
-                    del sD.studentDict[user]
+                    if user in sD.studentDict:
+                        del sD.studentDict[user]
                     return render_template("message.html", message="User removed and added to ban list.")
                 else:
                     return render_template("message.html", message="User not in list.")
@@ -3149,6 +3140,19 @@ def endpoint_users():
                                 dbcmd = db.cursor()
                                 dbcmd.execute("UPDATE users SET permissions=:perms WHERE username=:uname", {
                                               "uname": sD.studentDict[user]['name'], "perms": sD.studentDict[user]['perms']})
+                                db.commit()
+                                db.close()
+                                logFile("Info", "Permissions Changed")
+                                return render_template("message.html", message="Changed user permission.")
+                        elif user in names:
+                            # check if the name in list of names. Pretty similer to the if statement above. the only difference is this goes for the user that have a account. the one above goes for the user already sign in.
+                            if perm > 4 or perm < 0:
+                                return render_template("message.html", message="Permissions out of range.")
+                            else:
+                                db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
+                                dbcmd = db.cursor()
+                                dbcmd.execute("UPDATE users SET permissions=:perms WHERE username=:uname", {
+                                              "uname": user, "perms": perm})
                                 db.commit()
                                 db.close()
                                 logFile("Info", "Permissions Changed")

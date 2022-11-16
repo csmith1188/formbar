@@ -68,14 +68,6 @@
       <span>A compact page that includes all features.</span><br>
     </div>
   </label><br>
-  <label>
-    <div>
-      <input type="radio" id="quickpanel" name="page" value="quickpanel">
-      <h3>Quick panel</h3><br>
-      <span>A page where you can easily access the most-used features. There are separate versions for students and
-        teachers.</span><br>
-    </div>
-  </label><br>
   <input type="submit" class="button" value="OK">
 </form>
 {% endblock %}
@@ -83,7 +75,7 @@
 <!-- Extra JavaScript here -->
 {% block script %}
 <script>
-  let checked = ("{{ pm }}" == "None") ? "standard" : "{{ pm }}";
+  let checked = ("{{ pm }}" == "advanced") ? "advanced" : "standard";
   document.getElementById(checked).checked = true;
 </script>
 {% endblock %}

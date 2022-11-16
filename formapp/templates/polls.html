@@ -1,0 +1,165 @@
+{% extends 'header_content.html' %}
+<!-- ^^ This means add this file to the end of the contents of header.html -->
+<!-- This is where the title, top buttons, and stylesheet is located -->
+
+<!-- Change title here -->
+{% block title %}Formbar Polls{% endblock %}
+
+{% block color %}light{% endblock %}
+
+<!-- Extra style declarations here -->
+{% block style %}
+<style>
+    #content {
+        width: 600px;
+        text-align: center;
+    }
+
+    #thumbs,
+    #letters {
+        width: 480px;
+        display: flex;
+        justify-content: space-between;
+        margin: auto;
+    }
+
+    #essay {
+        width: 360px;
+        height: 108px;
+        margin-bottom: 8px;
+    }
+
+    #other {
+        display: flex;
+        justify-content: center;
+        gap: 32px;
+    }
+
+    h1 {
+        margin-bottom: 0;
+    }
+
+    h2 {
+        margin-top: 0;
+    }
+
+    #noPoll {
+        margin: 0;
+    }
+
+    .thumbButton {
+        width: 144px;
+        border-radius: 50% !important;
+    }
+
+    .letterButton {
+        width: 108px;
+        border-radius: 50% !important;
+    }
+
+    .highlight:hover {
+        transform: none !important;
+        box-shadow: none !important;
+    }
+
+    button {
+        width: 180px;
+        font-size: 28px;
+        font-weight: bold;
+        border-width: 2px !important;
+        border-radius: 9999px !important;
+    }
+</style>
+{% endblock %}
+
+
+<!-- Main content here -->
+{% block main %}
+<h1 id="prompt">{{ prompt }}</h1>
+<h2 id="pollName"></h2>
+<div id="thumbs" class="hidden">
+    <img src="{{ url_for('static', filename='img/basic/thumbButton0.png') }}" id="thumbButton0"
+    class="thumbButton button inline popOut moreDepth greenColor" title="Up" onclick="thumbsVote(0);" tabindex="0">
+    <img src="{{ url_for('static', filename='img/basic/thumbButton1.png') }}" id="thumbButton1"
+    class="thumbButton button inline popOut moreDepth cyanColor" title="Wiggle" onclick="thumbsVote(1);" tabindex="0">
+    <img src="{{ url_for('static', filename='img/basic/thumbButton2.png') }}" id="thumbButton2"
+    class="thumbButton button inline popOut moreDepth redColor" title="Down" onclick="thumbsVote(2);" tabindex="0">
+</div>
+<div id="letters" class="hidden">
+    <img src="{{ url_for('static', filename='img/basic/letterButton0.png') }}" id="letterButton0"
+    class="letterButton button inline popOut moreDepth redColor" title="Vote A" onclick="letterVote(0);" tabindex="0">
+    <img src="{{ url_for('static', filename='img/basic/letterButton1.png') }}" id="letterButton1"
+    class="letterButton button inline popOut moreDepth blueColor" title="Vote B" onclick="letterVote(1);"
+    tabindex="0">
+    <img src="{{ url_for('static', filename='img/basic/letterButton2.png') }}" id="letterButton2"
+    class="letterButton button inline popOut moreDepth yellowColor" title="Vote C" onclick="letterVote(2);"
+    tabindex="0">
+    <img src="{{ url_for('static', filename='img/basic/letterButton3.png') }}" id="letterButton3"
+    class="letterButton button inline popOut moreDepth greenColor" title="Vote D" onclick="letterVote(3);"
+    tabindex="0">
+</div>
+<div id="textBox" class="hidden">
+    <textarea id="essay" placeholder="Type your response here" oninput="checkEssay();"></textarea><br>
+    <button id="submitEssay" class="inline popOut moreDepth unselectable">Submit</button>
+</div>
+<h2 id="noPoll" class="hidden">There is no poll right now.</h2>
+<br><br>
+<div id="other">
+    <button id="help" class="inline popOut moreDepth" title="Send the teacher a help ticket">Help!</button>
+    <button id="break" class="inline popOut moreDepth" title="Request a bathroom break">Bathroom!</button>
+</div>
+
+<script>
+</script>
+{% endblock %}
+
+<!-- Extra javascript here -->
+{% block script %}
+<script src="{{ url_for('static', filename='js/home.js') }}"></script>
+<script>
+  function init() {
+    updateVotes();
+    checkForPoll();
+    checkForHelpTicket();
+  };
+  getApiData(true);
+
+  let update = init;
+  setInterval(getApiData, 1000);
+
+  document.getElementById("help").onclick = requestHelp;
+  document.getElementById("break").onclick = requestBreak;
+
+  function checkForPoll() {
+    let mode = modeRes.mode;
+    let pollName = document.getElementById("pollName");
+    let thumbs = document.getElementById("thumbs");
+    let letters = document.getElementById("letters");
+    let textBox = document.getElementById("textBox");
+    let noPoll = document.getElementById("noPoll");
+    if (mode == "tutd" || mode == "abcd" || mode == "text") {
+      noPoll.classList.add("hidden");
+      if (mode == "tutd") {
+          thumbs.classList.remove("hidden");
+          pollName.innerText = "Poll: thumbs";
+      } else {
+          thumbs.classList.add("hidden");
+      }
+      if (mode == "abcd") {
+          letters.classList.remove("hidden");
+          pollName.innerText = "Poll: letters";
+      } else {
+          letters.classList.add("hidden");
+      }
+      if (mode == "text") {
+          textBox.classList.remove("hidden");
+          pollName.innerText = "Poll: essay";
+      } else {
+          textBox.classList.add("hidden");
+      }
+    } else {
+      noPoll.classList.remove("hidden");
+    }
+  }
+</script>
+{% endblock %}

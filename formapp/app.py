@@ -627,13 +627,13 @@ def abcdBar():
                          (chunkLength * index) + chunkLength)
         # Fill in that chunk with the correct color
         if result == 'a':
-            answerColor = colors['red']
+            answerColor = colors['green']
         elif result == 'b':
             answerColor = colors['blue']
         elif result == 'c':
-            answerColor = colors['yellow']
+            answerColor = colors['red']
         elif result == 'd':
-            answerColor = colors['green']
+            answerColor = colors['yellow']
         else:
             answerColor = colors['default']
         for i, pix in enumerate(pixRange):

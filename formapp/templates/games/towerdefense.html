@@ -234,7 +234,7 @@
     box-sizing: border-box;
     color: var(--bg-dark);
     text-align: left;
-    filter: drop-shadow(10px 10px 5px black);
+    filter: drop-shadow(10px 10px 5px #000c);
   }
 
   #controls div {
@@ -275,7 +275,8 @@
     color: var(--bg-dark);
     font-size: 150%;
     text-align: left;
-    filter: drop-shadow(10px 10px 5px black);
+    border: 1px solid var(--dark-gray);
+    filter: drop-shadow(10px 10px 5px #000c);
   }
 
   #alert.large {
@@ -344,7 +345,7 @@
 
   #alert button:hover {
     background: white !important;
-    filter: brightness(90%) drop-shadow(2px 2px 1px #000a);
+    filter: brightness(90%) drop-shadow(2px 2px 1px #000c);
   }
 
   .menu {
@@ -356,7 +357,7 @@
     background: #cccc;
     color: var(--bg-dark);
     text-align: center;
-    filter: drop-shadow(10px 10px 5px black);
+    filter: drop-shadow(10px 10px 5px #000c);
   }
 
   .splitButton {
@@ -388,7 +389,7 @@
   }
 
   .splitButton:not(.unselectable):hover {
-    filter: brightness(90%) drop-shadow(2px 2px 1px #000a);
+    filter: brightness(90%) drop-shadow(2px 2px 1px #000c);
   }
 
   .sellButton {
@@ -516,7 +517,7 @@
     cursor: pointer;
   }
 
-  #mapOptions {
+  #mapInfo {
     position: absolute;
     width: 40%;
     height: 60%;
@@ -527,15 +528,15 @@
     font-weight: 600;
     font-size: 200%;
     text-align: left;
-    filter: drop-shadow(10px 10px 5px black);
+    filter: drop-shadow(10px 10px 5px #000c);
   }
 
-  #mapOptions h2 {
+  #mapInfo h2 {
     margin-top: 0;
     text-align: center;
   }
 
-  #mapOptions button {
+  #mapInfo button {
     position: absolute;
     bottom: 5%;
     width: 20%;
@@ -548,9 +549,9 @@
     left: 40%;
   }
 
-  #mapOptions button:hover {
+  #mapInfo button:hover {
     background: white !important;
-    filter: brightness(90%) drop-shadow(2px 2px 1px #000a);
+    filter: brightness(90%) drop-shadow(2px 2px 1px #000c);
   }
 
   #lightBackground {
@@ -559,16 +560,67 @@
     background: var(--light-gray);
   }
 
+  #editorHeader {
+    position: absolute;
+    top: 2%;
+    margin: 0;
+    font-size: 350%;
+    color: var(--bg-dark);
+  }
+
+  #visual,
+  #text {
+    position: absolute;
+    top: 12%;
+    width: 5.5%;
+    padding: 0.25% 1%;
+    margin: 0 0.5%;
+    text-align: center;
+    font-size: calc(150%);
+    font-weight: 500;
+    background: white;
+    color: var(--color-blue);
+    filter: drop-shadow(2px 2px 1px #000c);
+  }
+
+  #visual:hover,
+  #text:hover {
+    background: #ddd;
+  }
+
+  #visual.pressed,
+  #text.pressed {
+    background: var(--color-blue);
+    border-color: var(--color-blue);
+    color: white;
+  }
+
+  #visual {
+    left: 43.5%;
+  }
+
+  #text {
+    right: 43.5%;
+  }
+
   #newMapCanvas {
-    width: 75%;
+    position: absolute;
+    left: 5%;
+    bottom: 10%;
+    height: 72%;
     aspect-ratio: 17 / 10;
     background: linear-gradient(to bottom right, #040, #400, #004);
+    filter: drop-shadow(6px 6px 3px #000c);
   }
 
   #newMapGrid {
-    width: 75%;
+    position: absolute;
+    left: 5%;
+    bottom: 10%;
+    height: 72%;
     aspect-ratio: 17 / 10;
     border-collapse: collapse;
+    cursor: crosshair;
   }
 
   #newMapGrid td {
@@ -597,26 +649,85 @@
     background: #ccc5;
   }
 
-  #pathText {
-    width: 25%;
-    aspect-ratio: 17 / 30;
+  td.line {
+    cursor: grab;
+  }
+
+  #newMapGrid.draggingLine td {
+    cursor: grabbing;
+  }
+
+  td.corner {
+    cursor: move;
+  }
+
+  #editorTowers {
+    position: absolute;
+    left: 7.025%;
+    bottom: 13.6%;
+    height: 10.8%;
+    aspect-ratio: 32 / 3;
+    background: #0005;
+    border-top: 1.5px solid var(--light-gray);
+    pointer-events: none;
+  }
+
+  #editorInstructions {
+    position: absolute;
+    left: 76%;
+    top: 22%;
+    width: 20%;
+    font-size: 150%;
+    color: var(--bg-dark);
+  }
+
+  #editorInstructions * {
+    margin-top: 0;
+    margin-bottom: 5%;
+  }
+
+  #editorInstructions ul {
+    padding-left: 7.5%;
+  }
+
+  #textEditor {
+    position: absolute;
+    bottom: 10%;
+    width: 40%;
+    height: 72%;
     box-sizing: border-box;
-    padding: 1%;
-    font-size: 200%;
+    padding: 2%;
+    font-size: 175%;
     text-align: left;
+    color: var(--bg-dark);
+    font-weight: 500;
+  }
+
+  #pathText {
+    width: 100%;
+    height: 80%;
+    box-sizing: border-box;
+    margin-top: 1%;
+    padding: 1%;
+    color: var(--bg-dark);
   }
 
   #lightBackground button {
     position: absolute;
-    bottom: 0;
-    width: 20%;
-    height: 10%;
-    padding: 0.25% 1%;
+    bottom: 2%;
+    width: 8%;
+    height: 6%;
+    padding: 0.1% 0.4%;
     background: white;
-    font-size: calc(400% / 3);
+    font-size: calc(800% / 3);
     filter: drop-shadow(2px 2px 1px #000c);
     color: var(--color-blue);
-    left: 40%;
+    left: 46%;
+  }
+
+  #lightBackground button:hover {
+    background: white !important;
+    filter: brightness(90%) drop-shadow(2px 2px 1px #000c);
   }
 </style>
 {% endblock %}
@@ -935,7 +1046,6 @@
         range: 3.61,
         speed: 2.79,
         strength: 1,
-        movable: true,
         price: 150,
         extra1: {
           description: "Every fifth hit creates a small explosion.",
@@ -1643,8 +1753,8 @@
       ctx.clearRect(0, 0, 1920, 1080); //Clear the canvas
       ctx.drawPath(map);
 
-    //Controls menu
-    ctx.drawImage(images.buttons.menu, 15, 15, 30, 30);
+      //Controls menu
+      ctx.drawImage(images.buttons.menu, 15, 15, 30, 30);
       document.getElementById("r0c0").classList.add("gameButton");
       document.getElementById("r0c0").onclick = () => {
         pauseGame();
@@ -2446,8 +2556,7 @@
         switchDifficulty();
       };
       container.append(difficultyButtons);
-      document.getElementById("difficulty").append(normal);
-      document.getElementById("difficulty").append(hard);
+      document.getElementById("difficulty").append(normal, hard);
 
       let startButton = document.createElement("button");
       startButton.id = "startButton";
@@ -2801,10 +2910,10 @@
     }
 
     function createMap() {
-      let mapOptions = document.createElement("div");
-      mapOptions.id = "mapOptions";
-      mapOptions.classList.add("centered");
-      mapOptions.innerHTML = `
+      let mapInfo = document.createElement("div");
+      mapInfo.id = "mapInfo";
+      mapInfo.classList.add("centered");
+      mapInfo.innerHTML = `
         <h2>Create new map</h2><br>
         Map name: <input id="name" class="box" type="text"><br><br>
         Your name: <input id="author" class="box" type="text"><br><br>
@@ -2813,80 +2922,195 @@
       let next = document.createElement("button");
       next.innerText = "Next";
       next.onclick = createPath;
-      mapOptions.append(next);
-      document.getElementById("container").append(mapOptions);
+      mapInfo.append(next);
+      document.getElementById("container").append(mapInfo);
     }
+
+    let newPathSquares = [];
+    let newPathArr = [];
+    let newPathStart;
+    let segmentStart;
+    let segmentDirection;
+    let segmentIndex = 0;
+    let nmctx;
+    let drawing;
+    let fromStart;
 
     function createPath() {
       document.getElementById("myMaps").remove();
-      document.getElementById("mapOptions").remove();
+      document.getElementById("mapInfo").remove();
+
+      let container = document.getElementById("container");
 
       let lightBg = document.createElement("div");
       lightBg.id = "lightBackground";
       lightBg.classList.add("centered");
+
+      let header = document.createElement("h1");
+      header.id = "editorHeader";
+      header.classList.add("hCentered");
+      header.innerText = "Draw the path";
+      lightBg.append(header);
+
       let next = document.createElement("button");
       next.innerText = "Next";
-      next.onclick = null;
+      next.onclick = () => {
+        if (document.getElementById("startText").value && !document.getElementById("pathText").value) return gameAlert("Error: start position provided without path.");
+        if (document.getElementById("pathText").value && !document.getElementById("startText").value) return gameAlert("Error: path provided without start position.");
+        if (!validateText()) return gameAlert("Can't convert your text to a path. Check for errors.");
+        if (!newPathArr.length) return gameAlert("Create a path before moving to the next step.");
+        gameAlert("Do you want to set the enemy waves of your map? If you select \"No\", the default waves will be used.", "confirm", "normal", createWaves);
+      };
       lightBg.append(next);
-      document.getElementById("container").append(lightBg);
+      container.append(lightBg);
 
-      let pathText = document.createElement("textarea");
-      pathText.id = "pathText";
-      pathText.classList.add("centered", "hidden");
-      document.getElementById("container").append(pathText);
+      let visualButton = document.createElement("button");
+      let textButton = document.createElement("button");
+      visualButton.id = "visual";
+      textButton.id = "text";
+      visualButton.innerText = "Visual";
+      textButton.innerText = "Text";
+      visualButton.classList.add("pressed");
+      visualButton.onclick = () => {
+        if (document.getElementById("startText").value && !document.getElementById("pathText").value) return gameAlert("Error: start position provided without path.");
+        if (document.getElementById("pathText").value && !document.getElementById("startText").value) return gameAlert("Error: path provided without start position.");
+        if (!validateText()) return gameAlert("Can't convert your text to a path. Check for errors.");
+
+        document.getElementById("textEditor").classList.add("hidden");
+        document.getElementById("newMapCanvas").classList.remove("hidden");
+        document.getElementById("newMapGrid").classList.remove("hidden");
+        document.getElementById("editorTowers").classList.remove("hidden");
+        document.getElementById("editorInstructions").classList.remove("hidden");
+        document.getElementById("text").classList.remove("pressed");
+        document.getElementById("visual").classList.add("pressed");
+        
+        if (newPathArr.length) drawArr();
+        else resetNMC();
+      };
+      textButton.onclick = () => {
+        document.getElementById("newMapCanvas").classList.add("hidden");
+        document.getElementById("newMapGrid").classList.add("hidden");
+        document.getElementById("editorTowers").classList.add("hidden");
+        document.getElementById("editorInstructions").classList.add("hidden");
+        document.getElementById("textEditor").classList.remove("hidden");
+        document.getElementById("visual").classList.remove("pressed");
+        document.getElementById("text").classList.add("pressed");
+        document.getElementById("pathText").focus();
+      };
+      container.append(visualButton, textButton);
 
       let nmc = document.createElement("canvas");
       nmc.id = "newMapCanvas";
-      nmc.classList.add("centered");
       nmc.width = 2040;
       nmc.height = 1200;
-      document.getElementById("container").append(nmc);
+      container.append(nmc);
+      nmctx = nmc.getContext("2d");
+      resetNMC();
 
       let nmg = document.createElement("table");
       nmg.id = "newMapGrid";
-      nmg.classList.add("centered", "visibleLines");
+      nmg.classList.add("visibleLines");
       let gridHTML = "";
       for (let i = 0; i < 20; i++) {
         gridHTML += "<tr>";
-        for (let j = 0; j < 34; j++) gridHTML += `<td id=r${i}c${j} onmousedown="startPath(${i}, ${j});" onmouseover="dragLine(${i}, ${j});" onmouseup="endPath(${i}, ${j})"></td>`;
+        for (let j = 0; j < 34; j++) gridHTML += `<td id=r${i}c${j} onmousedown="startPath(${i}, ${j});" onmouseover="dragLine(${i}, ${j});"></td>`;
         gridHTML += "</tr>";
       }
       nmg.innerHTML = gridHTML;
-      document.getElementById("container").append(nmg);
+      container.append(nmg);
+
+      let editorTowers = document.createElement("div");
+      editorTowers.id = "editorTowers";
+      container.append(editorTowers);
+
+      let instructions = document.createElement("instructions");
+      instructions.id = "editorInstructions";
+      instructions.innerHTML = `
+        <h3>Instructions:</h3>
+        <ul>
+          <li>Click on an empty square and drag to start a new path.</li>
+          <li>Drag a corner to move it.</li>
+          <li>Drag a line to move the entire path.</li>
+          <li>Drag outward from the start and end points to extend the path.</li>
+          <li>Click and release on an empty square to clear the canvas.</li>
+          <li>Switch to the text editor to modify the map as an array.</li>
+        </ul>
+      `;
+      container.append(instructions);
+
+      let textEditor = document.createElement("div");
+      textEditor.id = "textEditor";
+      textEditor.classList.add("hCentered", "hidden");
+      textEditor.innerHTML = "Start: "
+      let startText = document.createElement("input");
+      startText.id = "startText";
+      startText.classList.add("box", "light");
+      startText.placeholder = "[column, row]";
+      textEditor.append(startText);
+      textEditor.innerHTML += "<br><br>Path: <br>"
+      let pathText = document.createElement("textarea");
+      pathText.id = "pathText";
+      pathText.classList.add("light");
+      pathText.placeholder = "[direction, length],\n[direction, length],";
+      textEditor.append(pathText);
+      container.append(textEditor);
     }
 
-    let newPathSquares = [];
-    let newPathText = "";
-    let newPathStart;
-    let segmentStart;
-    let segmentDirection;
-    let nmctx;
-
-    function startPath(row, col) {
-      newPathText = "";
-      newPathStart = [row, col];
-      segmentStart = newPathStart;
-      newPathSquares.push(newPathStart);
-      let nmc = document.getElementById("newMapCanvas");
-      nmctx = nmc.getContext("2d");
-
+    function resetNMC() {
       nmctx.clearRect(0, 0, 2040, 1200);
-
+      nmctx.drawImage(images.buttons.menu, 75, 75, 30, 30);
+      images.buttons.menu.onload = () => nmctx.drawImage(images.buttons.menu, 75, 75, 30, 30); //It sometimes fails to draw the image the first time, so try again when the image is loaded
+      nmctx.drawImage(images.buttons.fastForwardWhite, 135, 75, 30, 30);
+      images.buttons.fastForwardWhite.onload = () => nmctx.drawImage(images.buttons.fastForwardWhite, 135, 75, 30, 30);
+      nmctx.font = "30px monospace";
+      nmctx.fillStyle = "#ddd";
+      nmctx.fillText("00/50", 1624, 100);
+      nmctx.fillStyle = "#80ff80";
+      nmctx.fillText("$00075", 1744, 100);
+      nmctx.fillStyle = "#ff6860";
+      nmctx.fillText("❤︎100", 1880, 100);
+      for (let i = 0; i < 20; i++) for (let j = 0; j < 34; j++) {
+        let square = document.getElementById(`r${i}c${j}`);
+        if (square) {
+          square.classList.remove("line", "corner", "endpoint");
+          square.onmousedown = () => startPath(i, j);
+        }
+      }
       nmctx.lineWidth = 1.5;
       nmctx.strokeStyle = "#80ffff";
       nmctx.fillStyle = "#80ffff";
+    }
+
+    function startPath(row, col) {
+      resetNMC();
+
+      newPathArr = [];
+      newPathStart = [row, col];
+      segmentStart = newPathStart;
+      segmentDirection = null;
+      segmentIndex = 0;
+      newPathSquares = [newPathStart];
+      drawing = true;
+      fromStart = false;
       
       nmctx.beginPath();
       nmctx.arc(col * 60 + 30, row * 60 + 30, 15, 0, 2 * Math.PI);
-      nmctx.stroke();
       nmctx.fill();
+      let square = document.getElementById(`r${row}c${col}`);
+      if (square) {
+        square.classList.remove("line", "corner");
+        square.classList.add("endpoint");
+        square.onmousedown = () => continuePath(row, col, true);
+      }
 
       nmctx.beginPath();
       nmctx.moveTo(col * 60 + 30, row * 60 + 30);
+
+      document.body.onmouseup = () => endPath(row, col);
     }
 
     function dragLine(row, col) {
-      if (!newPathStart) return;
+      if (!drawing) return;
 
       let lastSquare = newPathSquares.at(-1);
       newPathSquares.push([row, col]);
@@ -2900,35 +3124,330 @@
         if (row > lastSquare[0]) segmentDirection = "down";
         else segmentDirection = "up";
       } else {
+        //Diagonal
         newPathSquares.pop();
-        return endPath(...lastSquare);
+        return;
       }
       if (lastDirection && segmentDirection != lastDirection) newSegment(...lastSquare, lastDirection);
       nmctx.lineTo(col * 60 + 30, row * 60 + 30);
       nmctx.stroke();
+      nmctx.stroke(); //Stoke twice, because only doing it once makes the last line darker for some reason
+
+      let square = document.getElementById(`r${row}c${col}`);
+      if (square && !square.classList.contains("corner") && !square.classList.contains("endpoint")) {
+        square.classList.add("line");
+        square.onmousedown = () => movePath(row, col);
+      }
+
+      document.body.onmouseup = () => endPath(row, col);
     }
 
     function newSegment(row, col, direction) {
       let length;
       switch (direction) {
-        case "right":
         case "left":
+        case "right":
           length = Math.abs(col - segmentStart[1]);
           break;
         case "up":
         case "down":
           length = Math.abs(row - segmentStart[0]);
       }
-      newPathText += `["${direction}", ${length}],\n`;
+      if (!length && !fromStart) return;
+      if (fromStart) {
+        let opposites = [["left", "right"], ["up", "down"]];
+        let opposite;
+        if (fromStart) opposite = opposites.find(arr => arr.includes(direction)).find(item => item != direction);
+        if (length) newPathArr.unshift([opposite, length]);
+        newPathStart = [row, col];
+      } else {
+        newPathArr.push([direction, length]);
+      }
       segmentStart = [row, col];
+      
+      nmctx.beginPath();
+      nmctx.arc(col * 60 + 30, row * 60 + 30, 7.5, 0, 2 * Math.PI);
+      nmctx.fill();
+      nmctx.moveTo(col * 60 + 30, row * 60 + 30);
+      let square = document.getElementById(`r${row}c${col}`);
+      if (square && !square.classList.contains("endpoint")) {
+        square.classList.add("corner");
+        let i = segmentIndex;
+        square.onmousedown = () => moveCorner(row, col, i);
+      }
+      segmentIndex++;
+    }
+
+    function drawArr(noStart, noEnd) {
+      let lastDirection = segmentDirection;
+      let arr = newPathArr;
+      let row = newPathStart[0];
+      let col = newPathStart[1];
+      startPath(row, col);
+      if (noStart) {
+        resetNMC();
+      }
+      arr.forEach(segment => {
+        for (let i = 0; i < segment[1]; i++) {
+          if (segment[0] == "right") col += 1;
+          else if (segment[0] == "left") col -= 1;
+          else if (segment[0] == "down") row += 1;
+          else if (segment[0] == "up") row -= 1;
+          dragLine(row, col);
+        }
+      });
+      if (!noEnd) endPath(row, col);
+      if (noStart) segmentDirection = lastDirection;
     }
 
     function endPath(row, col) {
       newSegment(row, col, segmentDirection);
-      newPathStart = null;
-      segmentStart = null;
-      segmentDirection = null;
-      document.getElementById("pathText").value = newPathText;
+      nmctx.fillRect(col * 60 + 15, row * 60 + 15, 30, 30);
+      let square = document.getElementById(`r${row}c${col}`);
+      if (square) {
+        square.classList.remove("line", "corner");
+        square.classList.add("endpoint");
+        square.onmousedown = () => continuePath(row, col);
+      }
+      let newPathStr = "";
+      if (newPathArr.every(segment => segment[1])) newPathStr = newPathArr.map(segment => `["${segment[0]}", ${segment[1]}],\n`).join("");
+      if (newPathStr) {
+        document.getElementById("startText").value = `[${newPathStart[0] - 1}, ${newPathStart[1] - 1}]`;
+      } else {
+        resetNMC();
+        document.getElementById("startText").value = null;
+      }
+      document.getElementById("pathText").value = newPathStr;
+      drawing = false;
+      document.body.onmouseup = null;
+    }
+
+    function moveCorner(row, col, index) {
+      let oldLengths = newPathArr.map(segment => segment[1]);
+      let oldStartPos = [...newPathStart];
+      let oldPathLength = newPathArr.length;
+      for (let i = 0; i < 20; i++) {
+        for (let j = 0; j < 34; j++) document.getElementById(`r${i}c${j}`).onmouseover = function() {
+          let action1;
+          let action2;
+          let axis1;
+          let axis2;
+          switch (newPathArr[index][0]) {
+            case "left":
+              axis1 = "x";
+              if (j < col) action1 = "stretch";
+              if (j > col) action1 = "shrink";
+              break;
+            case "right":
+              axis1 = "x";
+              if (j > col) action1 = "stretch";
+              if (j < col) action1 = "shrink";
+              break;
+            case "up":
+              axis1 = "y";
+              if (i < row) action1 = "stretch";
+              if (i > row) action1 = "shrink";
+              break;
+            case "down":
+              axis1 = "y";
+              if (i > row) action1 = "stretch";
+              if (i < row) action1 = "shrink";
+          }
+          switch (newPathArr[index + 1]?.[0]) {
+            case "left":
+              axis2 = "x";
+              if (j > col) action2 = "stretch";
+              if (j < col) action2 = "shrink";
+              break;
+            case "right":
+              axis2 = "x";
+              if (j < col) action2 = "stretch";
+              if (j > col) action2 = "shrink";
+              break;
+            case "up":
+              axis2 = "y";
+              if (i > row) action2 = "stretch";
+              if (i < row) action2 = "shrink";
+              break;
+            case "down":
+              axis2 = "y";
+              if (i < row) action2 = "stretch";
+              if (i > row) action2 = "shrink";
+          }
+          
+          function resizeSegment(segment, action, axis) {
+            let direction = newPathArr[segment][0];
+            let oldLength = oldLengths[segment];
+            let sameAxis = (axis == "x") ? ["left", "right"] : ["up", "down"];
+            let parallel;
+            if (segment == index) parallel = newPathArr.indexOf(newPathArr.slice(segment + 2).find(item => sameAxis.includes(item[0])));
+            else parallel = newPathArr.indexOf(newPathArr.slice(0, segment - 1).reverse().find(item => sameAxis.includes(item[0])));
+            let parallelDirection = newPathArr[parallel]?.[0];
+            let parallelOldLength = oldLengths[parallel];
+            let otherDirection = (segment == index) ? newPathArr[segment + 1][0] : newPathArr[segment - 1][0];
+            let difference = Math.abs((axis == "x") ? col - j : row - i);
+            let sign = (action == "stretch") ? 1 : -1;
+            if (action) {
+              newPathArr[segment][1] = oldLength + difference * sign;
+              if (newPathArr[parallel] && !sameAxis.includes(otherDirection)) {
+                if (direction == parallelDirection) newPathArr[parallel][1] = parallelOldLength - difference * sign;
+                else if (sameAxis.includes(parallelDirection)) newPathArr[parallel][1] = parallelOldLength + difference * sign;
+              }
+              let allSameAxis = newPathArr.slice(0, segment - 1).every(item => !sameAxis.includes(item[0]));
+              if (segment == index + 1 && ((!newPathArr[parallel] && !sameAxis.includes(otherDirection)) || (!sameAxis.includes(otherDirection) && allSameAxis))) {
+                if (direction == "left") newPathStart[1] = oldStartPos[1] + difference * sign;
+                else if (direction == "right") newPathStart[1] = oldStartPos[1] - difference * sign;
+                else if (direction == "up") newPathStart[0] = oldStartPos[0] + difference * sign;
+                else if (direction == "down") newPathStart[0] = oldStartPos[0] - difference * sign;
+              }
+            } else {
+              newPathArr[segment][1] = oldLength;
+              if (parallelOldLength) newPathArr[parallel][1] = parallelOldLength;
+              if (segment == index + 1) newPathStart = oldStartPos;
+            }
+          }
+          resizeSegment(index, action1, axis1);
+          resizeSegment(index + 1, action2, axis2);
+          drawArr();
+          if (newPathArr.length < oldPathLength) {
+            if (this.classList.contains("corner")) this.onmousedown();
+            else resetDragFunc();
+          }
+          document.body.onmouseup = resetDragFunc;
+        };
+      }
+      document.body.onmouseup = resetDragFunc;
+    }
+
+    function movePath(row, col) {
+      document.getElementById("newMapGrid").classList.add("draggingLine");
+      let oldStartPos = [...newPathStart];
+      for (let i = 0; i < 20; i++) {
+        for (let j = 0; j < 34; j++) document.getElementById(`r${i}c${j}`).onmouseover = () => {
+          newPathStart[0] = oldStartPos[0] + i - row;
+          newPathStart[1] = oldStartPos[1] + j - col;
+          drawArr();
+          document.body.onmouseup = () => {
+            document.getElementById("newMapGrid").classList.remove("draggingLine");
+            resetDragFunc();
+          }
+        };
+      }
+      document.body.onmouseup = () => {
+        document.getElementById("newMapGrid").classList.remove("draggingLine");
+        resetDragFunc();
+      }
+    }
+
+    function continuePath(row, col, start) {
+      let dragInward;
+      let oldLengths = newPathArr.map(segment => segment[1]);
+      let oldStartPos = [...newPathStart];
+      let firstDrag = true;
+      drawArr();
+      drawing = true;
+      for (let i = 0; i < 20; i++) for (let j = 0; j < 34; j++) document.getElementById(`r${i}c${j}`).onmouseover = () => {
+        if (dragInward === undefined) {
+          let firstDirection = newPathArr[0][0];
+          let finalDirection = newPathArr.at(-1)[0];
+          if (!start && ((finalDirection == "left" && j > col) || (finalDirection == "right" && j < col) || (finalDirection == "up" && i > row) || (finalDirection == "down" && i < row))) dragInward = true;
+          else if (start && ((firstDirection == "left" && j < col) || (firstDirection == "right" && j > col) || (firstDirection == "up" && i < row) || (firstDirection == "down" && i > row))) dragInward = true;
+          else dragInward = false;
+        }
+        if (dragInward) {
+          let segment = start ? 0 : newPathArr.length - 1;
+          let direction = newPathArr[segment][0];
+          let oldLength = oldLengths[segment];
+          let difference = Math.abs((direction == "left" || direction == "right") ? col - j : row - i);
+          if (!difference) dragInward = undefined;
+          newPathArr[segment][1] = oldLength - difference;
+          if (start) {
+            if (direction == "left") newPathStart[1] = oldStartPos[1] - difference;
+            else if (direction == "right") newPathStart[1] = oldStartPos[1] + difference;
+            else if (direction == "up") newPathStart[0] = oldStartPos[0] - difference;
+            else if (direction == "down") newPathStart[0] = oldStartPos[0] + difference;
+          }
+          drawArr();
+          document.body.onmouseup = resetDragFunc;
+          return;
+        }
+        let lastSquare = newPathSquares.at(-1);
+        if (start) {
+          drawing = true;
+        } else {
+          drawArr(false, true);
+        }
+        fromStart = start;
+        if (fromStart && firstDrag) {
+          let opposites = [["left", "right"], ["up", "down"]];
+          segmentDirection = opposites.find(opposite => opposite.includes(newPathArr[0][0])).find(direction => direction != newPathArr[0][0]);
+          newPathSquares.push(newPathStart);
+          nmctx.clearRect(newPathStart[1] * 60, newPathStart[0] * 60, 60, 60);
+          nmctx.moveTo(newPathSquares[1][1] * 60 + 30, newPathSquares[1][0] * 60 + 30);
+          nmctx.lineTo(newPathStart[1] * 60 + 30, newPathStart[0] * 60 + 30);
+          nmctx.stroke();
+          nmctx.stroke();
+        }
+        if (fromStart) {
+          segmentStart = [...newPathStart];
+          if (!firstDrag) newPathSquares.push(lastSquare);
+          nmctx.moveTo(newPathStart[1] * 60 + 30, newPathStart[0] * 60 + 30);
+        }
+        dragLine(i, j);
+        firstDrag = false;
+        document.body.onmouseup = () => {
+          endPath(i, j);
+          drawArr();
+          resetDragFunc();
+        };
+      };
+      document.body.onmouseup = () => {
+        drawing = false;
+        resetDragFunc();
+      };
+    }
+
+    function resetDragFunc() {
+      for (let i = 0; i < 20; i++) for (let j = 0; j < 34; j++) document.getElementById(`r${i}c${j}`).onmouseover = () => dragLine(i, j);
+    }
+
+    function validateText() {
+      let startStr = document.getElementById("startText").value;
+      if (startStr.length && (!startStr.startsWith("[") || !startStr.endsWith("]"))) return;
+      let start = startStr.replaceAll(" ", "").slice(1, -1).split(",");
+      if (startStr && start.length == 2 && start.every(pos => Number.isInteger(+pos))) newPathStart = start.map(pos => +pos + 1);
+      else if (startStr) return;
+
+      let str = document.getElementById("pathText").value.replaceAll("\n", "").replaceAll("'", "\"").replaceAll(" ", "");
+      ["up", "down", "left", "right"].forEach(direction => str = str.replaceAll(`[${direction},`, `["${direction}",`)); //Add quotes around directions
+      if (str.at(-1) == ",") str = str.slice(0, -1);
+      let newPathJSON = "[" + str + "]";
+      try {
+        newPathArr = JSON.parse(newPathJSON);
+      } catch {
+        return;
+      }
+      newPathArr = newPathArr.map(segment => [segment[0], +segment[1]]);
+
+      return newPathArr.every(segment =>
+        Array.isArray(segment)
+        && segment.length == 2
+        && ["up", "down", "left", "right"].includes(segment[0])
+        && Number.isInteger(segment[1])
+        && segment[1] > 0
+      );
+    }
+
+    function createWaves() {
+      document.getElementById("newMapCanvas").classList.add("hidden");
+      document.getElementById("newMapGrid").classList.add("hidden");
+      document.getElementById("editorTowers").classList.add("hidden");
+      document.getElementById("editorInstructions").classList.add("hidden");
+      document.getElementById("textEditor").classList.add("hidden");
+      document.getElementById("editorHeader").innerText = "Set enemy waves";
+      //document.getElementById("next").onclick = null;
+      document.getElementById("visual").onclick = null;
+      document.getElementById("text").onclick = null;
     }
   }
 </script>

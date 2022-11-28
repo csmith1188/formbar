@@ -1636,6 +1636,17 @@ def endpoint_createfightermatch():
     sD.fighter[code]['public'] = public
     return render_template("message.html", message='Match ' + code + ' created by ' + name + '.')
 
+
+@app.route('/createtdmap', methods=['POST'])
+def endpoint_createtdmap():
+    json = request.args.get('map')
+    if not json:
+        return render_template("message.html", message='Missing map data.')
+    maps = open(os.path.dirname(os.path.abspath(__file__)) + '/static/js/tdMaps.js', 'a')
+    maps.write('\nmaps.push(' + json + ');')
+    maps.close()
+    return render_template("message.html", message='Map published.')
+
 # ██████
 # ██   ██
 # ██   ██
@@ -2002,7 +2013,7 @@ def endpoint_games_towerdefense():
         if not achievements:
             achievements = ''
         db.close()
-        return render_template('games/towerdefense.html', progress=progress, achievements=achievements)
+        return render_template('games/towerdefense.html', progress=progress, achievements=achievements, username=sD.studentDict[request.remote_addr]['name'])
 
 # Tic Tac Toe
 @app.route('/games/ttt')

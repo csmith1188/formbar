@@ -507,20 +507,76 @@
     }
   }
 
-  #newMap {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 20%;
-    aspect-ratio: 4 / 3;
-    background: white;
+  #myMaps {
+    width: 70%;
+    height: 80%;
+    bottom: 0;
+    padding: 3% 3% 0;
+    display: grid;
+    grid-template-columns: repeat(3, 30%);
+    grid-template-rows: 40%;
+    gap: 5%;
+    font-size: 200%;
+    text-align: left;
+    overflow: auto;
+  }
+
+  .mapContainer {
+    position: relative;
     cursor: pointer;
+  }
+
+  #newMap {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    box-sizing: border-box;
+    background: #fff1;
+    border: 1px solid white;
+  }
+
+  .mapContainer:hover #newMap {
+    background: #fff3;
+  }
+
+  .mapThumbnail {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    box-sizing: border-box;
+    border: 1px solid white;
+    cursor: pointer;
+  }
+
+  .mapStatus {
+    position: absolute;
+    left: 1px;
+    top: 1px;
+    width: fit-content;
+    padding: 1% 1.5%;
+    border: 1px;
+    border-style: none solid solid none;
+    border-bottom-right-radius: 6px;
+    font-size: 60%;
+  }
+
+  .uncleared {
+    background-color: #5555;
+    color: var(--light-gray);
+  }
+
+  .published {
+    background-color: #00bf0055;
+    color: var(--light-green);
+  }
+
+  .removed {
+    background-color: #ff400055;
+    color: var(--light-orange);
   }
 
   #mapInfo {
     position: absolute;
     width: 40%;
-    height: 60%;
+    height: 50%;
     padding: 1.5%;
     box-sizing: border-box;
     background: #cccc;
@@ -536,17 +592,29 @@
     text-align: center;
   }
 
+  #digipogs {
+    width: 12%;
+  }
+
   #mapInfo button {
     position: absolute;
-    bottom: 5%;
-    width: 20%;
-    height: 10%;
+    bottom: 6%;
+    width: 25%;
+    height: 12%;
     padding: 0.25% 1%;
     background: white;
     font-size: calc(400% / 3);
     filter: drop-shadow(2px 2px 1px #000c);
+  }
+
+  #mapInfo #next {
     color: var(--color-blue);
-    left: 40%;
+    right: 22.5%;
+  }
+
+  #mapInfo #cancel {
+    color: var(--color-red);
+    left: 22.5%;
   }
 
   #mapInfo button:hover {
@@ -728,6 +796,80 @@
   #lightBackground button:hover {
     background: white !important;
     filter: brightness(90%) drop-shadow(2px 2px 1px #000c);
+  }
+
+  #wavesBox {
+    position: absolute;
+    left: 8%;
+    bottom: 10%;
+    height: 72%;
+    aspect-ratio: 3 / 2;
+    padding: 1% 0.5%;
+    box-sizing: border-box;
+    background: var(--bg-darker);
+    filter: drop-shadow(6px 6px 3px #000c);
+    overflow: auto;
+  }
+
+  .wave {
+    position: relative;
+    min-width: 96%;
+    height: 15%;
+    box-sizing: border-box;
+    margin: 2%;
+    background: var(--bg-dark-highlight);
+    border: 2px solid gray;
+    border-radius: 9999px;
+  }
+
+  .wave:nth-child(n + 51) {
+    background: #522;
+  }
+
+  .waveNumber {
+    position: absolute;
+    left: 0;
+    height: 100%;
+    aspect-ratio: 1;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 300%;
+    color: var(--light-gray);
+    border: 2px gray;
+    border-right-style: solid;
+  }
+
+  .waveEnemies {
+    position: absolute;
+    right: 0;
+    height: 100%;
+    aspect-ratio: 9;
+    box-sizing: border-box;
+    display: flex;
+    overflow: auto;
+  }
+
+  #enemiesBox {
+    position: absolute;
+    left: 72%;
+    bottom: 10%;
+    height: 72%;
+    aspect-ratio: 1 / 2;
+    box-sizing: border-box;
+    text-align: center;
+    background: var(--bg-darker);
+    filter: drop-shadow(6px 6px 3px #000c);
+    overflow: auto;
+  }
+
+  #enemiesBox img {
+    width: 30%;
+  }
+
+  #enemiesBox img:nth-child(n + 5):nth-child(-n + 7) {
+    transform: translateY(calc(-30%));
   }
 </style>
 {% endblock %}
@@ -2247,7 +2389,7 @@
                 squareEl.ondragover = () => {
                   event.preventDefault();
                   squareEl.classList.add("droppable");
-                  dragOver = [towerTypes[tower], j, i]; //Save the tower being sragges, the column, and the row
+                  dragOver = [towerTypes[tower], j, i]; //Save the tower being dragged, the column, and the row
                 };
                 squareEl.ondragleave = () => {
                   squareEl.classList.remove("droppable");
@@ -2895,18 +3037,83 @@
     }
 
     function openEditor() {
-      if (false) return createMap();
+      let myMaps = maps.filter(map => map.author == "{{ username }}");
+      if (!myMaps) return createMap();
 
       ctx.clearRect(0, 0, 1920, 1080); //Clear the canvas
       document.getElementById("progress").remove();
+      document.getElementById("playButton").remove();
+      document.getElementById("editorButton").remove();
 
-      let myMaps = document.createElement("div");
-      myMaps.id = "myMaps";
-      let newMap = document.createElement("div");
+      ctx.fillStyle = "white";
+      ctx.textAlign = "center";
+      ctx.font = "56px Segoe UI";
+      ctx.fillText("Choose a map", 960, 100);
+
+      let myMapsGrid = document.createElement("div");
+      myMapsGrid.id = "myMaps";
+      myMapsGrid.classList.add("hCentered");
+      let newMapContainer = document.createElement("div");
+      newMapContainer.classList.add("mapContainer");
+      let newMap = document.createElement("canvas");
       newMap.id = "newMap";
       newMap.onclick = createMap;
-      myMaps.append(newMap);
-      document.getElementById("container").append(myMaps);
+      newMapContainer.append(newMap);
+      newMapContainer.append("Create new map");
+      myMapsGrid.append(newMapContainer);
+      myMaps.forEach(myMap => {
+        let container = document.createElement("div");
+        container.classList.add("mapContainer");
+        let thumbnail = document.createElement("canvas");
+        thumbnail.width = 1920;
+        thumbnail.height = 1080;
+        thumbnail.classList.add("mapThumbnail");
+        thumbnail.onclick = editMap(myMap.id);
+        container.append(thumbnail);
+
+        //Draw the thumbnail
+        let tctx = thumbnail.getContext("2d");
+        tctx.lineWidth = 7.5;
+        tctx.strokeStyle = "#80ffff";
+        tctx.beginPath();
+        let xPos = myMap.start[0] * 60;
+        let yPos = myMap.start[1] * 60;
+        let col = myMap.start[0] - 0.5;
+        let row = myMap.start[1] - 0.5;
+        myMap.lines.forEach(line => {
+          tctx.moveTo(xPos, yPos);
+          for (let i = 0; i < line[1]; i++) {
+            switch (line[0]) {
+              case "right":
+                xPos += 60;
+                col++;
+                break;
+              case "left":
+                xPos -= 60;
+                col--;
+                break;
+              case "down":
+                yPos += 60;
+                row++;
+                break;
+              case "up":
+                yPos -= 60;
+                row--;
+            }
+            tctx.lineTo(xPos, yPos);
+          }
+        });
+        tctx.stroke();
+
+        container.append(myMap.name);
+        let status = document.createElement("div");
+        status.classList.add("mapStatus");
+        status.innerText = "PUBLISHED";
+        status.classList.add("published");
+        container.append(status);
+        myMapsGrid.append(container);
+      });
+      document.getElementById("container").append(myMapsGrid);
     }
 
     function createMap() {
@@ -2916,16 +3123,26 @@
       mapInfo.innerHTML = `
         <h2>Create new map</h2><br>
         Map name: <input id="name" class="box" type="text"><br><br>
-        Your name: <input id="author" class="box" type="text"><br><br>
         Digipogs to unlock: <input id="digipogs" class="box" type="number" value="0" min="0">
       `;
       let next = document.createElement("button");
+      next.id = "next";
       next.innerText = "Next";
       next.onclick = createPath;
       mapInfo.append(next);
+      let cancel = document.createElement("button");
+      cancel.id = "cancel";
+      cancel.innerText = "Cancel";
+      cancel.onclick = () => mapInfo.remove();
+      mapInfo.append(cancel);
       document.getElementById("container").append(mapInfo);
     }
 
+    function editMap() {
+
+    }
+
+    let newPathName;
     let newPathSquares = [];
     let newPathArr = [];
     let newPathStart;
@@ -2937,6 +3154,7 @@
     let fromStart;
 
     function createPath() {
+      newPathName = document.getElementById("name").value;
       document.getElementById("myMaps").remove();
       document.getElementById("mapInfo").remove();
 
@@ -2960,6 +3178,7 @@
         if (!validateText()) return gameAlert("Can't convert your text to a path. Check for errors.");
         if (!newPathArr.length) return gameAlert("Create a path before moving to the next step.");
         gameAlert("Do you want to set the enemy waves of your map? If you select \"No\", the default waves will be used.", "confirm", "normal", createWaves);
+        document.getElementById("no").onclick = finishMap;
       };
       lightBg.append(next);
       container.append(lightBg);
@@ -3178,15 +3397,11 @@
       segmentIndex++;
     }
 
-    function drawArr(noStart, noEnd) {
-      let lastDirection = segmentDirection;
+    function drawArr(noEnd) {
       let arr = newPathArr;
       let row = newPathStart[0];
       let col = newPathStart[1];
       startPath(row, col);
-      if (noStart) {
-        resetNMC();
-      }
       arr.forEach(segment => {
         for (let i = 0; i < segment[1]; i++) {
           if (segment[0] == "right") col += 1;
@@ -3197,7 +3412,6 @@
         }
       });
       if (!noEnd) endPath(row, col);
-      if (noStart) segmentDirection = lastDirection;
     }
 
     function endPath(row, col) {
@@ -3372,11 +3586,8 @@
           return;
         }
         let lastSquare = newPathSquares.at(-1);
-        if (start) {
-          drawing = true;
-        } else {
-          drawArr(false, true);
-        }
+        if (start) drawing = true;
+        else drawArr(true);
         fromStart = start;
         if (fromStart && firstDrag) {
           let opposites = [["left", "right"], ["up", "down"]];
@@ -3392,6 +3603,9 @@
           segmentStart = [...newPathStart];
           if (!firstDrag) newPathSquares.push(lastSquare);
           nmctx.moveTo(newPathStart[1] * 60 + 30, newPathStart[0] * 60 + 30);
+        } else {
+          dragLine(...lastSquare);
+          console.log(newPathSquares.at(-1))
         }
         dragLine(i, j);
         firstDrag = false;
@@ -3438,6 +3652,9 @@
       );
     }
 
+    let newWavesArr = Array(75).fill().map(() => []);
+    let draggingEnemy;
+
     function createWaves() {
       document.getElementById("newMapCanvas").classList.add("hidden");
       document.getElementById("newMapGrid").classList.add("hidden");
@@ -3448,6 +3665,74 @@
       //document.getElementById("next").onclick = null;
       document.getElementById("visual").onclick = null;
       document.getElementById("text").onclick = null;
+      
+      let container = document.getElementById("container");      
+
+      let wavesBox = document.createElement("div");
+      wavesBox.id = "wavesBox";
+      for (let i = 0; i < 75; i++) {
+        if (i == 50) wavesBox.append("Hard mode only");
+        let waveEl = document.createElement("div");
+        waveEl.classList.add("wave");
+        let waveNumber = document.createElement("div");
+        waveNumber.classList.add("waveNumber");
+        waveNumber.innerText = i + 1;
+        waveEl.append(waveNumber);
+        let waveEnemies = document.createElement("div");
+        waveEnemies.id = "enemies" + i;
+        waveEnemies.classList.add("waveEnemies");
+        waveEnemies.ondragover = () => event.preventDefault();
+        waveEnemies.ondrop = () => addEnemy(i, 0);
+        waveEl.append(waveEnemies);
+        wavesBox.append(waveEl);
+      }
+      container.append(wavesBox);
+
+      let enemiesBox = document.createElement("div");
+      enemiesBox.id = "enemiesBox";
+      enemiesBox.innerHTML = "<h1>Enemies</h1>";
+      for (let type in enemyTypes) {
+        let enemyImg = document.createElement("img");
+        enemyImg.src = enemyTypes[type].img.src;
+        enemyImg.id = type;
+        enemiesBox.append(enemyImg);
+      }
+      enemiesBox.innerHTML += "<h1>Pause</h1>";
+      container.append(enemiesBox);
+      for (let type in enemyTypes) document.getElementById(type).ondragstart = () => draggingEnemy = enemyTypes[type];
+    }
+
+    function addEnemy(wave, position) {
+      let img = new Image();
+      img.src = draggingEnemy.imgRotated?.src || draggingEnemy.img.src;
+      document.getElementById("enemies" + wave).append(img);
+      newWavesArr[wave].push("g");
+    }
+
+    function addToLoop(type, wave, i, position) {
+
+    }
+
+    function finishMap() {
+      if (!newWavesArr.every(wave => wave.length)) {
+        gameAlert("Some waves are empty. Are you sure you want to continue?", "confirm", "normal");
+      }
+
+      if (false) {
+        gameAlert("Before you can publish your map, you need to complete it on hard mode. Do you want to try now?", "confirm", "normal");
+      }
+
+      let newMap = {
+        name: newPathName,
+        author: "{{ username }}",
+        id: Date.now(),
+        start: [newPathStart[1] - 0.5, newPathStart[0] - 0.5],
+        lines: newPathArr,
+        waves: newWavesArr.length ? newWavesArr : wavesDefault
+      };
+      request.open("POST", "/createtdmap?map=" + JSON.stringify(newMap));
+      request.send();
+      gameAlert("Map published.");
     }
   }
 </script>

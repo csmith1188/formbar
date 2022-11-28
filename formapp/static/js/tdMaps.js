@@ -550,4 +550,5 @@ let maps = [
 
   //↑ New maps go here ↑
 ];
-maps[8].waves.forEach(wave => wave.unshift([8, pause])); //Add a break at the start of each wave
+
+//Maps from the in-game editor

@@ -1867,23 +1867,20 @@ def endpoint_games_fighter():
                     return render_template("message.html", message="Your password is incorrect.")
             else:
                 return render_template('authenticate.html', forward=request.path, action=action)
-
-        try:
-            db = sqlite3.connect(os.path.dirname(
-                os.path.abspath(__file__)) + '/data/database.db')
-            dbcmd = db.cursor()
-            wins = dbcmd.execute("SELECT fighterWins FROM users WHERE username=:uname", {
-                                 "uname": username}).fetchone()[0] or 0
-            losses = dbcmd.execute("SELECT fighterLosses FROM users WHERE username=:uname", {
-                                   "uname": username}).fetchone()[0] or 0
-            winStreak = dbcmd.execute("SELECT fighterWinStreak FROM users WHERE username=:uname", {
-                                      "uname": username}).fetchone()[0] or 0
-            goldUnlocked = dbcmd.execute("SELECT goldUnlocked FROM users WHERE username=:uname", {
-                                         "uname": username}).fetchone()[0] or 0
-            db.close()
-            return render_template('games/fighter.html', username=username, wins=wins, losses=losses, winStreak=winStreak, goldUnlocked=goldUnlocked, action=action, authenticated=authenticated)
-        except Exception as e:
-            logFile("Error", str(e))
+        
+        db = sqlite3.connect(os.path.dirname(
+            os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        wins = dbcmd.execute("SELECT fighterWins FROM users WHERE username=:uname", {
+                                "uname": username}).fetchone()[0] or 0
+        losses = dbcmd.execute("SELECT fighterLosses FROM users WHERE username=:uname", {
+                                "uname": username}).fetchone()[0] or 0
+        winStreak = dbcmd.execute("SELECT fighterWinStreak FROM users WHERE username=:uname", {
+                                    "uname": username}).fetchone()[0] or 0
+        goldUnlocked = dbcmd.execute("SELECT goldUnlocked FROM users WHERE username=:uname", {
+                                        "uname": username}).fetchone()[0] or 0
+        db.close()
+        return render_template('games/fighter.html', username=username, wins=wins, losses=losses, winStreak=winStreak, goldUnlocked=goldUnlocked, action=action, authenticated=authenticated)
 
 
 '''

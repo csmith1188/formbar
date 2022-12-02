@@ -816,6 +816,9 @@
     min-width: 96%;
     height: 15%;
     box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 2%;
     margin: 2%;
     background: var(--bg-dark-highlight);
     border: 2px solid gray;
@@ -826,29 +829,52 @@
     background: #522;
   }
 
+  #hardModeOnly {
+    width: 100%;
+    margin: auto;
+    text-align: center;
+    color: var(--light-red);
+  }
+
+  #hardModeOnly:before, #hardModeOnly:after {
+    content: "";
+    display: inline-block;
+    width: 30%;
+    margin: 0 2%;
+    vertical-align: middle;
+    border: 1px solid;
+  }
+
   .waveNumber {
-    position: absolute;
-    left: 0;
     height: 100%;
     aspect-ratio: 1;
     box-sizing: border-box;
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
     font-size: 300%;
     color: var(--light-gray);
     border: 2px gray;
     border-right-style: solid;
   }
 
-  .waveEnemies {
-    position: absolute;
-    right: 0;
-    height: 100%;
-    aspect-ratio: 9;
-    box-sizing: border-box;
+  .waveEnemy {
+    position: relative;
+    height: 50%;
+    aspect-ratio: 1;
     display: flex;
-    overflow: auto;
+    justify-content: center;
+    align-items: center;
+    border-radius: 100%;
+    overflow: hidden;
+  }
+
+  .waveEnemy.boss {
+    aspect-ratio: 2;
+  }
+
+  .waveEnemy img {
+    height: 200%;
   }
 
   #enemiesBox {
@@ -870,6 +896,32 @@
 
   #enemiesBox img:nth-child(n + 5):nth-child(-n + 7) {
     transform: translateY(calc(-30%));
+  }
+
+  #enemiesBox img:hover, .waveEnemy:hover {
+    cursor: grab;
+    filter: drop-shadow(0 0 6px white);
+  }
+
+  #enemiesBox img:active, .waveEnemy:active {
+    cursor: grabbing;
+  }
+
+  .dragTarget {    
+    filter: drop-shadow(0 0 6px white);
+  }
+
+  #wavesText {
+    position: absolute;
+    bottom: 10%;
+    width: 40%;
+    height: 72%;
+    box-sizing: border-box;
+    padding: 1%;
+    font-size: 175%;
+    text-align: left;
+    color: var(--bg-dark);
+    font-weight: 500;
   }
 </style>
 {% endblock %}
@@ -1289,42 +1341,51 @@
     let enemyTypes = {
       green: {
         speed: 1,
-        health: 1
+        health: 1,
+        code: "g"
       },
       yellow: {
         speed: 1.5,
-        health: 2
+        health: 2,
+        code: "y"
       },
       orange: {
         speed: 2,
-        health: 3
+        health: 3,
+        code: "o"
       },
       red: {
         speed: 2.5,
         health: 4,
+        code: "r"
       },
       purple: {
         speed: 4,
-        health: 2
+        health: 2,
+        code: "p"
       },
       brown: {
         speed: 1,
-        health: 10
+        health: 10,
+        code: "b"
       },
       boss: {
         speed: 0.5,
         health: 100,
-        boss: true
+        boss: true,
+        code: "x"
       },
       brownBoss: {
         speed: 0.25,
         health: 500,
-        boss: true
+        boss: true,
+        code: "z"
       },
       purpleBoss: {
         speed: 4,
         health: 100,
-        boss: true
+        boss: true,
+        code: "u"
       },
     };
     for (let type in enemyTypes) {
@@ -3175,7 +3236,7 @@
       next.onclick = () => {
         if (document.getElementById("startText").value && !document.getElementById("pathText").value) return gameAlert("Error: start position provided without path.");
         if (document.getElementById("pathText").value && !document.getElementById("startText").value) return gameAlert("Error: path provided without start position.");
-        if (!validateText()) return gameAlert("Can't convert your text to a path. Check for errors.");
+        if (!validatePathText()) return gameAlert("Can't convert your text to a path. Check for errors.");
         if (!newPathArr.length) return gameAlert("Create a path before moving to the next step.");
         gameAlert("Do you want to set the enemy waves of your map? If you select \"No\", the default waves will be used.", "confirm", "normal", createWaves);
         document.getElementById("no").onclick = finishMap;
@@ -3193,7 +3254,7 @@
       visualButton.onclick = () => {
         if (document.getElementById("startText").value && !document.getElementById("pathText").value) return gameAlert("Error: start position provided without path.");
         if (document.getElementById("pathText").value && !document.getElementById("startText").value) return gameAlert("Error: path provided without start position.");
-        if (!validateText()) return gameAlert("Can't convert your text to a path. Check for errors.");
+        if (!validatePathText()) return gameAlert("Can't convert your text to a path. Check for errors.");
 
         document.getElementById("textEditor").classList.add("hidden");
         document.getElementById("newMapCanvas").classList.remove("hidden");
@@ -3625,7 +3686,7 @@
       for (let i = 0; i < 20; i++) for (let j = 0; j < 34; j++) document.getElementById(`r${i}c${j}`).onmouseover = () => dragLine(i, j);
     }
 
-    function validateText() {
+    function validatePathText() {
       let startStr = document.getElementById("startText").value;
       if (startStr.length && (!startStr.startsWith("[") || !startStr.endsWith("]"))) return;
       let start = startStr.replaceAll(" ", "").slice(1, -1).split(",");
@@ -3654,6 +3715,7 @@
 
     let newWavesArr = Array(75).fill().map(() => []);
     let draggingEnemy;
+    let selectedAbility;
 
     function createWaves() {
       document.getElementById("newMapCanvas").classList.add("hidden");
@@ -3661,29 +3723,63 @@
       document.getElementById("editorTowers").classList.add("hidden");
       document.getElementById("editorInstructions").classList.add("hidden");
       document.getElementById("textEditor").classList.add("hidden");
-      document.getElementById("editorHeader").innerText = "Set enemy waves";
+      document.getElementById("editorHeader").innerText = "Create enemy waves";
       //document.getElementById("next").onclick = null;
       document.getElementById("visual").onclick = null;
       document.getElementById("text").onclick = null;
       
-      let container = document.getElementById("container");      
+      let container = document.getElementById("container");
+      
+      document.getElementById("visual").classList.remove("add");
+      document.getElementById("visual").onclick = () => {
+        if (!validateWavesText()) return gameAlert("Can't convert your text to waves. Check for errors.");
+
+        document.getElementById("wavesText").classList.add("hidden");
+        document.getElementById("wavesBox").classList.remove("hidden");
+        document.getElementById("enemiesBox").classList.remove("hidden");
+        document.getElementById("text").classList.remove("pressed");
+        document.getElementById("visual").classList.add("pressed");
+        
+        fillWaves();
+      };
+      document.getElementById("text").classList.remove("pressed");
+      document.getElementById("text").onclick = () => {
+        updateWavesText();
+        document.getElementById("wavesBox").classList.add("hidden");
+        document.getElementById("enemiesBox").classList.add("hidden");
+        document.getElementById("wavesText").classList.remove("hidden");
+        document.getElementById("visual").classList.remove("pressed");
+        document.getElementById("text").classList.add("pressed");
+        document.getElementById("pathText").focus();
+      }; 
 
       let wavesBox = document.createElement("div");
       wavesBox.id = "wavesBox";
       for (let i = 0; i < 75; i++) {
-        if (i == 50) wavesBox.append("Hard mode only");
+        if (i == 50) {
+          let hmo = document.createElement("h1");
+          hmo.id = "hardModeOnly";
+          hmo.innerText = "Hard mode only"
+          wavesBox.append(hmo);
+        }
         let waveEl = document.createElement("div");
+        waveEl.id = "wave" + i;
         waveEl.classList.add("wave");
+        waveEl.ondragover = function() {
+          event.preventDefault();
+          this.classList.add("dragTarget");
+        };
+        waveEl.ondragleave = function() {
+          this.classList.remove("dragTarget");
+        };
+        waveEl.ondrop = function() {
+          this.classList.remove("dragTarget");
+          addEnemy(draggingEnemy, i, newWavesArr[i].length);
+        }
         let waveNumber = document.createElement("div");
         waveNumber.classList.add("waveNumber");
         waveNumber.innerText = i + 1;
         waveEl.append(waveNumber);
-        let waveEnemies = document.createElement("div");
-        waveEnemies.id = "enemies" + i;
-        waveEnemies.classList.add("waveEnemies");
-        waveEnemies.ondragover = () => event.preventDefault();
-        waveEnemies.ondrop = () => addEnemy(i, 0);
-        waveEl.append(waveEnemies);
         wavesBox.append(waveEl);
       }
       container.append(wavesBox);
@@ -3692,29 +3788,158 @@
       enemiesBox.id = "enemiesBox";
       enemiesBox.innerHTML = "<h1>Enemies</h1>";
       for (let type in enemyTypes) {
-        let enemyImg = document.createElement("img");
+        let enemyImg = new Image();
         enemyImg.src = enemyTypes[type].img.src;
         enemyImg.id = type;
         enemiesBox.append(enemyImg);
       }
       enemiesBox.innerHTML += "<h1>Pause</h1>";
+      let pauseImg = new Image();
+      pauseImg.src = "../../static/img/towerdefense/break.png";
+      pauseImg.id = "pause";
+      enemiesBox.append(pauseImg);
+      enemiesBox.innerHTML += "<h1>Alert</h1>";
+      let alertImg = new Image();
+      alertImg.src = "../../static/img/towerdefense/alert.png";
+      alertImg.id = "message";
+      enemiesBox.append(alertImg);
       container.append(enemiesBox);
-      for (let type in enemyTypes) document.getElementById(type).ondragstart = () => draggingEnemy = enemyTypes[type];
+      for (let type in enemyTypes) {
+        document.getElementById(type).ondragstart = () => draggingEnemy = enemyTypes[type];
+        document.getElementById(type).ondragend = () => draggingEnemy = null;
+      }
+      let pauseObjImg = new Image();
+      pauseObjImg.src = "../../static/img/towerdefense/break.png";
+      document.getElementById("pause").ondragstart = () => draggingEnemy = {
+        code: "pause",
+        img: pauseObjImg
+      };
+      document.getElementById("pause").ondragend = () => draggingEnemy = null;
+      let alertObjImg = new Image();
+      alertObjImg.src = "../../static/img/towerdefense/alert.png";
+      document.getElementById("message").ondragstart = () => draggingEnemy = {
+        code: "alert",
+        img: alertObjImg
+      };
+      document.getElementById("message").ondragend = () => draggingEnemy = null;
+
+      let wavesText = document.createElement("textarea");
+      wavesText.id = "wavesText";
+      wavesText.classList.add("light", "hCentered", "hidden");
+      container.append(wavesText);
     }
 
-    function addEnemy(wave, position) {
+    function addEnemy(enemy, wave, position) {
+      if (!enemy) return;
+      
+      let imgBox = document.createElement("div");
+      imgBox.classList.add("waveEnemy");
+      if (enemy.boss) imgBox.classList.add("boss");
+      imgBox.ondrag = function() {
+        this.remove();
+        draggingEnemy = enemy;
+        newWavesArr[wave].splice(position, 1);
+      };
+      imgBox.ondragend = () => draggingEnemy = null;
       let img = new Image();
-      img.src = draggingEnemy.imgRotated?.src || draggingEnemy.img.src;
-      document.getElementById("enemies" + wave).append(img);
-      newWavesArr[wave].push("g");
+      img.src = enemy.imgRotated?.src || enemy.img.src;
+      imgBox.append(img);
+      document.getElementById("wave" + wave).append(imgBox);
+      if (enemy.code == "alert") {
+        gameAlert("Alert text:<br><input id='alertInput' class='box'>");
+        document.getElementById("ok").onclick = () => {
+          enemy.code = ["alert", document.getElementById("alertInput").value];
+          if (enemy.code) resumeGame();
+          newWavesArr[wave].splice(position, 0, enemy.code);
+          console.log(newWavesArr)
+        }
+      } else {
+        newWavesArr[wave].splice(position, 0, enemy.code);
+      }
     }
 
     function addToLoop(type, wave, i, position) {
 
     }
 
+    function updateWavesText() {
+      let newWavesStr = "";
+      newWavesArr.forEach((wave, i) => {
+        if (i == 50) newWavesStr += "\n";
+        newWavesStr += "[";
+        wave.forEach((item, j) => {
+          newWavesStr += `"${item}"`;
+          if (j < wave.length - 1) newWavesStr += ", ";
+        });
+        newWavesStr += "]";
+        if (i < newWavesArr.length - 1) newWavesStr += ",\n";
+      });
+      document.getElementById("wavesText").value = newWavesStr;
+    }
+
+    function validateWavesText() {
+      let str = document.getElementById("wavesText").value.replaceAll("\n", "").replaceAll("'", "\"").replaceAll(" ", "");
+      //["up", "down", "left", "right"].forEach(direction => str = str.replaceAll(`[${direction},`, `["${direction}",`)); //Add quotes around directions
+      let newWavesJSON = "[" + str + "]";
+      try {
+        newWavesArr = JSON.parse(newWavesJSON);
+      } catch {
+        return;
+      }
+      //newWavesArr = newPathArr.map(segment => [segment[0], +segment[1]]);
+
+      if (newWavesArr.length != 75) {} //
+
+      try {
+        let testingArr = [...newWavesArr];
+        let testingWave = 0;
+        let testingEnemy = 0;
+
+        while (testingWave < 75) {
+          let testingNext = testingArr[testingWave][testingEnemy];
+          while (Array.isArray(testingNext)) {
+            if (testingNext[0] == "alert") {
+              if (!testingNext[0]) throw "";
+            } else {
+              let repeat = testingNext[0]; //The array's first item is the number of times to repeat
+              let items = testingNext.slice(1); //Everything that follows is repeated
+              let repeated = Array(repeat).fill(items).flat(); //Make an array containing the items array repeated, then flatten it
+              testingArr[testingWave].splice(testingEnemy, 1, ...repeated); //Add each item in repeated to the wave and remove the array
+            }
+            testingNext = testingArr[testingWave][testingEnemy];
+          }
+          if (testingNext) new Enemy(testingNext);
+          
+          if (testingArr[testingWave][testingEnemy + 1] !== undefined) { //If there are enemies left in the wave
+            testingEnemy++;
+          } else {
+            testingWave++;
+            testingEnemy = 0;
+          }
+        }
+      } catch {
+        return;
+      }
+      return newWavesArr.every(wave => Array.isArray(wave));
+    }
+
+    function clearWaves() {
+
+    }
+
+    function fillWaves() {
+      clearWaves();
+      newWavesArr.forEach(wave => wave.forEach(item => {
+        for (let type in enemyTypes) if (item == enemyTypes[type].code[0]) addEnemy(enemyTypes[type], wave, wave.length);
+        //Abilities
+        if (item == "pause") addEnemy("pause", wave, wave.length);
+        if (item[0] == "alert") addEnemy(enemyTypes[type], wave, wave.length, item[1]);
+        else if (Array.isArray(item)) {} //loop
+      }));
+    }
+
     function finishMap() {
-      if (!newWavesArr.every(wave => wave.length)) {
+      if (newWavesArr.every(wave => !wave.length || wave.every(item => item == "pause"))) {
         gameAlert("Some waves are empty. Are you sure you want to continue?", "confirm", "normal");
       }
 

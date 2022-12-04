@@ -804,7 +804,7 @@
     bottom: 10%;
     height: 72%;
     aspect-ratio: 3 / 2;
-    padding: 1% 0.5%;
+    padding: 0.5%;
     box-sizing: border-box;
     background: var(--bg-darker);
     filter: drop-shadow(6px 6px 3px #000c);
@@ -812,8 +812,7 @@
   }
 
   .wave {
-    position: relative;
-    min-width: 96%;
+    width: 96%;
     height: 15%;
     box-sizing: border-box;
     display: flex;
@@ -859,14 +858,17 @@
   }
 
   .waveEnemy {
-    position: relative;
     height: 50%;
-    aspect-ratio: 1;
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-shrink: 0;
     border-radius: 100%;
     overflow: hidden;
+  }
+
+  .waveEnemy:not(.waveRepeat) {
+    aspect-ratio: 1;
   }
 
   .waveEnemy.boss {
@@ -877,6 +879,21 @@
     height: 200%;
   }
 
+  .waveRepeat {
+    height: 70%;
+    width: fit-content;
+    display: flex;
+    justify-content: flex-start;
+    gap: 2%;
+    background: #455;
+    border: 2px solid var(--light-cyan);
+    border-radius: 9999px;
+  }
+
+  .waveRepeat .waveEnemy {
+    height: calc(50% / 0.7);
+  }
+
   #enemiesBox {
     position: absolute;
     left: 72%;
@@ -884,26 +901,57 @@
     height: 72%;
     aspect-ratio: 1 / 2;
     box-sizing: border-box;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    justify-content: center;
     text-align: center;
     background: var(--bg-darker);
     filter: drop-shadow(6px 6px 3px #000c);
-    overflow: auto;
   }
 
-  #enemiesBox img {
-    width: 30%;
+  #enemiesBox h1 {
+    margin-bottom: 0;
   }
 
-  #enemiesBox img:nth-child(n + 5):nth-child(-n + 7) {
-    transform: translateY(calc(-30%));
+  .enemy {
+    position: relative;
+    width: 15%;
+    margin: 3.75% 7.5%;
+    aspect-ratio: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 100%;
+    overflow: hidden;
   }
 
-  #enemiesBox img:hover, .waveEnemy:hover {
+  .enemy.boss {
+    aspect-ratio: 1 / 2;
+  }
+
+  .enemy img {
+    height: 200%;
+  }
+
+  .enemy.boss img {
+    height: 100%;
+  }
+
+  #repeat {
+    width: 50%;
+    aspect-ratio: 2.5;
+    background: #455;
+    border: 2px solid var(--light-cyan);
+    border-radius: 9999px;
+  }
+
+  .enemy:hover, .waveEnemy:hover {
     cursor: grab;
     filter: drop-shadow(0 0 6px white);
   }
 
-  #enemiesBox img:active, .waveEnemy:active {
+  .enemy:active, .waveEnemy:active {
     cursor: grabbing;
   }
 
@@ -2716,13 +2764,10 @@
       if (document.getElementById("alert")) resumeGame();
       ctx.clearRect(0, 0, 1920, 1080); //Clear the canvas
 
-      let container = document.getElementById("container");
-
       let back = document.createElement("div");
       back.id = "back";
       back.innerText = "🡄";
       back.onclick = () => window.location.reload();
-      container.append(back);
 
       let left = document.createElement("div");
       let right = document.createElement("div");
@@ -2738,8 +2783,6 @@
         (mapIndex == maps.length - 1) ? mapIndex = 0 : mapIndex++;
         switchMap();
       }
-      container.append(left);
-      container.append(right);
 
       let difficultyButtons = document.createElement("div");
       difficultyButtons.id = "difficulty";
@@ -2758,14 +2801,14 @@
         difficulty = "hard";
         switchDifficulty();
       };
-      container.append(difficultyButtons);
-      document.getElementById("difficulty").append(normal, hard);
+      difficultyButtons.append(normal, hard);
 
       let startButton = document.createElement("button");
       startButton.id = "startButton";
       startButton.classList.add("hCentered");
       startButton.innerText = "Start game";
-      container.append(startButton);
+
+      document.getElementById("container").append(back, left, right, difficultyButtons, startButton);
 
       switchMap();
     }
@@ -3119,8 +3162,7 @@
       let newMap = document.createElement("canvas");
       newMap.id = "newMap";
       newMap.onclick = createMap;
-      newMapContainer.append(newMap);
-      newMapContainer.append("Create new map");
+      newMapContainer.append(newMap, "Create new map");
       myMapsGrid.append(newMapContainer);
       myMaps.forEach(myMap => {
         let container = document.createElement("div");
@@ -3219,8 +3261,6 @@
       document.getElementById("myMaps").remove();
       document.getElementById("mapInfo").remove();
 
-      let container = document.getElementById("container");
-
       let lightBg = document.createElement("div");
       lightBg.id = "lightBackground";
       lightBg.classList.add("centered");
@@ -3242,7 +3282,6 @@
         document.getElementById("no").onclick = finishMap;
       };
       lightBg.append(next);
-      container.append(lightBg);
 
       let visualButton = document.createElement("button");
       let textButton = document.createElement("button");
@@ -3277,13 +3316,11 @@
         document.getElementById("text").classList.add("pressed");
         document.getElementById("pathText").focus();
       };
-      container.append(visualButton, textButton);
 
       let nmc = document.createElement("canvas");
       nmc.id = "newMapCanvas";
       nmc.width = 2040;
       nmc.height = 1200;
-      container.append(nmc);
       nmctx = nmc.getContext("2d");
       resetNMC();
 
@@ -3297,11 +3334,9 @@
         gridHTML += "</tr>";
       }
       nmg.innerHTML = gridHTML;
-      container.append(nmg);
 
       let editorTowers = document.createElement("div");
       editorTowers.id = "editorTowers";
-      container.append(editorTowers);
 
       let instructions = document.createElement("instructions");
       instructions.id = "editorInstructions";
@@ -3316,7 +3351,6 @@
           <li>Switch to the text editor to modify the map as an array.</li>
         </ul>
       `;
-      container.append(instructions);
 
       let textEditor = document.createElement("div");
       textEditor.id = "textEditor";
@@ -3333,7 +3367,8 @@
       pathText.classList.add("light");
       pathText.placeholder = "[direction, length],\n[direction, length],";
       textEditor.append(pathText);
-      container.append(textEditor);
+      
+      document.getElementById("container").append(lightBg, visualButton, textButton, nmc, nmg, editorTowers, instructions, textEditor);
     }
 
     function resetNMC() {
@@ -3714,8 +3749,13 @@
     }
 
     let newWavesArr = Array(75).fill().map(() => []);
+    let wavesFromText;
     let draggingEnemy;
     let selectedAbility;
+    let pauseImg = new Image();
+    pauseImg.src = "../../static/img/towerdefense/break.png";
+    let alertImg = new Image();
+    alertImg.src = "../../static/img/towerdefense/alert.png";
 
     function createWaves() {
       document.getElementById("newMapCanvas").classList.add("hidden");
@@ -3728,11 +3768,10 @@
       document.getElementById("visual").onclick = null;
       document.getElementById("text").onclick = null;
       
-      let container = document.getElementById("container");
-      
       document.getElementById("visual").classList.remove("add");
       document.getElementById("visual").onclick = () => {
         if (!validateWavesText()) return gameAlert("Can't convert your text to waves. Check for errors.");
+        if (wavesFromText.length > 75) return gameAlert("Error: too many waves.");
 
         document.getElementById("wavesText").classList.add("hidden");
         document.getElementById("wavesBox").classList.remove("hidden");
@@ -3782,84 +3821,181 @@
         waveEl.append(waveNumber);
         wavesBox.append(waveEl);
       }
-      container.append(wavesBox);
 
       let enemiesBox = document.createElement("div");
       enemiesBox.id = "enemiesBox";
-      enemiesBox.innerHTML = "<h1>Enemies</h1>";
+
+      let enemiesHeader = document.createElement("h1");
+      enemiesHeader.innerText = "Enemies";
+      enemiesHeader.style.width = "100%";
+      enemiesBox.append(enemiesHeader);
       for (let type in enemyTypes) {
-        let enemyImg = new Image();
-        enemyImg.src = enemyTypes[type].img.src;
-        enemyImg.id = type;
-        enemiesBox.append(enemyImg);
+        let imgBox = document.createElement("div");
+        imgBox.classList.add("enemy");
+        if (enemyTypes[type].boss) imgBox.classList.add("boss");
+        let img = new Image();
+        img.src = enemyTypes[type].img.src;
+        img.ondragstart = () => draggingEnemy = enemyTypes[type];
+        img.ondragend = () => draggingEnemy = null;
+        imgBox.append(img);
+        enemiesBox.append(imgBox);
       }
-      enemiesBox.innerHTML += "<h1>Pause</h1>";
-      let pauseImg = new Image();
-      pauseImg.src = "../../static/img/towerdefense/break.png";
-      pauseImg.id = "pause";
-      enemiesBox.append(pauseImg);
-      enemiesBox.innerHTML += "<h1>Alert</h1>";
-      let alertImg = new Image();
-      alertImg.src = "../../static/img/towerdefense/alert.png";
-      alertImg.id = "message";
-      enemiesBox.append(alertImg);
-      container.append(enemiesBox);
-      for (let type in enemyTypes) {
-        document.getElementById(type).ondragstart = () => draggingEnemy = enemyTypes[type];
-        document.getElementById(type).ondragend = () => draggingEnemy = null;
-      }
-      let pauseObjImg = new Image();
-      pauseObjImg.src = "../../static/img/towerdefense/break.png";
-      document.getElementById("pause").ondragstart = () => draggingEnemy = {
+
+      let pauseHeader = document.createElement("h1");
+      pauseHeader.innerText = "Pause";
+      pauseHeader.style.width = "30%";
+      pauseHeader.style.marginLeft = "10%";
+
+      let alertHeader = document.createElement("h1");
+      alertHeader.innerText = "Alert";
+      alertHeader.style.width = "30%";
+      alertHeader.style.marginRight = "10%";
+
+      let pauseBox = document.createElement("div");
+      pauseBox.classList.add("enemy");
+      pauseImg.ondragstart = () => draggingEnemy = {
         code: "pause",
-        img: pauseObjImg
+        img: pauseImg
       };
-      document.getElementById("pause").ondragend = () => draggingEnemy = null;
-      let alertObjImg = new Image();
-      alertObjImg.src = "../../static/img/towerdefense/alert.png";
-      document.getElementById("message").ondragstart = () => draggingEnemy = {
+      pauseImg.ondragend = () => draggingEnemy = null;
+      pauseBox.append(pauseImg);
+
+      let alertBox = document.createElement("div");
+      alertBox.classList.add("enemy");
+      alertImg.ondragstart = () => draggingEnemy = {
         code: "alert",
-        img: alertObjImg
+        img: alertImg
       };
-      document.getElementById("message").ondragend = () => draggingEnemy = null;
+      alertImg.ondragend = () => draggingEnemy = null;
+      alertBox.append(alertImg);
+
+      let repeatHeader = document.createElement("h1");
+      repeatHeader.innerText = "Repeat";
+      repeatHeader.style.width = "100%";
+
+      let repeat = document.createElement("div");
+      repeat.id = "repeat";
+      repeat.classList.add("enemy");
+      repeat.draggable = true;
+      repeat.ondragstart = () => draggingEnemy = {
+        code: "repeat",
+        el: repeat.cloneNode()
+      };
+      repeat.ondragend = () => draggingEnemy = null;
 
       let wavesText = document.createElement("textarea");
       wavesText.id = "wavesText";
       wavesText.classList.add("light", "hCentered", "hidden");
-      container.append(wavesText);
+
+      enemiesBox.append(pauseHeader, alertHeader, pauseBox, alertBox, repeatHeader, repeat)
+      document.getElementById("container").append(wavesBox, enemiesBox, wavesText);
     }
 
-    function addEnemy(enemy, wave, position) {
+    function addEnemy(enemy, wave, position, alertText) {
       if (!enemy) return;
       
-      let imgBox = document.createElement("div");
-      imgBox.classList.add("waveEnemy");
-      if (enemy.boss) imgBox.classList.add("boss");
-      imgBox.ondrag = function() {
+      let parent = document.createElement("div");
+      parent.classList.add("waveEnemy");
+      if (enemy.boss) parent.classList.add("boss");
+      parent.ondrag = function() {
         this.remove();
+      }
+      parent.ondragstart = () => {
         draggingEnemy = enemy;
         newWavesArr[wave].splice(position, 1);
+        //update position of other enemies
       };
-      imgBox.ondragend = () => draggingEnemy = null;
-      let img = new Image();
-      img.src = enemy.imgRotated?.src || enemy.img.src;
-      imgBox.append(img);
-      document.getElementById("wave" + wave).append(imgBox);
+      parent.ondragend = () => draggingEnemy = null;
+      if (enemy.code == "repeat") {
+        parent.classList.add("waveRepeat");
+        parent.draggable = true;
+        parent.ondragover = function() {
+          event.preventDefault();
+          this.classList.add("dragTarget");
+        };
+        parent.ondragleave = function() {
+          this.classList.remove("dragTarget");
+        };
+        parent.ondrop = function() {
+          this.classList.remove("dragTarget");
+          addToRepeat(draggingEnemy, wave, position, 0, this);
+        }
+        enemy.code = [2];
+      } else {
+        let img = new Image();
+        img.src = enemy.imgRotated?.src || enemy.img.src;
+        parent.append(img);
+      }
+      document.getElementById("wave" + wave).append(parent);
+
       if (enemy.code == "alert") {
-        gameAlert("Alert text:<br><input id='alertInput' class='box'>");
-        document.getElementById("ok").onclick = () => {
-          enemy.code = ["alert", document.getElementById("alertInput").value];
-          if (enemy.code) resumeGame();
+        if (alertText) {
+          enemy.code = ["alert", alertText];
           newWavesArr[wave].splice(position, 0, enemy.code);
-          console.log(newWavesArr)
+        } else {
+          gameAlert("Alert text:<br><input id='alertInput' class='box'>");
+          document.getElementById("ok").onclick = () => {
+            enemy.code = ["alert", document.getElementById("alertInput").value];
+            if (enemy.code) resumeGame();
+            newWavesArr[wave].splice(position, 0, enemy.code);
+          }
         }
       } else {
         newWavesArr[wave].splice(position, 0, enemy.code);
       }
     }
 
-    function addToLoop(type, wave, i, position) {
+    function addToRepeat(enemy, wave, i, position, el) {
+      if (!enemy) return;
+      
+      let parent = document.createElement("div");
+      parent.classList.add("waveEnemy");
+      if (enemy.boss) parent.classList.add("boss");
+      parent.ondrag = function() {
+        this.remove();
+      }
+      parent.ondragstart = () => {
+        draggingEnemy = enemy;
+        newWavesArr[wave].splice(position, 1);
+        //update position of other enemies
+      };
+      parent.ondragend = () => draggingEnemy = null;
+      if (enemy.code == "repeat") {
+        parent.classList.add("waveRepeat");
+        parent.draggable = true;
+        parent.ondragover = function() {
+          event.preventDefault();
+          this.classList.add("dragTarget");
+        };
+        parent.ondragleave = function() {
+          this.classList.remove("dragTarget");
+        };
+        parent.ondrop = function() {
+          this.classList.remove("dragTarget");
+          addToRepeat(draggingEnemy, wave, this, 0);
+        }
+      } else {
+        let img = new Image();
+        img.src = enemy.imgRotated?.src || enemy.img.src;
+        parent.append(img);
+      }
+      el.append(parent);
 
+      if (enemy.code == "alert") {
+        if (alertText) {
+          enemy.code = ["alert", alertText];
+          newWavesArr[wave][i].splice(position, 0, enemy.code);
+        } else {
+          gameAlert("Alert text:<br><input id='alertInput' class='box'>");
+          document.getElementById("ok").onclick = () => {
+            enemy.code = ["alert", document.getElementById("alertInput").value];
+            if (enemy.code) resumeGame();
+            newWavesArr[wave].splice(position, 0, enemy.code);
+          }
+        }
+      } else {
+        newWavesArr[wave][i].splice(position + 1, 0, enemy.code);
+      }
     }
 
     function updateWavesText() {
@@ -3868,7 +4004,11 @@
         if (i == 50) newWavesStr += "\n";
         newWavesStr += "[";
         wave.forEach((item, j) => {
-          newWavesStr += `"${item}"`;
+          if (item == "pause") newWavesStr += item;
+          //fix single to double
+          else if (item[0] == "alert") newWavesStr += `["alert", "${item[1].replaceAll("\'", "\\\'").replaceAll("\"", "\\\"")}"]`;
+          else if (Array.isArray(item)) newWavesStr += `[${item.map(subitem => typeof subitem == "string" ? `"${subitem}"` : subitem).join(", ")}]`;
+          else newWavesStr += `"${item}"`;
           if (j < wave.length - 1) newWavesStr += ", ";
         });
         newWavesStr += "]";
@@ -3882,16 +4022,16 @@
       //["up", "down", "left", "right"].forEach(direction => str = str.replaceAll(`[${direction},`, `["${direction}",`)); //Add quotes around directions
       let newWavesJSON = "[" + str + "]";
       try {
-        newWavesArr = JSON.parse(newWavesJSON);
+        wavesFromText = JSON.parse(newWavesJSON);
       } catch {
         return;
       }
-      //newWavesArr = newPathArr.map(segment => [segment[0], +segment[1]]);
+      //wavesFromText = newPathArr.map(segment => [segment[0], +segment[1]]);
 
-      if (newWavesArr.length != 75) {} //
+      for (let i = wavesFromText.length; i < 75; i++) wavesFromText.push([]);
 
       try {
-        let testingArr = [...newWavesArr];
+        let testingArr = JSON.parse(JSON.stringify(wavesFromText));
         let testingWave = 0;
         let testingEnemy = 0;
 
@@ -3899,7 +4039,8 @@
           let testingNext = testingArr[testingWave][testingEnemy];
           while (Array.isArray(testingNext)) {
             if (testingNext[0] == "alert") {
-              if (!testingNext[0]) throw "";
+              if (!testingNext[1]) throw "";
+              testingArr[testingWave].splice(testingEnemy, 1); //Remove the array
             } else {
               let repeat = testingNext[0]; //The array's first item is the number of times to repeat
               let items = testingNext.slice(1); //Everything that follows is repeated
@@ -3920,21 +4061,26 @@
       } catch {
         return;
       }
-      return newWavesArr.every(wave => Array.isArray(wave));
+      return wavesFromText.every(wave => Array.isArray(wave));
     }
 
     function clearWaves() {
-
+      newWavesArr.forEach((wave, i) => {
+        newWavesArr[i] = [];
+        let waveEl = document.getElementById("wave" + i);
+        let waveEnemies = Array.from(waveEl.children).slice(1);
+        waveEnemies.forEach(enemy => enemy.remove());
+      });
     }
 
     function fillWaves() {
       clearWaves();
-      newWavesArr.forEach(wave => wave.forEach(item => {
-        for (let type in enemyTypes) if (item == enemyTypes[type].code[0]) addEnemy(enemyTypes[type], wave, wave.length);
+      wavesFromText.forEach((wave, i) => wave.forEach((item, j) => {
+        for (let type in enemyTypes) if (item == enemyTypes[type].code[0]) addEnemy(enemyTypes[type], i, j);
         //Abilities
-        if (item == "pause") addEnemy("pause", wave, wave.length);
-        if (item[0] == "alert") addEnemy(enemyTypes[type], wave, wave.length, item[1]);
-        else if (Array.isArray(item)) {} //loop
+        if (item == "pause") addEnemy({code: "pause", img: pauseImg}, i, j);
+        if (item[0] == "alert") addEnemy({code: "alert", img: alertImg}, i, j, item[1]);
+        else if (Array.isArray(item)) addEnemy({code: "repeat"}, i, j);
       }));
     }
 
@@ -3953,6 +4099,7 @@
         id: Date.now(),
         start: [newPathStart[1] - 0.5, newPathStart[0] - 0.5],
         lines: newPathArr,
+        //quotes?
         waves: newWavesArr.length ? newWavesArr : wavesDefault
       };
       request.open("POST", "/createtdmap?map=" + JSON.stringify(newMap));

@@ -4029,6 +4029,7 @@
       deleteButton.innerText = "Delete";
       deleteButton.onclick = () => {
         let message = (editingMap.status == "published") ? "Unpublish this map and remove it from your maps?" : "Remove this map from your maps?";
+        mapInfo.remove();
         gameAlert(message, "confirm", "normal", () => {
           request.open("POST", "/tdmapstatus?id=" + editingMap.id + "&status=deleted");
           request.send();
@@ -4036,6 +4037,10 @@
           mapInfo.remove();
           cover.remove();
         });
+        document.getElementById("no").onclick = () => {
+          resumeGame();
+          editMap();
+        }
       };
       let cancelButton = document.createElement("button");
       cancelButton.id = "cancel";

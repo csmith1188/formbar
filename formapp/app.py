@@ -1640,10 +1640,8 @@ def endpoint_createfightermatch():
 @app.route('/createtdmap', methods=['POST'])
 def endpoint_createtdmap():
     json = request.args.get('map')
-    if not json:
-        return render_template("message.html", message='Missing map data.')
     maps = open(os.path.dirname(os.path.abspath(__file__)) + '/static/js/tdMaps.js', 'a')
-    maps.write('\nmaps.push(' + json + ');')
+    maps.write('\ntdMaps.push(' + json + ');')
     maps.close()
     return render_template("message.html", message='Map published.')
 
@@ -1668,6 +1666,16 @@ def endpoint_debug():
 # █████
 # ██
 # ███████
+
+
+@app.route('/edittdmap', methods=['POST'])
+def endpoint_edittdmap():
+    json = request.args.get('map')
+    mapId = request.args.get('id')
+    maps = open(os.path.dirname(os.path.abspath(__file__)) + '/static/js/tdMaps.js', 'a')
+    maps.write('\ntdMaps[tdMaps.indexOf(tdMaps.find(tdMap => tdMap.id == ' + mapId + '))] = ' + json + ';')
+    maps.close()
+    return render_template("message.html", message='Map edited.')
 
 
 '''
@@ -2003,14 +2011,18 @@ def endpoint_games_towerdefense():
         if progress:
             progress = progress[0]
         if not progress:
-            progress = ''
+            progress = '{}'
         achievements = dbcmd.execute("SELECT tdAchievements FROM users WHERE username=:uname", {"uname": username}).fetchone()
         if achievements:
             achievements = achievements[0]
         if not achievements:
             achievements = ''
         db.close()
-        return render_template('games/towerdefense.html', progress=progress, achievements=achievements, username=sD.studentDict[request.remote_addr]['name'])
+        for user in sD.studentDict:
+            if sD.studentDict[user]['perms'] == 0:
+                teacherName = sD.studentDict[user]['name']
+                break
+        return render_template('games/towerdefense.html', progress=progress, achievements=achievements, username=username, perms=sD.studentDict[request.remote_addr]['perms'], teacherName=teacherName)
 
 # Tic Tac Toe
 @app.route('/games/ttt')
@@ -2929,6 +2941,16 @@ def endpoint_td():
     else:
         advanced = ''
     return redirect('/games/towerdefense' + advanced)
+
+
+@app.route('/tdmapstatus', methods=['POST'])
+def endpoint_tdmapstatus():
+    mapId = request.args.get('id')
+    status = request.args.get('status')
+    maps = open(os.path.dirname(os.path.abspath(__file__)) + '/static/js/tdMaps.js', 'a')
+    maps.write('\ntdMaps.find(tdMap => tdMap.id == ' + mapId + ').status = "' + status + '";')
+    maps.close()
+    return render_template("message.html", message='Map edited.')
 
 
 @app.route('/towerdefense')

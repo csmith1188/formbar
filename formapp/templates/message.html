@@ -6,7 +6,8 @@
 {% block title %}Formbar Alert{% endblock %}
 
 <!-- Extra style declarations here -->
-{% block style %}{{ style|safe }}{% endblock %}
+{% block style %}
+{{ style|safe }}{% endblock %}
 
 <!-- Change theme color here -->
 {% block color %}purple{% endblock %}
@@ -18,20 +19,30 @@
 
 <!-- Extra JavaScript here -->
 {% block script %}
-  <script>
-    let message = "{{ message }}";
+<script>
+  formbarAlert("{{ message }}", "alert", () => {
     let forward = "{{ forward }}";
+    let lastPage = document.referrer && new URL(document.referrer);
+    console.log(lastPage.pathname);
+    console.log(window.location.search);
+    if (forward) location.href = forward;
+    else if (!lastPage || (lastPage.pathname == "/login" && window.location.pathname != "/login")) location.href = "/";
+    else if (!lastPage || (lastPage.pathname == "/lesson" && window.location.search == "?action=next")) location.href = "/lesson";
+    else window.history.back();
+  });
+</script>
+<!-- <script>
+    let message = "{{ message }}";
+    
 
     //This decodes HTML entities
     var el = document.createElement("textarea");
     el.innerHTML = message;
     message =  el.value;
 
-    let lastPage = document.referrer && new URL(document.referrer);
+    
 
     alert(message);
-    if (forward) location.href = forward;
-    else if (!lastPage || (lastPage.pathname == "/login" && window.location.pathname != "/login")) location.href = "/";
-    else window.history.back();
-  </script>
+
+  </script>  -->
 {% endblock %}

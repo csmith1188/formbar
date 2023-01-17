@@ -76,6 +76,10 @@
 <!-- Extra JavaScript here -->
 {% block script %}
 <script>
+  // When the page needs to refresh, send a signal to chat which will then refresh everyone's page
+  chatSocket.on("reload", message => {
+    location.reload();
+  });
   {
     let wordList = eval("{{ wordList }}".replaceAll("&#39;", "'").slice(10, -1)).filter(item => item.length == 5);
     let word;
@@ -84,142 +88,140 @@
     let score = 0;
     let highScore = {{ highScore }};
 
-    document.getElementById("highScore").innerHTML = highScore;
+  document.getElementById("highScore").innerHTML = highScore;
 
-    let boxes = "";
-    for (let row = 0; row < 6; row++) {
-      boxes += "<tr>";
-      for (let col = 0; col < 5; col++) boxes += `<td id="r${row}c${col}"></td>`;
-      boxes += "</tr>";
-    }
-    document.getElementById("boxes").innerHTML = boxes;
+  let boxes = "";
+  for (let row = 0; row < 6; row++) {
+    boxes += "<tr>";
+    for (let col = 0; col < 5; col++) boxes += `<td id="r${row}c${col}"></td>`;
+    boxes += "</tr>";
+  }
+  document.getElementById("boxes").innerHTML = boxes;
 
-    let letterList = "abcdefghijklmnopqrstuvwxyz";
-    for (let i = 0; i < letterList.length; i++) {
-      let key = document.createElement("div");
-      key.id = letterList[i];
-      key.classList.add("key");
-      key.onclick = () => addLetter(letterList[i]);
-      key.innerText = letterList[i];
-      document.getElementById("keys").append(key);
-    }
-    let backspaceKey = document.createElement("div");
-    backspaceKey.id = "Enter";
-    backspaceKey.classList.add("key");
-    backspaceKey.style.width = "250px";
-    backspaceKey.onclick = () => backspace();
-    backspaceKey.innerText = "Backspace";
-    document.getElementById("keys").append(backspaceKey);
-    let enterKey = document.createElement("div");
-    enterKey.id = "Enter";
-    enterKey.classList.add("key");
-    enterKey.style.width = "235px";
-    enterKey.onclick = () => guessWord();
-    enterKey.innerText = "Guess";
-    document.getElementById("keys").append(enterKey);
+  let letterList = "abcdefghijklmnopqrstuvwxyz";
+  for (let i = 0; i < letterList.length; i++) {
+    let key = document.createElement("div");
+    key.id = letterList[i];
+    key.classList.add("key");
+    key.onclick = () => addLetter(letterList[i]);
+    key.innerText = letterList[i];
+    document.getElementById("keys").append(key);
+  }
+  let backspaceKey = document.createElement("div");
+  backspaceKey.id = "Enter";
+  backspaceKey.classList.add("key");
+  backspaceKey.style.width = "250px";
+  backspaceKey.onclick = () => backspace();
+  backspaceKey.innerText = "Backspace";
+  document.getElementById("keys").append(backspaceKey);
+  let enterKey = document.createElement("div");
+  enterKey.id = "Enter";
+  enterKey.classList.add("key");
+  enterKey.style.width = "235px";
+  enterKey.onclick = () => guessWord();
+  enterKey.innerText = "Guess";
+  document.getElementById("keys").append(enterKey);
 
-    /*wordList = [list of five-letter words];*/
+  /*wordList = [list of five-letter words];*/
 
-    async function newWord() {
-      guessed = 0;
-      let boxes = Array.from(document.querySelectorAll("td"));
-      let keys = Array.from(document.querySelectorAll(".key"));
-      boxes.forEach(box => {
-        box.style.background = null;
-        box.innerText = null;
-      });
-      keys.forEach(key => key.style.background = null);
-      word = "";
-      while (!word) {
-        let randomWord = wordList[Math.floor(Math.random() * wordList.length)]; //Get a random word
-        //Check if it's in the dictionary to filter out obscure words
-        let definition = await getResponse("https://api.dictionaryapi.dev/api/v2/entries/en_US/" + randomWord);
-        if (definition.title != "No Definitions Found") word = randomWord;
-      }
-    }
-    newWord();
-
-    function addLetter(letter) {
-      if (guess.length < 5) {
-        let box = document.getElementById(`r${guessed}c${guess.length}`);
-        box.innerText = letter;
-        guess += letter;
-      }
-    }
-
-    function backspace() {
-      if (guess.length) {
-        let box = document.getElementById(`r${guessed}c${guess.length - 1}`);
-        box.innerText = null;
-        guess = guess.slice(0, -1);
-      }
-    }
-
-    document.addEventListener("keydown", e => {
-      if (/^[a-z]{1}$/.test(e.key)) addLetter(e.key); //If a letter key is pressed, guess that letter
-      if (e.key == "Backspace") backspace();
-      if (e.key == "Enter") guessWord();
+  async function newWord() {
+    guessed = 0;
+    let boxes = Array.from(document.querySelectorAll("td"));
+    let keys = Array.from(document.querySelectorAll(".key"));
+    boxes.forEach(box => {
+      box.style.background = null;
+      box.innerText = null;
     });
-
-    function guessWord() {
-      if (guess.length == 5) {
-        if (!wordList.includes(guess)) {
-          alert("Not in word list");
-        } else if (!word) {
-          alert("Still getting a word. Try again in a few seconds.");
-        } else {
-          let greenList = guess.split("").filter((letter, i) => letter == word[i]);
-
-          for (let i = 0; i < guess.length; i++) {
-            let box = document.getElementById(`r${guessed}c${i}`);
-            let key = document.getElementById(guess[i]);
-            box.innerText = guess[i];
-
-            let instancesOfLetter = word.split("").filter(letter => letter == guess[i]);
-            let instancesGreen = greenList.filter(letter => letter == guess[i]);
-            let allGreen = instancesGreen.length == instancesOfLetter.length;
-            let instancesFound = guess.slice(0, i).split("").filter(letter => letter == guess[i]);
-            let tooMany = instancesFound.length >= instancesOfLetter.length;
-
-            if (guess[i] == word[i]) {
-              box.style.background = "var(--color-green)";
-              key.style.background = "var(--light-green)";
-              greenList.push(i);
-            } else if (word.includes(guess[i]) && !allGreen && !tooMany) {
-              box.style.background = "var(--color-yellow)";
-              if (!key.style.background) key.style.background = "var(--light-yellow)";
-            } else {
-              box.style.background = "gray";
-              if (!key.style.background) key.style.background = "gray";
-            }
-          }
-
-          guessed++;
-          setTimeout(() => {
-            if (guess == word) {
-              alert("Correct!");
-              score += 7 - guessed;
-              if (score > highScore) {
-                highScore = score;
-                document.getElementById("highScore").style.color = "var(--light-purple)";
-              }
-              newWord();
-            } else if (guessed == 6) {
-              alert("Game over\nCorrect word: " + word);
-              request.open("POST", "/savescore?game=wordle&score=" + score);
-              request.send();
-              score = 0;
-              newWord();
-            }
-            document.getElementById("score").innerText = score;
-            document.getElementById("highScore").innerText = highScore;
-            guess = "";
-          }, 0);
-        }
-      } else {
-        alert("Not enough letters");
-      }
+    keys.forEach(key => key.style.background = null);
+    word = "";
+    while (!word) {
+      let randomWord = wordList[Math.floor(Math.random() * wordList.length)]; //Get a random word
+      //Check if it's in the dictionary to filter out obscure words
+      let definition = await getResponse("https://api.dictionaryapi.dev/api/v2/entries/en_US/" + randomWord);
+      if (definition.title != "No Definitions Found") word = randomWord;
     }
+  }
+  newWord();
+
+  function addLetter(letter) {
+    if (guess.length < 5) {
+      let box = document.getElementById(`r${guessed}c${guess.length}`);
+      box.innerText = letter;
+      guess += letter;
+    }
+  }
+
+  function backspace() {
+    if (guess.length) {
+      let box = document.getElementById(`r${guessed}c${guess.length - 1}`);
+      box.innerText = null;
+      guess = guess.slice(0, -1);
+    }
+  }
+
+  document.addEventListener("keypress", e => {
+    if (/^[a-z]{1}$/.test(e.key)) addLetter(e.key); //If a letter key is pressed, guess that letter
+    if (e.key == "Backspace") backspace();
+    if (e.key == "Enter" && !document.getElementById("alertBox")) guessWord();
+  });
+
+  function guessWord() {
+    if (guess.length == 5) {
+      if (!wordList.includes(guess)) {
+        formbarAlert("Not in word list");
+      } else if (!word) {
+        formbarAlert("Still getting a word. Try again in a few seconds.");
+      } else {
+        let greenList = guess.split("").filter((letter, i) => letter == word[i]);
+
+        for (let i = 0; i < guess.length; i++) {
+          let box = document.getElementById(`r${guessed}c${i}`);
+          let key = document.getElementById(guess[i]);
+          box.innerText = guess[i];
+
+          let instancesOfLetter = word.split("").filter(letter => letter == guess[i]);
+          let instancesGreen = greenList.filter(letter => letter == guess[i]);
+          let allGreen = instancesGreen.length == instancesOfLetter.length;
+          let instancesFound = guess.slice(0, i).split("").filter(letter => letter == guess[i]);
+          let tooMany = instancesFound.length >= instancesOfLetter.length;
+
+          if (guess[i] == word[i]) {
+            box.style.background = "var(--color-green)";
+            key.style.background = "var(--light-green)";
+            greenList.push(i);
+          } else if (word.includes(guess[i]) && !allGreen && !tooMany) {
+            box.style.background = "var(--color-yellow)";
+            if (!key.style.background) key.style.background = "var(--light-yellow)";
+          } else {
+            box.style.background = "gray";
+            if (!key.style.background) key.style.background = "gray";
+          }
+        }
+
+        guessed++;
+        setTimeout(() => {
+          if (guess == word) {
+            score += 7 - guessed;
+            if (score > highScore) {
+              highScore = score;
+              document.getElementById("highScore").style.color = "var(--light-purple)";
+            }
+            formbarAlert("Correct!", "alert", newWord);
+          } else if (guessed == 6) {
+            request.open("POST", "/savescore?game=wordle&score=" + score);
+            request.send();
+            score = 0;
+            formbarAlert("Game over<br>Correct word: " + word, "alert", newWord);
+          }
+          document.getElementById("score").innerText = score;
+          document.getElementById("highScore").innerText = highScore;
+          guess = "";
+        }, 0);
+      }
+    } else {
+      formbarAlert("Not enough letters");
+    }
+  }
   }
 </script>
 {% endblock %}

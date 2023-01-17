@@ -4,7 +4,7 @@
   --color-red: #bf0000;
   --color-brown: #802000;
   --color-orange: #ff4000;
-  --color-gold: #fa0;
+  --color-gold: #e90;
   --color-yellow: #ffbf00;
   --color-green: #00bf00;
   --color-cyan: #009fbf;
@@ -19,7 +19,7 @@
   --light-yellow: #ffdf40;
   --light-green: #80ff80;
   --light-cyan: #80ffff;
-  --light-blue: #bfcfff;
+  --light-blue: #afbfff;
   --light-purple: #df80ff;
   --light-pink: #ff80bfff;
   --light-gray: #ccc;
@@ -56,7 +56,8 @@
 }
 
 /*Dark mode is default*/
-.dark, body:where(:not(.light):not(.classic)) {
+.dark,
+body:where(:not(.light):not(.classic)) {
   --bg-color: var(--bg-dark);
   --main-color: white;
   --gray-color: var(--light-gray);
@@ -97,7 +98,9 @@ body {
   padding: 8px;
 }
 
-body, .light, .dark {
+body,
+.light,
+.dark {
   background: var(--bg-color);
   color: var(--main-color);
 }
@@ -115,7 +118,8 @@ body, .light, .dark {
   padding: 8px;
 }
 
-.centered, .hCentered.vCentered {
+.centered,
+.hCentered.vCentered {
   position: absolute;
   left: 50%;
   top: 50%;
@@ -151,7 +155,7 @@ body, .light, .dark {
   border: solid 5px transparent;
 }
 
-.light::-webkit-scrollbar-thumb {
+:where(.light, .classic #content)::-webkit-scrollbar-thumb {
   box-shadow: inset 0 0 5px 5px var(--dark-gray);
   border: solid 5px transparent;
 }
@@ -160,7 +164,7 @@ body, .light, .dark {
   box-shadow: inset 0 0 5px 5px var(--main-color);
 }
 
-.light::-webkit-scrollbar-thumb:hover {
+:where(.light, .classic #content)::-webkit-scrollbar-thumb:hover {
   box-shadow: inset 0 0 5px 5px var(--bg-darker);
 }
 
@@ -169,7 +173,7 @@ body, .light, .dark {
   border: solid 2px transparent;
 }
 
-.light::-webkit-scrollbar-thumb:active {
+:where(.light, .classic #content)::-webkit-scrollbar-thumb:active {
   box-shadow: inset 0 0 13px 13px var(--bg-darker);
   border: solid 2px transparent;
 }
@@ -185,7 +189,10 @@ body, .light, .dark {
   accent-color: var(--theme-color);
 }
 
-input, button, textarea, select {
+input,
+button,
+textarea,
+select {
   font-size: inherit;
 }
 
@@ -205,25 +212,29 @@ input, button, textarea, select {
   background: var(--highlight-color);
 }
 
-textarea, .box {
+textarea,
+.box {
   background: var(--emphasis-color);
   color: var(--main-color);
   border: 1px solid;
 }
 
-textarea:focus, .box:focus {
+textarea:focus,
+.box:focus {
   border: 1px solid;
   outline: 1px solid;
 }
 
-button, .button {
+button,
+.button {
   cursor: pointer;
   user-select: none;
 }
 
 /*Use class "button" for button-like inputs, such as submit and file*/
 
-button:not(.inline), .button:not(.inline) {
+button:not(.inline),
+.button:not(.inline) {
   padding: 3px 9px;
   border-radius: 9999px;
   background: var(--emphasis-color);
@@ -239,7 +250,8 @@ button:where(:not(.popOut):where(:not(.unselectable):not(.pressed))):hover,
 
 /*Use class "inline" for buttons that are within the flow of text. "inline" should always be used with "popOut" (but not vice versa)*/
 
-button.inline, .button.inline {
+button.inline,
+.button.inline {
   background: var(--emphasis-color);
   border: 1px solid;
   border-radius: 6px;
@@ -271,16 +283,16 @@ img.button.inline {
   background: var(--highlight-color);
 }
 
-.unselectable {
-  opacity: 50%;
-  cursor: not-allowed;
-}
-
 .pressed.pressed {
   background: var(--theme-color);
   border-color: var(--theme-color);
   color: var(--bg-color);
   cursor: default;
+}
+
+.unselectable.unselectable {
+  opacity: 50%;
+  cursor: not-allowed;
 }
 
 input[type="number"] {
@@ -316,7 +328,9 @@ a {
   cursor: pointer;
 }
 
-table, th, td {
+table,
+th,
+td {
   border: 1px solid;
   border-collapse: collapse;
 }
@@ -346,4 +360,63 @@ table, th, td {
   margin-left: 4px;
   vertical-align: middle;
   cursor: pointer;
+}
+
+#alertBox {
+  position: absolute;
+  padding: 1.5%;
+  box-sizing: border-box;
+  font-size: 20px;
+  text-align: left;
+  border: 2px solid var(--dark-gray);
+  border-radius: 8px;
+  filter: drop-shadow(10px 10px 5px black);
+  z-index: 9999;
+}
+
+#alertText {
+  position: absolute;
+  top: 30px;
+  left: 30px;
+  width: calc(100% - 60px);
+  height: calc(100% - 150px);
+}
+
+#alertText.prompt {
+  height: calc(100% - 210px);
+}
+
+#alertBox input {
+  position: absolute;
+  bottom: 120px;
+  width: calc(100% - 60px);
+  text-align: left;
+}
+
+#alertBox button {
+  position: absolute;
+  bottom: 30px;
+  width: 100px;
+  height: 60px;
+  padding: 0.25% 1%;
+  border: 1px solid;
+  border-radius: 9999px;
+  font-size: 24px;
+  font-weight: 500;
+  filter: drop-shadow(2px 2px 1px #000c);
+}
+
+#yesButton {
+  color: var(--light-green);
+  left: calc(50% - 115px);
+}
+
+#noButton {
+  color: var(--light-red);
+  right: calc(50% - 115px);
+}
+
+#cover {
+  backdrop-filter: blur(2px);
+  z-index: 9999;
 }

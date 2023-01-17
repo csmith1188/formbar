@@ -8,8 +8,7 @@ const chatSocket = io("/chat");
 chatSocket.on("disconnect", message => {
   console.log("DISCONNECTED:", message);
   //if (message == "transport error") {
-    //alert("Session ended.");
-    //window.location.reload();
+  //formbarAlert("Session ended.", "alert", () => window.location.reload());
   //}
 });
 
@@ -32,6 +31,89 @@ function getResponse(endpoint, parse = true) {
     };
     newRequest.send(null);
   });
+}
+
+function formbarAlert(message, type = "alert", callback, inputType = "text", promptDefault = "", width = 500, height = 300) {
+  //There are three alert types: alert, confirm, and prompt.
+  //For confirm and prompt, the result is passed to the callback function as an argument.
+  //Example alert: formbarAlert("Type something", "prompt", input => console.log(input));
+
+  //If there is already an alert, hide it
+  document.getElementById("alertBox")?.remove();
+  document.getElementById("cover")?.remove();
+  let cover = document.createElement("div");
+  cover.id = "cover";
+  cover.classList.add("fullScreen");
+  document.body.append(cover);
+  let alertBox = document.createElement("div");
+  alertBox.id = "alertBox";
+  alertBox.style.width = width + "px";
+  alertBox.style.height = height + "px";
+  alertBox.classList.add("centered", "dark", "purple");
+  let alertText = document.createElement("div");
+  alertText.id = "alertText";
+  alertText.innerHTML = message;
+  alertBox.append(alertText);
+  let okButton;
+  let yesButton;
+  let noButton;
+  document.body.append(alertBox);
+  if (type == "alert") {
+    okButton = document.createElement("button");
+    okButton.classList.add("hCentered");
+    okButton.innerText = "OK";
+    okButton.onclick = () => {
+      alertBox.remove();
+      cover.remove();
+      if (callback) callback();
+    };
+    alertBox.append(okButton);
+    okButton.focus();
+  } else if (type == "confirm") {
+    yesButton = document.createElement("button");
+    yesButton.id = "yesButton";
+    yesButton.innerText = "Yes";
+    yesButton.onclick = () => {
+      alertBox.remove();
+      cover.remove();
+      if (callback) callback(true);
+    };
+    alertBox.append(yesButton);
+    noButton = document.createElement("button");
+    noButton.id = "noButton";
+    noButton.innerText = "No";
+    noButton.onclick = () => {
+      alertBox.remove();
+      cover.remove();
+      if (callback) callback(false);
+    }
+    alertBox.append(noButton);
+    yesButton.focus();
+  } else if (type == "prompt") {
+    alertText.classList.add("prompt");
+    let promptInput = document.createElement("input");
+    promptInput.classList.add("box", "hCentered");
+    promptInput.type = inputType;
+    promptInput.value = promptDefault;
+    alertBox.append(promptInput);
+    okButton = document.createElement("button");
+    okButton.classList.add("hCentered");
+    okButton.innerText = promptDefault ? "OK" : "Cancel";
+    promptInput.oninput = function() {
+      if (this.value) okButton.innerText = "OK";
+      else okButton.innerText = "Cancel";
+    }
+    okButton.onclick = () => {
+      alertBox.remove();
+      cover.remove();
+      if (callback) callback(promptInput.value);
+    };
+    promptInput.addEventListener("keydown", e => {
+      if (e.key == "Enter") okButton.click();
+    });
+    alertBox.append(okButton);
+    promptInput.focus();
+  }
 }
 
 const urlParams = new URLSearchParams(window.location.search);

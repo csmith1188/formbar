@@ -192,9 +192,9 @@
   }
 
   #notifications {
-    position: fixed;
+    position: absolute;
     right: 16px;
-    bottom: 71px;
+    top: 10px;
   }
 
   #controlChat.disabled {
@@ -302,14 +302,17 @@
     </div>
 </div>
 <div id="controlChat">
-    <div id="recContainer" style="font-size: 14px; margin-bottom: 5px;">To <span id="recipient">all</span><span id="removeRec" onclick="removeRec()" title="Reset recipients to all">✕</span></div>
-    <form onsubmit="event.preventDefault(); onSubmit(); return false;" style="margin: 0;">
-        <input id="input" class="box" placeholder="Enter a message" autocomplete="off">
-        <input type="submit" value="Send" id="sendButton" class="button">
-    </form>
-</div>
-<div id="notifications">
-  <input type="checkbox" id="notificationsCheckbox"><label for="notificationsCheckbox">Desktop notifications</label>
+  <div id="recContainer" style="font-size: 14px; margin-bottom: 5px;">To <span id="recipient">all</span><span
+      id="removeRec" onclick="removeRec()" title="Reset recipients to all">✕</span></div>
+  <form onsubmit="event.preventDefault(); onSubmit(); return false;" style="margin: 0;">
+    <input id="input" class="box" placeholder="Enter a message" autocomplete="off">
+    <input type="submit" value="Send" id="sendButton" class="button">
+  </form>
+  <div id="notifications">
+    <a onclick="notifSettings();">Notification settings</a>
+    <!-- Windows notifications (not working) -->
+    <input type="checkbox" id="notificationsCheckbox" class="hidden"><label for="notificationsCheckbox" class="hidden">Desktop notifications</label>
+  </div>
 </div>
 {% endblock %}
 

@@ -1452,6 +1452,15 @@ def endpoint_createfightermatch():
     sD.fighter[code]['public'] = public
     return render_template("message.html", message = 'Match ' + code + ' created by ' + name + '.')
 
+
+@app.route('/createtdmap', methods=['POST'])
+def endpoint_createtdmap():
+    json = request.args.get('map')
+    maps = open(os.path.dirname(os.path.abspath(__file__)) + '/static/js/tdMaps.js', 'a')
+    maps.write('\ntdMaps.push(' + json + ');')
+    maps.close()
+    return render_template("message.html", message='Map published.')
+
 # ██████
 # ██   ██
 # ██   ██
@@ -1471,6 +1480,16 @@ def endpoint_debug():
 # █████
 # ██
 # ███████
+
+
+@app.route('/edittdmap', methods=['POST'])
+def endpoint_edittdmap():
+    json = request.args.get('map')
+    mapId = request.args.get('id')
+    maps = open(os.path.dirname(os.path.abspath(__file__)) + '/static/js/tdMaps.js', 'a')
+    maps.write('\ntdMaps[tdMaps.indexOf(tdMaps.find(tdMap => tdMap.id == ' + mapId + '))] = ' + json + ';')
+    maps.close()
+    return render_template("message.html", message='Map edited.')
 
 
 '''
@@ -1652,19 +1671,21 @@ def endpoint_games_fighter():
                 else:
                     return render_template("message.html", message = "Your password is incorrect.")
             else:
-                return render_template('authenticate.html', forward = request.path, action = action)
-
-        try:
-            db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
-            dbcmd = db.cursor()
-            wins = dbcmd.execute("SELECT fighterWins FROM users WHERE username=:uname", {"uname": username}).fetchone()[0] or 0
-            losses = dbcmd.execute("SELECT fighterLosses FROM users WHERE username=:uname", {"uname": username}).fetchone()[0] or 0
-            winStreak = dbcmd.execute("SELECT fighterWinStreak FROM users WHERE username=:uname", {"uname": username}).fetchone()[0] or 0
-            goldUnlocked = dbcmd.execute("SELECT goldUnlocked FROM users WHERE username=:uname", {"uname": username}).fetchone()[0] or 0
-            db.close()
-            return render_template('games/fighter.html', username = username, wins = wins, losses = losses, winStreak = winStreak, goldUnlocked = goldUnlocked, action = action, authenticated = authenticated)
-        except Exception as e:
-            print("[error] " + "Error: " + str(e))
+                return render_template('authenticate.html', forward=request.path, action=action)
+        
+        db = sqlite3.connect(os.path.dirname(
+            os.path.abspath(__file__)) + '/data/database.db')
+        dbcmd = db.cursor()
+        wins = dbcmd.execute("SELECT fighterWins FROM users WHERE username=:uname", {
+                                "uname": username}).fetchone()[0] or 0
+        losses = dbcmd.execute("SELECT fighterLosses FROM users WHERE username=:uname", {
+                                "uname": username}).fetchone()[0] or 0
+        winStreak = dbcmd.execute("SELECT fighterWinStreak FROM users WHERE username=:uname", {
+                                    "uname": username}).fetchone()[0] or 0
+        goldUnlocked = dbcmd.execute("SELECT goldUnlocked FROM users WHERE username=:uname", {
+                                        "uname": username}).fetchone()[0] or 0
+        db.close()
+        return render_template('games/fighter.html', username=username, wins=wins, losses=losses, winStreak=winStreak, goldUnlocked=goldUnlocked, action=action, authenticated=authenticated)
 
 '''
     /games/flashcards
@@ -1769,10 +1790,22 @@ def endpoint_games_towerdefense():
         username = sD.studentDict[request.remote_addr]['name']
         db = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + '/data/database.db')
         dbcmd = db.cursor()
-        progress = dbcmd.execute("SELECT tdProgress FROM users WHERE username=:uname", {"uname": username}).fetchone()[0] or ''
-        achievements = dbcmd.execute("SELECT tdAchievements FROM users WHERE username=:uname", {"uname": username}).fetchone()[0] or ''
+        progress = dbcmd.execute("SELECT tdProgress FROM users WHERE username=:uname", {"uname": username}).fetchone()
+        if progress:
+            progress = progress[0]
+        if not progress:
+            progress = '{}'
+        achievements = dbcmd.execute("SELECT tdAchievements FROM users WHERE username=:uname", {"uname": username}).fetchone()
+        if achievements:
+            achievements = achievements[0]
+        if not achievements:
+            achievements = ''
         db.close()
-        return render_template('games/towerdefense.html', progress = progress, achievements = achievements)
+        for user in sD.studentDict:
+            if sD.studentDict[user]['perms'] == 0:
+                teacherName = sD.studentDict[user]['name']
+                break
+        return render_template('games/towerdefense.html', progress=progress, achievements=achievements, username=username, perms=sD.studentDict[request.remote_addr]['perms'], teacherName=teacherName)
 
 #Tic Tac Toe
 @app.route('/games/ttt')
@@ -2576,6 +2609,15 @@ def endpoint_td():
     else:
         advanced = ''
     return redirect('/games/towerdefense' + advanced)
+
+@app.route('/tdmapstatus', methods=['POST'])
+def endpoint_tdmapstatus():
+    mapId = request.args.get('id')
+    status = request.args.get('status')
+    maps = open(os.path.dirname(os.path.abspath(__file__)) + '/static/js/tdMaps.js', 'a')
+    maps.write('\ntdMaps.find(tdMap => tdMap.id == ' + mapId + ').status = "' + status + '";')
+    maps.close()
+    return render_template("message.html", message='Map edited.')
 
 @app.route('/towerdefense')
 def endpoint_towerdefense():

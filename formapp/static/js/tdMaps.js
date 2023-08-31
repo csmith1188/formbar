@@ -8,7 +8,6 @@
 /*{
   name: Map name,
   author: Your name,
-  digipogs: Cost to unlock (optional),
   start: [column, row],
   lines: [
     [direction, length],
@@ -45,7 +44,7 @@
 //"k" — blink
 //"d" — shield
 
-let maps = [
+tdMaps = [
   {
     name: "Map #01",
     author: "Oley Birkeland",
@@ -538,7 +537,7 @@ let maps = [
       ["ud"],
       [[3, [4, "xd"], [9, [2, "pd"], pause]], [25, "bd"], [3, "zd"]],
       [[8, [7, "gd"], [2, "bd"]], [10, "zd"]],
-      [[10, "xd"], [20, "pd"], [30, "xd"], pause, [2, "ud", pause], ["ud"]],
+      [[10, "xd"], [20, "pd"], [30, "xd"], pause, [2, "ud", pause], "ud"],
       [[6, "zd"], pause, [20, "pd"], pause, [15, "zd", [5, "bd"]]],
       [[10, "xd"], [35, "bd"], pause, [95, "rd"]],
       [[3, "ud"], [80, "od"]],
@@ -546,8 +545,9 @@ let maps = [
       ["ud", pause, [60, "bd", "pd"], [5, "zd"]],
       [[2, [50, "xd"], pause], [2, [15, "zd"], pause], [5, "ud"], pause, [5, "ud"]]
     ]
-  },
+  }
 
   //↑ New maps go here ↑
 ];
-maps[8].waves.forEach(wave => wave.unshift([8, pause])); //Add a break at the start of each wave
+
+//Maps from the in-game editor

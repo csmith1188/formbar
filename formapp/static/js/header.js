@@ -9,7 +9,8 @@ const urlParams = new URLSearchParams(window.location.search);
 chatSocket.on("disconnect", message => {
   console.log("DISCONNECTED:", message);
   //if (message == "transport error") {
-  //formbarAlert("Session ended.", "alert", () => window.location.reload());
+    //alert("Session ended.");
+    //window.location.reload();
   //}
 });
 

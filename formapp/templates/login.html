@@ -45,77 +45,89 @@
 <button id="newAccountButton" onclick="changeUserType(this);">New account</button>
 <button id="guestButton" onclick="changeUserType(this);">Use as guest</button>
 <form action="login" method="post" style="margin-bottom: 16px;">
-    <input type="text" id="usernameBox" name="username" class="box" placeholder="Name" value="" autocomplete="off" required>
-    <input type="password" id="passwordBox" name="password" class="box" placeholder="Password" value="" required>
-    <a href="/changepassword" id="forgotPassword">Forgot password</a>
-    <input type="hidden" id="userTypeBox" name="userType" value="login">
-    <input type="hidden" id="forwardBox" name="forward">
-    <input type="hidden" id="botBox" name="bot" value="False">
-    <input type="submit" id="submitButton" class="button unselectable" value="Log in" onsubmit="return false;">
+
+  <input type="text" id="usernameBox" name="username" class="box" placeholder="Name" value=""
+    title="Username can only contain letters, numbers and no spaces" autocomplete="off" required>
+
+  <input type="password" id="passwordBox" name="password" class="box" placeholder="Password" value="" required>
+  <a href="/changepassword" id="forgotPassword">Forgot password</a>
+  <input type="hidden" id="userTypeBox" name="userType" value="login">
+  <input type="hidden" id="forwardBox" name="forward">
+  <input type="hidden" id="botBox" name="bot" value="False">
+  <input type="submit" id="submitButton" class="button unselectable" value="Log in" onsubmit="return false;">
 </form>
 {% endblock %}
 
 <!-- Extra javascript here -->
 {% block script %}
-  <script type="text/javascript">
-    const forward = urlParams.get('forward');
-    if (forward) document.getElementById('forwardBox').value = forward;
-    else document.getElementById('forwardBox').value = null;
+<script type="text/javascript">
 
-    //Prevent submission if a field is blank
-    let liButton = document.getElementById("logInButton");
-    let naButton = document.getElementById("newAccountButton");
-    let gButton = document.getElementById("guestButton");
-    let ub = document.getElementById("usernameBox");
-    let pb = document.getElementById("passwordBox");
-    let fp = document.getElementById("forgotPassword");
-    let ut = document.getElementById("userTypeBox");
-    let sb = document.getElementById("submitButton");
+  const forward = urlParams.get('forward');
+  if (forward) document.getElementById('forwardBox').value = forward;
+  else document.getElementById('forwardBox').value = null;
 
-    function changeUserType(el) {
-      [liButton, naButton, gButton].forEach(button => (button == el) ? button.classList.add("pressed") : button.classList.remove("pressed"));
-      switch (el) {
-        case liButton:
-          pb.classList.remove("hidden");
-          pb.required = true;
-          fp.classList.remove("hidden");
-          sb.value = "Log in";
-          ut.value = "login";
-          break;
-        case naButton:
-          pb.classList.remove("hidden");
-          pb.required = true;
-          fp.classList.add("hidden");
-          sb.value = "Create account";
-          ut.value = "new";
-          break;
-        case gButton:
-          pb.value = null;
-          pb.classList.add("hidden");
-          pb.required = false;
-          fp.classList.add("hidden");
-          sb.value = "Go";
-          ut.value = "guest";
-      }
+  //Prevent submission if a field is blank
+  let liButton = document.getElementById("logInButton");
+  let naButton = document.getElementById("newAccountButton");
+  let gButton = document.getElementById("guestButton");
 
-      checkIfBlank();
+  let userBox = document.getElementById("usernameBox");
+  let passBox = document.getElementById("passwordBox");
+  let forgotCheck = document.getElementById("forgotPassword");
+  let userType = document.getElementById("userTypeBox");
+  let subBut = document.getElementById("submitButton");
 
-      document.getElementById("usernameBox").focus();
+
+  function changeUserType(el) {
+    [liButton, naButton, gButton].forEach(button => (button == el) ? button.classList.add("pressed") : button.classList.remove("pressed"));
+    switch (el) {
+      case liButton:
+
+        passBox.classList.remove("hidden");
+        passBox.required = true;
+        forgotCheck.classList.remove("hidden");
+        subBut.value = "Log in";
+        userType.value = "login";
+        break;
+      case naButton:
+        passBox.classList.remove("hidden");
+        passBox.required = true;
+        forgotCheck.classList.add("hidden");
+        subBut.value = "Create account";
+        userType.value = "new";
+        break;
+      case gButton:
+        passBox.value = null;
+        passBox.classList.add("hidden");
+        passBox.required = false;
+        forgotCheck.classList.add("hidden");
+        subBut.value = "Go";
+        userType.value = "guest";
     }
 
-    function checkIfBlank() {
-      if (ub.value && (pb.value || ut.value == "guest")) {
-        sb.classList.remove("unselectable");
-        sb.onsubmit = () => true;
-      } else {
-        sb.classList.add("unselectable");
-        sb.onsubmit = () => false;
-      }
+    checkIfBlank();
+
+    document.getElementById("usernameBox").focus();
+  }
+
+  function checkIfBlank() {
+    let regex = /[?<>|\/!@#$%^&*(){}]/g;
+    if (!regex.test(userBox.value) && userBox.value && (passBox.value || userType.value == "guest")) {
+      subBut.classList.remove("unselectable");
+      subBut.onsubmit = () => true;
+    } else {
+      subBut.classList.add("unselectable");
+      userBox.setAttribute('pattern', '[a-zA-Z0-9]+')
+      subBut.onsubmit = () => false;
     }
+    
+  }
 
-    ub.oninput = checkIfBlank;
-    pb.oninput = checkIfBlank;
+  userBox.oninput = checkIfBlank;
+  passBox.oninput = checkIfBlank;
 
-    changeUserType(liButton);
+  changeUserType(liButton);
+
+
 </script>
 {% endblock %}

@@ -32,7 +32,7 @@
     left: 21px;
   }
 
-  .user > * {
+  .user>* {
     max-width: calc(100% - 21px);
     overflow-wrap: break-word;
   }
@@ -42,12 +42,23 @@
     padding: 4px;
   }
 
+  form {
+    display: inline;
+  }
+
   button.inline {
     margin-bottom: 8px;
   }
 
   #users {
     margin-bottom: 8px;
+  }
+
+  .permsIcon {
+    height: 1.2em;
+    display: inline-block;
+    vertical-align: text-bottom;
+    margin-right: 8px;
   }
 </style>
 {% endblock %}
@@ -65,59 +76,91 @@
 <!-- Extra javascript here -->
 {% block script %}
 <script>
-    let users = "{{ users }}".replaceAll("&#39;", "'").replaceAll("(", "[").replaceAll(")", "]").replaceAll("b'", "'").replaceAll("None", null);
-    users = eval(users);
-    let permNames = ['Teacher', 'Mod', 'Student', 'Guest'];
-    let usersBox = document.getElementById("users");
+  let users = "{{ users }}".replaceAll("&#39;", "'").replaceAll("(", "[").replaceAll(")", "]").replaceAll("b'", "'").replaceAll("None", null);
+  users = eval(users);
+  let permNames = ['Teacher', 'Mod', 'Student', 'Guest'];
+  let usersBox = document.getElementById("users");
 
-    usersBox.innerHTML = "";
-    //Loop through each user in the list
-    for (let user of users) {
-        let newStudent = document.createElement('h3');
+  usersBox.innerHTML = "";
+  //Loop through each user in the list
+  for (let user of users) {
+    let newStudent = document.createElement('h3');
 
-        newStudent.innerHTML = user[1];
+
+    let pictureIcon = ""
+
+    //change image based upon persons permissions
+    let perms = user[3]
+    if (perms) var permsIcons = document.createElement("img");
+    if (perms == 0) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/teacher.png') }}" class="permsIcon" title="teacher">`
+    if (perms == 1) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/mod.png') }}" class="permsIcon" title="mod">`
+    if (perms == 2) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/student.png') }}" class="permsIcon" title="student">`
+    if (perms == 3) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/anyone.png') }}" class="permsIcon" title="anyone">`
+    if (perms == 4) pictureIcon += `<img src="{{ url_for('static', filename='img/controlpanel/banned.png') }}" class="permsIcon" title="banned">`
+
+         newStudent.innerHTML = pictureIcon + user[1] ;
+         let name = user[1];
         let newDetails = document.createElement('span');
         newDetails.classList.add('user');
         let userPerms = user[3];
+        console.log(user[1], userPerms, permNames[0]);
         newDetails.innerHTML += `
-            <select onchange="updatePerm(this)" id="userpermsDrop" name="userpermsDrop">
-            <option value="/updateuser?name=${user[1]}&field=permissions&value=0" ${userPerms === 0 ? "selected" : ""}>${permNames[0]}</option>
-            <option value="/updateuser?name=${user[1]}&field=permissions&value=1" ${userPerms === 1 ? "selected" : ""}>${permNames[1]}</option>
-            <option value="/updateuser?name=${user[1]}&field=permissions&value=2" ${userPerms === 2 ? "selected" : ""}>${permNames[2]}</option>
-            <option value="/updateuser?name=${user[1]}&field=permissions&value=3" ${userPerms === 3 ? "selected" : ""}>${permNames[3]}</option>
-            </select>
+            <form action="/users" method="POST">
+            <select onchange="updatePerm(this, '${name}')" id="userpermsDrop" name="userpermsDrop">
+            <option value="/users?name=${name}&action=perm&perm=0" ${userPerms === 0 ? "selected" : ""}>${permNames[0]}</option>
+            <option value="/users?name=${name}&action=perm&perm=1" ${userPerms === 1 ? "selected" : ""}>${permNames[1]}</option>
+            <option value="/users?name=${name}&action=perm&perm=2" ${userPerms === 2 ? "selected" : ""}>${permNames[2]}</option>
+            <option value="/users?name=${name}&action=perm&perm=3" ${userPerms === 3 ? "selected" : ""}>${permNames[3]}</option>
+            </select> </form>
         `;
+       
         usersBox.appendChild(newStudent)
         usersBox.appendChild(newDetails)
-        let name = user[1];
+        name = user[1];
         newDetails.innerHTML += "	&nbsp; ";
         newDetails.innerHTML += `<a onclick="changePw('${name}')">Change password</a>`;
         newDetails.innerHTML += "	&nbsp; ";
         newDetails.innerHTML += `<a onclick="deleteAcc('${name}')">Delete account</a>`;
+        newDetails.innerHTML += "	&nbsp; ";
+        newDetails.innerHTML += `<a onclick="updateDP('${name}')">Add DigiPogs</a>`;
         newDetails.innerHTML += "<br><br>";
     }
 
+  function updateDP(name) {
+    formbarAlert("DigiPog Amount:", "prompt", digipogs => {
+      if (digipogs) window.location = `/users?name=${name}&action=updateDP&digipogs=${digipogs}`;
+    }, "number");
+  }
+
     function changePw(name) {
-      let password;
-      do {password = prompt("New password:")} while (password === "");
-      window.location = `/users?name=${name}&action=changePw&password=${password}`;
+      formbarAlert("New password:", "prompt", password => {
+        if (password) window.location = `/users?name=${name}&action=changePw&password=${password}`;
+      });
     }
 
-    function deleteAcc(name) {
-      if (confirm(`Permanently delete ${name}'s account?`)) window.location = `/users?name=${name}&action=delete`;
+
+  function deleteAcc(name) {
+    formbarAlert(`Permanently delete ${name}'s account?`, "confirm", result => {
+      if (result) window.location = `/users?name=${name}&action=delete`;
+    });
+  }
+
+    function updatePerm(el, name) {
+      let newDetails = document.createElement('span');
+        newDetails.classList.add('user');
+        console.log(el.value[el.value.length - 1]);
+         window.location = `/users?name=${name}&action=perm&perm=${el.value[el.value.length - 1]}`
     }
 
-    function updatePerm(el) {
-      request.open("POST", el.value);
-      request.send();
-    }
 
-    document.getElementById("addUser").addEventListener("click", () => {
-      let username = prompt("New user's name:");
+  document.getElementById("addUser").addEventListener("click", () => {
+    formbarAlert("New user's name:", "prompt", username => {
       if (username) {
-        let password = prompt("New user's password:");
-        if (password) window.location = `/createaccount?name=${username}&password=${password}`;
+        formbarAlert("New user's password:", "prompt", password => {
+          if (password) window.location = `/createaccount?name=${username}&password=${password}`;
+        }, "password");
       }
     });
+  });
 </script>
 {% endblock %}

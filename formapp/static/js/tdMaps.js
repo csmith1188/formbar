@@ -8,6 +8,7 @@
 /*{
   name: Map name,
   author: Your name,
+  digipogs: Cost to unlock (optional),
   start: [column, row],
   lines: [
     [direction, length],
@@ -545,7 +546,7 @@ tdMaps = [
       ["ud", pause, [60, "bd", "pd"], [5, "zd"]],
       [[2, [50, "xd"], pause], [2, [15, "zd"], pause], [5, "ud"], pause, [5, "ud"]]
     ]
-  }
+  },
 
   //↑ New maps go here ↑
 ];

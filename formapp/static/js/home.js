@@ -1,4 +1,4 @@
-//This code is used in advanced.html, basic.html, and mobile.html
+//This code is used in advanced.html, polls.html, and mobile.html
 
 let thumbs = ["up", "wiggle", "down"];
 let letters = ["a", "b", "c", "d"];
@@ -59,7 +59,7 @@ letterButtons.forEach((button, i) => {
 
 function checkIfRemoved() {
   //If the user is removed by the teacher, send them back to the login page
-  if (meRes == "You are not logged in.") window.location = "/login?alert=You have been logged out.";
+  if (meRes == "You are not logged in.") formbarAlert("You have been logged out.", "alert", () => window.location = "/login");
 }
 
 thumbButtons.concat(letterButtons).forEach(el => {
@@ -116,13 +116,13 @@ function updateVotes() {
   }
 
   let essayEl = document.getElementById("essay");
-  let essay = meRes.essay;
+  let essay = meRes.essay.replaceAll("\\n", "\n").replaceAll("\\t", "\t");
   if (essay && !essayEl.value) {
     essayEl.value = essay;
     checkEssay();
     essaySubmitted();
   }
-  if (!essay && essayEl.value) essayUnsubmitted();
+  if (!essay && essayEl.value && document.activeElement.id != "submitEssay") essayUnsubmitted();
 }
 
 function highlight(image) {
@@ -175,7 +175,8 @@ function checkEssay() {
 
 function submitEssay() {
   let box = document.getElementById("essay");
-  request.open("POST", "/essay?essay=" + box.value);
+  let essay = box.value.replaceAll("\n", "\\n").replaceAll("\t", "\\t");
+  request.open("POST", "/essay?essay=" + essay);
   request.send();
   essaySubmitted();
 }
@@ -204,6 +205,21 @@ function essayUnsubmitted() {
   button.innerText = "Submit";
   button.onclick = submitEssay;
 }
+
+document.getElementById('essay').addEventListener('keydown', function (keyboard) {
+    if (keyboard.key == 'Tab') {
+        console.log("tab was pressed")
+        keyboard.preventDefault();
+        var start = this.selectionStart;
+        var end = this.selectionEnd;
+
+        this.value = this.value.substring(0, start) +
+            "\t" + this.value.substring(end);
+
+        this.selectionStart =
+            this.selectionEnd = start + 1;
+    };
+});
 
 function shorten(container, maxHeight, text, maxWidth) {
   //Set title to original string
@@ -287,7 +303,7 @@ function sendSound() {
     request.send();
     document.getElementById("sound").value = null;
   } else {
-    alert("File does not exist");
+    formbarAlert("File does not exist");
   }
 }
 
@@ -328,10 +344,10 @@ async function sendMusic() {
   if (volume == 1) volume = "1.0";
   if (bgm.includes(musicFile)) {
     let res = await getResponse("/bgm?file=" + musicFile + "&volume=" + volume);
-    if (res.error) alert(res.error);
+    if (res.error) formbarAlert(res.error);
     else document.getElementById("music").value = null;
   } else {
-    alert("File does not exist");
+    formbarAlert("File does not exist");
   }
 }
 

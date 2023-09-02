@@ -420,3 +420,44 @@ td {
   backdrop-filter: blur(2px);
   z-index: 9999;
 }
+
+#chatNotif {
+  position: fixed;
+  bottom: 50px;
+  width: 50%;
+  height: 50px;
+  box-sizing: border-box;
+  font-size: 20px;
+  text-align: left;
+  border: 2px solid var(--light-blue);
+  border-radius: 9999px;
+  filter: drop-shadow(10px 10px 5px black);
+  transition: opacity 0.5s;
+}
+
+#notifText {
+  width: calc(100% - 155px);
+  padding: 10px 0 10px 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+#notifButtons {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 2.5px 12px 2.5px 0;
+  user-select: none;
+}
+
+#notifButtons img {
+  width: 25px;
+  padding: 8px;
+  opacity: 50%;
+  cursor: pointer;
+}
+
+#notifButtons img:hover {
+  opacity: 100%;
+}

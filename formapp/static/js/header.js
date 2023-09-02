@@ -4,6 +4,7 @@ request.send(null);
 const serverIp = JSON.parse(request.responseText).ip;
 const apiSocket = io("/apisocket");
 const chatSocket = io("/chat");
+const urlParams = new URLSearchParams(window.location.search);
 
 chatSocket.on("disconnect", message => {
   console.log("DISCONNECTED:", message);
@@ -117,6 +118,108 @@ function formbarAlert(message, type = "alert", callback, inputType = "text", pro
 }
 
 const urlParams = new URLSearchParams(window.location.search);
+
+//Chat notifications
+chatSocket.on("message", message => {
+  message = JSON.parse(message);
+  let allowed = !+localStorage.getItem("notifPreferences") || (localStorage.getItem("notifPreferences") == 1 && message.to != "all");
+  if (!urlParams.get("advanced") && window.location.pathname != "/advanced" && window.location.pathname != "/chat" && !document.getElementById("gameChat")?.src && localStorage.getItem("pausedUntil") <= Date.now() && allowed) {
+    let notifBox = document.getElementById("chatNotif");
+    let notifText = document.getElementById("notifText");
+    if (notifBox) { //There is already a notification onscreen
+      notifText.innerHTML = `<b>${message.from}:</b> `;
+      notifText.append(message.content);
+      clearTimeout(notifBox.close);
+    } else {
+      notifBox = document.createElement("div");
+      notifBox.id = "chatNotif";
+      notifBox.classList.add("hCentered", "dark", "blue");
+      notifText = document.createElement("div");
+      notifText.id = "notifText";
+      notifText.innerHTML = `<b>${message.from}:</b> `;
+      notifText.append(message.content);
+      notifText.onclick = () => {
+        notifBox.remove();
+        window.open("/chat");
+      };
+      notifBox.append(notifText);
+      let notifButtons = document.createElement("div");
+      notifButtons.id = "notifButtons";
+      let pauseButton = new Image();
+      pauseButton.src = "../static/img/chat/pause.png";
+      pauseButton.title = "Pause for 10 minutes";
+      let settingsButton = new Image();
+      settingsButton.src = "../static/img/chat/settings.png";
+      settingsButton.title = "Notification settings";
+      let closeButton = new Image();
+      closeButton.src = "../static/img/chat/close.png";
+      closeButton.title = "Close";
+      pauseButton.onclick = function() {
+        localStorage.setItem("pausedUntil", Date.now() + 600000);
+        notifText.innerText = "Notifications paused for 10 minutes.";
+        notifText.onclick = null;
+        this.remove();
+        settingsButton.remove();
+        clearTimeout(notifBox.close);
+        setTimeout(() => notifBox.remove(), 3000);
+      };
+      settingsButton.onclick = notifSettings;
+      closeButton.onclick = () => notifBox.remove();
+      notifButtons.append(pauseButton, settingsButton, closeButton);
+      notifBox.append(notifButtons);
+      document.body.append(notifBox);
+      notifBox.onmouseenter = function() {
+        this.hover = true;
+      }
+      notifBox.onmouseleave = function() {
+        this.hover = false;
+      }
+    }
+    notifBox.close = setTimeout(() => {
+      if (notifBox.hover) {
+        notifBox.onmouseleave = function() {
+          this.style.opacity = 0;
+          setTimeout(() => notifBox.remove(), 500);
+        };
+      } else {
+        notifBox.style.opacity = 0;
+        setTimeout(() => notifBox.remove(), 500);
+      }
+    }, 3000);
+  }
+});
+function notifSettings() {
+  document.getElementById("chatNotif")?.remove();
+  let cover = document.createElement("div");
+  cover.id = "cover";
+  cover.classList.add("fullScreen");
+  let settingsBox = document.createElement("div");
+  settingsBox.id = "alertBox";
+  settingsBox.style.width = "400px";
+  settingsBox.style.height = "350px";
+  settingsBox.classList.add("centered", "dark", "purple");
+  settingsBox.innerHTML = `
+    <h3 style="margin: 0; text-align: center;">Notification preferences</h3>
+    <form id="notifPreferences">
+      <label style="display: block; margin: 15px 0;"><input type="radio" name="notifPreferences" value="0"> All messages</label>
+      <label style="display: block; margin: 15px 0;"><input type="radio" name="notifPreferences" value="1"> Private messages only</label>
+      <label style="display: block; margin: 15px 0;"><input type="radio" name="notifPreferences" value="2"> None</label>
+    </form>
+    <div style="margin: 15px 0;"><b>Note:</b> You won't get chat notifications while on the Advanced page.</div>
+  `;
+  settingsBox.style.fontSize = "16px";
+  okButton = document.createElement("button");
+  okButton.classList.add("hCentered");
+  okButton.innerText = "OK";
+  okButton.onclick = () => {
+    localStorage.setItem("notifPreferences", document.getElementById("notifPreferences").notifPreferences.value);
+    settingsBox.remove();
+    cover.remove();
+  };
+  settingsBox.append(okButton);
+  document.body.append(cover, settingsBox);
+  document.getElementById("notifPreferences").notifPreferences.value = +localStorage.getItem("notifPreferences");
+}
 
 //If the user is on a mobile device, take them to /mobile
 if (

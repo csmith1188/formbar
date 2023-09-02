@@ -184,9 +184,9 @@
   }
 
   #notifications {
-    position: fixed;
+    position: absolute;
     right: 16px;
-    bottom: 71px;
+    top: 10px;
   }
 
   #controlChat.disabled {
@@ -310,9 +310,11 @@
     <input id="input" class="box" placeholder="Enter a message" autocomplete="off">
     <input type="submit" value="Send" id="sendButton" class="button">
   </form>
-</div>
-<div id="notifications">
-  <input type="checkbox" id="notificationsCheckbox"><label for="notificationsCheckbox">Desktop notifications</label>
+  <div id="notifications">
+    <a onclick="notifSettings();">Notification settings</a>
+    <!-- Windows notifications (not working) -->
+    <input type="checkbox" id="notificationsCheckbox" class="hidden"><label for="notificationsCheckbox" class="hidden">Desktop notifications</label>
+  </div>
 </div>
 <!-- make a menu for the right click  -->
 <div class="menu" id="menu">

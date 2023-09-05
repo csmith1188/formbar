@@ -22,32 +22,10 @@
 
   @media (max-aspect-ratio: 16/9) { /*If the window is taller than 16/9*/
     #container {
-      aspect-ratio: 16 / 9;
-      outline: 1px solid var(--dark-gray);
-      overflow: hidden;
-      text-align: left;
-    }
-
-    @media (max-aspect-ratio: 16/9) {
-      #container {
-        width: 100%;
-        font-size: calc(5vw / 6);
-      }
-    }
-
-    @media (min-aspect-ratio: 16/9) {
-      #container {
-        height: 100%;
-        font-size: calc(40vh / 27);
-      }
-    }
-
-    #game {
-      position: absolute;
       width: 100%;
-      background: linear-gradient(to bottom right, #040, #400, #004);
-      background-size: 100%;
+      font-size: calc(5vw / 6);
     }
+
     :root {
       --game-width: 100vw;
       --game-height: calc(900vw / 16);
@@ -594,296 +572,16 @@
     }
 
     50% {
-
       background: #fff2;
-    }
-
-    #progress {
-      position: absolute;
-      left: 1.5%;
-      top: calc(24% / 9);
-      width: 100%;
-      color: var(--light-blue);
-    }
-
-    #progressText {
-      font-size: 250%;
-    }
-
-    #achievements {
-      margin-top: 1%;
-      font-size: 200%;
-    }
-
-    #achvButton {
-      margin-left: 0.75%;
-      font-size: 75%;
-    }
-
-    .complete {
-      color: var(--light-yellow) !important;
-    }
-
-    .complete span, .complete button:not(:hover) {
-      filter: drop-shadow(0 0 5px #fffa);
-    }
-
-    #back {
-      position: absolute;
-      left: 0%;
-      top: 0;
-      width: calc(75% / 16);
-      height: calc(75% / 9);
-      padding: 0;
-      text-align: center;
-      font-size: 400%;
-      line-height: 130%;
-      color: white;
-      cursor: pointer;
-    }
-
-    #prevMap {
-      position: absolute;
-      left: 15%;
-      top: calc(250% / 9);
-      width: calc(75% / 16);
-      height: calc(75% / 9);
-      padding: 0;
-      text-align: center;
-      font-size: 400%;
-      line-height: 130%;
-      color: var(--light-cyan);
-      cursor: pointer;
-    }
-
-    #nextMap {
-      position: absolute;
-      right: 15%;
-      top: calc(250% / 9);
-      width: calc(75% / 16);
-      height: calc(75% / 9);
-      padding: 0;
-      text-align: center;
-      font-size: 400%;
-      line-height: 130%;
-      color: var(--light-cyan);
-      cursor: pointer;
-    }
-
-    #prevMap:active, #nextMap:active {
       color: white;
     }
 
-    #difficulty {
-      position: absolute;
-      left: 0;
-      top: 56%;
-      width: 100%;
-      text-align: center;
-      font-size: 200%;
+    62.5% {
+      transform: rotate(2deg);
     }
 
-    #normal, #hard {
-      padding: 0.25% 1%;
-      margin: 0 0.5%;
-      border: 1px solid;
-      border-radius: 9999px;
-      font-size: calc(inherit x 0.75);
-      font-weight: 500;
-    }
-
-    #normal {
-      color: var(--light-green);
-    }
-
-    #normal.pressed {
-      background: var(--light-green);
-      border-color: var(--light-green);
-      color: var(--bg-dark);
-    }
-
-    #hard {
-      color: var(--light-orange);
-    }
-
-    #hard.pressed {
-      background: var(--light-orange);
-      border-color: var(--light-orange);
-      color: var(--bg-dark);
-    }
-
-    #startButton {
-      position: absolute;
-      bottom: 5%;
-      padding: 0.25% 1%;
-      color: var(--light-cyan);
-      border: 1px solid;
-      border-radius: 9999px;
-      font-size: 200%;
-      font-weight: 500;
-    }
-
-    #grid {
-      position: absolute;
-      top: 0;
-      width: 100%;
-      aspect-ratio: 32 / 15;
-      border-collapse: collapse;
-    }
-
-    table, td {
-      border: none;
-    }
-
-    td {
-      width: calc(100% / 32);
-    }
-
-    .visibleLines td {
-      border: 1px solid #555;
-    }
-
-    td.gameButton {
-      cursor: pointer;
-    }
-
-    td.droppable {
-      background: #aaa5;
-    }
-
-    td.undroppable {
-      background: #a555;
-    }
-
-    td.tower {
-      cursor: pointer;
-    }
-
-    #alert {
-      position: absolute;
-      width: 30%;
-      height: 30%;
-      padding: 1.5%;
-      box-sizing: border-box;
-      background: #cccc;
-      color: var(--bg-dark);
-      font-size: 150%;
-      text-align: left;
-      filter: drop-shadow(10px 10px 5px black);
-    }
-
-    #alert.large {
-      height: 50%;
-    }
-
-    #alert.error b {
-      color: var(--color-red);
-    }
-
-    #alertText {
-      position: absolute;
-      top: calc(5% * 16 / 9);
-      left: 5%;
-      width: 90%;
-      height: 50%;
-      overflow: auto;
-    }
-
-    #alert.large #alertText {
-      top: calc(5% * 16 / 15);
-      height: 70%;
-    }
-
-    #alert h1 {
-      margin: 0 0 3% 0;
-      font-size: 125%;
-      font-weight: normal;
-    }
-
-    li.earned::marker {
-      content: "🗸  ";
-    }
-
-    #ok {
-      position: absolute;
-      left: 40%;
-      bottom: 10%;
-      width: 20%;
-      height: 20%;
-      padding: 0.25% 1%;
-      background: white;
-      color: var(--color-blue);
-      border: 1px solid;
-      border-radius: 9999px;
-      font-size: calc(400% / 3);
-      font-weight: 500;
-      filter: drop-shadow(2px 2px 1px #000c);
-    }
-    
-    #alert.large #ok {
-      height: 12%;
-      bottom: 6%;
-    }
-
-    #ok:hover {
-      background: white !important;
-      filter: brightness(90%) drop-shadow(2px 2px 1px #000a);
-    }
-
-    .menu {
-      position: absolute;
-      min-width: 15%;
-      max-width: 20%;
-      padding: 0.5%;
-      box-sizing: border-box;
-      background: #cccc;
-      color: var(--bg-dark);
-      text-align: center;
-      filter: drop-shadow(10px 10px 5px black);
-    }
-
-    .splitButton {
-      color: var(--color-green);
-      border: 1px solid;
-      border-radius: 4px;
-      font-size: 80%;
-      font-weight: 500;
-      filter: drop-shadow(2px 2px 1px #000c);
-    }
-
-    .splitButton:not(.unselectable) {
-      cursor: pointer;
-    }
-
-    .buttonLeft {
-      width: fit-content;
-      padding: 0 1.5%;
-      border-radius: 4px 0 0 4px;
-      background: white;
-    }
-
-    .buttonRight {
-      width: fit-content;
-      padding: 0 1.5%;
-      border-radius: 0 4px 4px 0;
-      background: var(--color-green);
-      color: white;
-    }
-
-    .splitButton:not(.unselectable):hover {
-      filter: brightness(90%) drop-shadow(2px 2px 1px #000a);
-    }
-
-    .sellButton {
-      color: var(--color-red);
-    }
-
-    .sellButton .buttonRight {
-      background: var(--color-red);
-    }
-
-    .bought .buttonLeft {
-    border-radius: 4px;
+    87.5% {
+      transform: rotate(-1deg);
     }
   }
 
@@ -2684,11 +2382,9 @@
       this.stroke();
     }
 
-
     function update() {
       ctx.clearRect(0, 0, 1920, 1080); //Clear the canvas
       ctx.drawPath(map);
-
 
       //Controls menu
       ctx.drawImage(images.buttons.menu, 15, 15, 30, 30);
@@ -3032,7 +2728,6 @@
                 tower.planeY--;
             }
             img = images.planes[planePathArr[j]];
-
           }
           ctx.drawImage(img, tower.planeX - 30, tower.planeY - 30);
         }
@@ -4393,7 +4088,6 @@
         } else {
           editButton.classList.add("unselectable");
           if (this.value != editingMap.name) saveButton.classList.add("unselectable");
-
         }
       };
       document.getElementById("digipogs").oninput = function() {
@@ -4670,61 +4364,8 @@
       if (square && !square.classList.contains("corner") && !square.classList.contains("endpoint")) {
         square.classList.add("line");
         square.onmousedown = () => movePath(row, col);
-
       }
-      achvText.append(achvButton);
-      progressEl.append(achvText);
 
-      function showMaps() {
-        document.getElementById("progress").classList.add("hidden");
-        if (document.getElementById("alert")) hideAlert();
-        ctx.clearRect(0, 0, 1920, 1080); //Clear the canvas
-
-        let container = document.getElementById("container");
-
-        let back = document.createElement("div");
-        back.id = "back";
-        back.innerText = "🡄";
-        back.onclick = () => window.location.reload();
-        container.append(back);
-
-        let left = document.createElement("div");
-        let right = document.createElement("div");
-        left.id = "prevMap";
-        right.id = "nextMap";
-        left.innerText = "◀";
-        right.innerText = "▶";
-        left.onclick = () => {
-          (mapIndex == 0) ? mapIndex = maps.length - 1 : mapIndex--;
-          switchMap();
-        }
-        right.onclick = () => {
-          (mapIndex == maps.length - 1) ? mapIndex = 0 : mapIndex++;
-          switchMap();
-        }
-        container.append(left);
-        container.append(right);
-
-        let difficultyButtons = document.createElement("div");
-        difficultyButtons.id = "difficulty";
-        difficultyButtons.innerText = "Difficulty: ";
-        let normal = document.createElement("button");
-        let hard = document.createElement("button");
-        normal.id = "normal";
-        hard.id = "hard";
-        normal.innerText = "Normal";
-        hard.innerText = "Hard";
-        normal.onclick = () => {
-          difficulty = "normal";
-          switchDifficulty();
-        };
-        hard.onclick = () => {
-          difficulty = "hard";
-          switchDifficulty();
-        };
-        container.append(difficultyButtons);
-        document.getElementById("difficulty").append(normal);
-        document.getElementById("difficulty").append(hard);
       document.body.onmouseup = () => endPath(row, col);
     }
 
@@ -6327,8 +5968,8 @@
           startGame();
         });
         if (document.getElementById("lightBackground")) document.getElementById("no").onclick = exitEditor;
-
       }
     }
-  </script>
+  }
+</script>
 {% endblock %}

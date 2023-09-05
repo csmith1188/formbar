@@ -7,11 +7,11 @@
 
 <!-- Extra style declarations here -->
 {% block style %}
-  <style>
-    h1 {
-      text-align: left;
-    }
-  </style>
+<style>
+  h1 {
+    text-align: left;
+  }
+</style>
 {% endblock %}
 
 <!-- Change theme color here -->
@@ -21,20 +21,22 @@
 {% block main %}
 <h1>{{ username }}'s profile</h1>
 <ul>
-    <li><b>Permissions:</b> {{ perms }}</li>
-    <li><b>Bot:</b> {{ bot }}</li>
+  <li><b>Permissions:</b> {{ perms }}</li>
+  <li><b>Bot:</b> {{ bot }}</li>
+  <li><b>Digipogs:</b> {{ digipogs }}</li>
 </ul>
+<span id="digipogs"></span>
 <span id="highScores"></span>
 {% endblock %}
 
 <!-- Extra javascript here -->
 {% block script %}
-  <script>
-    //Get scores from the database
-    let highScores = "{{ highScores }}".replaceAll("&#34;", "\"");
-    highScores = JSON.parse(highScores);
+<script>
+  //Get scores from the database
+  let highScores = "{{ highScores }}".replaceAll("&#34;", "\"");
+  highScores = JSON.parse(highScores);
 
-    document.getElementById("highScores").innerHTML += `
+  document.getElementById("highScores").innerHTML += `
       <h2>High scores</h2>
       <ul>
           <li><b>2048:</b> ${highScores["2048"]?.[3] || 0}</li>
@@ -48,5 +50,5 @@
           <li><b>Wordle:</b> ${highScores["wordle"]?.[3] || 0}</li>
       </ul>
     `;
-  </script>
+</script>
 {% endblock %}

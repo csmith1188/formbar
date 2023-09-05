@@ -9,8 +9,7 @@ const urlParams = new URLSearchParams(window.location.search);
 chatSocket.on("disconnect", message => {
   console.log("DISCONNECTED:", message);
   //if (message == "transport error") {
-    //alert("Session ended.");
-    //window.location.reload();
+  //formbarAlert("Session ended.", "alert", () => window.location.reload());
   //}
 });
 
@@ -94,7 +93,6 @@ function formbarAlert(message, type = "alert", callback, inputType = "text", pro
   } else if (type == "prompt") {
     alertText.classList.add("prompt");
     let promptInput = document.createElement("input");
-    promptInput.id = "alertInput";
     promptInput.classList.add("box", "hCentered");
     promptInput.type = inputType;
     promptInput.value = promptDefault;
@@ -118,6 +116,8 @@ function formbarAlert(message, type = "alert", callback, inputType = "text", pro
     promptInput.focus();
   }
 }
+
+const urlParams = new URLSearchParams(window.location.search);
 
 //Chat notifications
 chatSocket.on("message", message => {

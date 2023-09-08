@@ -1,4 +1,13 @@
-testing.txt
-testing.py
-testing/
+formapp/testing/
 send.bat
+info.log
+__pycache__
+formapp/lessondata/*
+database.db
+run.bat
+__pycache__
+*/__pycache__
+**key.py
+**config.py
+**database.db
+**send.bat

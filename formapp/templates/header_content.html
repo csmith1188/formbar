@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+  <style>
+    /* #homeLink {
+      position: absolute;
+      left: 8px;
+      top: 8px;
+      color: var(--light-red);
+      font-size: 20px;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .light #homeLink {
+      color: var(--color-red);
+    }
+
+    #homeLink:hover {
+      color: var(--main-color);
+    } */
+    body {
+      background: var(--bg-darker);
+      overflow: hidden;
+    }
+    h1 {
+      text-align: center;
+      margin-top: 12px;
+    }
+
+    h2 {
+      margin-top: 32px;
+    }
+    #quickmenu {
+        text-align: center;
+        justify-content: center;
+        margin: auto;
+        margin-bottom: 16px;
+    }
+    #content,
+    .quickButton {
+      border-style: solid;
+      border-width: 2px;
+      margin: auto;
+      background-color: var(--bg-color);
+    }
+    #content {
+      /* width: fit-content; */
+      /* max-width: 600px; */
+      width: 600px;
+      padding: 10px;
+      border-radius: 10px;
+      overflow: auto;
+      position: relative;
+    }
+    .quickButton {
+      display: inline-block;
+      width: 50px;
+      margin: 0 4px;
+      padding: 5px;
+      border-radius: 8.75px;
+    }
+    .classic #content,
+    .classic .quickButton {
+      border-color: var(--light-blue);
+    }
+  </style>
+  {% block style %}{% endblock %}
+</head>
+
+<body class="{% block color %}{% endblock %}">
+  <div id="quickmenu" class="hidden">
+    <a href="/home" class="quickButton">Home</a>
+    <a href="/chat" class="quickButton">Chat</a>
+    <a href="/tutd" class="quickButton">Polls</a>
+  </div>
+  <div id="content">
+    {% block main %}{% endblock %}
+  </div>
+</body>
+
+<script src="{{url_for('static', filename='js/jquery.js')}}"></script>
+<script src="{{url_for('static', filename='js/socket.io.min.js')}}"></script>
+<script src="{{url_for('static', filename='js/header.js')}}"></script>
+<script>
+  if (!urlParams.get("advanced") && window.location.pathname != "/login") document.getElementById("quickmenu").classList.remove("hidden");
+
+  function contentHeight() {
+    let content = document.getElementById("content");
+    content.style.height = null;
+    if (document.body.clientHeight > window.innerHeight) content.style.height = window.innerHeight - 125 + "px";
+  }
+  window.addEventListener("load", contentHeight);
+  window.addEventListener("resize", contentHeight);
+</script>
+{% block script %}{% endblock %}
+
+</html>
